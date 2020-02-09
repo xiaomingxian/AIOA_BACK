@@ -1,0 +1,290 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cfcc.modules.oaBus.mapper.OaBusdataMapper">
+
+    <!--根据表名,Id查询数据-->
+    <!--<select id="getOneTableInfo" resultType="java.util.Map">-->
+        <!--SELECT *-->
+        <!--FROM #{tableName}-->
+        <!--WHERE -->
+    <!--</select>-->
+
+    <!--根据表名列名查询所有数据-->
+    <select id="getModifyFieldList" resultType="java.util.Map">
+        select ${column} from ${tableName} b
+        <where>
+            <if test="map.size>0">
+                <foreach collection="map" item="value" index="key" separator="and" >
+                    <choose>
+                        <when test="key == 'function_id' and value != null and value != ''">
+                            i_bus_function_id = #{value}
+                        </when>
+                        <when test="key == 's_create_name' and value != null and value != ''">
+                            s_create_name like concat(concat("%",#{value}),"%")
+                        </when>
+                        <when test="key == 'd_create_time' and value != null and value != ''">
+                            d_create_time like concat(concat("%",#{value}),"%")
+                        </when>
+                        <when test="key == 'i_is_state' and value != null and value != ''">
+                            i_is_state = #{value}
+                        </when>
+                        <otherwise>
+                            <if test="value != null and value != ''">
+                                ${key} like concat(concat("%",#{value}),"%")
+                            </if>
+                        </otherwise>
+                    </choose>
+                </foreach>
+            </if>
+        </where>
+        order by b.d_create_time desc
+        limit ${pageNo},${pageSize}
+    </select>
+
+    <!--运维工具列表条数-->
+    <select id="getModifyFieldListTotals" resultType="java.lang.Integer">
+        select count(1) from ${tableName} b
+        <where>
+            <if test="map.size>0">
+                <foreach collection="map" item="value" index="key" separator="and" >
+                    <choose>
+                        <when test="key == 'function_id' and value != null and value != ''">
+                            i_bus_function_id = #{value}
+                        </when>
+                        <when test="key == 's_create_name' and value != null and value != ''">
+                            s_create_name like concat(concat("%",#{value}),"%")
+                        </when>
+                        <when test="key == 'd_create_time' and value != null and value != ''">
+                            d_create_time like concat(concat("%",#{value}),"%")
+                        </when>
+                        <when test="key == 'i_is_state' and value != null and value != ''">
+                            i_is_state = #{value}
+                        </when>
+                        <otherwise>
+                            <if test="value != null and value != ''">
+                                ${key} like concat(concat("%",#{value}),"%")
+                            </if>
+                        </otherwise>
+                    </choose>
+                </foreach>
+            </if>
+        </where>
+    </select>
+
+    <!--运维工具。所以动态字段。修改内容-->
+    <update id="updateAllOaData" parameterType="map">
+        UPDATE ${tableName}
+        <set>
+            <if test="i_bus_model_id !=null and i_bus_model_id !=''">
+                i_bus_model_id=#{i_bus_model_id},
+            </if>
+            <if test="i_bus_function_id !=null and i_bus_function_id !=''">
+                i_bus_function_id=#{i_bus_function_id},
+            </if>
+            <if test="PROC_INST_ID !=null and PROC_INST_ID !=''">
+                PROC_INST_ID=#{PROC_INST_ID},
+            </if>
+            <if test="s_main_unit_names !=null and s_main_unit_names !=''">
+                s_main_unit_names=#{s_main_unit_names},
+            </if>
+            <if test="s_cc_unit_names !=null and s_cc_unit_names !=''">
+                s_cc_unit_names=#{s_cc_unit_names},
+            </if>
+            <if test="s_inside_deptnames !=null and s_inside_deptnames !=''">
+                s_inside_deptnames=#{s_inside_deptnames},
+            </if>
+            <if test="s_report_nuit_names !=null and s_report_nuit_names !=''">
+                s_report_nuit_names=#{s_report_nuit_names},
+            </if>
+            <if test="s_crc_deptnames !=null and s_crc_deptnames !=''">
+                s_crc_deptnames=#{s_crc_deptnames},
+            </if>
+            <if test="s_title !=null and s_title !=''">
+                s_title=#{s_title},
+            </if>
+            <if test="s_left_parameter !=null and s_left_parameter !=''">
+                s_left_parameter=#{s_left_parameter},
+            </if>
+            <if test="s_unit_name !=null and s_unit_name !=''">
+                s_unit_name=#{s_unit_name},
+            </if>
+            <if test="s_dept_name !=null and s_dept_name !=''">
+                s_dept_name=#{s_dept_name},
+            </if>
+            <if test="s_middle_parameter !=null and s_middle_parameter !=''">
+                s_middle_parameter=#{s_middle_parameter},
+            </if>
+            <if test="s_right_parameter !=null and s_right_parameter !=''">
+                s_right_parameter=#{s_right_parameter},
+            </if>
+            <!--<if test="s_right_parameter !=null and s_right_parameter !=''">-->
+                <!--s_right_parameter=#{s_right_parameter}-->
+            <!--</if>-->
+            <if test="s_file_num !=null and s_file_num !=''">
+                s_file_num=#{s_file_num},
+            </if>
+            <!--<if test="iIsRelease !=null and iIsRelease !=''">-->
+                <!--sReportNuitNames=#{iIsRelease}-->
+            <!--</if>-->
+            <if test="i_is_state !=null and i_is_state !=''">
+                i_is_state=#{i_is_state},
+            </if>
+            <if test="i_is_sealdate !=null and i_is_sealdate !=''">
+                i_is_sealdate=#{i_is_sealdate},
+            </if>
+            <if test="i_is_typeset !=null and i_is_typeset !=''">
+                i_is_typeset=#{i_is_typeset},
+            </if>
+            <if test="i_is_approve !=null and i_is_approve !=''">
+                i_is_approve=#{i_is_approve},
+            </if>
+            <if test="i_is_archives !=null and i_is_archives !=''">
+                i_is_archives=#{i_is_archives},
+            </if>
+            <if test="i_is_es !=null and i_is_es !=''">
+                i_is_es=#{i_is_es},
+            </if>
+            <if test="i_is_send !=null and i_is_send !=''">
+                i_is_send=#{i_is_send},
+            </if>
+            <if test="i_is_display !=null and i_is_display !=''">
+                i_is_display=#{i_is_display},
+            </if>
+            <if test="s_remarks !=null and s_remarks !=''">
+                s_remarks=#{s_remarks},
+            </if>
+            <if test="i_create_year !=null and i_create_year !=''">
+                i_create_year=#{i_create_year},
+            </if>
+            <if test="i_create_month !=null and i_create_month !=''">
+                i_create_month=#{i_create_month},
+            </if>
+            <if test="i_create_day !=null and i_create_day !=''">
+                i_create_day=#{i_create_day},
+            </if>
+            <if test="s_create_name !=null and s_create_name !=''">
+                s_create_name=#{s_create_name},
+            </if>
+            <if test="s_create_by !=null and s_create_by !=''">
+                s_create_by=#{s_create_by},
+            </if>
+            <if test="s_create_dept !=null and s_create_dept !=''">
+                s_create_dept=#{s_create_dept},
+            </if>
+            <if test="d_create_time !=null and d_create_time !=''">
+                d_create_time=#{d_create_time},
+            </if>
+            <if test="d_create_time !=null and d_create_time !=''">
+                d_create_time=#{d_create_time},
+            </if>
+            <if test="i_bigint1 !=null and i_bigint1 !=''">
+                i_bigint1=#{i_bigint1},
+            </if>
+            <if test="i_bigint2 !=null and i_bigint2 !=''">
+                i_bigint2=#{i_bigint2},
+            </if>
+            <if test="i_bigint3 !=null and i_bigint3 !=''">
+                i_bigint3=#{i_bigint3},
+            </if>
+            <if test="i_bigint4 !=null and i_bigint4 !=''">
+                i_bigint4=#{i_bigint4},
+            </if>
+            <if test="d_datetime1 !=null and d_datetime1 !=''">
+                d_datetime1=#{d_datetime1},
+            </if>
+            <if test="d_datetime2 !=null and d_datetime2 !=''">
+                d_datetime2=#{d_datetime2},
+            </if>
+            <if test="d_datetime3 !=null and d_datetime3 !=''">
+                d_datetime3=#{d_datetime3},
+            </if>
+            <if test="d_datetime4 !=null and d_datetime4 !=''">
+                d_datetime4=#{d_datetime4},
+            </if>
+            <if test="d_datetime5 !=null and d_datetime5 !=''">
+                d_datetime5=#{d_datetime5},
+            </if>
+            <if test="d_datetime6 !=null and d_datetime6 !=''">
+                d_datetime6=#{d_datetime6},
+            </if>
+            <if test="s_varchar1 !=null and s_varchar1 !=''">
+                s_varchar1=#{s_varchar1},
+            </if>
+            <if test="s_varchar2 !=null and s_varchar2 !=''">
+                s_varchar2=#{s_varchar2},
+            </if>
+            <if test="s_varchar3 !=null and s_varchar3 !=''">
+                s_varchar3=#{s_varchar3},
+            </if>
+            <if test="s_varchar4 !=null and s_varchar4 !=''">
+                s_varchar4=#{s_varchar4},
+            </if>
+            <if test="s_varchar5 !=null and s_varchar5 !=''">
+                s_varchar5=#{s_varchar5},
+            </if>
+            <if test="s_varchar6 !=null and s_varchar6 !=''">
+                s_varchar6=#{s_varchar6},
+            </if>
+            <if test="s_varchar7 !=null and s_varchar7 !=''">
+                s_varchar7=#{s_varchar7},
+            </if>
+            <if test="s_varchar8 !=null and s_varchar8 !=''">
+                s_varchar8=#{s_varchar8},
+            </if>
+            <if test="s_varchar9 !=null and s_varchar9 !=''">
+                s_varchar9=#{s_varchar9},
+            </if>
+            <if test="s_varchar10 !=null and s_varchar10 !=''">
+                s_varchar10=#{s_varchar10},
+            </if>
+            <if test="s_varchar11 !=null and s_varchar11 !=''">
+                s_varchar11=#{s_varchar11},
+            </if>
+            <if test="s_varchar12 !=null and s_varchar12 !=''">
+                s_varchar12=#{s_varchar12},
+            </if>
+            <if test="s_varchar13 !=null and s_varchar13 !=''">
+                s_varchar13=#{s_varchar13},
+            </if>
+            <if test="s_varchar14 !=null and s_varchar14 !=''">
+                s_varchar14=#{s_varchar14},
+            </if>
+            <if test="s_varchar15 !=null and s_varchar15 !=''">
+                s_varchar15=#{s_varchar15},
+            </if>
+            <if test="s_varchar16 !=null and s_varchar16 !=''">
+                s_varchar16=#{s_varchar16},
+            </if>
+            <if test="s_varchar17 !=null and s_varchar17 !=''">
+                s_varchar17=#{s_varchar17},
+            </if>
+            <if test="s_varchar18 !=null and s_varchar18 !=''">
+                s_varchar18=#{s_varchar18},
+            </if>
+            <if test="s_varchar19 !=null and s_varchar19 !=''">
+                s_varchar19=#{s_varchar19},
+            </if>
+            <if test="s_varchar20 !=null and s_varchar20 !=''">
+                s_varchar20=#{s_varchar20},
+            </if>
+            <if test="i_is_1 !=null and i_is_1 !=''">
+                i_is_1=#{i_is_1},
+            </if>
+            <if test="i_is_2 !=null and i_is_2 !=''">
+                i_is_2=#{i_is_2},
+            </if>
+            <if test="i_is_3 !=null and i_is_3 !=''">
+                i_is_3=#{i_is_3},
+            </if>
+            <if test="i_is_4 !=null and i_is_4 !=''">
+                i_is_4=#{i_is_4},
+            </if>
+            <if test="i_is_5 !=null and i_is_5 !=''">
+                i_is_5=#{i_is_5},
+            </if>
+        </set>
+        WHERE i_id = #{i_id}
+    </update>
+
+
+</mapper>

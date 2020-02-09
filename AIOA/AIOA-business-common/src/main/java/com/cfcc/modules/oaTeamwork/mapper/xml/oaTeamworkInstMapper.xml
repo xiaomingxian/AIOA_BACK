@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cfcc.modules.oaTeamwork.mapper.oaTeamworkInstMapper">
+    <insert id="Insert">
+         insert into oa_teamwork_inst
+        (i_id,
+         i_teamwork_id,
+         i_teamwork_set_id,
+         i_bus_model_id,
+         i_bus_function_id,
+         i_version,
+         i_busdata_id,
+         i_order
+        ) values
+        (null,
+        #{iTeamworkId},
+        #{iTeamworkSetId},
+        #{iBusModelId},
+        #{iBusFunctionId},
+        #{iVersion},
+        #{iBusdataId},
+        #{iOrder}
+        )
+    </insert>
+
+    <update id="updateByIid">
+      	UPDATE oa_teamwork_inst SET i_teamwork_set_id = #{iTeamworkSetId},i_teamwork_id = #{iTeamworkId},i_bus_model_id = #{iBusModelId} ,i_bus_function_id = #{iBusFunctionId},i_version = #{iVersion},i_busdata_id =  #{iBusdataId} where i_id = #{iId}
+    </update>
+
+    <delete id="deleteByid">
+         DELETE  from oa_teamwork_inst  where i_id = #{id}
+    </delete>
+
+    <select id="findById" resultType="com.cfcc.modules.oaTeamwork.entity.oaTeamworkInst">
+        SELECT * from oa_teamwork_inst  where i_id = #{iId}
+    </select>
+
+    <select id="findMax" resultType="java.lang.Integer">
+         select max(i_order) from oa_teamwork_inst where i_teamwork_id = #{iteamworkId}
+    </select>
+    <select id="count" resultType="java.lang.Integer">
+        select count(1) from oa_teamwork_inst c
+        <where>
+            c.i_order =1
+            <if test="iId != null  ">
+              and  c.i_id = #{iId}
+            </if>
+            <if test="iTeamworkId!= null  ">
+                and c.i_teamwork_id = #{iTeamworkId}
+            </if>
+            <if test="iTeamworkSetId != null  ">
+                and c.i_teamwork_set_id = #{iTeamworkSetId}
+            </if>
+            <if test="iVersion != null  ">
+                and c.i_version = #{iVersion}
+            </if>
+        </where>
+    </select>
+
+    <select id="findPage" resultType="com.cfcc.modules.oaTeamwork.entity.oaTeamworkInst">
+        select *  from oa_teamwork_inst c
+        <where>
+              c.i_order = 1
+            <if test="oaTeamworkInst.iTeamworkId != null and oaTeamworkInst.iTeamworkId != '' ">
+               c.i_teamwork_id = #{oaTeamworkInst.iTeamworkId}
+            </if>
+            <if test="oaTeamworkInst.iTeamworkSetId != null and oaTeamworkInst.iTeamworkSetId != '' ">
+                and c.i_teamwork_set_id = #{oaTeamworkInst.iTeamworkSetId}
+            </if>
+            <if test="oaTeamworkInst.iVersion != null and oaTeamworkInst.iVersion != '' ">
+                and c.i_version = #{oaTeamworkInst.iVersion}
+            </if>
+        </where>  ORDER BY c.i_order asc
+        limit #{pageNo},#{pageSize}
+    </select>
+    <select id="findList" resultType="com.cfcc.modules.oaTeamwork.entity.oaTeamworkInst">
+        select *  from oa_teamwork_inst c
+        <where>
+            <if test="oaTeamworkInst.iTeamworkId != null and oaTeamworkInst.iTeamworkId != '' ">
+                and  c.i_teamwork_id = #{oaTeamworkInst.iTeamworkId}
+            </if>
+            <if test="oaTeamworkInst.iTeamworkSetId != null and oaTeamworkInst.iTeamworkSetId != '' ">
+                and c.i_teamwork_set_id = #{oaTeamworkInst.iTeamworkSetId}
+            </if>
+            <if test="oaTeamworkInst.iVersion != null and oaTeamworkInst.iVersion != '' ">
+                and c.i_version = #{oaTeamworkInst.iVersion}
+            </if>
+        </where>
+        ORDER BY c.i_order asc
+    </select>
+    <select id="findOrder" resultType="java.lang.Integer">
+      select max(i_order) from oa_teamwork_inst where i_teamwork_id =#{iteamworkId}   GROUP BY i_version
+    </select>
+    <select id="getDataId" resultType="java.lang.Integer">
+        select i_busdata_id from oa_teamwork_inst where i_bus_function_id  = #{iBusFunctionId} and i_version = #{iVersion}
+    </select>
+
+</mapper>

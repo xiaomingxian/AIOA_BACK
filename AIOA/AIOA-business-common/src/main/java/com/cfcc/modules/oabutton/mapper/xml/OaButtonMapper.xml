@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cfcc.modules.oabutton.mapper.OaButtonMapper">
+    <insert id="insertoaButton">
+        insert into oa_button (s_method,s_btn_id, s_btn_name, s_btn_value, s_excbutton_id, s_excfield, i_is_refresh, i_is_checkbus, i_is_defend, i_is_ntko,
+        i_is_print,i_is_printpreview,i_is_saveas,i_is_save,i_is_new,i_is_close,i_is_open,i_is_edit,i_is_copy,i_is_saverevision,i_is_showrevision,
+        i_is_addread,i_is_base
+        ) values (#{sMethod},#{sBtnId},#{sBtnName},#{sBtnValue},#{sExcbuttonId},#{sExcfield},#{iIsRefresh},
+        #{iIsCheckbus},#{iIsDefend},#{iIsNtko},#{iIsPrint},#{iIsPrintpreview},#{iIsSaveas},#{iIsSave},#{iIsNew},
+        #{iIsClose},#{iIsOpen},#{iIsEdit},#{iIsCopy},#{iIsSaverevision},#{iIsShowrevision},#{iIsAddread}
+        ,#{iIsBase}
+        )
+    </insert>
+    <!--编辑-->
+    <update id="updateOaButtonById" parameterType="com.cfcc.modules.oabutton.entity.OaButton">
+        UPDATE oa_button
+        SET s_method=#{sMethod},s_btn_id=#{sBtnId}, s_btn_name=#{sBtnName},s_btn_value=#{sBtnValue},
+        s_excbutton_id=#{sExcbuttonId}, s_excfield=#{sExcfield}, i_is_refresh=#{iIsRefresh},
+        i_is_checkbus=#{iIsCheckbus}, i_is_defend=#{iIsDefend}, i_is_ntko=#{iIsNtko},
+        i_is_print=#{iIsPrint},i_is_printpreview=#{iIsPrintpreview},i_is_saveas=#{iIsSaveas},
+        i_is_save=#{iIsSave},i_is_new=#{iIsNew},i_is_close=#{iIsClose},
+        i_is_open=#{iIsOpen},i_is_edit=#{iIsEdit},i_is_copy=#{iIsCopy},
+        i_is_saverevision=#{iIsSaverevision},i_is_showrevision=#{iIsShowrevision},
+        i_is_addread=#{iIsAddread}
+        ,i_is_base=#{iIsBase}
+        WHERE i_id = #{iId}
+    </update>
+    <!--根据id删除-->
+    <delete id="deleteOaButtonByID">
+        DELETE FROM oa_button WHERE i_id = #{id}
+    </delete>
+
+    <!--条件查询统计条数-->
+    <select id="queryButtonCount" resultType="java.lang.Integer" parameterType="com.cfcc.modules.oabutton.entity.OaButton">
+
+        select  count(i_id) as total from oa_button
+        <where>
+            <if test="sBtnId != null and sBtnId != ''">
+                s_btn_id=#{sBtnId}
+            </if>
+            <if test="sBtnName !=null and sBtnName!=''">
+                and s_btn_name=#{sBtnName}
+            </if>
+            <if test="sBtnValue !=null and sBtnValue!=''">
+                and s_btn_value=#{sBtnValue}
+            </if>
+            <if test="sExcbuttonId !=null and sExcbuttonId!=''">
+                and s_excbutton_id=#{sExcbuttonId}
+            </if>
+            <if test="iIsDefend !=null and iIsDefend!=''">
+                and i_is_defend=#{iIsDefend}
+            </if>
+        </where>
+
+    </select>
+    <!--分页查询-->
+    <select id="queryButton" resultType="com.cfcc.modules.oabutton.entity.OaButton">
+        select *
+        from oa_button
+        <where>
+            <!--<if test="button.sBtnId != null and button.sBtnId != ''">-->
+                <!--s_btn_id=#{button.sBtnId}-->
+            <!--</if>-->
+            <if test="button.sBtnName !=null and button.sBtnName!=''">
+                and s_btn_name=#{button.sBtnName}
+            </if>
+            <!--<if test="button.sBtnValue !=null and button.sBtnValue!=''">-->
+                <!--and s_btn_value=#{button.sBtnValue}-->
+            <!--</if>-->
+            <!--<if test="button.sExcbuttonId !=null and button.sExcbuttonId!=''">-->
+                <!--and s_excbutton_id=#{button.sExcbuttonId}-->
+            <!--</if>-->
+            <!--<if test="button.iIsDefend !=null and button.iIsDefend!=''">-->
+                <!--and i_is_defend=#{button.iIsDefend}-->
+            <!--</if>-->
+        </where>
+        ORDER BY i_id desc
+        limit #{pageNo},#{pageSize}
+    </select>
+    <!--根据id查询-->
+    <select id="queryById" resultType="com.cfcc.modules.oabutton.entity.OaButton">
+        select s_btn_id, s_btn_name, s_btn_value, s_excbutton_id, s_excfield, i_is_refresh, i_is_checkbus, i_is_defend, i_is_ntko,
+        i_is_print,i_is_printpreview,i_is_saveas,i_is_save,i_is_new,i_is_close,i_is_open,i_is_edit,i_is_copy,i_is_saverevision,i_is_showrevision,
+        i_is_addread,i_is_base
+        from oa_button where i_id = #{id}
+    </select>
+    <!--按钮配置-->
+    <select id="buttonList" resultType="com.cfcc.modules.oabutton.entity.OaButton">
+        select i_id, s_btn_id, s_btn_name, s_btn_value, s_excbutton_id, s_excfield, i_is_refresh, i_is_checkbus, i_is_defend, i_is_ntko,
+        i_is_print,i_is_printpreview,i_is_saveas,i_is_save,i_is_new,i_is_close,i_is_open,i_is_edit,i_is_copy,i_is_saverevision,i_is_showrevision,
+        i_is_addread,i_is_base from oa_button
+    </select>
+    <select id="findList" resultType="com.cfcc.modules.oabutton.entity.OaButton">
+        select * from oa_button
+    </select>
+</mapper>

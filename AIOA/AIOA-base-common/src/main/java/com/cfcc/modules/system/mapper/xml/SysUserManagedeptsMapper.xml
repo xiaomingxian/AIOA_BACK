@@ -1,0 +1,141 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cfcc.modules.system.mapper.SysUserManagedeptsMapper">
+
+
+    <delete id="deleteListById">
+        delete from sys_user_managedepts
+        <where>
+            1 = 1
+            and i_id in
+            <foreach collection="list" item="value" index="key" separator=" , " open="(" close=")">
+                <if test=" value != null and value != ''">
+                  #{value}
+                </if>
+            </foreach>
+        </where>
+    </delete>
+
+
+    <select id="findByUserIdAndDepartId" resultType="java.util.Map">
+
+        select * from sys_user_managedepts
+        <where>
+            1 =1
+            <if test="userId != null and userId != ''">
+                and  s_user_id = #{userId}
+            </if>
+            <if test="list.size != 0">
+                and s_dept_id in
+                <foreach collection="list" item="key" open="(" close=")" separator=",">
+                    #{key}
+                </foreach>
+            </if>
+        </where>
+    </select>
+
+    <select id="findUserManagedepts" resultType="java.util.Map">
+        SELECT
+        i_id id, s_user_id userId, s_dept_id deptId
+        FROM
+        sys_user_managedepts
+        <where>
+            <if test="userId != null and userId != ''">
+                s_user_id = #{userId}
+            </if>
+            limit #{start},#{pageSize}
+        </where>
+
+    </select>
+
+
+    <select id="findUserId" resultType="string">
+        SELECT
+        id
+        FROM
+        sys_user
+        <where>
+            1 = 1
+            <if test="username != null and username != ''">
+                and username = #{username}
+            </if>
+        </where>
+    </select>
+
+    <delete id="removeByIdAndDeptId">
+        delete from sys_user_managedepts
+         <where>
+             1 = 1
+             <if test="userId != null and userId != ''">
+                 and s_user_id = #{userId}
+             </if>
+             <if test="deptId != null and deptId != ''">
+                 and s_dept_id = #{deptId}
+             </if>
+         </where>
+    </delete>
+
+    <select id="findTotal" resultType="long">
+        SELECT
+        count(i_id)
+        FROM
+        sys_user_managedepts
+        <where>
+            s_user_id IN (
+            SELECT
+            id
+            FROM
+            sys_user
+            <where>
+                <if test="username != null and username != ''">
+                    username = #{username}
+                </if>
+            </where>
+            )
+        </where>
+    </select>
+
+    <select id="findDepartNameByDeptId" resultType="java.util.Map">
+        select depart_name departName, parent_id parentId from sys_depart where id = #{sDeptId}
+    </select>
+
+    <select id="findUserIdByUserName" resultType="java.util.Map">
+        SELECT
+            i_id id, s_user_id userId, s_dept_id deptId
+        FROM
+            sys_user_managedepts
+        <where>
+            s_user_id IN (
+            SELECT
+            id
+            FROM
+            sys_user
+            <where>
+                <if test="username != null and username != ''">
+                    username = #{username}
+                </if>
+            </where>
+            )
+            limit #{start},#{pageSize}
+        </where>
+
+    </select>
+
+    <select id="findDepartIdByUserId" resultType="long">
+		select count(i_id) from sys_user_managedepts
+		<where>
+            1 = 1
+            <if test="userId != null and userId != ''">
+                and s_user_id = #{userId}
+            </if>
+            <if test="departId != null and departId != ''">
+                and s_dept_id = #{departId}
+            </if>
+        </where>
+	</select>
+
+    <!--useGeneratedKeys="true"-->
+    <insert id="saveDepartIdByUserId">
+        insert into sys_user_managedepts(s_user_id, s_dept_id)values (#{userId}, #{departId})
+    </insert>
+</mapper>

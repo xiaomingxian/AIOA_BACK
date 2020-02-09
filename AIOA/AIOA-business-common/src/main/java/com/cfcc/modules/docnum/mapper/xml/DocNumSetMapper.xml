@@ -1,0 +1,129 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cfcc.modules.docnum.mapper.DocNumSetMapper">
+
+    <select id="queryById" parameterType="integer" resultType="com.cfcc.modules.docnum.entity.DocNumSet">
+        SELECT i_utemplate_id,i_dtemplate_id,i_atemplate_id FROM oa_docnum WHERE i_id = #{id}
+    </select>
+
+    <!--根据id查询-->
+    <select id="selectDocNumById" parameterType="integer" resultType="com.cfcc.modules.docnum.entity.DocNumSet">
+        SELECT  i_id, i_bus_model_id, i_bus_function_id, i_order, s_name, s_doc_rule, i_doc_num, i_utemplate_id, i_dtemplate_id, i_atemplate_id, s_remarks, s_create_by, d_create_time, s_update_by, d_update_time
+        FROM oa_docnum WHERE i_id = #{id}
+    </select>
+    <!--分页查询-->
+    <select id="selectDocNumList"  resultType="com.cfcc.modules.docnum.entity.DocNumSet">
+        SELECT
+        d.i_id,
+        d.i_bus_model_id,
+        bm.s_name AS mName,
+        d.i_bus_function_id,
+        bf.s_name AS fName,
+        d.i_order,
+        d.s_name,
+        d.s_doc_rule,
+        d.i_doc_num,
+        d.i_utemplate_id,
+        d.i_dtemplate_id,
+        d.i_atemplate_id,
+        d.s_remarks,
+        d.s_create_by,
+        d.d_create_time,
+        d.s_update_by,
+        d.d_update_time
+        FROM
+        oa_docnum AS d
+        LEFT JOIN oa_bus_model bm ON bm.i_id = d.i_bus_model_id
+        LEFT JOIN oa_bus_function bf ON bf.i_id = d.i_bus_function_id
+        <where>
+            <if test="doc.iBusModelId != null and doc.iBusModelId != ''">
+                d.i_bus_model_id=#{doc.iBusModelId}
+            </if>
+            <if test="doc.iBusFunctionId != null and doc.iBusFunctionId != ''">
+                and d.i_bus_function_id=#{doc.iBusFunctionId}
+            </if>
+            <if test="doc.sName !=null and doc.sName!=''">
+                and d.s_name=#{doc.sName}
+            </if>
+        </where>
+        ORDER BY d_create_time DESC
+        limit #{pageNo},#{pageSize}
+    </select>
+
+    <!--条件查询统计条数-->
+    <select id="selectDocNumTotal"  resultType="integer">
+        select  count(i_id) as total from oa_docnum
+        <where>
+            <if test="iBusModelId != null and iBusModelId != ''">
+                i_bus_model_id=#{iBusModelId}
+            </if>
+            <if test="iBusFunctionId != null and iBusFunctionId != ''">
+               and i_bus_function_id=#{iBusFunctionId}
+            </if>
+            <if test="sName !=null and sName!=''">
+                and s_name=#{sName}
+            </if>
+        </where>
+    </select>
+
+    <!--查询模块下拉列表-->
+    <select id="busModelList" resultType="com.cfcc.modules.oaBus.entity.BusModel">
+        SELECT i_id,s_name FROM oa_bus_model
+    </select>
+
+    <!--查询业务下拉列表-->
+    <select id="busFunctionList" resultType="com.cfcc.modules.oaBus.entity.BusFunction">
+        SELECT i_id,i_bus_model_id,s_name  FROM oa_bus_function where  i_bus_model_id = #{ibusModelId}
+    </select>
+
+    <!--根据当前文号查询关联部门id-->
+    <select id="selectDepartIds" resultType="java.lang.String">
+        SELECT GROUP_CONCAT(s_dept_id) FROM oa_docnum_dept WHERE i_docnum_id = #{docId}
+    </select>
+
+    <!--根据id查询关联部门-->
+    <select id="selectDepartByIds" resultType="com.cfcc.modules.system.entity.SysDepart">
+        SELECT id, depart_name FROM sys_depart WHERE id in  (${depIdList})
+    </select>
+
+    <!--根据业务id查询对应文号列表 -->
+    <select id="getDocNumNameList" resultType="com.cfcc.modules.docnum.entity.DocNumSet">
+        SELECT od.i_id, od.s_name
+          FROM oa_docnum as od
+        LEFT JOIN oa_docnum_dept as op ON op.i_docnum_id = od.i_id
+          WHERE od.i_bus_function_id = #{iBusFunctionId}
+          AND (op.s_dept_id = "" OR op.s_dept_id = #{sDeptId})
+    </select>
+
+    <!--新增文号配置-->
+    <insert id="insertDocNum" parameterType="com.cfcc.modules.docnum.entity.DocNumSet">
+        INSERT INTO oa_docnum (i_id,i_bus_model_id,i_bus_function_id,i_order,s_name,s_doc_rule,i_doc_num,i_utemplate_id,
+                     i_dtemplate_id,i_atemplate_id,s_remarks,s_create_by,d_create_time)
+        VALUES(0,#{iBusModelId},#{iBusFunctionId},#{iOrder},#{sName},#{sDocRule},#{iDocNum},#{iUtemplateId},#{iDtemplateId},#{iAtemplateId},#{sRemarks},#{sCreateBy},NOW())
+        <selectKey resultType="integer" keyProperty="iId" order="AFTER">
+            SELECT LAST_INSERT_ID()
+        </selectKey>
+    </insert>
+
+    <!--新增文号关联部门表-->
+    <insert id="insertDepart">
+        INSERT INTO oa_docnum_dept (i_id, i_docnum_id ,s_dept_id)VALUES(0,#{docId},#{departId})
+    </insert>
+
+    <!--根据id修改-->
+    <update id="updateDocNumById" parameterType="com.cfcc.modules.docnum.entity.DocNumSet">
+        UPDATE oa_docnum
+        SET i_bus_model_id=#{iBusModelId}, i_bus_function_id=#{iBusFunctionId}, i_order=#{iOrder}, s_name=#{sName}, s_doc_rule=#{sDocRule}, i_doc_num=#{iDocNum}, i_utemplate_id=#{iUtemplateId}, i_dtemplate_id=#{iDtemplateId}, i_atemplate_id=#{iAtemplateId}, s_remarks=#{sRemarks},s_update_by=#{sUpdateBy}, d_update_time=now()
+        WHERE i_id = #{iId}
+    </update>
+
+    <!--根据id删除-->
+    <delete id="deleteDocNumByIID">
+        DELETE FROM oa_docnum WHERE i_id = #{id}
+    </delete>
+
+    <!--文号关联部门信息修改-->
+    <delete id="deleteDocNumDeptByIdocId">
+        DELETE FROM oa_docnum_dept WHERE i_docnum_id= #{docId}
+    </delete>
+</mapper>

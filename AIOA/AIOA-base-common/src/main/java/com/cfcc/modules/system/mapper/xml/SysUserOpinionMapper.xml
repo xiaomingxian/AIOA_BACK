@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cfcc.modules.system.mapper.SysUserOpinionMapper">
+
+    <!--  修改 -->
+    <update id="updateByIid" parameterType="com.cfcc.modules.system.entity.SysUserOpinion">
+		UPDATE sys_user_opinion SET s_user_id = #{sUserId} ,i_order = #{iOrder} ,s_content = #{sContent} where i_id = #{iId}
+	</update>
+    <!-- 删除-->
+    <delete id="deleteByIidd" parameterType="String">
+        DELETE from sys_user_opinion  where i_id = #{id}
+    </delete>
+    <!-- 根据Id查询-->
+    <select id="findById" resultType="com.cfcc.modules.system.entity.SysUserOpinion" parameterType="integer">
+        SELECT * from sys_user_opinion  where i_id = #{iId}
+    </select>
+    <!-- <delete id="delectIds" >
+         delete from sys_user_opinion where i_id in <foreach collection="array" item="ids" open="(" separator="," close=")" >#{ids}</foreach>
+     </delete>-->
+
+    <select id="count" resultType="integer">
+        select count(1) from sys_user_opinion c
+        <where>
+            <if test="iId != null  ">
+                c.i_id = #{iId}
+            </if>
+            <if test="iOrder != null  ">
+                and c.i_order = #{iOrder}
+            </if>
+            <if test="sContent != null  ">
+                and c.s_content = #{sContent}
+            </if>
+            <if test="sUserId != null  ">
+                and c.s_user_id = #{sUserId}
+            </if>
+        </where>
+
+    </select>
+
+    <select id="findPage" resultType="com.cfcc.modules.system.entity.SysUserOpinion">
+        select * from sys_user_opinion c
+        <where>
+            <if test="sysUserOpinion.iId != null and sysUserOpinion.iId != '' ">
+                c.i_id = #{sysUserOpinion.iId}
+            </if>
+            <if test="sysUserOpinion.iOrder != null and sysUserOpinion.iOrder != '' ">
+                and c.i_order = #{sysUserOpinion.iOrder}
+            </if>
+            <if test="sysUserOpinion.sContent != null and sysUserOpinion.sContent != '' ">
+                and c.s_content = #{sysUserOpinion.sContent}
+            </if>
+            <if test="sysUserOpinion.sUserId != null and sysUserOpinion.sUserId != '' ">
+                and c.s_user_id = #{sysUserOpinion.sUserId}
+            </if>
+        </where>
+        limit #{pageNo},#{pageSize}
+    </select>
+
+    <!--查询用户个人意见-->
+    <select id="queryUserOpinion" resultType="com.cfcc.modules.system.entity.SysUserOpinion">
+      SELECT s_content FROM sys_user_opinion WHERE s_user_id = #{sUserId} ORDER BY i_order
+    </select>
+
+
+</mapper>

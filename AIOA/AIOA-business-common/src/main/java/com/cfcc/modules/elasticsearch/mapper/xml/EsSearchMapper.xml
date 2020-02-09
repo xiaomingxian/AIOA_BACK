@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cfcc.modules.elasticsearch.mapper.EsSearchMapper">
+    <insert id="insertSearchFrequency">
+        insert into oa_es_search(key_word,frequency) values (#{keyword},1)
+    </insert>
+
+    <update id="updateSearchFrequency">
+        update oa_es_search set frequency = frequency + 1 where id = #{id}
+    </update>
+
+    <select id="getSearchFrequency" resultType="java.lang.Integer">
+        select id from oa_es_search where key_word = #{keyWord}
+    </select>
+
+    <select id="selectEsSearch" resultType="com.cfcc.modules.elasticsearch.entity.EsSearch" >
+        select * from oa_es_search
+        <if test="keyWord != null and keyWord != ''">
+            where key_word like concat(#{keyWord},'%')
+        </if>
+        order by frequency desc limit 0,5
+    </select>
+
+</mapper>

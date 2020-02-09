@@ -1,0 +1,440 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cfcc.modules.oaBus.mapper.OaBusdataMapper">
+
+    <select id="getBusdataByOaFile" resultType="java.lang.String">
+        select s_title from ${sTable}
+        where i_id = #{iTableId}
+    </select>
+
+    <select id="getBusdataIidByTable" resultType="java.lang.Integer">
+        select i_id from ${sBusdataTable} where  i_bus_model_id = #{iId}
+    </select>
+
+    <update id="updateIsESByid">
+        update ${tableName} set i_is_es = 2 where i_id = #{id}
+    </update>
+
+    <select id="queryBusdataCount" resultType="java.lang.Integer">
+        select count(1) from oa_busdata1
+        <!--<where>
+            <if test=""></if>
+        </where>-->
+    </select>
+    <select id="queryBusdata" resultType="com.cfcc.modules.oaBus.entity.OaBusdata">
+
+        select * from oa_busdata1
+    </select>
+
+    <select id="getBusdataByTable" resultType="java.util.Map">
+        select i_id ,i_bus_function_id
+        <if test="columnLists != null and columnLists != ''">
+            ,${columnLists}
+        </if>
+          from ${busFunction.sBusdataTable}
+        <where>
+            <if test="busFunction.iId != null">
+                i_bus_model_id = #{busFunction.iBusModelId}
+            </if>
+            and i_is_es in (1,3)
+        </where>
+    </select>
+
+    <select id="getBusdataByIdDao" resultType="com.cfcc.modules.oaBus.entity.OaBusdata">
+        select * from oa_busdata1 c  where c.i_id = #{iId}
+    </select>
+    <select id="getTableColListDao" resultType="com.cfcc.modules.oaBus.entity.TableCol">
+        SELECT
+            DISTINCT(column_name) AS s_table_column,
+            column_comment AS s_column_name
+        FROM
+            information_schema.`COLUMNS`
+        WHERE
+            TABLE_NAME = #{tableName}
+    </select>
+    <select id="queryIsDetailDefault" resultType="com.cfcc.modules.oaBus.entity.BusPageDetail">
+        select * from oa_bus_page_detail c where c.i_bus_page_id = #{iPageId}  LIMIT 0,1
+    </select>
+    <select id="queryTabeleNameByModelId" resultType="java.lang.String">
+      select c.s_busdata_table  from oa_bus_model c where c.i_id = #{modelId};
+    </select>
+
+    <!--根据页面id查询出列的名字和含义-->
+    <select id="getTableColListByPageID" resultType="com.cfcc.modules.oaBus.entity.TableCol">
+        select c.s_table_column  ,c.s_column_name  from oa_bus_page_detail c where c.i_bus_page_id = #{iPageId} and c.i_is_default = 1
+    </select>
+    <select id="getBusdataByCondition" resultType="java.util.Map">
+        select ${column} from ${tableName}
+
+        <if test="map.size>0">
+            where
+            <foreach collection="map" item="value" index="key" separator=" and ">
+                ${key} like concat(concat("%",#{value}),"%")
+            </foreach>
+        </if>
+    </select>
+    <select id="getBusdataById" resultType="java.util.Map">
+        select * from ${tableName} where i_id = #{tableId}
+    </select>
+    <select id="queryUserManagedepts" resultType="java.lang.String">
+        select c.s_dept_id from sys_user_managedepts c where c.s_user_id = #{userId}
+    </select>
+    <select id="getDataIdfromPermit" resultType="java.lang.String">
+
+        select GROUP_CONCAT(i_busdata_id) from ${tableName} c where c.i_bus_function_id = #{funid} and c.s_user_id = #{userId} and c.s_userdept_id in (${unit})
+    </select>
+
+<!--一级折叠列表 任务环节列表-->
+    <select id="getTaskNameList" resultType="java.lang.String">
+        select  DISTINCT s_cur_task_name from ${tableName} where s_cur_task_name!='newtask-新建任务' and s_cur_task_name is not NULL
+    </select>
+
+    <!--折叠二级-根据环节查询不带分页,,,带权限-->
+    <select id="getBusdataByMapNoPages" resultType="java.util.Map">
+        select ${column} from ${tableName} b where
+        s_cur_task_name like concat("%",#{taskName},"%")
+        <if test="map.size>0">
+            <foreach collection="map" item="value" index="key" separator=" and ">
+                <choose>
+                    <when test="key == 'function_id' and value != null and value != ''">
+                      and  i_bus_function_id = #{value}
+                    </when>
+                    <when test="key == 's_create_name' and value != null and value != ''">
+                        and  s_create_name like concat(concat("%",#{value}),"%")
+                    </when>
+                    <when test="key == 'd_create_time' and value != null and value != ''">
+                        and  d_create_time like concat(concat("%",#{value}),"%")
+                    </when>
+                    <when test="key == 'i_is_state' and value != null and value != ''">
+                        and  i_is_state = #{value}
+                    </when>
+                    <otherwise>
+                        <if test="value != null and value != ''">
+                            and ${key} like concat(concat("%",#{value}),"%")
+                        </if>
+                    </otherwise>
+                </choose>
+
+            </foreach>
+        </if>
+        and (
+        s_create_by = #{userId}
+        <if test="permitData.size>0">
+            or
+            <foreach collection="permitData" item="value" index="key" separator=" and " open="(" close=")">
+                ${key} in (${value})
+            </foreach>
+        </if>
+        or (
+        exists(
+        SELECT * FROM ${tableName}_permit p
+        WHERE b.i_id=p.i_busdata_id
+        AND (
+        p.s_user_id=#{userId}
+        OR (p.s_user_id IS NULL AND p.s_userdept_id in (${userDepart}) )
+        OR (p.s_user_id IS NULL AND p.s_userdept_id IS NULL AND p.s_userunit_id in (${userUnit}))
+        )
+        )
+        )
+        )
+        order by
+        <choose>
+            <when test="orderFlag != ''">
+                b.${orderFlag}
+            </when>
+            <otherwise>
+                b.d_create_time desc
+            </otherwise>
+        </choose>
+    </select>
+
+    <select id="getBusdataByMap" resultType="java.util.Map">
+        select ${column} from ${tableName} b where
+        b.i_is_display = 0 and
+        <if test="map.size>0">
+            <foreach collection="map" item="value" index="key" separator=" and ">
+                <choose>
+                    <when test="key == 'function_id' and value != null and value != ''">
+                        i_bus_function_id = #{value}
+                    </when>
+                    <when test="key == 's_create_name' and value != null and value != ''">
+                        s_create_name like concat(concat("%",#{value}),"%")
+                    </when>
+                    <when test="key == 'd_create_time' and value != null and value != ''">
+                        d_create_time like concat(concat("%",#{value}),"%")
+                    </when>
+                    <when test="key == 'i_is_state' and value != null and value != ''">
+                        i_is_state = #{value}
+                    </when>
+                    <otherwise>
+                        <if test="value != null and value != ''">
+                            ${key} like concat(concat("%",#{value}),"%")
+                        </if>
+                    </otherwise>
+                </choose>
+
+            </foreach>
+        </if>
+        and (
+        s_create_by = #{userId}
+        <if test="permitData.size>0">
+            or
+            <foreach collection="permitData" item="value" index="key" separator=" and " open="(" close=")">
+                 ${key} in (${value})
+            </foreach>
+        </if>
+        or (
+        exists(
+        SELECT * FROM ${tableName}_permit p
+        WHERE b.i_id=p.i_busdata_id
+        AND (
+        p.s_user_id=#{userId}
+        OR (p.s_user_id IS NULL AND p.s_userdept_id in (${userDepart}) )
+        OR (p.s_user_id IS NULL AND p.s_userdept_id IS NULL AND p.s_userunit_id in (${userUnit}))
+        )
+        )
+        )
+        )
+        order by
+        <choose>
+            <when test="orderFlag != ''">
+                b.${orderFlag}
+            </when>
+            <otherwise>
+                b.d_create_time desc
+            </otherwise>
+        </choose>
+        limit ${pageNo},${pageSize}
+    </select>
+    <select id="getBusdataByMapTotal" resultType="int">
+        select count(*) from ${tableName} b where
+        b.i_is_display = 0 and
+        <if test="map.size>0">
+            <foreach collection="map" item="value" index="key" separator=" and ">
+                <choose>
+                    <when test="key == 'function_id' and value != null and value != ''">
+                        i_bus_function_id = #{value}
+                    </when>
+                    <when test="key == 's_create_name' and value != null and value != ''">
+                        s_create_name like concat(concat("%",#{value}),"%")
+                    </when>
+                    <when test="key == 'd_create_time' and value != null and value != ''">
+                        d_create_time like concat(concat("%",#{value}),"%")
+                    </when>
+                    <when test="key == 'i_is_state' and value != null and value != ''">
+                        i_is_state = #{value}
+                    </when>
+                    <otherwise>
+                        <if test="value != null and value != ''">
+                            ${key} like concat(concat("%",#{value}),"%")
+                        </if>
+                    </otherwise>
+                </choose>
+
+            </foreach>
+        </if>
+        and (
+        s_create_by = #{userId}
+        <if test="permitData.size>0">
+            or
+            <foreach collection="permitData" item="value" index="key" separator=" and " open="(" close=")">
+                <![CDATA[ ${key} in (${value}) ]]>
+            </foreach>
+        </if>
+        or (
+        exists(
+        SELECT * FROM ${tableName}_permit p
+        WHERE b.i_id=p.i_busdata_id
+        AND (
+        p.s_user_id=#{userId}
+        OR (p.s_user_id IS NULL AND p.s_userdept_id in (${userDepart}) )
+        OR (p.s_user_id IS NULL AND p.s_userdept_id IS NULL AND p.s_userunit_id in (${userUnit}))
+        )
+        )
+        )
+        )
+    </select>
+    <select id="getSelFunDao" resultType="java.util.Map">
+        select c.i_id,c.s_name from oa_bus_function c  where c.i_bus_model_id = #{modelId}
+    </select>
+    <select id="getBusDataUserDepartDao" resultType="java.util.Map">
+       select d.depart_name,p.username ,d.org_code from sys_depart d,
+       (select c.username ,c.org_code from sys_user c where c.username = #{admin}) p
+       where p.org_code = d.org_code;
+    </select>
+
+    <!--公文链接条件查询-->
+    <select id="selectDocList" resultType="com.cfcc.modules.oaBus.entity.OaBusdata">
+        SELECT s_file_num,s_title,s_unit_name,s_dept_name, i_create_day,d_create_time FROM ${table} bd LEFT JOIN
+        oa_bus_model bm on bm.i_id = bd.i_bus_model_id
+        <where>
+            <if test="bdata.iBusModelId != null and bdata.iBusModelId != ''">
+                bd.i_bus_model_id=#{bdata.iBusModelId}
+            </if>
+            <if test="bdata.sFileNum != null and bdata.sFileNum != ''">
+                AND bd.s_file_num = #{bdata.sFileNum}
+            </if>
+            <if test="bdata.sTitle != null and bdata.sTitle != ''">
+                AND bd.s_title=#{bdata.sTitle}
+            </if>
+        </where>
+        limit #{pageNo},#{pageSize}
+    </select>
+
+    <!--统计公文链接数量-->
+    <select id="getDocListTotal" resultType="java.lang.Integer">
+        SELECT count(i_id) FROM ${table} as bd
+        <where>
+            <if test="bdata.iBusModelId != null and bdata.iBusModelId != ''">
+                bd.i_bus_model_id=#{bdata.iBusModelId}
+            </if>
+            <if test="bdata.sFileNum != null and bdata.sFileNum != ''">
+                AND bd.s_file_num = #{bdata.sFileNum}
+            </if>
+            <if test="bdata.sTitle != null and bdata.sTitle != ''">
+                AND bd.s_title=#{bdata.sTitle}
+            </if>
+        </where>
+    </select>
+
+<!--折叠二级-根据环节查询不带分页,无权限-->
+    <select id="getBusdataByCreateNameNoPages" resultType="java.util.Map">
+        select ${column} from ${tableName} b where
+        s_cur_task_name like concat(concat("%",#{taskName}),"%")
+        <if test="map.size>0">
+            <foreach collection="map" item="value" index="key" separator=" and ">
+                <choose>
+                    <when test="key == 'function_id' and value != null and value != ''">
+                        i_bus_function_id = #{value}
+                    </when>
+                    <when test="key == 's_create_name' and value != null and value != ''">
+                        s_create_name like concat(concat("%",#{value}),"%")
+                    </when>
+                    <when test="key == 'd_create_time' and value != null and value != ''">
+                        d_create_time like concat(concat("%",#{value}),"%")
+                    </when>
+                    <when test="key == 'i_is_state' and value != null and value != ''">
+                        i_is_state = #{value}
+                    </when>
+                    <otherwise>
+                        <if test="value != null and value != ''">
+                            ${key} like concat(concat("%",#{value}),"%")
+                        </if>
+                    </otherwise>
+                </choose>
+
+            </foreach>
+        </if>
+        and s_create_name = #{userName}
+        order by
+        <choose>
+        <when test="orderFlag != ''">
+            b.${orderFlag}
+        </when>
+        <otherwise>
+            b.d_create_time desc
+        </otherwise>
+        </choose>
+    </select>
+
+    <select id="getBusdataByCreateName" resultType="java.util.Map">
+        select ${column} from ${tableName} b where
+        b.i_is_display = 0 and
+        <if test="map.size>0">
+            <foreach collection="map" item="value" index="key" separator=" and ">
+                <choose>
+                    <when test="key == 'function_id' and value != null and value != ''">
+                        i_bus_function_id = #{value}
+                    </when>
+                    <when test="key == 's_create_name' and value != null and value != ''">
+                        s_create_name like concat(concat("%",#{value}),"%")
+                    </when>
+                    <when test="key == 'd_create_time' and value != null and value != ''">
+                        d_create_time like concat(concat("%",#{value}),"%")
+                    </when>
+                    <when test="key == 'i_is_state' and value != null and value != ''">
+                        i_is_state = #{value}
+                    </when>
+                    <otherwise>
+                        <if test="value != null and value != ''">
+                            ${key} like concat(concat("%",#{value}),"%")
+                        </if>
+                    </otherwise>
+                </choose>
+
+            </foreach>
+        </if>
+        and s_create_name = #{userName}
+        order by
+        <choose>
+            <when test="orderFlag != ''">
+                b.${orderFlag}
+            </when>
+            <otherwise>
+                b.d_create_time desc
+            </otherwise>
+        </choose>
+        limit ${pageNo},${pageSize}
+
+    </select>
+    <select id="getBusdataByCreateNameCount" resultType="java.lang.Integer">
+
+        select count(*) from ${tableName} b where
+        b.i_is_display = 0 and
+        <if test="map.size>0">
+            <foreach collection="map" item="value" index="key" separator=" and ">
+                <choose>
+                    <when test="key == 'function_id' and value != null and value != ''">
+                        i_bus_function_id = #{value}
+                    </when>
+                    <when test="key == 's_create_name' and value != null and value != ''">
+                        s_create_name like concat(concat("%",#{value}),"%")
+                    </when>
+                    <when test="key == 'd_create_time' and value != null and value != ''">
+                        d_create_time like concat(concat("%",#{value}),"%")
+                    </when>
+                    <when test="key == 'i_is_state' and value != null and value != ''">
+                        i_is_state = #{value}
+                    </when>
+                    <otherwise>
+                        <if test="value != null and value != ''">
+                            ${key} like concat(concat("%",#{value}),"%")
+                        </if>
+                    </otherwise>
+                </choose>
+
+            </foreach>
+        </if>
+        and s_create_name = #{userName}
+    </select>
+
+    <!--修改文头-->
+    <update id="updateMiddleById">
+        UPDATE ${table} SET s_middle_parameter=#{oabus.sMiddleParameter} WHERE i_id = #{oabus.iId}
+    </update>
+
+    <select id="queryValue" resultType="java.lang.String">
+        select #{sTableColumn} from ${tableName} where i_id=#{tableid}
+    </select>
+
+    <select id="listCountBytableName" resultType="java.lang.Integer">
+         select count(*) from ${tableName}
+         <where>
+             <if test="iBusFunctionId!=null and iBusFunctionId!=''">
+                 and i_bus_function_id=#{iBusFunctionId}
+             </if>
+             <if test="iBusModelId!=null and iBusModelId!=''">
+                 and i_bus_model_id=#{iBusModelId}
+             </if>
+         </where>
+    </select>
+
+    <select id="queryFuncitonDataById" resultType="java.util.Map">
+        SELECT f.i_bus_model_id  modelId,m.s_name mName,f.i_id fucntionId,f.s_name fName
+        FROM oa_bus_function f
+        LEFT JOIN oa_bus_model m ON m.i_id = f.i_bus_model_id
+        WHERE f.i_id =#{functionId}
+    </select>
+
+
+</mapper>

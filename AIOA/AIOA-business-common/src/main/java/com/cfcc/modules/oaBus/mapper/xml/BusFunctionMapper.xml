@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cfcc.modules.oaBus.mapper.BusFunctionMapper">
+    <update id="updateBusFunctionByIdDao">
+        update oa_bus_function set i_proc_set_id = #{iProcSetId} where i_id = #{iId} ;
+    </update>
+
+    <!--根据id删除数据-->
+    <delete id="delBusFunctionById">
+        delete from oa_bus_function  where i_id = #{id}
+    </delete>
+
+    <select id="getFunByIsEs" resultType="com.cfcc.modules.oaBus.entity.BusFunction">
+        select distinct i_bus_model_id, i_id, s_name  from oa_bus_function c where c.i_is_es = 1
+    </select>
+
+    <select id="queryBusFunctionCount" resultType="java.lang.Integer">
+
+        select count(*) from oa_bus_function c
+        <where>
+            <if test="iBusModelId != null and iBusModelId != '' ">
+                c.i_bus_model_id = #{iBusModelId}
+            </if>
+            <if test="sName != null and sName != '' ">
+                and c.s_name = #{sName}
+            </if>
+        </where>
+    </select>
+    <select id="queryBusFunction" resultType="com.cfcc.modules.oaBus.entity.BusFunction">
+
+        select * from oa_bus_function c
+        <where>
+            <if test="busFunction.iBusModelId != null and busFunction.iBusModelId != '' ">
+                c.i_bus_model_id = #{busFunction.iBusModelId}
+            </if>
+            <if test="busFunction.sName != null and busFunction.sName != '' ">
+                and c.s_name = #{busFunction.sName}
+            </if>
+        </where>
+        <choose>
+            <when test="column != null and column != ''">
+                order by i_bus_model_id ${order}
+            </when>
+            <otherwise>
+                order by c.i_id desc
+            </otherwise>
+        </choose>
+         limit #{pageNO},#{pageSize}
+    </select>
+    <select id="findList" resultType="com.cfcc.modules.oaBus.entity.BusFunction">
+        select * from oa_bus_function ORDER BY s_level asc
+    </select>
+    <select id="selectByIid" resultType="com.cfcc.modules.oaBus.entity.BusFunction">
+        select * from oa_bus_function where i_id=#{iid}
+    </select>
+
+    <!--插寻出流程对应的意见配置-->
+    <select id="queryProcOpinionDao" resultType="com.cfcc.modules.oabutton.entity.OaProcOpinion">
+        SELECT * FROM oa_proc_opinion c where c.PROC_DEF_KEY_ = #{key}
+    </select>
+    <select id="getFunByModelIdDao" resultType="com.cfcc.modules.oaBus.entity.BusFunction">
+        select * from oa_bus_function c where c.
+    </select>
+    <select id="queryByModelIdDao" resultType="com.cfcc.modules.oaBus.entity.BusFunction">
+        select * from oa_bus_function c where c.i_bus_model_id = #{modelId} order by IF(ISNULL(s_level), 1, 0),(s_level + 0) ;
+    </select>
+</mapper>

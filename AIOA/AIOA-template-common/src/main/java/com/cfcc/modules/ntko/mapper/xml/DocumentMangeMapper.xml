@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cfcc.modules.ntko.mapper.DocumentMangeMapper">
+
+    <select id="queryById" resultType="com.cfcc.modules.docnum.entity.DocNumManage">
+      SELECT
+      i_docnum_id,i_send_obj
+      FROM
+      oa_docnum_manage
+      WHERE
+      i_id=#{id}
+    </select>
+
+</mapper>

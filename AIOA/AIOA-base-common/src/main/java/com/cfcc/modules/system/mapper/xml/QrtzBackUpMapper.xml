@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cfcc.modules.system.mapper.QrtzBackUpMapper">
+
+    <select id="selectBackUpList" resultType="com.cfcc.modules.system.entity.QrtzBackUp">
+        select i_id,DATE_FORMAT(d_start_time,'%Y-%m-%d') AS dCreateDay,i_back_type,s_name,s_back_path,s_file_size,d_start_time,d_end_time
+        from qrtz_back_up
+        <where>
+            <if test="back.iBackType != null and back.iBackType != ''">
+                i_back_type=#{back.iBackType}
+            </if>
+            <if test="back.dStartTime != null and back.dEndTime != null">
+                and d_start_time between #{back.dStartTime} AND  #{back.dEndTime}
+            </if>
+        </where>
+        ORDER BY dCreateDay DESC
+        limit #{pageNo},#{pageSize}
+
+    </select>
+
+    <select id="selectBackUpTotal" resultType="java.lang.Integer">
+        select count(i_id) as total from qrtz_back_up
+        <where>
+            <if test="iBackType != null and iBackType != ''">
+                i_back_type=#{iBackType}
+            </if>
+            <if test="dStartTime != null and dEndTime != null">
+                and d_start_time between #{dStartTime} AND  #{dEndTime}
+            </if>
+        </where>
+    </select>
+
+    <!--根据id删除-->
+    <delete id="deleteBackUpByIID">
+        DELETE FROM qrtz_back_up WHERE i_id = #{id}
+    </delete>
+
+    <!--根据附件id查询-->
+    <select id="getBackUpById" resultType="com.cfcc.modules.system.entity.QrtzBackUp">
+        SELECT i_back_type,s_name,s_back_path,s_file_size,d_start_time,d_end_time FROM qrtz_back_up WHERE i_id = #{id}
+    </select>
+</mapper>

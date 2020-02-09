@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cfcc.modules.docnum.mapper.DocNumManageMapper">
+
+    <!--查询空号列表-->
+    <select id="getNumList" resultType="com.cfcc.modules.docnum.entity.DocNumManage">
+        SELECT i_id, i_docnum_id, s_year, i_doc_num, s_busdata_table, i_busdata_id
+        FROM oa_docnum_manage as dm
+        <where>
+            <if test="doc.iDocnumId != null and doc.iDocnumId != ''">
+                dm.i_docnum_id=#{doc.iDocnumId}
+            </if>
+            <if test="doc.sYear != null and doc.sYear != ''">
+                and dm.s_year=#{doc.sYear}
+            </if>
+            and dm.i_busdata_id in (0,-1)
+        </where>
+        limit #{pageNo},#{pageSize}
+    </select>
+
+    <!--查询最大文号-->
+    <select id="queryMaxDocNum" resultType="com.cfcc.modules.docnum.entity.DocNumManage">
+        SELECT
+	    d.i_id,MAX(m.i_doc_num) as i_doc_num
+        FROM
+    	oa_docnum_manage m
+        LEFT JOIN oa_docnum  d ON d.i_id = m.i_docnum_id
+        WHERE  m.i_docnum_id = #{iId} AND  m.s_year = #{sYear}
+    </select>
+    <!--统计空号数量-->
+    <select id="getNumListTotal" resultType="java.lang.Integer">
+        SELECT count(i_id) AS iId FROM oa_docnum_manage as dm
+        <where>
+            <if test="iDocnumId != null and iDocnumId != ''">
+                dm.i_docnum_id=#{iDocnumId}
+            </if>
+            <if test="sYear != null and sYear != ''">
+                and dm.s_year=#{sYear}
+            </if>
+            and dm.i_busdata_id in (0,-1)
+        </where>
+    </select>
+
+    <!--登记文号-->
+    <insert id="addDocNum">
+        INSERT INTO oa_docnum_manage
+        (i_id,i_docnum_id,s_year,i_doc_num,s_busdata_table,i_busdata_id,i_send_obj)
+        VALUES
+        (0,#{iDocnumId},#{sYear},#{iDocNum},#{sBusdataTable},#{iBusdataId},#{iSendObj})
+        <selectKey resultType="integer" keyProperty="iId" keyColumn="i_id">
+            SELECT LAST_INSERT_ID();
+        </selectKey>
+    </insert>
+
+    <!--选择使用文号-->
+    <update id="updateDocNumStatus">
+        UPDATE oa_docnum_manage
+        SET i_busdata_id = #{iBusdataId}
+        WHERE i_id = #{iId}
+    </update>
+
+    <!--更新最大文号-->
+    <update id="updateMaxNum">
+        UPDATE oa_docnum SET i_doc_num = #{iDocNum} WHERE i_id =#{iId}
+    </update>
+</mapper>

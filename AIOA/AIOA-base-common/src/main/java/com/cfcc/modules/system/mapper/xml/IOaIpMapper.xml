@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cfcc.modules.system.mapper.IOaIpMapper">
+    <insert id="addOaIp">
+         INSERT INTO oa_ip (userid,ip,tlogin) VALUES (#{userId},#{ip},NOW())
+    </insert>
+    <update id="updateOaIp">
+        update oa_ip set ip = #{ip} where userid = #{userId}
+    </update>
+
+    <select id="getIpByUserId" resultType="java.lang.String" parameterType="string">
+        SELECT ip FROM oa_ip WHERE userid = #{userId}
+    </select>
+</mapper>

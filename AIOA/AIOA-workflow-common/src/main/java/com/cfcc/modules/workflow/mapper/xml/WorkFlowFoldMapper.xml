@@ -1,0 +1,1427 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cfcc.modules.workflow.mapper.TaskFoldMapper">
+
+
+
+    <select id="queryTaskToDoCountFold" resultType="long">
+        select count(*) from (
+        select * from (
+        SELECT
+        t.ID_ id,t.NAME_ name,t.EXECUTION_ID_ executionId,t.PROC_INST_ID_ processInstanceId ,
+        t.PROC_DEF_ID_ processDefinitionId,t.PARENT_TASK_ID_ parentTaskId,t.DESCRIPTION_ description,t.TASK_DEF_KEY_
+        taskDefinitionKey,t.OWNER_ owner,t.ASSIGNEE_ assignee,t.DELEGATION_ delegation,
+        t.CREATE_TIME_ createTime,t.DUE_DATE_ dueDate,t.CATEGORY_ category,t.SUSPENSION_STATE_
+        suspensionState,t.TENANT_ID_ tenantId,t.FORM_KEY_ formKey,v.text_ busMsg
+        FROM `act_ru_task` t left JOIN act_hi_varinst v on t.PROC_INST_ID_ = v.PROC_INST_ID_ and v.name_='busMsg' where
+        1=1
+
+        <if test="ids.size()>0">
+            and ASSIGNEE_ in
+            <foreach collection="ids" item="id" open="(" close=")" separator=",">
+                #{id}
+            </foreach>
+        </if>
+
+
+        <if test="ids.size()==0">
+            and ASSIGNEE_ is not null
+        </if>
+
+
+        <if test="pojo.startQueryTime!=null ">
+            and t.CREATE_TIME_ &gt;= #{pojo.startQueryTime}
+        </if>
+
+        <if test="pojo.endQueryTime!=null ">
+            and t.CREATE_TIME_ &lt;= #{pojo.endQueryTime}
+        </if>
+
+        <if test="pojo.dataTitle!=null and pojo.dataTitle!=''">
+            and v.text_ like CONCAT('%[%',#{pojo.dataTitle},'%]%')
+        </if>
+        <if test="pojo.mainDept!=null and pojo.mainDept!=''">
+            and v.text_ like CONCAT('%@mainDept:%',#{pojo.mainDept},'%@%')
+        </if>
+        <if test="pojo.fileNum!=null and pojo.fileNum!=''">
+            and v.text_ like CONCAT('%{file_num:%',#{pojo.fileNum},'%}%')
+        </if>
+        <if test="pojo.createName!=null and pojo.createName!=''">
+            and v.text_ like CONCAT('%$create_name:%',#{pojo.createName},'%$%')
+        </if>
+        <if test="urgencyDegree !=null and urgencyDegree !=''">
+            and SUBSTRING_INDEX(v.TEXT_,',',1)=#{urgencyDegree}
+        </if>
+
+        UNION
+        select
+        t.ID_ id, t.NAME_ NAME, t.EXECUTION_ID_ executionId, t.PROC_INST_ID_ processInstanceId,t.PROC_DEF_ID_
+        processDefinitionId,
+        t.PARENT_TASK_ID_ parentTaskId, t.DESCRIPTION_ description,
+        t.TASK_DEF_KEY_ taskDefinitionKey, t.OWNER_ OWNER,i.user_id_ assignee, t.DELEGATION_ delegation,
+        t.CREATE_TIME_ createTime, t.DUE_DATE_ dueDate,t.CATEGORY_ category,t.SUSPENSION_STATE_ suspensionState,
+        t.TENANT_ID_ tenantId,
+        t.FORM_KEY_ formKey,v.text_ busMsg
+        from act_ru_identitylink i
+        LEFT JOIN act_ru_task t on t.id_=i.task_id_
+        LEFT JOIN act_hi_varinst v ON t.PROC_INST_ID_ = v.PROC_INST_ID_
+        where v.name_='busMsg'
+        and i.TYPE_='candidate'
+        and t.ASSIGNEE_ is null
+
+        <if test="ids.size()>0">
+            and i.user_id_ in
+            <foreach collection="ids" item="id" open="(" close=")" separator=",">
+                #{id}
+            </foreach>
+        </if>
+        <if test="pojo.startQueryTime!=null ">
+            and t.CREATE_TIME_ &gt;= #{pojo.startQueryTime}
+        </if>
+
+        <if test="pojo.endQueryTime!=null ">
+            and t.CREATE_TIME_ &lt;= #{pojo.endQueryTime}
+        </if>
+
+        <if test="pojo.dataTitle!=null and pojo.dataTitle!=''">
+            and v.text_ like CONCAT('%[%',#{pojo.dataTitle},'%]%')
+        </if>
+
+        <if test="pojo.mainDept!=null and pojo.mainDept!=''">
+            and v.text_ like CONCAT('%@mainDept:%',#{pojo.mainDept},'%@%')
+        </if>
+        <if test="pojo.fileNum!=null and pojo.fileNum!=''">
+            and v.text_ like CONCAT('%{file_num:%',#{pojo.fileNum},'%}%')
+        </if>
+        <if test="pojo.createName!=null and pojo.createName!=''">
+            and v.text_ like CONCAT('%$create_name:%',#{pojo.createName},'%$%')
+        </if>
+        <if test="urgencyDegree !=null and urgencyDegree !=''">
+            and SUBSTRING_INDEX(v.TEXT_,',',1)=#{urgencyDegree}
+        </if>
+        )s
+        GROUP BY s.processInstanceId
+        )ss
+
+    </select>
+
+    <!--代办-->
+    <select id="queryTaskToDoFold" resultType="com.cfcc.modules.workflow.pojo.TaskInfoJsonAble">
+        select
+        GROUP_CONCAT(DISTINCT id) id,
+        GROUP_CONCAT(distinct NAME) NAME,
+        GROUP_CONCAT( NAME) allNames,
+
+        executionId,
+        processInstanceId,
+        processDefinitionId,
+        parentTaskId,
+        description,
+        GROUP_CONCAT( taskDefinitionKey) taskDefinitionKey,
+        OWNER,
+        assignee,
+        delegation,
+        createTime,
+        dueDate,
+        category,
+        suspensionState,
+        tenantId,
+        formKey,
+        busMsg
+        from
+        (
+        select * from (
+        SELECT
+        t.ID_ id,t.NAME_ name,t.EXECUTION_ID_ executionId,t.PROC_INST_ID_ processInstanceId ,
+        t.PROC_DEF_ID_ processDefinitionId,t.PARENT_TASK_ID_ parentTaskId,t.DESCRIPTION_ description,t.TASK_DEF_KEY_
+        taskDefinitionKey,t.OWNER_ owner,t.ASSIGNEE_ assignee,t.DELEGATION_ delegation,
+        t.CREATE_TIME_ createTime,t.DUE_DATE_ dueDate,t.CATEGORY_ category,t.SUSPENSION_STATE_
+        suspensionState,t.TENANT_ID_ tenantId,t.FORM_KEY_ formKey,v.text_ busMsg
+        FROM `act_ru_task` t left JOIN act_hi_varinst v on t.PROC_INST_ID_ = v.PROC_INST_ID_ and v.name_='busMsg' where
+        1=1
+
+        <if test="ids.size()>0">
+            and ASSIGNEE_ in
+            <foreach collection="ids" item="id" open="(" close=")" separator=",">
+                #{id}
+            </foreach>
+        </if>
+
+
+        <if test="ids.size()==0">
+            and ASSIGNEE_ is not null
+        </if>
+
+
+        <if test="pojo.startQueryTime!=null ">
+            and t.CREATE_TIME_ &gt;= #{pojo.startQueryTime}
+        </if>
+
+        <if test="pojo.endQueryTime!=null ">
+            and t.CREATE_TIME_ &lt;= #{pojo.endQueryTime}
+        </if>
+
+        <if test="pojo.dataTitle!=null and pojo.dataTitle!=''">
+            and v.text_ like CONCAT('%[%',#{pojo.dataTitle},'%]%')
+        </if>
+        <if test="pojo.mainDept!=null and pojo.mainDept!=''">
+            and v.text_ like CONCAT('%@mainDept:%',#{pojo.mainDept},'%@%')
+        </if>
+        <if test="pojo.fileNum!=null and pojo.fileNum!=''">
+            and v.text_ like CONCAT('%{file_num:%',#{pojo.fileNum},'%}%')
+        </if>
+        <if test="pojo.createName!=null and pojo.createName!=''">
+            and v.text_ like CONCAT('%$create_name:%',#{pojo.createName},'%$%')
+        </if>
+        <if test="urgencyDegree !=null and urgencyDegree !=''">
+            and SUBSTRING_INDEX(v.TEXT_,',',1)=#{urgencyDegree}
+        </if>
+
+        UNION
+        select
+        t.ID_ id, t.NAME_ NAME, t.EXECUTION_ID_ executionId, t.PROC_INST_ID_ processInstanceId,t.PROC_DEF_ID_
+        processDefinitionId,
+        t.PARENT_TASK_ID_ parentTaskId, t.DESCRIPTION_ description,
+        t.TASK_DEF_KEY_ taskDefinitionKey, t.OWNER_ OWNER,i.user_id_ assignee, t.DELEGATION_ delegation,
+        t.CREATE_TIME_ createTime, t.DUE_DATE_ dueDate,t.CATEGORY_ category,t.SUSPENSION_STATE_ suspensionState,
+        t.TENANT_ID_ tenantId,
+        t.FORM_KEY_ formKey,v.text_ busMsg
+        from act_ru_identitylink i
+        LEFT JOIN act_ru_task t on t.id_=i.task_id_
+        LEFT JOIN act_hi_varinst v ON t.PROC_INST_ID_ = v.PROC_INST_ID_
+        where v.name_='busMsg'
+        and i.TYPE_='candidate'
+        and t.ASSIGNEE_ is null
+
+        <if test="ids.size()>0">
+            and i.user_id_ in
+            <foreach collection="ids" item="id" open="(" close=")" separator=",">
+                #{id}
+            </foreach>
+        </if>
+        <if test="pojo.startQueryTime!=null ">
+            and t.CREATE_TIME_ &gt;= #{pojo.startQueryTime}
+        </if>
+
+        <if test="pojo.endQueryTime!=null ">
+            and t.CREATE_TIME_ &lt;= #{pojo.endQueryTime}
+        </if>
+
+        <if test="pojo.dataTitle!=null and pojo.dataTitle!=''">
+            and v.text_ like CONCAT('%[%',#{pojo.dataTitle},'%]%')
+        </if>
+
+        <if test="pojo.mainDept!=null and pojo.mainDept!=''">
+            and v.text_ like CONCAT('%@mainDept:%',#{pojo.mainDept},'%@%')
+        </if>
+        <if test="pojo.fileNum!=null and pojo.fileNum!=''">
+            and v.text_ like CONCAT('%{file_num:%',#{pojo.fileNum},'%}%')
+        </if>
+        <if test="pojo.createName!=null and pojo.createName!=''">
+            and v.text_ like CONCAT('%$create_name:%',#{pojo.createName},'%$%')
+        </if>
+        <if test="urgencyDegree !=null and urgencyDegree !=''">
+            and SUBSTRING_INDEX(v.TEXT_,',',1)=#{urgencyDegree}
+        </if>
+        )ut where 1=1
+        order by cast(ut.id as SIGNED INTEGER) desc
+
+        )s
+        GROUP BY s.processInstanceId
+        order by
+        <if test="pojo.tableOrder">
+            <!--<if test="pojo.orederByTile==1">-->
+                <!--SUBSTRING_INDEX(s.busMsg, '!functionName:', -1),-->
+            <!--</if>-->
+            <!--<if test="pojo.orederByTile==-1">-->
+                <!--SUBSTRING_INDEX(s.busMsg, '!functionName:', -1) desc,-->
+            <!--</if>-->
+
+            <!--<if test="pojo.orederByWenHao==1">-->
+                <!--SUBSTRING_INDEX(s.busMsg, '{file_num:', -1),-->
+            <!--</if>-->
+            <!--<if test="pojo.orederByWenHao==-1">-->
+                <!--SUBSTRING_INDEX(s.busMsg, '{file_num:', -1) desc,-->
+            <!--</if>-->
+
+            <!--<if test="pojo.orederByHuanJie==1">-->
+                <!--s.name,-->
+            <!--</if>-->
+            <!--<if test="pojo.orederByHuanJie==-1">-->
+                <!--s.name desc,-->
+            <!--</if>-->
+
+            <!--<if test="pojo.orederByDrafter==1">-->
+                <!--SUBSTRING_INDEX(s.busMsg, '$create_name:', -1),-->
+            <!--</if>-->
+            <!--<if test="pojo.orederByDrafter==-1">-->
+                <!--SUBSTRING_INDEX(s.busMsg, '$create_name:', -1) desc,-->
+            <!--</if>-->
+
+            <if test="pojo.orederByTime==1">
+                s.createTime,
+            </if>
+            <if test="pojo.orederByTime==-1">
+                s.createTime desc,
+            </if>
+
+        </if>
+        <if test="!pojo.tableOrder">
+            s.busMsg,s.createTime desc,
+        </if>
+        1=1
+        limit #{pageNo},#{pageSize}
+    </select>
+
+    <!--已办任务-->
+    <select id="queryTaskDoneFold" resultType="com.cfcc.modules.workflow.pojo.HisTaskJsonAble">
+        SELECT
+        GROUP_CONCAT(DISTINCT t.ID_) hiTaskId,
+        t.PROC_DEF_ID_ processDefinitionId,
+        GROUP_CONCAT( t.task_def_key_) taskDefinitionKey,
+        t.proc_inst_id_ processInstanceId,
+        t.execution_id_ executionId,
+        GROUP_CONCAT( DISTINCT t.name_) taskDefinitionKeyName,
+        GROUP_CONCAT(  t.name_) allNames,
+        t.PARENT_TASK_ID_ parentTaskId,
+        t.description_ descp,
+        t.owner_ OWNER,
+        t.assignee_ assignee,
+        MAX(t.START_TIME_) startTime,
+        t.CLAIM_TIME_ claimTime,
+        t.END_TIME_ endTime,
+        t.DURATION_ duration,
+        t.DELETE_REASON_ delReason,
+        t.PRIORITY_ priority,
+        t.DUE_DATE_ dueDate,
+        t.FORM_KEY_ formKey,
+        t.CATEGORY_ category,
+        v.TEXT_ busMsg
+        FROM
+        act_hi_taskinst t
+
+        LEFT JOIN act_hi_varinst v ON v.PROC_INST_ID_ = t.PROC_INST_ID_
+        WHERE
+        EXISTS(select * from act_ru_execution where  PROC_INST_ID_=t.PROC_INST_ID_)
+        AND t.ASSIGNEE_ = #{pojo.userId}
+        AND LENGTH(t.DELETE_REASON_) > 0
+        AND v.name_ = 'busMsg'
+
+
+        <if test="pojo.startQueryTime!=null ">
+            and T.START_TIME_ &gt;= #{pojo.startQueryTime}
+        </if>
+
+        <if test="pojo.endQueryTime!=null ">
+            and t.START_TIME_ &lt;= #{pojo.endQueryTime}
+        </if>
+
+        <if test="pojo.dataTitle!=null and pojo.dataTitle!=''">
+            and v.text_ like CONCAT('%[%',#{pojo.dataTitle},'%]%')
+        </if>
+
+        <if test="pojo.mainDept!=null and pojo.mainDept!=''">
+            and v.text_ like CONCAT('%@mainDept:%',#{pojo.mainDept},'%@%')
+        </if>
+        <if test="pojo.fileNum!=null and pojo.fileNum!=''">
+            and v.text_ like CONCAT('%{file_num:%',#{pojo.fileNum},'%}%')
+        </if>
+        <if test="pojo.createName!=null and pojo.createName!=''">
+            and v.text_ like CONCAT('%$create_name:%',#{pojo.createName},'%$%')
+        </if>
+        <if test="urgencyDegree !=null and urgencyDegree !=''">
+            and SUBSTRING_INDEX(v.TEXT_,',',1)=#{urgencyDegree}
+        </if>
+        group by t.PROC_INST_ID_
+
+        order by
+        <if test="pojo.tableOrder">
+            <!--<if test="pojo.orederByTile==1">-->
+                <!--SUBSTRING_INDEX(v.text_, '!functionName:', -1),-->
+            <!--</if>-->
+            <!--<if test="pojo.orederByTile==-1">-->
+                <!--SUBSTRING_INDEX(v.text_, '!functionName:', -1) desc,-->
+            <!--</if>-->
+
+            <!--<if test="pojo.orederByWenHao==1">-->
+                <!--SUBSTRING_INDEX(v.text_, '{file_num:', -1),-->
+            <!--</if>-->
+            <!--<if test="pojo.orederByWenHao==-1">-->
+                <!--SUBSTRING_INDEX(v.text_, '{file_num:', -1) desc,-->
+            <!--</if>-->
+
+            <!--<if test="pojo.orederByHuanJie==1">-->
+                <!--t.name_,-->
+            <!--</if>-->
+            <!--<if test="pojo.orederByHuanJie==-1">-->
+                <!--t.name_ desc,-->
+            <!--</if>-->
+
+            <!--<if test="pojo.orederByDrafter==1">-->
+                <!--SUBSTRING_INDEX(v.text_, '$create_name:', -1),-->
+            <!--</if>-->
+            <!--<if test="pojo.orederByDrafter==-1">-->
+                <!--SUBSTRING_INDEX(v.text_, '$create_name:', -1) desc,-->
+            <!--</if>-->
+
+            <if test="pojo.orederByTime==1">
+                t.START_TIME_,
+            </if>
+            <if test="pojo.orederByTime==-1">
+                t.START_TIME_ desc,
+            </if>
+
+        </if>
+        <if test="!pojo.tableOrder">
+            v.text_,t.START_TIME_ desc,
+        </if>
+        1=1
+
+
+        limit #{pageNo},#{pageSize}
+    </select>
+
+    <!--已办数量-->
+    <select id="queryTaskDoneCountFold" resultType="long">
+
+
+        SELECT
+        COUNT( DISTINCT t.PROC_INST_ID_)
+        FROM
+        act_hi_taskinst t
+
+        LEFT JOIN act_hi_varinst v on v.PROC_INST_ID_=t.PROC_INST_ID_
+        WHERE
+        EXISTS(select * from act_ru_execution where  PROC_INST_ID_=t.PROC_INST_ID_)
+        AND t.ASSIGNEE_ = #{pojo.userId}
+        AND LENGTH(t.DELETE_REASON_) > 0
+        and v.name_='busMsg'
+
+        <if test="pojo.startQueryTime!=null ">
+            and t.START_TIME_ &gt;= #{pojo.startQueryTime}
+        </if>
+
+        <if test="pojo.endQueryTime!=null ">
+            and t.START_TIME_ &lt;= #{pojo.endQueryTime}
+        </if>
+
+        <if test="pojo.dataTitle!=null and pojo.dataTitle!=''">
+            and v.text_ like CONCAT('%[%',#{pojo.dataTitle},'%]%')
+        </if>
+
+
+        <if test="pojo.mainDept!=null and pojo.mainDept!=''">
+            and v.text_ like CONCAT('%@mainDept:%',#{pojo.mainDept},'%@%')
+        </if>
+        <if test="pojo.fileNum!=null and pojo.fileNum!=''">
+            and v.text_ like CONCAT('%{file_num:%',#{pojo.fileNum},'%}%')
+        </if>
+        <if test="pojo.createName!=null and pojo.createName!=''">
+            and v.text_ like CONCAT('%$create_name:%',#{pojo.createName},'%$%')
+        </if>
+        <if test="urgencyDegree !=null and urgencyDegree !=''">
+            and SUBSTRING_INDEX(v.TEXT_,',',1)=#{urgencyDegree}
+        </if>
+
+    </select>
+
+    <!--流程监控数据数量：直接参与的数据, 身为候选人的信息-->
+    <select id="monitorFoldUrgency" resultType="com.cfcc.modules.system.entity.SysDictItem">
+        SELECT d.item_text,d.item_value FROM sys_dict_item d INNER JOIN sys_dict s
+        WHERE d.dict_id=s.id and dict_code=#{urgencyDegree}
+ AND EXISTS(
+        SELECT t.ID_ id FROM act_hi_taskinst t
+         LEFT JOIN act_hi_varinst v ON t.PROC_INST_ID_ = v.PROC_INST_ID_ AND v.name_ = 'busMsg'
+         WHERE  EXISTS(select * from act_ru_execution where  PROC_INST_ID_=t.PROC_INST_ID_)
+         AND v.name_ = 'busMsg' and t.ASSIGNEE_ =  #{pojo.userId}
+					AND SUBSTRING_INDEX(v.TEXT_,',',1)=d.item_value LIMIT 1
+        UNION
+        SELECT
+        t.ID_ id
+        FROM
+        act_ru_task t
+        LEFT JOIN act_ru_identitylink i ON t.id_ = i.task_id_
+        LEFT JOIN act_hi_varinst v ON t.PROC_INST_ID_ = v.PROC_INST_ID_
+        WHERE
+        v.name_ = 'busMsg'
+        AND i.user_id_ =  #{pojo.userId}
+        AND i.TYPE_ = 'candidate'
+        AND t.ASSIGNEE_ IS NULL
+		AND SUBSTRING_INDEX(v.TEXT_,',',1)=d.item_value LIMIT 1
+)
+ORDER BY d.sort_order
+    </select>
+
+    <!--流程监控数据数量：直接参与的数据, 身为候选人的信息-->
+    <select id="monitorCountFold" resultType="int">
+        select
+        COUNT(DISTINCT task.processInstanceId )
+
+        from
+        (
+        SELECT
+        t.ID_ id,
+        t.NAME_ NAME,
+        t.EXECUTION_ID_ executionId,
+        t.PROC_INST_ID_ processInstanceId,
+        t.PROC_DEF_ID_ processDefinitionId,
+        t.PARENT_TASK_ID_ parentTaskId,
+        t.DESCRIPTION_ description,
+        t.TASK_DEF_KEY_ taskDefinitionKey,
+        t.OWNER_ OWNER,
+        t.start_time_ createTime,
+        t.ASSIGNEE_ assignee,
+        t.DUE_DATE_ dueDate,
+        t.CATEGORY_ category,
+        t.TENANT_ID_ tenantId,
+        t.FORM_KEY_ formKey,
+        v.text_ busMsg,
+        IFNULL(t.DELETE_REASON_,'todo') del
+        FROM
+        act_hi_taskinst t
+        LEFT JOIN act_hi_varinst v ON t.PROC_INST_ID_ = v.PROC_INST_ID_
+        AND v.name_ = 'busMsg'
+        WHERE
+        EXISTS(select * from act_ru_execution where  PROC_INST_ID_=t.PROC_INST_ID_)
+        AND v.name_ = 'busMsg'
+
+        and t.ASSIGNEE_ = #{pojo.userId}
+
+        UNION
+        SELECT
+        t.ID_ id,
+        t.NAME_ NAME,
+        t.EXECUTION_ID_ executionId,
+        t.PROC_INST_ID_ processInstanceId,
+        t.PROC_DEF_ID_ processDefinitionId,
+        t.PARENT_TASK_ID_ parentTaskId,
+        t.DESCRIPTION_ description,
+        t.TASK_DEF_KEY_ taskDefinitionKey,
+        t.OWNER_ OWNER,
+        t.create_time_ createTime,
+        t.ASSIGNEE_ assignee,
+        t.DUE_DATE_ dueDate,
+        t.CATEGORY_ category,
+        t.TENANT_ID_ tenantId,
+        t.FORM_KEY_ formKey,
+        v.text_ busMsg,
+        'todo' del
+        FROM
+        act_ru_task t
+        LEFT JOIN act_ru_identitylink i ON t.id_ = i.task_id_
+        LEFT JOIN act_hi_varinst v ON t.PROC_INST_ID_ = v.PROC_INST_ID_
+        WHERE
+        v.name_ = 'busMsg'
+        AND i.user_id_ = #{pojo.userId}
+        AND i.TYPE_ = 'candidate'
+        AND t.ASSIGNEE_ IS NULL
+        <if test="urgencyDegree !=null and urgencyDegree !=''">
+            and SUBSTRING_INDEX(v.TEXT_,',',1)=#{urgencyDegree}
+        </if>
+        ) task where 1=1
+        <if test="pojo.startQueryTime!=null ">
+            and task.startTime &gt;= #{pojo.startQueryTime}
+        </if>
+
+        <if test="pojo.endQueryTime!=null ">
+            and task.startTime &lt;= #{pojo.endQueryTime}
+        </if>
+
+        <if test="pojo.dataTitle!=null and pojo.dataTitle!=''">
+            and task.busMsg like CONCAT('%[%',#{pojo.dataTitle},'%]%')
+        </if>
+
+        <if test="pojo.mainDept!=null and pojo.mainDept!=''">
+            and task.busMsg like CONCAT('%@mainDept:%',#{pojo.mainDept},'%@%')
+        </if>
+        <if test="pojo.fileNum!=null and pojo.fileNum!=''">
+            and task.busMsg like CONCAT('%{file_num:%',#{pojo.fileNum},'%}%')
+        </if>
+        <if test="pojo.createName!=null and pojo.createName!=''">
+            and task.busMsg like CONCAT('%$create_name:%',#{pojo.createName},'%$%')
+        </if>
+
+
+
+    </select>
+    <!--监控数据：直接参与的数据(未结束), 身为候选人的信息-->
+    <select id="monitorDataFold" resultType="com.cfcc.modules.workflow.pojo.TaskInfoJsonAble">
+
+        select
+
+        GROUP_CONCAT(DISTINCT l.id) id,
+        GROUP_CONCAT(DISTINCT l.NAME) name,
+        GROUP_CONCAT( l.NAME) allNames,
+        l.executionId,
+        l.processInstanceId,
+        l.processDefinitionId,
+        l.parentTaskId,
+        l.description,
+        GROUP_CONCAT( l.taskDefinitionKey) taskDefinitionKey,
+        l.OWNER,
+        MAX(l.createTime) createTime,
+        l.assignee,
+        l.dueDate,
+        l.category,
+        l.tenantId,
+        l.formKey,
+        l.busMsg,
+        GROUP_CONCAT(DISTINCT(CONCAT(l.id,':',l.del))) deleteReason
+
+        from
+        (
+        SELECT
+        t.ID_ id,
+        t.NAME_ NAME,
+        t.EXECUTION_ID_ executionId,
+        t.PROC_INST_ID_ processInstanceId,
+        t.PROC_DEF_ID_ processDefinitionId,
+        t.PARENT_TASK_ID_ parentTaskId,
+        t.DESCRIPTION_ description,
+        t.TASK_DEF_KEY_ taskDefinitionKey,
+        t.OWNER_ OWNER,
+        t.start_time_ createTime,
+        t.ASSIGNEE_ assignee,
+        t.DUE_DATE_ dueDate,
+        t.CATEGORY_ category,
+        t.TENANT_ID_ tenantId,
+        t.FORM_KEY_ formKey,
+        v.text_ busMsg,
+        ifNULL(t.DELETE_REASON_,'todo') del
+        FROM
+        act_hi_taskinst t
+        LEFT JOIN act_hi_varinst v ON t.PROC_INST_ID_ = v.PROC_INST_ID_
+        AND v.name_ = 'busMsg'
+        WHERE
+        EXISTS(select * from act_ru_execution where  PROC_INST_ID_=t.PROC_INST_ID_)
+        AND v.name_ = 'busMsg'
+
+        and t.ASSIGNEE_ = #{pojo.userId}
+        <if test="urgencyDegree !=null and urgencyDegree !=''">
+            and SUBSTRING_INDEX(v.TEXT_,',',1)=#{urgencyDegree}
+        </if>
+        UNION
+        SELECT
+        t.ID_ id,
+        t.NAME_ NAME,
+        t.EXECUTION_ID_ executionId,
+        t.PROC_INST_ID_ processInstanceId,
+        t.PROC_DEF_ID_ processDefinitionId,
+        t.PARENT_TASK_ID_ parentTaskId,
+        t.DESCRIPTION_ description,
+        t.TASK_DEF_KEY_ taskDefinitionKey,
+        t.OWNER_ OWNER,
+        t.create_time_ createTime,
+        t.ASSIGNEE_ assignee,
+        t.DUE_DATE_ dueDate,
+        t.CATEGORY_ category,
+        t.TENANT_ID_ tenantId,
+        t.FORM_KEY_ formKey,
+        v.text_ busMsg,
+        'todo' del
+        FROM
+        act_ru_task t
+        LEFT JOIN act_ru_identitylink i ON t.id_ = i.task_id_
+        LEFT JOIN act_hi_varinst v ON t.PROC_INST_ID_ = v.PROC_INST_ID_
+        WHERE
+        v.name_ = 'busMsg'
+        AND i.user_id_ = #{pojo.userId}
+        AND i.TYPE_ = 'candidate'
+        AND t.ASSIGNEE_ IS NULL
+        <if test="urgencyDegree !=null and urgencyDegree !=''">
+            and SUBSTRING_INDEX(v.TEXT_,',',1)=#{urgencyDegree}
+        </if>
+        )
+
+        l where 1=1
+        <if test="pojo.startQueryTime!=null ">
+            and l.createTime &gt;= #{pojo.startQueryTime}
+        </if>
+        <if test="pojo.endQueryTime!=null ">
+            and l.createTime &lt;= #{pojo.endQueryTime}
+        </if>
+
+        <if test="pojo.dataTitle!=null and pojo.dataTitle!=''">
+            and l.busMsg like CONCAT('%[%',#{pojo.dataTitle},'%]%')
+        </if>
+
+        <if test="pojo.mainDept!=null and pojo.mainDept!=''">
+            and l.busMsg like CONCAT('%@mainDept:%',#{pojo.mainDept},'%@%')
+        </if>
+        <if test="pojo.fileNum!=null and pojo.fileNum!=''">
+            and l.busMsg like CONCAT('%{file_num:%',#{pojo.fileNum},'%}%')
+        </if>
+        <if test="pojo.createName!=null and pojo.createName!=''">
+            and l.busMsg like CONCAT('%$create_name:%',#{pojo.createName},'%$%')
+        </if>
+
+        group by l.processInstanceId
+        order by
+        <if test="pojo.tableOrder">
+
+            <if test="pojo.orederByTime==1">
+                l.createTime,
+            </if>
+            <if test="pojo.orederByTime==-1">
+                l.createTime desc,
+            </if>
+
+        </if>
+        <if test="!pojo.tableOrder">
+            l.busMsg,l.createTime desc,
+        </if>
+        1=1
+
+
+        limit #{pageNo},#{pageSize}
+
+    </select>
+
+
+    <!--时间限制范围内的数据-->
+    <select id="allUndoltLimitTimeHaveAssigneeFold" resultType="com.cfcc.modules.workflow.pojo.TaskInfoJsonAble">
+     SELECT
+             t.ID_ id,t.NAME_ NAME,t.EXECUTION_ID_ executionId,t.PROC_INST_ID_ processInstanceId,
+             t.PROC_DEF_ID_ processDefinitionId,t.PARENT_TASK_ID_ parentTaskId,t.DESCRIPTION_ description,
+             t.TASK_DEF_KEY_ taskDefinitionKey,t.OWNER_ OWNER,t.ASSIGNEE_ assignee,t.DELEGATION_ delegation,
+             t.CREATE_TIME_ createTime,t.DUE_DATE_ dueDate, t.CATEGORY_ category,t.SUSPENSION_STATE_ suspensionState,
+             t.TENANT_ID_ tenantId, t.FORM_KEY_ formKey,v.text_ busMsg,s.text_ endTime
+            FROM
+             `act_ru_task` t
+            LEFT JOIN act_hi_varinst v ON t.PROC_INST_ID_ = v.PROC_INST_ID_
+            left JOIN (
+
+              SELECT
+               i.proc_inst_id_ ,v.TEXT_
+              FROM
+               sys_user_set u
+              LEFT JOIN act_ru_identitylink i ON u.s_user_id = i.user_id_
+              LEFT JOIN act_ru_variable v ON v.PROC_INST_ID_ = i.PROC_INST_ID_
+              WHERE
+               v.name_ = 'endTime'
+              AND abs(
+               timestampdiff(SECOND, now(), v.TEXT_) / 3600 / 24
+              ) > u.i_calendar_day
+            )s on t.PROC_INST_ID_=s.proc_inst_id_
+            WHERE
+             t.PROC_INST_ID_ IN (
+              SELECT
+               i.proc_inst_id_
+              FROM
+               sys_user_set u
+              LEFT JOIN act_ru_identitylink i ON u.s_user_id = i.user_id_
+              LEFT JOIN act_ru_variable v ON v.PROC_INST_ID_ = i.PROC_INST_ID_
+              WHERE
+               v.name_ = 'endTime'
+              AND abs(
+               timestampdiff(SECOND, now(), v.TEXT_) / 3600 / 24
+              ) > u.i_calendar_day
+             )
+            and  v.name_ = 'busMsg'
+    </select>
+
+
+    <!--部门待办数量-->
+    <select id="deptTaskCountFold" resultType="long">
+
+        SELECT
+        COUNT(DISTINCT s.processInstanceId)
+        FROM
+        (
+        SELECT
+        t.ID_ id,
+        t.NAME_ NAME,
+        t.EXECUTION_ID_ executionId,
+        t.PROC_INST_ID_ processInstanceId,
+        t.PROC_DEF_ID_ processDefinitionId,
+        t.PARENT_TASK_ID_ parentTaskId,
+        t.DESCRIPTION_ description,
+        t.TASK_DEF_KEY_ taskDefinitionKey,
+        t.OWNER_ OWNER,
+        t.ASSIGNEE_ assignee,
+        t.DELEGATION_ delegation,
+        t.CREATE_TIME_ createTime,
+        t.DUE_DATE_ dueDate,
+        t.CATEGORY_ category,
+        t.SUSPENSION_STATE_ suspensionState,
+        t.TENANT_ID_ tenantId,
+        t.FORM_KEY_ formKey,
+        v.text_ busMsg
+        FROM
+        `act_ru_task` t
+        LEFT JOIN act_hi_varinst v ON t.PROC_INST_ID_ = v.PROC_INST_ID_
+        AND v.name_ = 'busMsg'
+        WHERE
+        ASSIGNEE_=#{pojo.userId}
+        <if test="pojo.startQueryTime!=null ">
+            and t.CREATE_TIME_ &gt;= #{pojo.startQueryTime}
+        </if>
+
+        <if test="pojo.endQueryTime!=null ">
+            and t.CREATE_TIME_ &lt;= #{pojo.endQueryTime}
+        </if>
+
+        <if test="pojo.dataTitle!=null and pojo.dataTitle!=''">
+            and v.text_ like CONCAT('%[%',#{pojo.dataTitle},'%]%')
+        </if>
+
+        <if test="urgencyDegree !=null and urgencyDegree !=''">
+            and SUBSTRING_INDEX(v.TEXT_,',',1)=#{urgencyDegree}
+        </if>
+        <if test="pojo.mainDept!=null and pojo.mainDept!=''">
+            and v.text_ like CONCAT('%@mainDept:%',#{pojo.mainDept},'%@%')
+        </if>
+        <if test="pojo.fileNum!=null and pojo.fileNum!=''">
+            and v.text_ like CONCAT('%{file_num:%',#{pojo.fileNum},'%}%')
+        </if>
+        <if test="pojo.createName!=null and pojo.createName!=''">
+            and v.text_ like CONCAT('%$create_name:%',#{pojo.createName},'%$%')
+        </if>
+        UNION
+        SELECT
+        t.ID_ id,
+        t.NAME_ NAME,
+        t.EXECUTION_ID_ executionId,
+        t.PROC_INST_ID_ processInstanceId,
+        t.PROC_DEF_ID_ processDefinitionId,
+        t.PARENT_TASK_ID_ parentTaskId,
+        t.DESCRIPTION_ description,
+        t.TASK_DEF_KEY_ taskDefinitionKey,
+        t.OWNER_ OWNER,
+        i.user_id_ assignee,
+        t.DELEGATION_ delegation,
+        t.CREATE_TIME_ createTime,
+        t.DUE_DATE_ dueDate,
+        t.CATEGORY_ category,
+        t.SUSPENSION_STATE_ suspensionState,
+        t.TENANT_ID_ tenantId,
+        t.FORM_KEY_ formKey,
+        v.text_ busMsg
+        FROM
+        act_ru_identitylink i
+        LEFT JOIN act_ru_task t ON t.id_ = i.task_id_
+        LEFT JOIN act_hi_varinst v ON t.PROC_INST_ID_ = v.PROC_INST_ID_
+        WHERE
+        v.name_ = 'busMsg'
+        AND i.user_id_=#{pojo.userId}
+        AND i.TYPE_ = 'candidate'
+        and t.ASSIGNEE_ is null
+        <if test="urgencyDegree !=null and urgencyDegree !=''">
+            and SUBSTRING_INDEX(v.TEXT_,',',1)=#{urgencyDegree}
+        </if>
+        <if test="pojo.startQueryTime!=null ">
+            and t.CREATE_TIME_ &gt;= #{pojo.startQueryTime}
+        </if>
+
+        <if test="pojo.endQueryTime!=null ">
+            and t.CREATE_TIME_ &lt;= #{pojo.endQueryTime}
+        </if>
+
+        <if test="pojo.dataTitle!=null and pojo.dataTitle!=''">
+            and v.text_ like CONCAT('%[%',#{pojo.dataTitle},'%]%')
+        </if>
+        <if test="pojo.mainDept!=null and pojo.mainDept!=''">
+            and v.text_ like CONCAT('%@mainDept:%',#{pojo.mainDept},'%@%')
+        </if>
+        <if test="pojo.fileNum!=null and pojo.fileNum!=''">
+            and v.text_ like CONCAT('%{file_num:%',#{pojo.fileNum},'%}%')
+        </if>
+        <if test="pojo.createName!=null and pojo.createName!=''">
+            and v.text_ like CONCAT('%$create_name:%',#{pojo.createName},'%$%')
+        </if>
+
+        ) s
+        LEFT JOIN  oa_task_dept td on s.processInstanceId = td.proc_inst_id and s.id=td.task_id
+        and td.task_def_key=s.taskDefinitionKey
+        and td.type=#{type} and  td.user_id=#{pojo.userId}
+        where
+        s.processInstanceId = td.proc_inst_id and s.id=td.task_id and td.task_def_key=s.taskDefinitionKey
+        and td.type=#{type}  and  td.user_id=#{pojo.userId}
+</select>
+
+
+    <!--部门待办-->
+    <select id="deptTaskQueryFold" resultType="com.cfcc.modules.workflow.pojo.TaskInfoJsonAble">
+        SELECT
+        GROUP_CONCAT(DISTINCT s.id) id,
+        GROUP_CONCAT(DISTINCT s.NAME) name,
+        GROUP_CONCAT(  s.NAME) allNames,
+
+        s.executionId,
+        s.processInstanceId,
+        s.processDefinitionId,
+        s.parentTaskId,
+        s.description,
+        GROUP_CONCAT( s.taskDefinitionKey) taskDefinitionKey,
+        s.OWNER,
+        s.assignee,
+        s.delegation,
+        MAX(s.createTime) createTime,
+        s.dueDate,
+        s.category,
+        s.suspensionState,
+        s.tenantId,
+        s.formKey,
+        s.busMsg
+        FROM
+        (
+        SELECT
+        t.ID_ id,
+        t.NAME_ NAME,
+        t.EXECUTION_ID_ executionId,
+        t.PROC_INST_ID_ processInstanceId,
+        t.PROC_DEF_ID_ processDefinitionId,
+        t.PARENT_TASK_ID_ parentTaskId,
+        t.DESCRIPTION_ description,
+        t.TASK_DEF_KEY_ taskDefinitionKey,
+        t.OWNER_ OWNER,
+        t.ASSIGNEE_ assignee,
+        t.DELEGATION_ delegation,
+        t.CREATE_TIME_ createTime,
+        t.DUE_DATE_ dueDate,
+        t.CATEGORY_ category,
+        t.SUSPENSION_STATE_ suspensionState,
+        t.TENANT_ID_ tenantId,
+        t.FORM_KEY_ formKey,
+        v.text_ busMsg
+        FROM
+        `act_ru_task` t
+        LEFT JOIN act_hi_varinst v ON t.PROC_INST_ID_ = v.PROC_INST_ID_
+        AND v.name_ = 'busMsg'
+        WHERE
+        ASSIGNEE_=#{pojo.userId}
+        <if test="pojo.startQueryTime!=null ">
+            and t.CREATE_TIME_ &gt;= #{pojo.startQueryTime}
+        </if>
+
+        <if test="pojo.endQueryTime!=null ">
+            and t.CREATE_TIME_ &lt;= #{pojo.endQueryTime}
+        </if>
+
+        <if test="pojo.dataTitle!=null and pojo.dataTitle!=''">
+            and v.text_ like CONCAT('%[%',#{pojo.dataTitle},'%]%')
+        </if>
+
+        <if test="pojo.mainDept!=null and pojo.mainDept!=''">
+            and v.text_ like CONCAT('%@mainDept:%',#{pojo.mainDept},'%@%')
+        </if>
+        <if test="pojo.fileNum!=null and pojo.fileNum!=''">
+            and v.text_ like CONCAT('%{file_num:%',#{pojo.fileNum},'%}%')
+        </if>
+        <if test="pojo.createName!=null and pojo.createName!=''">
+            and v.text_ like CONCAT('%$create_name:%',#{pojo.createName},'%$%')
+        </if>
+        <if test="urgencyDegree !=null and urgencyDegree !=''">
+            and SUBSTRING_INDEX(v.TEXT_,',',1)=#{urgencyDegree}
+        </if>
+        UNION
+        SELECT
+        t.ID_ id,
+        t.NAME_ NAME,
+        t.EXECUTION_ID_ executionId,
+        t.PROC_INST_ID_ processInstanceId,
+        t.PROC_DEF_ID_ processDefinitionId,
+        t.PARENT_TASK_ID_ parentTaskId,
+        t.DESCRIPTION_ description,
+        t.TASK_DEF_KEY_ taskDefinitionKey,
+        t.OWNER_ OWNER,
+        i.user_id_ assignee,
+        t.DELEGATION_ delegation,
+        t.CREATE_TIME_ createTime,
+        t.DUE_DATE_ dueDate,
+        t.CATEGORY_ category,
+        t.SUSPENSION_STATE_ suspensionState,
+        t.TENANT_ID_ tenantId,
+        t.FORM_KEY_ formKey,
+        v.text_ busMsg
+        FROM
+        act_ru_identitylink i
+        LEFT JOIN act_ru_task t ON t.id_ = i.task_id_
+        LEFT JOIN act_hi_varinst v ON t.PROC_INST_ID_ = v.PROC_INST_ID_
+        WHERE
+        v.name_ = 'busMsg'
+        AND i.user_id_=#{pojo.userId}
+        AND i.TYPE_ = 'candidate'
+        and t.ASSIGNEE_ is null
+
+        <if test="pojo.startQueryTime!=null ">
+            and t.CREATE_TIME_ &gt;= #{pojo.startQueryTime}
+        </if>
+
+        <if test="pojo.endQueryTime!=null ">
+            and t.CREATE_TIME_ &lt;= #{pojo.endQueryTime}
+        </if>
+
+        <if test="pojo.dataTitle!=null and pojo.dataTitle!=''">
+            and v.text_ like CONCAT('%[%',#{pojo.dataTitle},'%]%')
+        </if>
+        <if test="pojo.mainDept!=null and pojo.mainDept!=''">
+            and v.text_ like CONCAT('%@mainDept:%',#{pojo.mainDept},'%@%')
+        </if>
+        <if test="pojo.fileNum!=null and pojo.fileNum!=''">
+            and v.text_ like CONCAT('%{file_num:%',#{pojo.fileNum},'%}%')
+        </if>
+        <if test="pojo.createName!=null and pojo.createName!=''">
+            and v.text_ like CONCAT('%$create_name:%',#{pojo.createName},'%$%')
+        </if>
+        <if test="urgencyDegree !=null and urgencyDegree !=''">
+            and SUBSTRING_INDEX(v.TEXT_,',',1)=#{urgencyDegree}
+        </if>
+        ) s
+        LEFT JOIN oa_task_dept td ON td.proc_inst_id = s.processInstanceId
+        AND td.task_id = s.id
+        AND td.task_def_key = s.taskDefinitionKey
+        AND td.type = #{type}
+        AND td.user_id = #{pojo.userId}
+        WHERE
+        td.proc_inst_id = s.processInstanceId
+        AND td.task_id = s.id
+        AND td.task_def_key = s.taskDefinitionKey
+        AND td.type = #{type}
+        AND td.user_id = #{pojo.userId}
+
+        GROUP BY s.processInstanceId
+
+        order by
+
+        <if test="pojo.tableOrder">
+            <!--<if test="pojo.orederByTile==1">-->
+                <!--SUBSTRING_INDEX(s.busMsg, '!functionName:', -1),-->
+            <!--</if>-->
+            <!--<if test="pojo.orederByTile==-1">-->
+                <!--SUBSTRING_INDEX(s.busMsg, '!functionName:', -1) desc,-->
+            <!--</if>-->
+
+            <!--<if test="pojo.orederByWenHao==1">-->
+                <!--SUBSTRING_INDEX(s.busMsg, '{file_num:', -1),-->
+            <!--</if>-->
+            <!--<if test="pojo.orederByWenHao==-1">-->
+                <!--SUBSTRING_INDEX(s.busMsg, '{file_num:', -1) desc,-->
+            <!--</if>-->
+
+            <!--<if test="pojo.orederByHuanJie==1">-->
+                <!--s.name,-->
+            <!--</if>-->
+            <!--<if test="pojo.orederByHuanJie==-1">-->
+                <!--s.name desc,-->
+            <!--</if>-->
+
+            <!--<if test="pojo.orederByDrafter==1">-->
+                <!--SUBSTRING_INDEX(s.busMsg, '$create_name:', -1),-->
+            <!--</if>-->
+            <!--<if test="pojo.orederByDrafter==-1">-->
+                <!--SUBSTRING_INDEX(s.busMsg, '$create_name:', -1) desc,-->
+            <!--</if>-->
+
+            <if test="pojo.orederByTime==1">
+                s.createTime,
+            </if>
+            <if test="pojo.orederByTime==-1">
+                s.createTime desc,
+            </if>
+
+        </if>
+        <if test="!pojo.tableOrder">
+            s.busMsg,s.createTime desc,
+        </if>
+        1=1
+
+        limit #{pageNo},#{pageSize}
+    </select>
+
+
+    <!--部门已办数量-->
+    <select id="deptTaskHaveDoneCountFold" resultType="long">
+
+        SELECT
+        COUNT(DISTINCT t.PROC_INST_ID_)
+        FROM
+        act_hi_taskinst t
+        LEFT JOIN act_hi_varinst v ON v.PROC_INST_ID_ = t.PROC_INST_ID_
+        LEFT JOIN oa_task_dept td on t.ID_=td.task_id and t.PROC_INST_ID_=td.proc_inst_id
+        and td.task_def_key=t.TASK_DEF_KEY_ and td.user_id=#{pojo.userId}
+        and td.type= #{type}
+        WHERE
+        EXISTS(select * from act_ru_execution where  PROC_INST_ID_=t.PROC_INST_ID_)
+        and t.ID_=td.task_id and t.PROC_INST_ID_=td.proc_inst_id
+        and td.task_def_key=t.TASK_DEF_KEY_ and td.user_id=#{pojo.userId}
+        and td.type= #{type}
+        AND t.ASSIGNEE_ = #{pojo.userId}
+        AND LENGTH(t.DELETE_REASON_) > 0
+        AND v.name_ = 'busMsg'
+
+
+        <if test="pojo.startQueryTime!=null ">
+            and t.START_TIME_ &gt;= #{pojo.startQueryTime}
+        </if>
+
+        <if test="pojo.endQueryTime!=null ">
+            and t.START_TIME_ &lt;= #{pojo.endQueryTime}
+        </if>
+
+        <if test="pojo.dataTitle!=null and pojo.dataTitle!=''">
+            and v.text_ like CONCAT('%[%',#{pojo.dataTitle},'%]%')
+        </if>
+
+        <if test="pojo.mainDept!=null and pojo.mainDept!=''">
+            and v.text_ like CONCAT('%@mainDept:%',#{pojo.mainDept},'%@%')
+        </if>
+        <if test="pojo.fileNum!=null and pojo.fileNum!=''">
+            and v.text_ like CONCAT('%{file_num:%',#{pojo.fileNum},'%}%')
+        </if>
+        <if test="pojo.createName!=null and pojo.createName!=''">
+            and v.text_ like CONCAT('%$create_name:%',#{pojo.createName},'%$%')
+        </if>
+        <if test="urgencyDegree !=null and urgencyDegree !=''">
+            and SUBSTRING_INDEX(v.TEXT_,',',1)=#{urgencyDegree}
+        </if>
+    </select>
+    <!--部门已办-->
+    <select id="deptTaskHaveDoneFold" resultType="com.cfcc.modules.workflow.pojo.TaskInfoJsonAble">
+
+        SELECT
+        GROUP_CONCAT(DISTINCT t.ID_) hiTaskId,
+        t.PROC_DEF_ID_ processDefinitionId,
+        GROUP_CONCAT( t.task_def_key_) taskDefinitionKey,
+        t.proc_inst_id_ processInstanceId,
+        t.execution_id_ executionId,
+        GROUP_CONCAT( DISTINCT t.name_) taskDefinitionKeyName,
+        GROUP_CONCAT(  t.name_) allNames,
+
+        t.PARENT_TASK_ID_ parentTaskId,
+        t.description_ descp,
+        t.owner_ OWNER,
+        t.assignee_ assignee,
+        MAX(t.START_TIME_) startTime,
+        t.CLAIM_TIME_ claimTime,
+        t.END_TIME_ endTime,
+        t.DURATION_ duration,
+        t.DELETE_REASON_ delReason,
+        t.PRIORITY_ priority,
+        t.DUE_DATE_ dueDate,
+        t.FORM_KEY_ formKey,
+        t.CATEGORY_ category,
+        v.TEXT_ busMsg
+        FROM
+        act_hi_taskinst t
+        LEFT JOIN act_hi_varinst v ON v.PROC_INST_ID_ = t.PROC_INST_ID_
+        LEFT JOIN oa_task_dept td on t.ID_=td.task_id and t.PROC_INST_ID_=td.proc_inst_id
+        and td.task_def_key=t.TASK_DEF_KEY_ and td.user_id= #{pojo.userId}
+        and td.type= #{type}
+        WHERE
+        EXISTS(select * from act_ru_execution where  PROC_INST_ID_=t.PROC_INST_ID_)
+        and t.ID_=td.task_id and t.PROC_INST_ID_=td.proc_inst_id
+        and td.task_def_key=t.TASK_DEF_KEY_ and td.user_id= #{pojo.userId}
+        and td.type= #{type}
+        AND t.ASSIGNEE_ =  #{pojo.userId}
+        AND LENGTH(t.DELETE_REASON_) > 0
+        AND v.name_ = 'busMsg'
+        <if test="urgencyDegree !=null and urgencyDegree !=''">
+            and SUBSTRING_INDEX(v.TEXT_,',',1)=#{urgencyDegree}
+        </if>
+        <if test="pojo.startQueryTime!=null ">
+            and t.START_TIME_ &gt;= #{pojo.startQueryTime}
+        </if>
+
+        <if test="pojo.endQueryTime!=null ">
+            and t.START_TIME_ &lt;= #{pojo.endQueryTime}
+        </if>
+
+        <if test="pojo.dataTitle!=null and pojo.dataTitle!=''">
+            and v.text_ like CONCAT('%[%',#{pojo.dataTitle},'%]%')
+        </if>
+
+        <if test="pojo.mainDept!=null and pojo.mainDept!=''">
+            and v.text_ like CONCAT('%@mainDept:%',#{pojo.mainDept},'%@%')
+        </if>
+        <if test="pojo.fileNum!=null and pojo.fileNum!=''">
+            and v.text_ like CONCAT('%{file_num:%',#{pojo.fileNum},'%}%')
+        </if>
+        <if test="pojo.createName!=null and pojo.createName!=''">
+            and v.text_ like CONCAT('%$create_name:%',#{pojo.createName},'%$%')
+        </if>
+        GROUP BY
+        t.PROC_INST_ID_
+        order by
+        <if test="pojo.tableOrder">
+            <!--<if test="pojo.orederByTile==1">-->
+                <!--SUBSTRING_INDEX(v.text_, '!functionName:', -1),-->
+            <!--</if>-->
+            <!--<if test="pojo.orederByTile==-1">-->
+                <!--SUBSTRING_INDEX(v.text_, '!functionName:', -1) desc,-->
+            <!--</if>-->
+
+            <!--<if test="pojo.orederByWenHao==1">-->
+                <!--SUBSTRING_INDEX(v.text_, '{file_num:', -1),-->
+            <!--</if>-->
+            <!--<if test="pojo.orederByWenHao==-1">-->
+                <!--SUBSTRING_INDEX(v.text_, '{file_num:', -1) desc,-->
+            <!--</if>-->
+
+            <!--<if test="pojo.orederByHuanJie==1">-->
+                <!--t.name_,-->
+            <!--</if>-->
+            <!--<if test="pojo.orederByHuanJie==-1">-->
+                <!--t.name_ desc,-->
+            <!--</if>-->
+
+            <!--<if test="pojo.orederByDrafter==1">-->
+                <!--SUBSTRING_INDEX(v.text_, '$create_name:', -1),-->
+            <!--</if>-->
+            <!--<if test="pojo.orederByDrafter==-1">-->
+                <!--SUBSTRING_INDEX(v.text_, '$create_name:', -1) desc,-->
+            <!--</if>-->
+
+            <if test="pojo.orederByTime==1">
+                t.START_TIME_,
+            </if>
+            <if test="pojo.orederByTime==-1">
+                t.START_TIME_ desc,
+            </if>
+
+        </if>
+        <if test="!pojo.tableOrder">
+            v.text_,t.START_TIME_ desc,
+        </if>
+        1=1
+
+
+        LIMIT #{pageNo},#{pageSize}
+
+
+    </select>
+
+    <!--部门监控数量-->
+    <select id="deptTaskMonitorCountFold" resultType="long">
+
+
+        select
+        COUNT(DISTINCT l.processInstanceId )
+
+        from
+        (
+        SELECT
+        t.ID_ id,
+        t.NAME_ NAME,
+        t.EXECUTION_ID_ executionId,
+        t.PROC_INST_ID_ processInstanceId,
+        t.PROC_DEF_ID_ processDefinitionId,
+        t.PARENT_TASK_ID_ parentTaskId,
+        t.DESCRIPTION_ description,
+        t.TASK_DEF_KEY_ taskDefinitionKey,
+        t.OWNER_ OWNER,
+        t.start_time_ createTime,
+        t.ASSIGNEE_ assignee,
+        t.DUE_DATE_ dueDate,
+        t.CATEGORY_ category,
+        t.TENANT_ID_ tenantId,
+        t.FORM_KEY_ formKey,
+        v.text_ busMsg,
+        IFNULL(t.DELETE_REASON_,'todo') del
+        FROM
+        act_hi_taskinst t
+        LEFT JOIN act_hi_varinst v ON t.PROC_INST_ID_ = v.PROC_INST_ID_
+        AND v.name_ = 'busMsg'
+        WHERE
+        EXISTS(select * from act_ru_execution where  PROC_INST_ID_=t.PROC_INST_ID_)
+        AND v.name_ = 'busMsg'
+
+        and t.ASSIGNEE_ =  #{pojo.userId}
+
+        UNION
+        SELECT
+        t.ID_ id,
+        t.NAME_ NAME,
+        t.EXECUTION_ID_ executionId,
+        t.PROC_INST_ID_ processInstanceId,
+        t.PROC_DEF_ID_ processDefinitionId,
+        t.PARENT_TASK_ID_ parentTaskId,
+        t.DESCRIPTION_ description,
+        t.TASK_DEF_KEY_ taskDefinitionKey,
+        t.OWNER_ OWNER,
+        t.create_time_ createTime,
+        t.ASSIGNEE_ assignee,
+        t.DUE_DATE_ dueDate,
+        t.CATEGORY_ category,
+        t.TENANT_ID_ tenantId,
+        t.FORM_KEY_ formKey,
+        v.text_ busMsg,
+        'todo' del
+        FROM
+        act_ru_task t
+        LEFT JOIN act_ru_identitylink i ON t.id_ = i.task_id_
+        LEFT JOIN act_hi_varinst v ON t.PROC_INST_ID_ = v.PROC_INST_ID_
+        WHERE
+        v.name_ = 'busMsg'
+        AND i.user_id_ =  #{pojo.userId}
+        AND i.TYPE_ = 'candidate'
+        AND t.ASSIGNEE_ IS NULL
+
+        ) l left JOIN
+        oa_task_dept td on td.proc_inst_id =l.processInstanceId and td.task_id =  l.id and td.task_def_key=l.taskDefinitionKey
+        and td.type=#{type} and td.user_id= #{pojo.userId}
+        where
+        td.proc_inst_id =l.processInstanceId and td.task_id =  l.id and td.task_def_key=l.taskDefinitionKey
+        and td.type=#{type} and td.user_id= #{pojo.userId}
+
+        <if test="pojo.startQueryTime!=null ">
+            and l.createTime &gt;= #{pojo.startQueryTime}
+        </if>
+
+        <if test="pojo.endQueryTime!=null ">
+            and l.createTime &lt;= #{pojo.endQueryTime}
+        </if>
+
+        <if test="pojo.dataTitle!=null and pojo.dataTitle!=''">
+            and l.busMsg like CONCAT('%[%',#{pojo.dataTitle},'%]%')
+        </if>
+
+        <if test="pojo.mainDept!=null and pojo.mainDept!=''">
+            and l.busMsg like CONCAT('%@mainDept:%',#{pojo.mainDept},'%@%')
+        </if>
+        <if test="pojo.fileNum!=null and pojo.fileNum!=''">
+            and l.busMsg like CONCAT('%{file_num:%',#{pojo.fileNum},'%}%')
+        </if>
+        <if test="pojo.createName!=null and pojo.createName!=''">
+            and l.busMsg like CONCAT('%$create_name:%',#{pojo.createName},'%$%')
+        </if>
+        <if test="urgencyDegree !=null and urgencyDegree !=''">
+            and SUBSTRING_INDEX(v.TEXT_,',',1)=#{urgencyDegree}
+        </if>
+    </select>
+    <!--部门监控-->
+    <select id="deptTaskMonitorQueryFold" resultType="com.cfcc.modules.workflow.pojo.TaskInfoJsonAble">
+
+        select
+
+        GROUP_CONCAT(DISTINCT l.id) id,
+        GROUP_CONCAT(DISTINCT l.NAME) name,
+        GROUP_CONCAT( l.NAME) allNames,
+        l.executionId,
+        l.processInstanceId,
+        l.processDefinitionId,
+        l.parentTaskId,
+        l.description,
+        GROUP_CONCAT( l.taskDefinitionKey) taskDefinitionKey,
+        l.OWNER,
+        MAX(l.createTime) createTime,
+        l.assignee,
+        l.dueDate,
+        l.category,
+        l.tenantId,
+        l.formKey,
+        l.busMsg,
+        GROUP_CONCAT(DISTINCT(CONCAT(l.id,':',l.del))) deleteReason
+
+        from
+        (
+        SELECT
+        t.ID_ id,
+        t.NAME_ NAME,
+        t.EXECUTION_ID_ executionId,
+        t.PROC_INST_ID_ processInstanceId,
+        t.PROC_DEF_ID_ processDefinitionId,
+        t.PARENT_TASK_ID_ parentTaskId,
+        t.DESCRIPTION_ description,
+        t.TASK_DEF_KEY_ taskDefinitionKey,
+        t.OWNER_ OWNER,
+        t.start_time_ createTime,
+        t.ASSIGNEE_ assignee,
+        t.DUE_DATE_ dueDate,
+        t.CATEGORY_ category,
+        t.TENANT_ID_ tenantId,
+        t.FORM_KEY_ formKey,
+        v.text_ busMsg,
+        ifNULL(t.DELETE_REASON_,'todo') del
+        FROM
+        act_hi_taskinst t
+        LEFT JOIN act_hi_varinst v ON t.PROC_INST_ID_ = v.PROC_INST_ID_
+        AND v.name_ = 'busMsg'
+        WHERE
+        EXISTS(select * from act_ru_execution where  PROC_INST_ID_=t.PROC_INST_ID_)
+        AND v.name_ = 'busMsg'
+
+        and t.ASSIGNEE_ =  #{pojo.userId}
+
+        UNION
+        SELECT
+        t.ID_ id,
+        t.NAME_ NAME,
+        t.EXECUTION_ID_ executionId,
+        t.PROC_INST_ID_ processInstanceId,
+        t.PROC_DEF_ID_ processDefinitionId,
+        t.PARENT_TASK_ID_ parentTaskId,
+        t.DESCRIPTION_ description,
+        t.TASK_DEF_KEY_ taskDefinitionKey,
+        t.OWNER_ OWNER,
+        t.create_time_ createTime,
+        t.ASSIGNEE_ assignee,
+        t.DUE_DATE_ dueDate,
+        t.CATEGORY_ category,
+        t.TENANT_ID_ tenantId,
+        t.FORM_KEY_ formKey,
+        v.text_ busMsg,
+        'todo' del
+        FROM
+        act_ru_task t
+        LEFT JOIN act_ru_identitylink i ON t.id_ = i.task_id_
+        LEFT JOIN act_hi_varinst v ON t.PROC_INST_ID_ = v.PROC_INST_ID_
+        WHERE
+        v.name_ = 'busMsg'
+        AND i.user_id_ =  #{pojo.userId}
+        AND i.TYPE_ = 'candidate'
+        AND t.ASSIGNEE_ IS NULL
+
+        )  l left JOIN
+        oa_task_dept td on td.proc_inst_id =l.processInstanceId and td.task_id =  l.id and td.task_def_key=l.taskDefinitionKey
+        and td.type= #{type} and td.user_id= #{pojo.userId}
+        where
+        td.proc_inst_id =l.processInstanceId and td.task_id =  l.id and td.task_def_key=l.taskDefinitionKey
+        and td.type= #{type} and td.user_id= #{pojo.userId}
+        <if test="pojo.startQueryTime!=null ">
+            and l.createTime &gt;= #{pojo.startQueryTime}
+        </if>
+
+        <if test="pojo.endQueryTime!=null ">
+            and l.createTime &lt;= #{pojo.endQueryTime}
+        </if>
+
+        <if test="pojo.dataTitle!=null and pojo.dataTitle!=''">
+            and l.busMsg like CONCAT('%[%',#{pojo.dataTitle},'%]%')
+        </if>
+        <if test="pojo.mainDept!=null and pojo.mainDept!=''">
+            and l.busMsg like CONCAT('%@mainDept:%',#{pojo.mainDept},'%@%')
+        </if>
+        <if test="pojo.fileNum!=null and pojo.fileNum!=''">
+            and l.busMsg like CONCAT('%{file_num:%',#{pojo.fileNum},'%}%')
+        </if>
+        <if test="pojo.createName!=null and pojo.createName!=''">
+            and l.busMsg like CONCAT('%$create_name:%',#{pojo.createName},'%$%')
+        </if>
+        <if test="urgencyDegree !=null and urgencyDegree !=''">
+            and SUBSTRING_INDEX(v.TEXT_,',',1)=#{urgencyDegree}
+        </if>
+        GROUP BY l.processInstanceId
+
+        order by
+        <if test="pojo.tableOrder">
+
+
+            <if test="pojo.orederByTime==1">
+                l.createTime,
+            </if>
+            <if test="pojo.orederByTime==-1">
+                l.createTime desc,
+            </if>
+
+        </if>
+        <if test="!pojo.tableOrder">
+            l.busMsg,l.createTime desc,
+        </if>
+        1=1
+
+        limit #{pageNo},#{pageSize}
+
+    </select>
+
+</mapper>

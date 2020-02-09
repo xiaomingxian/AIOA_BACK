@@ -1,0 +1,73 @@
+package com.cfcc.modules.utils;
+
+import org.activiti.engine.RuntimeService;
+import org.activiti.engine.TaskService;
+import org.activiti.engine.impl.interceptor.Command;
+import org.activiti.engine.impl.interceptor.CommandContext;
+import org.activiti.engine.impl.persistence.entity.ExecutionEntity;
+import org.activiti.engine.impl.persistence.entity.TaskEntity;
+import org.activiti.engine.runtime.Execution;
+import org.activiti.engine.task.Task;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
+
+import java.util.Date;
+
+@Component
+public class AddUserCmd implements Command<Void> {
+
+    protected String executionId;//执行实例id
+
+    protected String assignee;//办理人
+
+    @Autowired
+    private RuntimeService runtimeService;
+
+    @Autowired
+    private TaskService taskService;
+
+    //@Autowired
+    //private IdGenerator idGenerator;
+
+
+    @Override
+    public Void execute(CommandContext commandContext) {
+
+        Execution execution = runtimeService.createExecutionQuery().executionId(executionId).singleResult();
+
+        ExecutionEntity executionEntity = (ExecutionEntity) execution;
+
+        ExecutionEntity parent = executionEntity.getParent();//获取父级 ExecutionEntity实例对象
+
+        ExecutionEntity newExecution = parent.createExecution();//创建一个新的ExecutionEntity实例对象
+
+        newExecution.setActive(true);//激活状态
+        newExecution.setConcurrent(true);//设置创建的新实例对象是分支
+        newExecution.setScope(false);
+
+        //创建新taskEntity 填充属性
+        Task newTask = taskService.createTaskQuery().executionId(executionId).singleResult();
+        TaskEntity t = (TaskEntity) newTask;
+        TaskEntity taskEntity = new TaskEntity();
+        taskEntity.setCreateTime(new Date());
+        taskEntity.setTaskDefinitionKey(t.getTaskDefinitionKey());
+        taskEntity.setProcessDefinitionId(t.getProcessDefinitionId());
+        taskEntity.setTaskDefinition(t.getTaskDefinition());
+        taskEntity.setProcessInstanceId(t.getProcessInstanceId());
+        taskEntity.setExecutionId(newExecution.getId());
+        taskEntity.setName(t.getName());
+        taskEntity.setExecution(newExecution);
+        taskEntity.setAssignee(assignee);
+        //保存
+        taskService.saveTask(taskEntity);
+
+        Integer nrOfInstances = LoopVariableUtils.getLoopVariable(newExecution, "nrOfInstances");
+        Integer nrOfActiveInstances = LoopVariableUtils.getLoopVariable(newExecution, "nrOfActiveInstances");
+
+
+        LoopVariableUtils.setLoopVariable(newExecution, "nrOfInstances", nrOfInstances + 1);
+        LoopVariableUtils.setLoopVariable(newExecution, "nrOfActiveInstances", nrOfActiveInstances + 1);
+
+        return null;
+    }
+}

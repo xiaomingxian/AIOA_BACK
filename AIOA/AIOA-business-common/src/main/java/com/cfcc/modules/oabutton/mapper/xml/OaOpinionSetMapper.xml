@@ -1,0 +1,179 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cfcc.modules.oabutton.mapper.OaOpinionSetMapper">
+    <!--编辑-->
+    <update id="updateOaButtonById" parameterType="com.cfcc.modules.oabutton.entity.OaOpinionSet">
+        UPDATE oa_opinion_set
+        SET i_proc_opinion_id=#{iProcOpinionId},
+        i_proc_set_id=#{iProcSetId},
+        i_task_opinion_name=#{iTaskOpinionName},i_task_opinion_order=#{iTaskOpinionOrder},
+        PROC_DEF_KEY_=#{procDefKey},TASK_DEF_KEY_=#{taskDefKey},TYPE_=#{type}
+        WHERE i_id = #{iId}
+    </update>
+    <!--通过id删除-->
+    <delete id="deleteOaOpinionSetByID">
+        DELETE FROM oa_opinion_set WHERE i_id = #{id}
+    </delete>
+    <!--条件查询统计条数-->
+    <select id="queryButtonCount" resultType="java.lang.Integer"
+            parameterType="com.cfcc.modules.oabutton.entity.OaOpinionSet">
+        select count(i_id) as total from oa_opinion_set
+        <where>
+            <if test="iTaskOpinionName != null and iTaskOpinionName != ''">
+                i_task_opinion_name=#{iTaskOpinionName}
+            </if>
+            <if test="iTaskOpinionOrder !=null and iTaskOpinionOrder!=''">
+                and i_task_opinion_order=#{iTaskOpinionOrder}
+            </if>
+            <if test="taskDefKey !=null and taskDefKey!=''">
+                and TASK_DEF_KEY_=#{taskDefKey}
+            </if>
+            <if test="iProcOpinionId !=null and iProcOpinionId!=''">
+                and i_proc_opinion_id=#{iProcOpinionId}
+            </if>
+            <if test="taskDefKey !=null and taskDefKey!=''">
+                and PROC_DEF_KEY_=#{procDefKey}
+            </if>
+        </where>
+    </select>
+    <!--分页查询-->
+    <select id="queryButton" resultType="com.cfcc.modules.oabutton.entity.OaOpinionSet">
+        select i_id, i_proc_opinion_id,i_proc_set_id,i_task_opinion_name,i_task_opinion_order,
+        PROC_DEF_KEY_,TASK_DEF_KEY_
+        from oa_opinion_set
+        <where>
+            <if test="opinionset.iTaskOpinionName != null and opinionset.iTaskOpinionName != ''">
+                i_task_opinion_name=#{opinionset.iTaskOpinionName}
+            </if>
+            <if test="opinionset.iTaskOpinionOrder !=null and opinionset.iTaskOpinionOrder!=''">
+                and i_task_opinion_order=#{opinionset.iTaskOpinionOrder}
+            </if>
+            <if test="opinionset.taskDefKey !=null and opinionset.taskDefKey!=''">
+                and TASK_DEF_KEY_=#{opinionset.taskDefKey}
+            </if>
+            <if test="opinionset.iProcOpinionId !=null and opinionset.iProcOpinionId!=''">
+                and i_proc_opinion_id=#{opinionset.iProcOpinionId}
+            </if>
+            <if test="opinionset.taskDefKey !=null and opinionset.taskDefKey!=''">
+                and PROC_DEF_KEY_=#{opinionset.procDefKey}
+            </if>
+        </where>
+        order by i_task_opinion_order
+        limit #{pageNo},#{pageSize}
+    </select>
+    <!--根据id查询-->
+    <select id="queryById" resultType="com.cfcc.modules.oabutton.entity.OaOpinionSet">
+          select i_id,i_proc_opinion_id,i_proc_set_id,i_task_opinion_name,i_task_opinion_order,
+        PROC_DEF_KEY_,TASK_DEF_KEY_,TYPE_
+        from oa_opinion_set where i_id = #{id}
+    </select>
+
+    <!--根据一套意见，type不能重复查询-->
+    <select id="queryByType" resultType="com.cfcc.modules.oabutton.entity.OaOpinionSet">
+          select i_id,i_proc_opinion_id,i_proc_set_id,i_task_opinion_name,i_task_opinion_order,
+        PROC_DEF_KEY_,TASK_DEF_KEY_,TYPE_
+        from oa_opinion_set where TYPE_= #{type} and i_proc_opinion_id=#{iProcOpinionId}
+    </select>
+
+    <select id="queryByTaskDefKey" resultType="com.cfcc.modules.oabutton.entity.OaOpinionSet">
+          select i_id,i_proc_opinion_id,i_proc_set_id,i_task_opinion_name,i_task_opinion_order,
+        PROC_DEF_KEY_,TASK_DEF_KEY_,TYPE_
+        from oa_opinion_set where TASK_DEF_KEY_ = #{taskDefKey}
+        and i_proc_opinion_id=#{iProcOpinionId}
+        and PROC_DEF_KEY_=#{procDefKey}
+    </select>
+
+    <!--根据意见Id 查询列表-->
+    <select id="queryListByOpinionId" resultType="com.cfcc.modules.oabutton.entity.OaOpinionSet"
+            parameterType="integer">
+        select i_id, i_proc_opinion_id,i_proc_set_id,i_task_opinion_name,i_task_opinion_order,
+        PROC_DEF_KEY_,TASK_DEF_KEY_,TYPE_
+        from oa_opinion_set
+        where i_proc_opinion_id=#{iProcOpinionId}
+    </select>
+
+    <!--根据oa_proc_button的根据序号校验查询-->
+    <select id="queryByOrderAndKey" resultType="com.cfcc.modules.oabutton.entity.OaOpinionSet">
+        select * from oa_opinion_set
+         where PROC_DEF_KEY_ = #{procDefKey}
+         and i_task_opinion_order=#{itaskOpinionOrder}
+    </select>
+
+    <!--添加流程意见-->
+    <insert id="insertOaButtonSet" parameterType="com.cfcc.modules.oabutton.entity.OaButtonSet">
+        insert into oa_opinion_set
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="procDefKey!=null and procDefKey!=''">
+                PROC_DEF_KEY_,
+            </if>
+            <if test="taskDefKey!=null and taskDefKey!=''">
+                TASK_DEF_KEY_,
+            </if>
+            <if test="iProcOpinionId!=null and iProcOpinionId!=''">
+                i_proc_opinion_id,
+            </if>
+            <if test="iProcSetId!=null and iProcSetId!=''">
+                i_proc_set_id,
+            </if>
+            <if test="iTaskOpinionName!=null and iTaskOpinionName!=''">
+                i_task_opinion_name,
+            </if>
+            <if test="iTaskOpinionOrder!=null and iTaskOpinionOrder!=''">
+                i_task_opinion_order,
+            </if>
+            <if test="type!=null and type!=''">
+                TYPE_,
+            </if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="procDefKey!=null and procDefKey!=''">
+                #{procDefKey},
+            </if>
+            <if test="taskDefKey!=null and taskDefKey!=''">
+                #{taskDefKey},
+            </if>
+            <if test="iProcOpinionId!=null and iProcOpinionId!=''">
+                #{iProcOpinionId},
+            </if>
+            <if test="iProcSetId!=null and iProcSetId!=''">
+                #{iProcSetId},
+            </if>
+            <if test="iTaskOpinionName!=null and iTaskOpinionName!=''">
+                #{iTaskOpinionName},
+            </if>
+            <if test="iTaskOpinionOrder!=null and iTaskOpinionOrder!=''">
+                #{iTaskOpinionOrder},
+            </if>
+            <if test="type!=null and type!=''">
+                #{type},
+            </if>
+        </trim>
+    </insert>
+
+
+    <insert id="insertBatch">
+        insert into oa_opinion_set
+        (
+        i_proc_opinion_id,
+        i_proc_set_id,
+        i_task_opinion_name,
+        i_task_opinion_order,
+        PROC_DEF_KEY_,
+        TASK_DEF_KEY_,
+        TYPE_
+        )values
+        <foreach collection="list" item="pojo" separator=",">
+            (
+            #{pojo.iProcOpinionId},
+            #{pojo.iProcSetId},
+            #{pojo.iTaskOpinionName},
+            #{pojo.iTaskOpinionOrder},
+            #{pojo.procDefKey},
+            #{pojo.taskDefKey},
+            #{pojo.type}
+            )
+        </foreach>
+
+
+    </insert>
+</mapper>

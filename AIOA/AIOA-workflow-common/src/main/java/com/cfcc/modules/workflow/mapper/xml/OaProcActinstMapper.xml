@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cfcc.modules.workflow.mapper.OaProcActinstMapper">
+
+
+    <select id="queryActs" resultType="map">
+        select t.i_id iId,t.proc_def_key procDefKey,t.act_id actId,act_name actName,candidates
+        candidates,is_mult_assignee isMultAssignee
+        ,role_scope roleScope,user_or_role userOrRole,is_can_add isCanAdd,is_dept_finish ,is_complete_task
+        isCompleteTask,record_currentuser recordCurrentuser
+        ,record_key recordKey ,depts depts,create_time createTime, update_time updateTime
+        from oa_proc_actinst t where t.PROC_DEF_KEY=#{key} and t.act_id in
+        <foreach collection='taskIds' index='index' item='item' open='(' separator=',' close=')'>
+            '${item}'
+        </foreach>
+    </select>
+
+    <select id="selectCountMy" resultType="long">
+
+        select count(*) from oa_proc_actinst
+        where 1=1
+        <if test="pojo.procDefKey!=null and pojo.procDefKey!=''">
+            and PROC_DEF_KEY= #{pojo.procDefKey}
+        </if>
+    </select>
+
+
+    <select id="selectData" resultType="com.cfcc.modules.workflow.pojo.OaProcActinst">
+
+        select
+        i_id iId,
+        proc_def_key procDefKey,
+        act_id actId,
+        act_name actName,
+        candidates candidates,
+        is_mult_assignee isMultAssignee,
+        role_scope roleScope,
+        user_or_role userOrRole,
+        is_can_add isCanAdd,
+        is_dept_finish,
+        is_complete_task isCompleteTask,
+        record_currentuser recordCurrentuser,
+        record_key recordKey,
+        depts depts,
+        is_dept_finish isDeptFinish,
+        create_time createTime,
+        update_time updateTime,
+        user_record_val userRecordVal
+        from oa_proc_actinst
+        where 1=1
+        <if test="pojo.procDefKey!=null and pojo.procDefKey!=''">
+            and PROC_DEF_KEY= #{pojo.procDefKey}
+        </if>
+        limit #{pageNo},#{pageSize}
+    </select>
+
+    <insert id="insertBatch">
+
+
+        insert into oa_proc_actinst ( proc_def_key ,
+        act_id ,act_name ,candidates,is_mult_assignee
+        ,role_scope ,user_or_role ,is_can_add ,
+        is_dept_finish ,is_complete_task,record_currentuser
+        ,record_key ,depts,create_time )
+        values
+        <foreach collection="list" item="pojo" separator=",">
+            (#{copyKey},#{pojo.actId},#{pojo.actName},#{pojo.candidates},
+            #{pojo.isMultAssignee},#{pojo.roleScope},#{pojo.userOrRole},
+            #{pojo.isCanAdd},#{pojo.isDeptFinish},#{pojo.isCompleteTask},
+            #{pojo.recordCurrentuser},#{pojo.recordKey},#{pojo.depts},now())
+        </foreach>
+
+
+    </insert>
+
+
+</mapper>

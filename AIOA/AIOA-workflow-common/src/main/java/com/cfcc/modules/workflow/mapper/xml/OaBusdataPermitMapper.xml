@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cfcc.modules.workflow.mapper.OaBusdataPermitMapper">
+
+    <select id="queryBusdataPermitUserTotal" resultType="java.lang.Integer">
+        SELECT
+        COUNT(*) as total
+        FROM ${sBusdataTable}
+        WHERE i_bus_function_id=#{iBusFunctionId}
+        AND i_busdata_id=#{iBusdataId}
+    </select>
+
+
+    <select id="queryOaBusdataPermitRead" resultType="com.cfcc.modules.workflow.vo.OaBusdataPermitRead">
+        SELECT
+	    p.i_id,ud.dep_id deptId,p.s_user_id,p.s_userunit_id unitId,u.username,d.depart_name deptName,p.i_is_read isread
+        FROM
+        ${sBusdataTable} p
+        LEFT JOIN sys_user u ON u.id=p.s_user_id
+        LEFT JOIN sys_user_depart ud ON ud.user_id=p.s_user_id
+        LEFT JOIN sys_depart d ON d.id=ud.dep_id
+        WHERE p.i_bus_function_id=#{iBusFunctionId}
+        And p.i_busdata_id=#{iBusdataId}
+        order by d.depart_name
+    </select>
+
+</mapper>

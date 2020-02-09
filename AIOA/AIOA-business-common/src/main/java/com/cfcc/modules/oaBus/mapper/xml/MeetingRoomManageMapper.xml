@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cfcc.modules.oaBus.mapper.MeetingRoomManageMapper">
+
+
+    <select id="selectMeetingRoomList" resultType="com.cfcc.modules.oaBus.entity.OaBusdata">
+        SELECT *
+        FROM oa_busdata40
+        <where>
+            <if test="meet.sTitle != null  ">
+                s_title like CONCAT('%',#{meet.sTitle},'%')
+            </if>
+            <if test="meet.sVarchar1 != null  ">
+                and s_varchar1 like CONCAT('%', #{meet.sVarchar1},'%')
+            </if>
+            <if test="meet.sVarchar2 != null  ">
+                and s_varchar2 like CONCAT('%',#{meet.sVarchar2},'%')
+            </if>
+            <if test="meet.iIs1 != null &amp; meet.iIs2 != null  ">
+                and s_varchar3 &gt;= #{meet.iIs1} and s_varchar3 &lt;= #{meet.iIs2}
+            </if>
+            <if test="meet.sVarchar4 != null  ">
+                and s_varchar4 like CONCAT('%', #{meet.sVarchar4},'%')
+            </if>
+            <if test="meet.iCreateYear != null  ">
+                and i_create_year = #{meet.iCreateYear}
+            </if>
+        </where>
+        ORDER BY d_create_time DESC
+        limit #{pageNo},#{pageSize}
+    </select>
+
+    <select id="selectMeetingRoomTotal" resultType="java.lang.Integer">
+        select count(i_id) as total from oa_busdata40
+        <where>
+            <if test="sTitle != null  ">
+                s_title like CONCAT('%',#{sTitle},'%')
+            </if>
+            <if test="sVarchar1 != null  ">
+                and s_varchar1 like CONCAT('%', #{sVarchar1},'%')
+            </if>
+            <if test="sVarchar2 != null  ">
+                and s_varchar2 like CONCAT('%',#{sVarchar2},'%')
+            </if>
+            <if test="iIs1 != null &amp; iIs2 != null  ">
+                and s_varchar3 &gt;= #{iIs1} and s_varchar3 &lt;= #{iIs2}
+            </if>
+            <if test="sVarchar4 != null  ">
+                and s_varchar4 like CONCAT('%', #{sVarchar4},'%')
+            </if>
+            <if test="iCreateYear != null  ">
+                and i_create_year = #{iCreateYear}
+            </if>
+        </where>
+    </select>
+</mapper>

@@ -1,0 +1,110 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cfcc.modules.oabutton.mapper.OaProcButtonMapper">
+    <!--编辑-->
+    <update id="updateProcOaButtonById" parameterType="com.cfcc.modules.oabutton.entity.OaProcButton">
+         UPDATE oa_proc_button
+        <set>
+            <if test="procDefKey!=null and procDefKey!=''">
+                PROC_DEF_KEY =#{procDefKey},
+            </if>
+            <if test="sButtonSetName!=null and sButtonSetName!=''">
+                s_button_set_name=#{sButtonSetName},
+            </if>
+        </set>
+        WHERE i_id = #{iId}
+    </update>
+    <!--根据id删除-->
+    <delete id="deleteProcOaButtonByID">
+        DELETE FROM oa_proc_button WHERE i_id = #{id}
+    </delete>
+    <!--条件查询统计条数-->
+    <select id="queryProcButtonCount" resultType="java.lang.Integer"
+            parameterType="com.cfcc.modules.oabutton.entity.OaProcButton">
+        select count(1) as total from oa_proc_button
+        <where>
+            <if test="iId !=null and iId !=''">
+                and i_id=#{iId}
+            </if>
+            <if test="procDefKey !=null and procDefKey !=''">
+                and PROC_DEF_KEY=#{procDefKey}
+            </if>
+            <if test="procDefKey ==null or procDefKey ==''">
+                and (PROC_DEF_KEY='' or PROC_DEF_KEY is null)
+            </if>
+            <if test="sButtonSetName !=null and sButtonSetName !=''">
+                and s_button_set_name=#{sButtonSetName}
+            </if>
+        </where>
+    </select>
+    <!--分页查询-->
+    <select id="queryProcButton" resultType="com.cfcc.modules.oabutton.entity.OaProcButton">
+        select i_id,PROC_DEF_KEY,s_button_set_name from oa_proc_button
+        <where>
+            <if test="procbutton.iId != null and procbutton.iId != ''">
+                and i_id=#{procbutton.iId}
+            </if>
+            <if test="procbutton.procDefKey != null and procbutton.procDefKey != ''">
+                and PROC_DEF_KEY=#{procbutton.procDefKey}
+            </if>
+            <if test="procbutton.procDefKey ==null or procbutton.procDefKey ==''">
+                and (PROC_DEF_KEY='' or PROC_DEF_KEY is null)
+            </if>
+            <if test="procbutton.sButtonSetName !=null and procbutton.sButtonSetName!=''">
+                 and s_button_set_name=#{procbutton.sButtonSetName}
+            </if>
+        </where>
+        limit #{pageNo},#{pageSize}
+    </select>
+    <!--根据id查询-->
+    <select id="queryById" resultType="com.cfcc.modules.oabutton.entity.OaProcButton">
+         select i_id,PROC_DEF_KEY,s_button_set_name
+        from oa_proc_button where i_id = #{id}
+    </select>
+    <select id="procButtonList" resultType="com.cfcc.modules.oabutton.entity.OaProcButton">
+        select i_id,PROC_DEF_KEY,s_button_set_name from oa_proc_button
+    </select>
+    <select id="queryByKey" resultType="com.cfcc.modules.oabutton.entity.OaProcButton">
+        select b.i_id,b.PROC_DEF_KEY,b.s_button_set_name
+        from oa_proc_button b
+        where PROC_DEF_KEY = #{key}
+    </select>
+    <select id="findList" resultType="com.cfcc.modules.oabutton.entity.OaProcButton">
+        select * from oa_proc_button
+    </select>
+    <select id="queryProcButtonByProcDao" resultType="com.cfcc.modules.oabutton.entity.OaProcButton">
+        select * from oa_proc_button c where c.PROC_DEF_KEY = #{procKey}
+    </select>
+    <select id="queryProcButtonByProcDaoNull" resultType="com.cfcc.modules.oabutton.entity.OaProcButton">
+        select * from oa_proc_button
+    </select>
+    <!--根据配置名称查询条数-->
+    <select id="queryProcButtonBySButtonSetName" resultType="int">
+        select count(i_id) from oa_proc_button where s_button_set_name=#{sButtonSetName}
+    </select>
+    <!--&lt;!&ndash;根据配置名称查询配置列表&ndash;&gt;-->
+    <!--<select id="queryProcButtonBySButtonSetNameList" resultType="list">-->
+        <!--select PROC_DEF_KEY,s_button_set_name from oa_proc_button where s_button_set_name=#{sButtonSetName}-->
+    <!--</select>-->
+    <!--添加-->
+    <insert id="insertProcOaButton" useGeneratedKeys="true" keyProperty="iId" keyColumn="i_id">
+        insert oa_proc_button
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="procDefKey!=null and procDefKey!=''">
+                PROC_DEF_KEY,
+            </if>
+            <if test="sButtonSetName!=null and sButtonSetName!=''">
+                s_button_set_name,
+            </if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="procDefKey!=null and procDefKey!=''">
+                #{procDefKey},
+            </if>
+            <if test="sButtonSetName!=null and sButtonSetName!=''">
+                #{sButtonSetName},
+            </if>
+        </trim>
+    </insert>
+
+</mapper>

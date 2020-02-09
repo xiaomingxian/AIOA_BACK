@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cfcc.modules.oaTeamwork.mapper.oaTeamworkMapper">
+    <insert id="Insert">
+        insert into oa_teamwork
+        (i_id,
+         s_teamwork_name,
+         description,
+         s_create_by,
+         s_create_deptid,
+         s_create_unitid,
+         d_create_time,
+         d_update_time,
+         i_version
+        ) values
+        (null,
+        #{sTeamworkName},
+        #{description},
+        #{sCreateBy},
+        #{sCreateDeptid},
+        #{sCreateUnitid},
+        #{dCreateTime},
+        #{dUpdateTime},
+        #{iVersion}
+        )
+    </insert>
+    <!--  修改 -->
+    <update id="updateByIid" parameterType="com.cfcc.modules.oaTeamwork.entity.oaTeamwork">
+		UPDATE oa_teamwork SET s_teamwork_name = #{sTeamworkName} ,description = #{description} ,s_create_by = #{sCreateBy},s_create_deptid = #{sCreateDeptid},s_create_unitid = #{sCreateUnitid},d_create_time = #{dCreateTime},d_update_time = #{dUpdateTime},i_version = #{iVersion} where i_id = #{iId}
+	</update>
+    <!-- 删除-->
+    <delete id="deleteByIid" parameterType="String">
+        DELETE  from oa_teamwork  where i_id = #{id}
+    </delete>
+
+    <!-- 根据Id查询-->
+    <!--resultType="com.cfcc.modules.oaTeamwork.entity.oaTeamwork" parameterType="integer"-->
+    <select id="findById"  resultType="com.cfcc.modules.oaTeamwork.entity.oaTeamwork">
+        SELECT * from oa_teamwork  where i_id = #{iId}
+    </select>
+
+    <select id="count" resultType="integer">
+        select count(1) from oa_teamwork c
+        <where>
+            <if test="iId != null  ">
+                c.i_id = #{iId}
+            </if>
+            <if test="sTeamworkName != null  ">
+                and c.s_teamwork_name = #{sTeamworkName}
+            </if>
+            <if test="description != null  ">
+                and c.description = #{description}
+            </if>
+            <if test="sCreateBy != null and sCreateBy != '' ">
+                and c.s_create_by = #{sCreateBy}
+            </if>
+            <if test="iVersion != null  ">
+                and c.i_version = #{iVersion}
+            </if>
+        </where>
+
+    </select>
+
+    <select id="findPage" resultType="com.cfcc.modules.oaTeamwork.entity.oaTeamwork">
+        select *  from oa_teamwork c
+        <where>
+            <if test="oaTeamwork.iId != null and oaTeamwork.iId != '' ">
+                c.i_id = #{oaTeamwork.iId}
+            </if>
+            <if test="oaTeamwork.sCreateBy != null and oaTeamwork.sCreateBy != '' ">
+                and c.s_create_by = #{oaTeamwork.sCreateBy}
+            </if>
+            <if test="oaTeamwork.sTeamworkName != null and oaTeamwork.sTeamworkName != '' ">
+                and c.s_teamwork_name = #{oaTeamwork.sTeamworkName}
+            </if>
+            <if test="oaTeamwork.description != null and oaTeamwork.description != '' ">
+                and c.description = #{oaTeamwork.description}
+            </if>
+            <if test="oaTeamwork.iVersion != null and oaTeamwork.iVersion != '' ">
+                and c.i_version = #{oaTeamwork.iVersion}
+            </if>
+        </where>
+        limit #{pageNo},#{pageSize}
+    </select>
+    <select id="findTeamworkName" resultType="com.cfcc.modules.oaTeamwork.entity.oaTeamwork">
+        select * from oa_teamwork
+    </select>
+    <select id="selectByName" resultType="com.cfcc.modules.oaTeamwork.entity.oaTeamwork">
+        select * from oa_teamwork where  s_teamwork_name=#{teamworkName}
+    </select>
+
+</mapper>

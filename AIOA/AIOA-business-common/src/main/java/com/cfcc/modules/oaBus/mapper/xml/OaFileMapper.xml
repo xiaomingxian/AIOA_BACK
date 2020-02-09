@@ -1,0 +1,144 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cfcc.modules.oaBus.mapper.OaFileMapper">
+
+    <update id="updateFileOrder0">
+        update oa_file set i_order = 0 where s_file_type = #{fileType} and i_order = 1
+    </update>
+
+    <update id="updateFileOrder">
+        update oa_file set i_order = 1  where i_id = #{id}
+    </update>
+
+    <update id="updateTableIdById">
+        UPDATE oa_file SET i_table_id = #{checked} where s_file_type = #{fileType} and i_order = 1
+    </update>
+
+    <select id="getOaFileByTypeAndOrderAndChecked" resultType="com.cfcc.modules.oaBus.entity.OaFile">
+        select * from oa_file where s_file_type = #{fileType} and i_order = 1 and i_table_id = 1
+    </select>
+
+    <select id="getOaFileById" resultType="com.cfcc.modules.oaBus.entity.OaFile">
+        select * from oa_file where i_id = #{id}
+    </select>
+
+    <delete id="deleteOneFileByType">
+        delete from oa_file where i_id = #{id}
+    </delete>
+
+    <delete id="deleteFileByTypeAndOrder">
+        delete from oa_file
+        <where>
+            1 = 1
+            <if test="oaFileList.size != 0">
+                and i_id in
+                <foreach collection="list" index="index" item="item" open="(" separator="," close=")">
+                    #{item.iId}
+                </foreach>
+            </if>
+        </where>
+    </delete>
+
+
+    <select id="getOaFileByType" resultType="com.cfcc.modules.oaBus.entity.OaFile">
+        select * from oa_file where s_file_type = #{fileType} and i_order = 0
+    </select>
+
+
+    <!--aaaaaaaaaaaaaaaaaaaaaa-->
+
+    <insert id="saveOaFile" parameterType="com.cfcc.modules.oaBus.entity.OaFile">
+        insert into oa_file (s_file_type , s_file_name , s_file_path, s_create_by , d_create_time ，)
+          values
+          (#{sFileType},#{sFileName},#{sFilePath}, #{sCreateBy}, #{dCreateTime})
+    </insert>
+
+    <select id="queryById" resultType="com.cfcc.modules.oaBus.entity.OaFile">
+        select * from oa_file where i_id = #{id}
+    </select>
+
+    <select id="getOaFileByIidAndTable" resultType="com.cfcc.modules.oaBus.entity.OaFile">
+        select * from oa_file
+        <where>
+            s_table = #{sBusdataTable}
+            <if test="oaBusdataIid.size> 0">
+                and i_table_id in
+
+                <foreach collection="oaBusdataIid" index="index" item="oaBusdataIid" open="(" separator="," close=")">
+                    #{oaBusdataIid}
+                </foreach>
+            </if>
+            and s_file_name is NOT NULL
+
+        </where>
+    </select>
+
+    <select id="queryOaFileCount" resultType="java.lang.Integer">
+        select count(*) from oa_file c
+        <where>
+            <if test="iId != '' and iId != null">
+                c.i_id = #{iId}
+            </if>
+            <if test="sTable != '' and sTable != null">
+                and c.s_table = #{sTable}
+            </if>
+            <if test="iTableId != '' and iTableId != null">
+                and c.i_table_id = #{iTableId}
+            </if>
+
+        </where>
+    </select>
+
+    <select id="queryOaFileList" resultType="com.cfcc.modules.oaBus.entity.OaFile">
+
+        select * from oa_file c
+        <where>
+            <if test="oaFile.iId != '' and oaFile.iId != null">
+                c.i_id = #{oaFile.iId}
+            </if>
+            <if test="oaFile.sTable != '' and oaFile.sTable != null">
+                and c.s_table = #{oaFile.sTable}
+            </if>
+            <if test="oaFile.iTableId != '' and oaFile.iTableId != null">
+                and c.i_table_id = #{oaFile.iTableId}
+            </if>
+        </where>
+        order by c.i_id desc limit #{pageNo},#{pageSize}
+    </select>
+
+    <select id="getOaFileListDao" resultType="com.cfcc.modules.oaBus.entity.OaFile">
+        select * from oa_file c where c.s_table = #{tableName} and c.i_table_id = #{busDataId} and c.s_file_type  = '4' ORDER BY c.i_order
+    </select>
+
+    <select id="getBanWenList" resultType="com.cfcc.modules.oaBus.entity.OaFile">
+        select * from oa_file c where c.s_table = #{tableName} and c.i_table_id = #{busDataId} and c.s_file_type  = #{sFileType} ORDER BY c.i_order
+    </select>
+
+    <select id="queryFileListByType" resultType="com.cfcc.modules.oaBus.entity.OaFile">
+        SELECT * FROM oa_file
+        WHERE s_table=#{tableName} AND i_table_id = #{busDataId} AND  FIND_IN_SET(s_file_type,#{sFileType})
+    </select>
+
+    <select id="queryFileButton" resultType="java.lang.Integer">
+      SELECT s_button_id FROM oa_file_button
+    </select>
+
+    <!--修改附件名称-->
+    <update id="updateDocNameById">
+        UPDATE oa_file SET s_file_name = #{sFileName},s_file_path=#{sFilePath} WHERE i_id = #{iId}
+    </update>
+
+    <update id="updateIorderById">
+        UPDATE oa_file SET i_order = #{id} WHERE i_id = #{id}
+    </update>
+
+    <update id="changeIorderById">
+        UPDATE oa_file SET i_order = #{iOrder} WHERE i_id = #{id}
+    </update>
+    <update id="updateFileOrder2">
+         update oa_file set i_order = 1 where i_id = #{id}
+    </update>
+    <update id="updatePicText">
+        update oa_file set s_table = #{picText} where s_file_type = #{fileType} and i_order = 1
+    </update>
+</mapper>

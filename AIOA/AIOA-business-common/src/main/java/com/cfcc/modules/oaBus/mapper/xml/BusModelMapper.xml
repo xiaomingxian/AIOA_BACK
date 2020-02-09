@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cfcc.modules.oaBus.mapper.BusModelMapper">
+
+    <!--根据id更新一条数据-->
+    <update id="updateBusModelByIdDao" parameterType="com.cfcc.modules.oaBus.entity.BusModel">
+        update oa_bus_model c set c.i_order = #{iOrder} ,c.s_busdata_table = #{sBusdataTable} ,c.s_name = #{sName} where c.i_id = #{iId};
+    </update>
+
+    <!--根据id删除一条数据-->
+    <delete id="removeBusModelByIdDao">
+        delete from oa_bus_model where i_id = #{id} ;
+    </delete>
+
+    <select id="getBusModelById" resultType="com.cfcc.modules.oaBus.entity.BusModel"
+            parameterType="integer">
+        select * from oa_bus_model c where c.i_id = #{iId}
+    </select>
+
+    <select id="
+" resultType="com.cfcc.modules.oaBus.entity.BusModel"
+            parameterType="integer">
+        select * from oa_bus_model c where c.i_id = #{iId}
+    </select>
+
+    <select id="queryBusModelCount" resultType="integer">
+        select count(*) from oa_bus_model c
+        <where>
+            <if test="iId != null  ">
+                c.i_id = #{iId}
+            </if>
+            <if test="iOrder != null  ">
+                and c.i_order = #{iOrder}
+            </if>
+            <if test="sName != null  ">
+                and c.s_name = #{sName}
+            </if>
+            <if test="sBusdataTable != null  ">
+                and c.s_busdata_table = #{sBusdataTable}
+            </if>
+        </where>
+
+    </select>
+
+    <select id="queryBusModel" resultType="com.cfcc.modules.oaBus.entity.BusModel">
+        select * from oa_bus_model c
+        <where>
+            <if test="busModel.iId != null and busModel.iId != '' ">
+                c.i_id = #{busModel.iId}
+            </if>
+            <if test="busModel.iOrder != null and busModel.iOrder != '' ">
+                and c.i_order = #{busModel.iOrder}
+            </if>
+            <if test="busModel.sName != null and busModel.sName != '' ">
+                and c.s_name = #{busModel.sName}
+            </if>
+            <if test="busModel.sBusdataTable != null and busModel.sBusdataTable != '' ">
+                and c.s_busdata_table = #{busModel.sBusdataTable}
+            </if>
+        </where>
+        order by c.i_id desc limit #{pageNo},#{pageSize}
+    </select>
+    <!--查询页面list ，不用排序， 生成下拉框  -->
+    <select id="getModelListDao" resultType="com.cfcc.modules.oaBus.entity.BusModel">
+        select * from oa_bus_model
+    </select>
+
+    <select id="findList" resultType="com.cfcc.modules.oaBus.entity.BusModel">
+      select  * from oa_bus_model
+    </select>
+
+    <select id="selectDocType" resultType="com.cfcc.modules.oaBus.entity.BusModel">
+        SELECT i_id,s_name FROM oa_bus_model
+    </select>
+    <select id="findListNotInPermit" resultType="com.cfcc.modules.oaBus.entity.BusModel">
+       SELECT
+            *
+        FROM
+            `oa_bus_model`
+        WHERE
+            i_id NOT IN ( SELECT DISTINCT i_bus_model_id FROM oa_bus_model_permit )
+    </select>
+
+</mapper>

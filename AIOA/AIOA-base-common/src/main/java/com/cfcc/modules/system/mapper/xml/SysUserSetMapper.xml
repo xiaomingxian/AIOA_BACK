@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cfcc.modules.system.mapper.SysUserSetMapper">
+    <insert id="insertinto">
+        insert into sys_user_set
+        (s_user_id ,i_is_ai,i_is_messages,i_is_calendar,i_is_fold ,i_calendar_day,i_bus1_id,i_bus2_id ,i_bus3_id ,i_bus4_id )
+        values
+        (
+         #{sUserId},#{iIsAi},#{iIsMessages},#{iIsCalendar},#{iCalendarDay},#{iIsFold},#{iBus1Id},#{iBus2Id},#{iBus3Id},#{iBus4Id}
+        )
+
+
+    </insert>
+    <!--  修改 -->
+    <update id="updateByIid" parameterType="com.cfcc.modules.system.entity.SysUserSet">
+		UPDATE sys_user_set SET s_user_id = #{sUserId} ,i_is_ai = #{iIsAi} ,i_is_messages = #{iIsMessages},i_is_calendar = #{iIsCalendar},i_calendar_day=#{iCalendarDay},i_is_fold = #{iIsFold},i_bus1_id = #{iBus1Id},i_bus2_id = #{iBus2Id},i_bus3_id = #{iBus3Id},i_bus4_id = #{iBus4Id} where i_id = #{iId}
+	</update>
+    <!-- 删除-->
+    <delete id="deleteByIidd" parameterType="String">
+        DELETE from sys_user_set  where i_id = #{id}
+    </delete>
+    <!-- 根据Id查询-->
+    <select id="findById" resultType="com.cfcc.modules.system.entity.SysUserSet"  parameterType="integer">
+        SELECT * from sys_user_set  where i_id = #{iId}
+    </select>
+    <select id="count" resultType="integer">
+        select count(1) from sys_user_set c
+        <where>
+            <if test="iId != null  ">
+                c.i_id = #{iId}
+            </if>
+            <if test="iIsAi != null  ">
+                and c.i_is_ai = #{iIsAi}
+            </if>
+            <if test="iIsMessages != null  ">
+                and c.i_is_messages = #{iIsMessages}
+            </if>
+            <if test="sUserId != null  ">
+                and c.s_user_id = #{sUserId}
+            </if>
+            <if test="iIsFold != null  ">
+                and c.i_is_fold = #{iIsFold}
+            </if>
+            <if test="iIsCalendar != null  ">
+                and c.i_is_calendar = #{iIsCalendar}
+            </if>
+            <if test="iCalendarDay != null  ">
+                and c.i_calendar_day = #{iCalendarDay}
+            </if>
+        </where>
+
+    </select>
+
+    <select id="findPage" resultType="com.cfcc.modules.system.entity.SysUserSet">
+        select * from sys_user_set c
+        <where>
+            <if test="sysUserSet.iId != null and sysUserSet.iId != '' ">
+                c.i_id = #{sysUserSet.iId}
+            </if>
+            <if test="sysUserSet.iIsFold != null and sysUserSet.iIsFold != '' ">
+                and c.i_is_fold = #{iIsFold}
+            </if>
+            <if test="sysUserSet.iIsCalendar != null and sysUserSet.iIsCalendar != '' ">
+                and c.i_is_calendar = #{iIsCalendar}
+            </if>
+             <if test="sysUserSet.iCalendarDay != null and sysUserSet.iCalendarDay != '' ">
+                and c.i_calendar_day = #{iCalendarDay}
+            </if>
+            <if test="sysUserSet.iIsMessages != null and sysUserSet.iIsMessages != '' ">
+                and c.i_is_messages = #{iIsMessages}
+            </if>
+            <if test="sysUserSet.iIsAi != null and sysUserSet.iIsAi != '' ">
+                and c.i_is_ai = #{iIsAi}
+            </if>
+            <if test="sysUserSet.sUserId != null and sysUserSet.sUserId != '' ">
+                and c.s_user_id = #{sysUserSet.sUserId}
+            </if>
+        </where>
+        limit #{pageNo},#{pageSize}
+    </select>
+    <select id="findList" resultType="com.cfcc.modules.system.entity.SysUserSet">
+        select * from sys_user_set
+    </select>
+    <select id="findByUserId" resultType="com.cfcc.modules.system.entity.SysUserSet">
+         select s.*  from sys_user_set s   where  s.s_user_id=#{userId}
+    </select>
+    <select id="findByIId" resultType="com.cfcc.modules.system.entity.SysUserSet">
+        select *  from sys_user_set where i_id = #{iId}
+     </select>
+    <select id="HomeAndDay" resultType="com.cfcc.modules.system.entity.SysUserSet">
+        select * from sys_user_set  where s_user_id=#{sUserId}
+    </select>
+
+</mapper>

@@ -1,0 +1,186 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cfcc.modules.system.mapper.SysUserMapper">
+
+    <select id="getSysUserAllByAll" resultType="java.util.Map">
+        SELECT
+        ud.dep_id deptId,
+        d.depart_name departName,
+        d.parent_id parentId,
+        u.*
+        FROM
+        sys_user u
+        LEFT JOIN sys_user_depart ud ON ud.user_id = u.id
+        LEFT JOIN sys_depart d ON d.id = ud.dep_id
+        <where>
+            1 = 1
+            <if test="user.departName != null and user.departName != ''">
+                and  d.depart_name = #{user.departName}
+            </if>
+            <if test="user.username != null and user.username != ''">
+                and u.username like CONCAT('%',#{user.username},'%')
+            </if>
+            <if test="user.sex != null">
+                and u.sex = #{user.sex}
+            </if>
+            <if test="user.email != null and user.email != ''">
+                and u.email = #{user.email}
+            </if>
+            <if test="user.status != null">
+                and u.status = #{user.status}
+            </if>
+        </where>
+        ORDER BY
+          ud.dep_id + 0
+        <if test="orderBydepart != null and orderBydepart != ''">
+            desc
+        </if>
+        LIMIT #{start},#{pageSize}
+    </select>
+
+    <select id="getSysUserTotalByAll" resultType="long">
+        SELECT
+        count(*)
+        FROM
+        sys_user u
+        LEFT JOIN sys_user_depart ud ON ud.user_id = u.id
+        LEFT JOIN sys_depart d ON d.id = ud.dep_id
+        <where>
+            1 = 1
+            <if test="user.departName != null and user.departName != ''">
+                and  d.depart_name = #{user.departName}
+            </if>
+            <if test="user.username != null and user.username != ''">
+                and u.username = #{user.username}
+            </if>
+            <if test="user.sex != null">
+                and u.sex = #{user.sex}
+            </if>
+            <if test="user.email != null and user.email != ''">
+                and u.email = #{user.email}
+            </if>
+            <if test="user.status != null">
+                and u.status = #{user.status}
+            </if>
+        </where>
+    </select>
+
+
+    <!-- 根据用户名查询 -->
+    <select id="getUserByName" resultType="com.cfcc.modules.system.entity.SysUser">
+		select * from  sys_user  where username = #{username} and del_flag = '0'
+	</select>
+
+    <!-- 根据部门Id查询 -->
+    <select id="getUserByDepId" resultType="com.cfcc.modules.system.entity.SysUser">
+        select * from sys_user where del_flag = '0' and id in (select user_id from sys_user_depart where
+        dep_id=#{departId})
+        <if test="username!=null and username!=''">
+            and username = #{username}
+        </if>
+    </select>
+
+    <!-- 根据角色Id查询 -->
+    <select id="getUserByRoleId" resultType="com.cfcc.modules.system.entity.SysUser">
+        select * from sys_user where del_flag = '0' and id in (select user_id from sys_user_role where
+        role_id=#{roleId})
+        <if test="username!=null and username!=''">
+            and username = #{username}
+        </if>
+    </select>
+
+    <!--  修改用户部门code -->
+    <update id="updateUserDepart">
+		UPDATE sys_user SET org_code = #{orgCode} where username = #{username}
+	</update>
+
+    <!-- 根据手机号查询 -->
+    <select id="getUserByPhone" resultType="com.cfcc.modules.system.entity.SysUser">
+		select * from  sys_user  where phone = #{phone} and del_flag = '0'
+	</select>
+
+    <!-- 根据邮箱查询用户信息 -->
+    <select id="getUserByEmail" resultType="com.cfcc.modules.system.entity.SysUser">
+	select * from  sys_user  where email = #{email} and del_flag = '0'
+	</select>
+
+    <select id="queryAllUser" resultType="com.cfcc.modules.system.entity.SysUser">
+		select id from sys_user
+	</select>
+
+    <select id="getSysUserTotal" resultType="long">
+        SELECT
+        count(*)
+        FROM
+        sys_user u
+        LEFT JOIN sys_user_depart ud ON ud.user_id = u.id
+        LEFT JOIN sys_depart d ON d.id = ud.dep_id
+        <where>
+            1 = 1
+            <if test="user.username != null and user.username != ''">
+                and u.username = #{user.username}
+            </if>
+            <if test="user.departName != null and user.departName != ''">
+                and  d.depart_name = #{user.departName}
+            </if>
+        </where>
+    </select>
+
+    <select id="getSysUserAndDepartName" resultType="java.util.Map">
+        SELECT
+            ud.dep_id deptId,
+            d.depart_name departName,
+            d.parent_id parentId,
+            u.*
+        FROM
+            sys_user u
+        LEFT JOIN sys_user_depart ud ON ud.user_id = u.id
+        LEFT JOIN sys_depart d ON d.id = ud.dep_id
+        <where>
+            1 = 1
+            <if test="user.username != null and user.username != ''">
+                and u.username = #{user.username}
+            </if>
+            <if test="user.departName != null and user.departName != ''">
+                and  d.depart_name = #{user.departName}
+            </if>
+        </where>
+        ORDER BY
+            CAST(dep_id AS signed)
+        LIMIT #{start},#{pageSize}
+    </select>
+
+    <select id="getSysUserAll" resultType="com.cfcc.modules.system.entity.SysUser">
+        select * from sys_user where 1 = 1
+        <if test="user.username != null and user.username != ''">
+            and username like "%"#{user.username}"%"
+        </if>
+        limit #{pageNo}, #{pageSize}
+	</select>
+
+    <select id="queryUserIdsByName" resultType="string">
+      select id from sys_user where username in
+      <foreach collection="list" item="user" open="(" close=")" separator=",">
+          #{user.userName}
+      </foreach>
+    </select>
+
+    <select id="queryUserByDepts" resultType="com.cfcc.modules.system.entity.SysUser">
+
+        select u.* from sys_user u RIGHT  JOIN sys_user_depart ud on ud.user_id=u.id
+        where ud.dep_id in
+        <foreach collection="ids" item="id" open="(" close=")" separator=",">
+             #{id}
+         </foreach>
+
+
+
+    </select>
+    <select id="findById" resultType="com.cfcc.modules.system.entity.SysUser">
+        select * from sys_user where id = #{sysUserId}
+    </select>
+    <select id="getUserIdByUserName" resultType="java.lang.String">
+        SELECT id FROM sys_user WHERE username = #{username}
+    </select>
+
+</mapper>

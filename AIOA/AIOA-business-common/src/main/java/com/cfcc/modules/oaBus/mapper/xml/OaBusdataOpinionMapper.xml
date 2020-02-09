@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cfcc.modules.oaBus.mapper.OaBusdataOpinionMapper">
+
+    <!--查询意见列表-->
+    <select id="selectOpinionList" resultType="com.cfcc.modules.oaBus.entity.OaBusdataOpinion">
+        SELECT
+            os.i_task_opinion_name opinionName,
+            ob.i_order,
+            ob.s_dept_name,
+            ob.s_name,
+            ob.s_opinion
+        FROM
+            ${table} ob
+        LEFT JOIN oa_opinion_set os ON ob.i_opinion_set_id = os.i_id
+        WHERE
+            i_busdata_id = #{oabus.iBusdataId}
+        ORDER BY
+            i_order,s_dept_name
+    </select>
+
+    <!--填写意见-->
+    <insert id="putBusOpinion">
+        INSERT INTO ${busTable} (i_id,i_bus_function_id,i_busdata_id,s_name,i_user_id,d_sign,s_opinion,s_opinion_type,s_task_id,s_task_name,s_overt,i_order,s_tpye,s_dept_id,s_dept_name,s_taskdef_key)
+        VALUES(0,#{op.iBusFunctionId},#{op.iBusdataId},#{op.sName},#{op.iUserId},NOW(),#{op.sOpinion},#{op.sOpinionType},#{op.sTaskId},#{op.sTaskName},#{op.sOvert},#{op.iOrder},#{op.sTpye},#{op.sDeptId},#{op.sDeptName},#{op.sTaskdefKey})
+    </insert>
+</mapper>

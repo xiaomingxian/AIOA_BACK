@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cfcc.modules.oaBus.mapper.BusProcSetMapper">
+
+    <select id="findList" resultType="com.cfcc.modules.oaBus.entity.BusProcSet">
+        select * from oa_bus_proc_set
+    </select>
+
+    <select id="getProSetIdDao" resultType="com.cfcc.modules.oaBus.entity.BusProcSet">
+
+        select * from oa_bus_proc_set c where
+            c.i_bus_model_id = #{modelId}
+            and c.i_bus_function_id = #{functionId}
+        <if test="i_fun_version==null">
+            and i_version is null
+        </if>
+
+        <if test="i_fun_version!=null">
+            and i_version =#{i_fun_version}
+        </if>
+        limit 0,1
+
+    </select>
+
+    <select id="getProcSetByprocbuttonId" resultType="com.cfcc.modules.oaBus.entity.BusProcSet">
+        select * from oa_bus_proc_set
+         <where>
+             <if test="iProcButtonId!=null and iProcButtonId!=''">
+                 i_proc_button_id=#{iProcButtonId}
+             </if>
+             <if test="iProcOpinionId!=null and iProcOpinionId!=''">
+                 i_proc_opinion_id=#{iProcOpinionId}
+             </if>
+             <if test="functionId!=null and functionId!=''">
+                 i_bus_function_id=#{functionId}
+             </if>
+         </where>
+    </select>
+</mapper>

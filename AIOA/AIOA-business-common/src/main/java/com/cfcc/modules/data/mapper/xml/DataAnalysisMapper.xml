@@ -1,0 +1,226 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cfcc.modules.data.mapper.DataAnalysisMapper">
+
+   <!-- 办结率  ——LYJ-->
+    <select id="MyRate" resultType="java.util.Map">
+    select 
+    (select count(i_is_state)  as num  from ${table}
+      <where>
+         i_is_display =0
+      <if test="bdata.sCreateBy != null and bdata.sCreateBy != ''">
+          and  s_create_by = #{bdata.sCreateBy}
+      </if>
+      <if test="bdata.iBusFunctionId != null and bdata.iBusFunctionId != ''">
+          AND  i_bus_function_id = #{bdata.iBusFunctionId}
+      </if>
+        <if test="bdata.iCreateYear != null and bdata.iCreateYear != ''">
+            AND i_create_year = #{bdata.iCreateYear}
+        </if>
+          <if test="bdata.sCreateUnitid != null and bdata.sCreateUnitid != ''">
+              AND s_create_unitid = #{bdata.sCreateUnitid}
+          </if>
+          <if test="bdata.sCreateDeptid != null and bdata.sCreateDeptid != ''">
+              AND  s_create_deptid = #{bdata.sCreateDeptid}
+          </if>
+      </where> )/
+    (SELECT count(*)  as num1  from ${table}
+        <where>
+            i_is_display =0
+        <if test="bdata.sCreateBy != null and bdata.sCreateBy != ''">
+            and  s_create_by = #{bdata.sCreateBy}
+        </if>
+        <if test="bdata.iBusFunctionId != null and bdata.iBusFunctionId != ''">
+            AND  i_bus_function_id = #{bdata.iBusFunctionId}
+        </if>
+        <if test="bdata.iCreateYear != null and bdata.iCreateYear != ''">
+            AND i_create_year = #{bdata.iCreateYear}
+        </if>
+        <if test="bdata.sCreateUnitid != null and bdata.sCreateUnitid != ''">
+            AND s_create_unitid = #{bdata.sCreateUnitid}
+        </if>
+        <if test="bdata.sCreateDeptid != null and bdata.sCreateDeptid != ''">
+            AND  s_create_deptid = #{bdata.sCreateDeptid}
+        </if>
+    </where> ) as reta   from dual
+
+    </select>
+    <!--同行办结数量-->
+    <select id="PeerNum"  resultType="java.util.Map">
+        select 
+         (select count(i_is_state)  as num  from ${table} <where>
+         i_is_display =0
+        <if test="bdata.sCreateBy != null and bdata.sCreateBy != ''">
+            AND  s_create_by = #{bdata.sCreateBy}
+        </if>
+        <if test="bdata.iBusFunctionId != null and bdata.iBusFunctionId != ''">
+            AND  i_bus_function_id = #{bdata.iBusFunctionId}
+        </if>
+        <if test="bdata.iCreateYear != null and bdata.iCreateYear != ''">
+            AND i_create_year = #{bdata.iCreateYear}
+        </if>
+        <if test="bdata.sCreateUnitid != null and bdata.sCreateUnitid != ''">
+            AND s_create_unitid = #{bdata.sCreateUnitid}
+        </if>
+        <if test="bdata.sCreateDeptid != null and bdata.sCreateDeptid != ''">
+            AND  s_create_deptid = #{bdata.sCreateDeptid}
+        </if>
+    </where> )/
+        ( SELECT count(i_is_state)  as num1  from ${table}
+        <where>
+        i_is_display =0
+        <if test="bdata.sCreateBy != null and bdata.sCreateBy != ''">
+            AND  s_create_by = #{bdata.sCreateBy}
+        </if>
+        <if test="bdata.iCreateYear != null and bdata.iCreateYear != ''">
+            AND i_create_year = #{bdata.iCreateYear}
+        </if>
+            <if test="bdata.sCreateUnitid != null and bdata.sCreateUnitid != ''">
+                AND s_create_unitid = #{bdata.sCreateUnitid}
+            </if>
+            <if test="bdata.sCreateDeptid != null and bdata.sCreateDeptid != ''">
+                AND  s_create_deptid = #{bdata.sCreateDeptid}
+            </if>
+
+    </where> ) as reta   from dual
+    </select>
+    <!--办理率-->
+    <select id="HandlingRate" resultType="java.util.Map">
+        	select
+        	(select count(*)  as num  from ${table}  <where>
+        i_is_display =0
+        <if test="bdata.sCreateBy != null and bdata.sCreateBy != ''">
+            AND  s_create_by = #{bdata.sCreateBy}
+        </if>
+        <if test="bdata.iBusFunctionId != null and bdata.iBusFunctionId != ''">
+            AND  i_bus_function_id = #{bdata.iBusFunctionId}
+        </if>
+        <if test="bdata.sCreateUnitid != null and bdata.sCreateUnitid != ''">
+            AND s_create_unitid = #{bdata.sCreateUnitid}
+        </if>
+        <if test="bdata.sCreateDeptid != null and bdata.sCreateDeptid != ''">
+            AND  s_create_deptid = #{bdata.sCreateDeptid}
+        </if>
+    </where>)/
+        	(SELECT count(*)  as num1  from ${table}   <where>
+        i_is_display =0
+        <if test="bdata.sCreateBy != null and bdata.sCreateBy != ''">
+            AND  s_create_by = #{bdata.sCreateBy}
+        </if>
+        <if test="bdata.iCreateYear != null and bdata.iCreateYear != ''">
+            AND i_create_year = #{bdata.iCreateYear}
+        </if>
+        <if test="bdata.sCreateUnitid != null and bdata.sCreateUnitid != ''">
+            AND s_create_unitid = #{bdata.sCreateUnitid}
+        </if>
+        <if test="bdata.sCreateDeptid != null and bdata.sCreateDeptid != ''">
+            AND  s_create_deptid = #{bdata.sCreateDeptid}
+        </if>
+    </where>) as reta from dual
+
+    </select>
+
+    <select id="getDepartId" resultType="java.lang.String">
+        select id from sys_depart where id=(select dep_id from sys_user_depart where user_id = ${sCreateBy})
+    </select>
+
+    <select id="selectColums" resultType="java.util.Map">
+        select  *  from   ${table}
+    </select>
+    <select id="selectDeptNames" resultType="java.util.Map">
+        select count(s_main_dept_names) as num , s_main_dept_names from ${table}
+        <where>
+            i_is_display =0
+            <if test="bdata.sCreateBy != null and bdata.sCreateBy != ''">
+                AND  s_create_by = #{bdata.sCreateBy}
+            </if>
+            <if test="bdata.sCreateUnitid != null and bdata.sCreateUnitid != ''">
+                AND s_create_unitid = #{bdata.sCreateUnitid}
+            </if>
+            <if test="bdata.sCreateDeptid != null and bdata.sCreateDeptid != ''">
+                AND  s_create_deptid = #{bdata.sCreateDeptid}
+            </if>
+            <if test="bdata.iCreateMonth != null and bdata.iCreateMonth != ''">
+                AND i_create_month = #{bdata.iCreateMonth}
+            </if>
+            <if test="bdata.iBusFunctionId != null and bdata.iBusFunctionId != ''">
+                AND i_bus_function_id=#{bdata.iBusFunctionId}
+            </if>
+            <if test="bdata.iCreateYear != null and bdata.iCreateYear != ''">
+                AND i_create_year=#{bdata.iCreateYear}
+            </if>
+        </where>
+         GROUP BY s_main_dept_names
+    </select>
+
+     <select id="selectMyCreateDepart" resultType="java.util.Map">
+        select count(s_create_dept) as num , s_create_dept from ${table}
+        <where>
+            i_is_display =0
+            <if test="bdata.sCreateBy != null and bdata.sCreateBy != ''">
+                AND  s_create_by = #{bdata.sCreateBy}
+            </if>
+            <if test="bdata.sCreateDeptid != null and bdata.sCreateDeptid != ''">
+                AND s_create_deptid = #{bdata.sCreateDeptid}
+            </if>
+            <if test="bdata.sCreateUnitid != null and bdata.sCreateUnitid != ''">
+                AND s_create_unitid = #{bdata.sCreateUnitid}
+            </if>
+            <if test="bdata.iCreateMonth != null and bdata.iCreateMonth != ''">
+                AND i_create_month = #{bdata.iCreateMonth}
+            </if>
+            <if test="bdata.iBusFunctionId != null and bdata.iBusFunctionId != ''">
+                AND i_bus_function_id=#{bdata.iBusFunctionId}
+            </if>
+            <if test="bdata.iCreateYear != null and bdata.iCreateYear != ''">
+                AND i_create_year=#{bdata.iCreateYear}
+            </if>
+        </where>
+         GROUP BY s_create_dept
+    </select>
+    <!--统计数据    LYJ-->
+    <select id="findByTableAndMy" resultType="java.util.Map">
+        SELECT i_create_month,count(i_id) as num   from  ${table}
+        <where>
+            i_is_display =0
+            <if test="bdata.sCreateBy != null and bdata.sCreateBy != ''">
+                AND  s_create_by = #{bdata.sCreateBy}
+            </if>
+            <if test="bdata.sCreateDeptid != null and bdata.sCreateDeptid != ''">
+                AND s_create_deptid = #{bdata.sCreateDeptid}
+            </if>
+            <if test="bdata.sCreateUnitid != null and bdata.sCreateUnitid != ''">
+                AND s_create_unitid = #{bdata.sCreateUnitid}
+            </if>
+            <if test="bdata.iBusFunctionId != null and bdata.iBusFunctionId != ''">
+                AND i_bus_function_id=#{bdata.iBusFunctionId}
+            </if>
+            <if test="bdata.iCreateYear != null and bdata.iCreateYear != ''">
+                AND i_create_year=#{bdata.iCreateYear}
+            </if>
+        </where>
+        GROUP BY i_create_month
+    </select>
+    <select id="Handling" resultType="java.util.Map">
+        SELECT count(*)  as num1  from ${table}
+        <where>
+            i_is_display =0
+            <if test="bdata.sCreateBy != null and bdata.sCreateBy != ''">
+                AND  s_create_by = #{bdata.sCreateBy}
+            </if>
+            <if test="bdata.sCreateDeptid != null and bdata.sCreateDeptid != ''">
+                AND s_create_deptid = #{bdata.sCreateDeptid}
+            </if>
+            <if test="bdata.sCreateUnitid != null and bdata.sCreateUnitid != ''">
+                AND s_create_unitid = #{bdata.sCreateUnitid}
+            </if>
+            <if test="bdata.iCreateYear != null and bdata.iCreateYear != ''">
+                AND i_create_year=#{bdata.iCreateYear}
+            </if>
+        </where>
+    </select>
+    <select id="getAvg" resultType="java.lang.Double">
+        select (select sum(num)	from (select i_create_month ,count(i_id) as num  from  ${table}  GROUP BY i_create_month) b)/12 as ave
+    </select>
+
+</mapper>

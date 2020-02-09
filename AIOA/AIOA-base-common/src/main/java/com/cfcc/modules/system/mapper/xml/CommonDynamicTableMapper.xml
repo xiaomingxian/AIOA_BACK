@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cfcc.modules.system.mapper.CommonDynamicTableMapper">
+
+
+    <!--查询数据支持like查询-->
+    <select id="queryByEquals" resultType="map">
+
+        select * from ${table}
+
+        <if test="query.size>0">
+            where
+        </if>
+
+        <foreach collection="query" item="value" index="key" separator=" and ">
+
+            <if test="key.contains('like')">
+                ${key.substring(0,key.length()-5)} like CONCAT('%',#{value},'%')
+            </if>
+            <if test="! key.contains('like')">
+                ${key} = #{value}
+            </if>
+
+        </foreach>
+
+        limit #{pageNo},#{pageSize}
+
+    </select>
+
+    <!--查询总量-->
+    <select id="queryCountByEquals" resultType="long">
+
+        select count(*) from ${table}
+
+        <if test="query.size>0">
+            where
+        </if>
+
+        <foreach collection="query" item="value" index="key" separator=" and ">
+
+            <if test="key.contains('like')">
+                ${key.substring(0,key.length()-5)} like CONCAT('%',#{value},'%')
+            </if>
+            <if test="! key.contains('like')">
+                ${key} = #{value}
+            </if>
+
+        </foreach>
+
+    </select>
+
+    <!--插入数据并返回主键-->
+    <insert id="insertData" parameterType="java.util.Map" useGeneratedKeys="true" keyProperty="id" keyColumn="i_id">
+
+        insert into ${map.table} (
+        <foreach collection="map" item="value" index="key" separator=",">
+            <if test="key!='id' and key!='table'">
+                ${key}
+            </if>
+        </foreach>
+        )
+        values (
+        <foreach collection="map" item="value" index="key" separator=",">
+            <if test="key!='id' and  key!='table'">
+                #{value}
+            </if>
+        </foreach>
+        )
+
+    </insert>
+
+
+    <!--插入数据并返回主键-->
+    <insert id="insertDataBatch" parameterType="list" useGeneratedKeys="true" keyProperty="id" keyColumn="i_id">
+
+        insert into ${list[0].table} (
+        <foreach collection="list[0]" item="value" index="key" separator=",">
+            <if test="key!='id' and key!='table'">
+                ${key}
+            </if>
+        </foreach>
+        )
+        values
+        <foreach collection="list" item="map" index="key" separator=",">
+            (
+            <foreach collection="map" item="value" index="key" separator=",">
+                <if test="key!='id' and  key!='table'">
+                    #{value}
+                </if>
+            </foreach>
+            )
+        </foreach>
+
+    </insert>
+
+
+</mapper>

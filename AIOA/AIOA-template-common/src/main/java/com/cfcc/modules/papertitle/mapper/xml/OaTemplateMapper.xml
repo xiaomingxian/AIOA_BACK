@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cfcc.modules.papertitle.mapper.OaTemplateMapper">
+
+    <!--根据id查询-->
+    <select id="selectTemplateById" parameterType="integer" resultType="com.cfcc.modules.papertitle.entity.OaTemplate">
+        SELECT i_type, s_name, i_file_id, i_title_rule_id, s_remarks, s_create_by, d_create_time, s_update_by, d_update_time
+        FROM oa_template WHERE i_id = #{id}
+    </select>
+
+    <!--分页查询-->
+    <select id="selectTemplateList"  resultType="com.cfcc.modules.papertitle.entity.OaTemplate">
+        select i_id, i_type, s_name, i_file_id, i_title_rule_id, s_remarks, s_create_by, d_create_time, s_update_by, d_update_time
+        from oa_template
+        <where>
+            <if test="temp.iType != null and temp.iType != ''  or temp.iType==0 ">
+                i_type=#{temp.iType}
+            </if>
+            <if test="temp.sName !=null and temp.sName!=''">
+                and s_name=#{temp.sName}
+            </if>
+        </where>
+        ORDER BY d_create_time DESC
+        limit #{pageNo},#{pageSize}
+    </select>
+    <!--条件查询统计条数-->
+    <select id="selectTemplateTotal" parameterType="com.cfcc.modules.papertitle.entity.OaTemplate" resultType="integer">
+        select  count(i_id) as total from oa_template
+        <where>
+            <if test="iType != null and iType != '' or iType==0 ">
+                i_type=#{iType}
+            </if>
+            <if test="sName !=null and sName!=''">
+                and s_name=#{sName}
+            </if>
+        </where>
+    </select>
+
+    <!--根据模板类型查询列表-->
+    <select id="templateList" resultType="com.cfcc.modules.papertitle.entity.OaTemplate">
+        SELECT i_id,s_name FROM oa_template WHERE i_type = #{type}
+    </select>
+
+    <!--根据id修改-->
+    <update id="updateTemplateById" parameterType="com.cfcc.modules.papertitle.entity.OaTemplate">
+        UPDATE oa_template
+        SET i_type=#{iType}, s_name=#{sName}, i_file_id=#{iFileId}, i_title_rule_id=#{iTitleRuleId}, s_remarks=#{sRemarks},
+            s_update_by = #{sUpdateBy},d_update_time = NOW()
+        WHERE i_id = #{iId}
+    </update>
+
+    <!--根据id删除-->
+    <delete id="deleteTemplateByIID">
+        DELETE FROM oa_template WHERE i_id = #{id}
+    </delete>
+
+    <!--新增附件信息-->
+    <insert id="insertOaFile" >
+        INSERT INTO oa_file
+        (i_id,s_table,i_table_id,s_file_type,s_file_name,s_file_path,s_create_by,d_create_time)
+        VALUES
+        (0,#{sTable},#{iTableId},#{sFileType},#{sFileName},#{sFilePath},#{sCreateBy},NOW())
+      <selectKey keyProperty="iId" keyColumn="i_id">
+          SELECT LAST_INSERT_ID();
+      </selectKey>
+    </insert>
+
+    <!--根据附件id查询-->
+    <select id="getFileNameById" resultType="com.cfcc.modules.oaBus.entity.OaFile">
+        SELECT s_file_name,s_file_path FROM oa_file WHERE i_id = #{iFileId}
+    </select>
+
+</mapper>

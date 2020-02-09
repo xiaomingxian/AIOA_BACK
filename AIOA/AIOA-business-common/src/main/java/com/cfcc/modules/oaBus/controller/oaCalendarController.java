@@ -1,0 +1,512 @@
+package com.cfcc.modules.oaBus.controller;
+import java.util.*;
+import java.io.IOException;
+import java.io.UnsupportedEncodingException;
+import java.net.URLDecoder;
+import java.util.stream.Collectors;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.cfcc.common.LunarDate.LunarDate;
+import com.cfcc.common.api.vo.Result;
+import com.cfcc.common.aspect.annotation.AutoLog;
+import com.cfcc.common.system.query.QueryGenerator;
+import com.cfcc.common.system.util.JwtUtil;
+import com.cfcc.common.util.oConvertUtils;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.cfcc.modules.oaBus.entity.BusFunction;
+import com.cfcc.modules.oaBus.entity.BusModelPermit;
+import com.cfcc.modules.oaBus.entity.oaCalendar;
+import com.cfcc.modules.oaBus.service.IoaCalendarService;
+import com.cfcc.modules.oaBus.service.OaBusDynamicTableService;
+import com.cfcc.modules.shiro.vo.DefContants;
+import com.cfcc.modules.system.entity.SysUser;
+import com.cfcc.modules.system.entity.SysUserSet;
+import com.cfcc.modules.system.service.ISysUserService;
+import com.cfcc.modules.workflow.pojo.TaskInfoJsonAble;
+import com.cfcc.modules.workflow.service.TaskCommonService;
+import lombok.extern.slf4j.Slf4j;
+
+import org.jeecgframework.poi.excel.ExcelImportUtil;
+import org.jeecgframework.poi.excel.def.NormalExcelConstants;
+import org.jeecgframework.poi.excel.entity.ExportParams;
+import org.jeecgframework.poi.excel.entity.ImportParams;
+import org.jeecgframework.poi.excel.view.JeecgEntityExcelView;
+
+import org.quartz.Job;
+import org.quartz.JobExecutionContext;
+import org.quartz.JobExecutionException;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.multipart.MultipartHttpServletRequest;
+import org.springframework.web.servlet.ModelAndView;
+import com.alibaba.fastjson.JSON;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
+
+ /**
+ * @Description: 日程管理表
+ * @Author: jeecg-boot
+ * @Date:   2019-11-21
+ * @Version: V1.0
+ */
+@Slf4j
+@Api(tags="日程管理表")
+@RestController
+@RequestMapping("/oaBus/Calendar/oaCalendar")
+public class oaCalendarController implements Job {
+	@Autowired
+	private IoaCalendarService oaCalendarService;
+
+	@Autowired
+	private ISysUserService sysUserService;
+
+	@Autowired
+    private TaskCommonService taskCommonService;
+
+
+
+
+	 /**
+	  * 时间阴历
+	  * @param
+	  * @param
+	  * @return
+	  */
+	 @AutoLog(value = "阴历时间表")
+	 @ApiOperation(value="阴历时间表", notes="阴历时间表")
+	 @GetMapping(value = "/findLunarDate")
+	 public Result findLunarDate(@RequestParam(name="year") Integer year,
+													@RequestParam(name="month") Integer month,
+													@RequestParam(name="day") Integer day) {
+		 Result result = new Result();
+		 //LunarDate lunarDate = new LunarDate();
+		 String  data = LunarDate.oneDay(year,month,day);
+
+		 result.setSuccess(true);
+		 result.setResult(data);
+		 return result;
+	 }
+	 /**
+	  * 我的日程
+	 * @param
+	 * @param pageNo
+	 * @param pageSize
+	 * @param
+	 * @return
+	 */
+	@AutoLog(value = "日程管理表-分页列表查询")
+	@ApiOperation(value="日程管理表-分页列表查询", notes="日程管理表-分页列表查询")
+	@GetMapping(value = "/list")
+	public Result<IPage<oaCalendar>> queryPageList(oaCalendar oaCalendar,
+												   @RequestParam(name="pageNo", defaultValue="1") Integer pageNo,
+												   @RequestParam(name="pageSize", defaultValue="10") Integer pageSize,
+												   HttpServletRequest request) {
+		Result<IPage<oaCalendar>> result = new Result<IPage<oaCalendar>>();
+		String token = request.getHeader(DefContants.X_ACCESS_TOKEN);
+		String username = JwtUtil.getUsername(token);
+		oaCalendar.setSCreateBy(username);
+		IPage<oaCalendar> pageList = oaCalendarService.findPage(pageNo,pageSize,oaCalendar);
+		result.setSuccess(true);
+		result.setResult(pageList);
+     	return result;
+	}
+
+
+	 /***
+	  * 查出领导的日程
+	  *
+	  */
+	 @AutoLog(value = "日程管理表-领导的日程")
+	 @ApiOperation(value="日程管理表-领导的日程", notes="日程管理表-领导的日程")
+	 @GetMapping(value = "/findByLeader")
+	 public Result<IPage<oaCalendar>> findByLeader(oaCalendar oaCalendar,HttpServletRequest request,
+													@RequestParam(name="pageNo", defaultValue="1") Integer pageNo,
+													@RequestParam(name="pageSize", defaultValue="10") Integer pageSize,
+													HttpServletRequest req) {
+		 Result<IPage<oaCalendar>> result = new Result<IPage<oaCalendar>>();
+		 IPage<oaCalendar> pageList = new Page<oaCalendar>();
+		 List<oaCalendar> oaCalendarList = new ArrayList<>();
+		 //查询当前用户，作为assignee
+		 String token = request.getHeader(DefContants.X_ACCESS_TOKEN);
+		 String username = JwtUtil.getUsername(token);
+         SysUser user = sysUserService.getUserByName(username);
+         String id = user.getId();//查出当前用户的id
+         String departId = oaCalendarService.getDepartId(user.getId()); //查出当前登陆用户的部门id
+         String managedeptsId = oaCalendarService.getUserId(id);//查出当前登陆用户分管的id
+		 IPage<oaCalendar> byLeader = oaCalendarService.findByLeader(pageNo,pageSize,oaCalendar);  //查出领导的所有日程
+		 List<oaCalendar> oaCalendars = byLeader.getRecords();
+	     if(oaCalendars == null){
+			 result.error500("未找到对应实体");
+		 } else {
+			 for (oaCalendar Leader :oaCalendars) {
+				 Integer iOpenType = Leader.getIOpenType();//公开类型
+				 String userName = Leader.getSCreateBy();//创建人的名字
+				 String userNameId = sysUserService.getUserByName(userName).getId();//查出创建人的id
+				 String manageId = oaCalendarService.getUserId(userNameId);//查出创建人的分管id
+				 List<String> departIdList=oaCalendarService.getDepartIdList(userNameId);//查出创建人的部门
+				 if(iOpenType == 1){ //公开类型是全行
+					 oaCalendarList.add(Leader);
+				 }else if (iOpenType == 2){ //公开类型是分管
+					 if(managedeptsId!=null&&managedeptsId.equals(manageId)){
+						 oaCalendarList.add(Leader);
+					 }
+				 }else{ //公开类型是部门
+					 for(int i=0;i<departIdList.size();i++)
+						 if (departId!=null&&departIdList.get(i).equals(departId)) {
+							 oaCalendarList.add(Leader);
+						 }
+
+				 }
+			 }
+		 }
+		 pageList.setRecords(oaCalendarList) ;
+	     pageList.setTotal(oaCalendarList.size()) ;
+         result.setSuccess(true);
+		 result.setResult(pageList);
+		 return result;
+	 }
+
+	 /***
+	  * 查出共享的日程
+	  *
+	  */
+	 @AutoLog(value = "日程管理表-共享日程")
+	 @ApiOperation(value="日程管理表-分页列表查询", notes="日程管理表-分页列表查询")
+	 @GetMapping(value = "/queryPageList")
+	 public Result<IPage<oaCalendar>> queryPage(oaCalendar oaCalendar,HttpServletRequest request,
+										   @RequestParam(name="pageNo", defaultValue="1") Integer pageNo,
+										   @RequestParam(name="pageSize", defaultValue="10") Integer pageSize,
+										   HttpServletRequest req) {
+		 Result<IPage<oaCalendar>> result = new Result<IPage<oaCalendar>>();
+		 IPage<oaCalendar> pageList = new Page<oaCalendar>();
+		 List<oaCalendar> oaCalendarList = new ArrayList<>();
+		 IPage<oaCalendar> queryPageList = oaCalendarService.queryPageList(pageNo,pageSize, oaCalendar);//查出全部的共享日程
+		 //查询当前用户，作为assignee
+		 String token = request.getHeader(DefContants.X_ACCESS_TOKEN);
+		 String username = JwtUtil.getUsername(token);
+		 SysUser user = sysUserService.getUserByName(username);
+		 String id = user.getId();//查出当前用户的id
+		 String departId = oaCalendarService.getDepartId(user.getId()); //查出当前登陆用户的部门id
+		 String managedeptsId = oaCalendarService.getUserId(id);//查出当前登陆用户分管的id
+		 List<oaCalendar> oaCalendars = queryPageList.getRecords();
+		 if(oaCalendars == null){
+			 result.error500("未找到对应实体");
+		 }else {
+		 for (oaCalendar share :oaCalendars) {
+			 Integer iOpenType = share.getIOpenType();//公开类型
+			 String userName = share.getSCreateBy();//创建人的名字
+			 String userNameId = sysUserService.getUserByName(userName).getId();//查出创建人的id
+			 String manageId = oaCalendarService.getUserId(userNameId);//查出创建人的分管id
+			 List<String> departIdList=oaCalendarService.getDepartIdList(userNameId);//查出创建人的部门
+			 if(iOpenType == 1){ //公开类型是全行
+				 oaCalendarList.add(share);
+			 }else if (iOpenType == 2){ //公开类型是分管
+				 if(managedeptsId!=null&&managedeptsId.equals(manageId)){
+					 oaCalendarList.add(share);
+				 }
+			 }else{ //公开类型是部门
+				 for(int i=0;i<departIdList.size();i++)
+					 if (departId!=null&&departIdList.get(i).equals(departId)) {
+						 oaCalendarList.add(share);
+					 }
+
+			 }
+		 }}
+		 pageList.setRecords(oaCalendarList) ;
+		 pageList.setTotal(oaCalendarList.size()) ;
+		 result.setSuccess(true);
+		 result.setResult(pageList);
+		 return result;
+	 }
+	 /***
+	  * 查出代办的日程
+	  *
+	  */
+	 @AutoLog(value = "日程管理表-分页列表查询")
+	 @ApiOperation(value="日程管理表-分页列表查询", notes="日程管理表-分页列表查询")
+	 @PostMapping(value = "/findwait")
+	 public Result<IPage<oaCalendar>> findwait(oaCalendar oaCalendar,
+												@RequestParam(name="pageNo", defaultValue="1") Integer pageNo,
+												@RequestParam(name="pageSize", defaultValue="10") Integer pageSize,
+												HttpServletRequest req) {
+		 Result<IPage<oaCalendar>> result = new Result<IPage<oaCalendar>>();
+		 IPage<oaCalendar> pageList = oaCalendarService.findWait(pageNo,pageSize, oaCalendar);
+		 result.setSuccess(true);
+		 result.setResult(pageList);
+		 return result;
+	 }
+
+	 /***
+	  * 查出常用链接
+	  *
+	  */
+	 @AutoLog(value = "日程管理表-分页列表查询")
+	 @ApiOperation(value="日程管理表-分页列表查询", notes="日程管理表-分页列表查询")
+	 @PostMapping(value = "/MostUserLink")
+	 public List<Map<String,Object>> MostUserLink(HttpServletRequest request) {
+		 List<Map<String,Object>> linklist = oaCalendarService.MostUserLink();
+		 return linklist;
+	 }
+
+	 /**
+	  *   添加
+	 * @param oaCalendar
+	 * @return
+	 */
+	@AutoLog(value = "日程管理表-添加")
+	@ApiOperation(value="日程管理表-添加", notes="日程管理表-添加")
+	@PutMapping(value = "/add")
+	public Result<oaCalendar> add(@RequestBody oaCalendar oaCalendar , HttpServletRequest request) {
+		Result<oaCalendar> result = new Result<oaCalendar>();
+		//查询当前用户，作为assignee
+		String token = request.getHeader(DefContants.X_ACCESS_TOKEN);
+		String username = JwtUtil.getUsername(token);
+		try {
+			// 给定截取条件分割字符串为字符数组
+			String[] split = oaCalendar.getSUserNames().split(",");
+            List<SysUser> listUsr = new ArrayList<>() ;
+			//接收排序好的字符串
+			String str="";
+			for(int i=0;i<split.length;i++){
+				SysUser user = sysUserService.getUserByName(split[i]); //根据username查出user
+				if(user != null){
+                    listUsr.add(user) ;
+				}
+			}
+			List<SysUser> listUserOrder = listUsr.stream().sorted(Comparator.comparing(SysUser::getShowOrder)).collect(Collectors.toList());
+			//遍历show_order   根据show_order 找到对应的id
+
+            for (SysUser sysUser : listUserOrder) {
+                str =  str +  sysUser.getUsername() + "," ;
+            }
+			oaCalendar.setSUserNames(str);
+			oaCalendar.setSCreateBy(username);
+			if(oaCalendar.getIIsTop() == null){
+				oaCalendar.setIIsTop(0);
+			}
+			if(oaCalendar.getIIsLeader() == null){
+				oaCalendar.setIIsLeader(0);
+			}if(oaCalendar.getIOpenType() == null){
+			    oaCalendar.setIOpenType(1);
+            }if(oaCalendar.getIRemindType() == null){
+                oaCalendar.setIOpenType(1);
+            }
+			oaCalendar.setIFunDataId(1);
+			oaCalendarService.saveCalendar(oaCalendar);
+			result.success("添加成功！");
+		} catch (Exception e) {
+			log.error(e.getMessage(),e);
+			result.error500("操作失败");
+		}
+		return result;
+	}
+
+	/**
+	  *  编辑
+	 * @param oaCalendar
+	 * @return
+	 */
+	@AutoLog(value = "日程管理表-编辑")
+	@ApiOperation(value="日程管理表-编辑", notes="日程管理表-编辑")
+	@PutMapping(value = "/edit")
+	public Result<oaCalendar> edit(@RequestBody oaCalendar oaCalendar) {
+		Result<oaCalendar> result = new Result<oaCalendar>();
+		oaCalendar oaCalendarEntity = oaCalendarService.findById(oaCalendar.getIId());
+		if(oaCalendarEntity==null) {
+			result.error500("未找到对应实体");
+		}else {
+			boolean ok = oaCalendarService.updateByIid(oaCalendar);
+			//TODO 返回false说明什么？
+			if(ok) {
+				result.success("修改成功!");
+			}
+		}
+		
+		return result;
+	}
+	
+	/**
+	  *   通过id删除
+	 * @param id
+	 * @return
+	 */
+	@AutoLog(value = "日程管理表-通过id删除")
+	@ApiOperation(value="日程管理表-通过id删除", notes="日程管理表-通过id删除")
+	@DeleteMapping(value = "/delete")
+	public Result<?> delete(HttpServletRequest request,@RequestParam(name="id",required=false) String id,@RequestParam(name="sCreateBy",required=false) String sCreateBy) {
+		try {
+            //查询当前用户，作为assignee
+            String token = request.getHeader(DefContants.X_ACCESS_TOKEN);
+            String username = JwtUtil.getUsername(token);
+			if(sCreateBy.equals(username)){
+                oaCalendarService.deleteByIid(id);
+
+			}
+			else{
+                return Result.error("您没有权限删除其他人的日程");
+            }
+		} catch (Exception e) {
+			log.error("删除失败",e.getMessage());
+			return Result.error("删除失败!");
+		}
+		return Result.ok("删除成功!");
+	}
+	
+	/**
+	  *  批量删除
+	 * @param ids
+	 * @return
+	 */
+	@AutoLog(value = "日程管理表-批量删除")
+	@ApiOperation(value="日程管理表-批量删除", notes="日程管理表-批量删除")
+	@DeleteMapping(value = "/deleteBatch")
+	public Result<oaCalendar> deleteBatch(HttpServletRequest request,@RequestParam(name="ids",required=false) String ids) {
+		Result<oaCalendar> result = new Result<oaCalendar>();
+		if(ids==null || "".equals(ids.trim())) {
+
+			result.error500("参数不识别！");
+		}else {
+
+			List<String> list = Arrays.asList(ids.split(","));
+			for (int j=0;j<list.size();j++)
+			{
+				this.oaCalendarService.deleteByIid(list.get(j));
+				result.success("删除成功!");
+			}
+		}
+		return result;
+	}
+	
+	/**
+	  * 通过id查询
+	 * @param id
+	 * @return
+	 */
+	@AutoLog(value = "日程管理表-通过id查询")
+	@ApiOperation(value="日程管理表-通过id查询", notes="日程管理表-通过id查询")
+	@GetMapping(value = "/queryById")
+	public Result<oaCalendar> queryById(@RequestParam(name="id",required=false) String id) {
+		Result<oaCalendar> result = new Result<oaCalendar>();
+		oaCalendar oaCalendar = oaCalendarService.getByIid(id);
+		if(oaCalendar==null) {
+			result.error500("未找到对应实体");
+		}else {
+			result.setResult(oaCalendar);
+			result.setSuccess(true);
+		}
+		return result;
+	}
+
+  /**
+      * 导出excel
+   *
+   * @param request
+   * @param response
+   */
+  @RequestMapping(value = "/exportXls")
+  public ModelAndView exportXls(HttpServletRequest request, HttpServletResponse response) {
+      // Step.1 组装查询条件
+      QueryWrapper<oaCalendar> queryWrapper = null;
+      try {
+          String paramsStr = request.getParameter("paramsStr");
+          if (oConvertUtils.isNotEmpty(paramsStr)) {
+              String deString = URLDecoder.decode(paramsStr, "UTF-8");
+              oaCalendar oaCalendar = JSON.parseObject(deString, oaCalendar.class);
+              queryWrapper = QueryGenerator.initQueryWrapper(oaCalendar, request.getParameterMap());
+          }
+      } catch (UnsupportedEncodingException e) {
+          e.printStackTrace();
+      }
+
+      //Step.2 AutoPoi 导出Excel
+      ModelAndView mv = new ModelAndView(new JeecgEntityExcelView());
+      List<oaCalendar> pageList = oaCalendarService.list(queryWrapper);
+      //导出文件名称
+      mv.addObject(NormalExcelConstants.FILE_NAME, "日程管理表列表");
+      mv.addObject(NormalExcelConstants.CLASS,oaCalendar.class);
+      mv.addObject(NormalExcelConstants.PARAMS, new ExportParams("日程管理表列表数据", "导出人:Jeecg", "导出信息"));
+      mv.addObject(NormalExcelConstants.DATA_LIST, pageList);
+      return mv;
+  }
+
+  /**
+      * 通过excel导入数据
+   *
+   * @param request
+   * @param response
+   * @return
+   */
+  @RequestMapping(value = "/importExcel", method = RequestMethod.POST)
+  public Result<?> importExcel(HttpServletRequest request, HttpServletResponse response) {
+      MultipartHttpServletRequest multipartRequest = (MultipartHttpServletRequest) request;
+      Map<String, MultipartFile> fileMap = multipartRequest.getFileMap();
+      for (Map.Entry<String, MultipartFile> entity : fileMap.entrySet()) {
+          MultipartFile file = entity.getValue();// 获取上传文件对象
+          ImportParams params = new ImportParams();
+          params.setTitleRows(2);
+          params.setHeadRows(1);
+          params.setNeedSave(true);
+          try {
+              List<oaCalendar> listoaCalendars = ExcelImportUtil.importExcel(file.getInputStream(),oaCalendar.class, params);
+              oaCalendarService.saveBatch(listoaCalendars);
+              return Result.ok("文件导入成功！数据行数:" + listoaCalendars.size());
+          } catch (Exception e) {
+              log.error(e.getMessage(),e);
+              return Result.error("文件导入失败:"+e.getMessage());
+          } finally {
+              try {
+                  file.getInputStream().close();
+              } catch (IOException e) {
+                  e.printStackTrace();
+              }
+          }
+      }
+      return Result.ok("文件导入失败！");
+  }
+
+
+	 @Override
+	 public void execute(JobExecutionContext jobExecutionContext) throws JobExecutionException {
+         oaCalendar oaCalendar=new oaCalendar();
+         List<TaskInfoJsonAble> taskInfoJsonAbles = taskCommonService.allUndoltLimitTime();
+
+         for (TaskInfoJsonAble taskInfo:taskInfoJsonAbles) {
+             boolean b = taskInfoJsonAbles.stream().anyMatch(u -> u.getId().equals(taskInfo.getId()));
+             if(!b){
+             oaCalendar.setSUserNames(taskInfo.getDrafterId()); //用户id
+             oaCalendar.setSTitle(taskInfo.getTitle()); //标题
+             oaCalendar.setDStartTime(taskInfo.getCreateTime());//开始时间
+			 oaCalendar.setDEndTime(taskInfo.getEndTime());//结束时间
+             Integer FunDataId = Integer.valueOf(taskInfo.getTableId());
+             oaCalendar.setIFunDataId(FunDataId); //实例数据id
+             SysUser sysUser = sysUserService.getById(taskInfo.getDrafterId());
+             oaCalendar.setSCreateBy(sysUser.getUsername());
+			 oaCalendar.setIBusFunctionId( Integer.valueOf(taskInfo.getFunctionId()));//业务功能
+			 oaCalendar.setIBusModelId(Integer.valueOf(taskInfo.getModelId()));//业务模块
+             }
+         }
+		 oaCalendarService.saveCalendar(oaCalendar);
+     }
+	 /**
+	  * 查询功能模块
+	  * @return
+	  */
+	 @AutoLog(value = "权限设置-查询功能模块")
+	 @ApiOperation(value="权限设置-查询功能模块", notes="权限设置-查询功能模块")
+	 @GetMapping(value = "/getFunctionName")
+	 public Result<List<BusFunction>> getFunctionName() {
+		 Result<List<BusFunction>> result = new Result<>();
+		 List<BusFunction> busModelList = oaCalendarService.busFunctionList();
+		 if (busModelList.size() == 0) {
+			 result.error500("未找到对应实体");
+		 } else {
+			 result.setResult(busModelList);
+			 result.setSuccess(true);
+		 }
+		 return result;
+	 }
+ }

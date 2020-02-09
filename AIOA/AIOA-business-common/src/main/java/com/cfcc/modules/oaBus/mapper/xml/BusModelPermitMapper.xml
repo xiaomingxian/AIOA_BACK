@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cfcc.modules.oaBus.mapper.BusModelPermitMapper">
+
+    <update id="updateByIid" parameterType="com.cfcc.modules.oaBus.entity.BusModelPermit">
+		UPDATE oa_bus_model_permit
+		SET i_bus_model_id = #{iBusModelId} ,s_permit_type = #{sPermitType} ,s_display = #{sDisplay},i_type_id=#{iTypeId}
+		where i_id = #{iId}
+	</update>
+	<delete id="deleteById" parameterType="String">
+        DELETE from oa_bus_model_permit  where i_id = #{id}
+    </delete>
+    <select id="count" resultType="java.lang.Integer" parameterType="integer">
+		select count(*) from
+		(select b.i_id ,c.i_bus_model_id as mid from oa_bus_model_permit c
+		INNER JOIN oa_bus_model b on b.i_id=c.i_bus_model_id) as mo where mo.mid=#{ibusmodelId}
+	</select>
+	<select id="findPage" resultType="com.cfcc.modules.oaBus.entity.BusModelPermit" parameterType="integer">
+		select c.i_id ,c.s_display,c.i_type_id,c.s_permit_type,b.s_name ,c.i_bus_model_id  FROM oa_bus_model_permit c
+		INNER JOIN oa_bus_model b on b.i_id=c.i_bus_model_id and c.i_bus_model_id = #{ibusmodelId}
+		limit #{pageNo},#{pageSize}
+	</select>
+
+	<!-- 根据Id查询-->
+	<select id="findById" resultType="com.cfcc.modules.oaBus.entity.BusModelPermit"  parameterType="integer">
+        SELECT * from oa_bus_model_permit  where i_id = #{iId}
+    </select>
+	<select id="findList" resultType="com.cfcc.modules.oaBus.entity.BusModelPermit">
+		select * from oa_bus_model_permit
+	</select>
+    <select id="getTypeId" resultType="java.lang.String" parameterType="integer">
+		select  i_type_id from oa_bus_model_permit where i_bus_model_id = #{modelId}
+	</select>
+	<select id="queryCount" resultType="java.lang.Integer">
+		select count(1) from (select b.i_id as mid , c.s_display ,c.i_type_id,c.s_permit_type,c.i_bus_model_id from oa_bus_model_permit c
+		INNER JOIN oa_bus_model b on b.i_id=c.i_bus_model_id) as f
+		<where>
+			<if test="sPermitType != null and sPermitType != '' ">
+				f.s_permit_type = #{sPermitType}
+			</if>
+			<if test="sDisplay != null and sDisplay != '' ">
+				and f.s_display = #{sDisplay}
+			</if>
+			<if test="iBusModelId != null and iBusModelId != '' ">
+				and f.i_bus_model_id = #{iBusModelId}
+			</if>
+		</where>
+	</select>
+	<select id="findAllList" resultType="com.cfcc.modules.oaBus.entity.BusModelPermit">
+		select  c.i_id ,c.s_display,c.i_type_id,c.s_permit_type,b.s_name ,c.i_bus_model_id from oa_bus_model_permit c INNER JOIN oa_bus_model b
+		<where>
+			b.i_id=c.i_bus_model_id
+			<if test="busModelPermit.sPermitType != null and busModelPermit.sPermitType != '' ">
+			    and c.s_permit_type = #{busModelPermit.sPermitType}
+			</if>
+			<if test="busModelPermit.sDisplay != null and busModelPermit.sDisplay != '' ">
+				and c.s_display = #{busModelPermit.sDisplay}
+			</if>
+			<if test="busModelPermit.iBusModelId != null and busModelPermit.iBusModelId != '' ">
+				and c.i_bus_model_id = #{busModelPermit.iBusModelId}
+			</if>
+		</where>
+		limit #{pageNo},#{pageSize}
+	</select>
+	<select id="findRoleId" resultType="com.cfcc.modules.system.entity.SysRole">
+		select id from sys_role
+	</select>
+
+
+
+</mapper>

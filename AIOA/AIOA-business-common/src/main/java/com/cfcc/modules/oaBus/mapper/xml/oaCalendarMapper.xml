@@ -1,0 +1,349 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cfcc.modules.oaBus.mapper.oaCalendarMapper">
+    <insert id="saveCalendar">
+          INSERT INTO oa_calendar (
+            i_id,
+            s_title,
+            s_user_names,
+            s_address,
+            i_is_top,
+            i_is_leader,
+            i_remind_type,
+            i_open_type,
+            d_start_time,
+            d_end_time,
+            s_create_by,
+            d_create_time,
+            i_bus_model_id,
+            i_bus_function_id,
+            i_fun_data_id
+        )VALUES(
+                NULL,
+                #{sTitle},
+                #{sUserNames},
+                #{sAddress},
+                #{iIsTop},
+                #{iIsLeader},
+                #{iRemindType},
+                #{iOpenType},
+                #{dStartTime},
+                #{dEndTime},
+                #{sCreateBy},
+                #{dCreateTime},
+                #{iBusModelId},
+                #{iBusFunctionId},
+                #{iFunDataId}
+            )
+    </insert>
+    <update id="updateByIid" parameterType="com.cfcc.modules.oaBus.entity.oaCalendar">
+         update oa_calendar c set
+         c.s_title = #{sTitle},
+         c.s_user_names = #{sUserNames},
+         c.s_address =#{sAddress},
+         c.i_is_top = #{iIsTop},
+         c.i_is_leader =#{iIsLeader},
+         c.i_remind_type = #{iRemindType},
+         c.i_open_type = #{iOpenType},
+         c.d_start_time = #{dStartTime},
+         c.d_end_time = #{dEndTime},
+         c.s_create_by = #{sCreateBy},
+         c.d_create_time = #{dCreateTime},
+         c.i_bus_model_id = #{iBusModelId},
+         c.i_bus_function_id = #{iBusFunctionId},
+         c.i_fun_data_id  = #{iFunDataId}
+         where c.i_id = #{iId};
+    </update>
+    <delete id="deleteByIid" parameterType="String">
+         DELETE from oa_calendar where i_id = #{id}
+    </delete>
+
+    <select id="findById" resultType="com.cfcc.modules.oaBus.entity.oaCalendar">
+        select * from oa_calendar where i_id = #{id}
+    </select>
+    <select id="countIsLeader" resultType="java.lang.Integer">
+        select count(*) from oa_calendar
+        <where>
+            ISNULL(i_fun_data_id)="" and i_is_leader = 1
+            <if test="sAddress != '' and sAddress != null">
+                and s_address = #{sAddress}
+            </if>
+            <if test="sTitle != '' and sTitle != null">
+                and s_title = #{sTitle}
+            </if>
+            <if test="iOpenType != '' and iOpenType != null">
+                and i_open_type = #{iOpenType}
+            </if>
+            <if test="username != '' and username != null">
+                and s_create_by = #{username}
+            </if>
+            <if test="date != '' and date != null">
+                and  (d_start_time &lt;= #{date} and  d_end_time &gt;= #{date})
+            </if>
+            <if test="Strdate != '' and Strdate != null">
+                and d_start_time &lt;= #{Strdate}
+            </if>
+            <if test="Enddate != '' and Enddate != null">
+                and d_end_time &gt;= #{Enddate}
+            </if>
+        </where>
+    </select>
+    <select id="countIsNoLeader" resultType="java.lang.Integer">
+        select count(*) from oa_calendar
+        <where>
+            ISNULL(i_fun_data_id)="" and i_is_leader = 0
+            <if test="sAddress != '' and sAddress != null">
+                and s_address = #{sAddress}
+            </if>
+
+            <if test="sTitle != '' and sTitle != null">
+                and s_title = #{sTitle}
+            </if>
+            <if test="iOpenType != '' and iOpenType != null">
+                and i_open_type = #{iOpenType}
+            </if>
+            <if test="username != '' and username != null">
+                and s_create_by = #{username}
+            </if>
+            <if test="date != '' and date != null">
+                and  (d_start_time &lt;= #{date} and  d_end_time &gt;= #{date})
+            </if>
+            <if test="Strdate != '' and Strdate != null">
+                and d_start_time &gt;= #{Strdate}
+            </if>
+            <if test="Enddate != '' and Enddate != null">
+                and d_end_time &lt;= #{Enddate}
+            </if>
+        </where>
+    </select>
+    <!--我的日程的totle的个数-->
+    <select id="count" resultType="java.lang.Integer">
+        select count(*) from oa_calendar
+        <where>
+            ISNULL(i_fun_data_id)=""
+            <if test="sAddress != '' and sAddress != null">
+                and s_address = #{sAddress}
+            </if>
+            <if test="sTitle != '' and sTitle != null">
+                and s_title = #{sTitle}
+            </if>
+            <if test="iOpenType != '' and iOpenType != null">
+                and i_open_type = #{iOpenType}
+            </if>
+            <if test="username != '' and username != null">
+                and s_create_by = #{username}
+            </if>
+            <if test="date != '' and date != null">
+                and  (d_start_time &lt;= #{date} and  d_end_time &gt;= #{date})
+            </if>
+            <if test="Strdate != '' and Strdate != null">
+                and d_start_time &gt;= #{Strdate}
+            </if>
+            <if test="Enddate != '' and Enddate != null">
+                and d_end_time &lt;= #{Enddate}
+            </if>
+        </where>
+    </select>
+    <!--我的日程-->
+    <select id="findPage" resultType="com.cfcc.modules.oaBus.entity.oaCalendar">
+        select * from oa_calendar INNER  JOIN  sys_user s
+        <where>
+            ISNULL(i_fun_data_id)=""
+            <if test="oaCalendar.username != '' and oaCalendar.username != null">
+                and s_create_by = #{oaCalendar.username}
+            </if>
+            <if test="oaCalendar.sAddress != '' and oaCalendar.sAddress != null">
+                and s_address = #{oaCalendar.sAddress}
+            </if>
+            <if test="oaCalendar.sTitle != '' and oaCalendar.sTitle != null">
+                and s_title = #{oaCalendar.sTitle}
+            </if>
+            <if test="oaCalendar.iOpenType != '' and oaCalendar.iOpenType != null">
+                and i_open_type = #{oaCalendar.iOpenType}
+            </if>
+            <if test="oaCalendar.date != '' and oaCalendar.date != null">
+                and  (d_start_time  &lt;=  #{oaCalendar.date} and  d_end_time &gt;= #{oaCalendar.date})
+            </if>
+            <if test="oaCalendar.Strdate != '' and oaCalendar.Strdate != null">
+                and ((  d_start_time &lt;= #{oaCalendar.Strdate}
+            </if>
+            <if test="oaCalendar.Enddate != '' and oaCalendar.Enddate != null">
+                and d_end_time &gt;= #{oaCalendar.Enddate}
+                )
+            </if>
+
+            <if test="oaCalendar.Strdate != '' and oaCalendar.Strdate != null">
+                or ( d_start_time &lt;=  #{oaCalendar.Strdate}
+            </if>
+            <if test="oaCalendar.Enddate != '' and oaCalendar.Enddate != null">
+                and d_end_time &gt;= #{oaCalendar.Enddate}))
+            </if>
+             and SUBSTRING_INDEX(s_user_names,',',1) = s.username
+        </where>
+        order by i_is_top desc ,s.show_order desc  limit
+        ${pageNo},${pageSize}
+    </select>
+    <select id="countIsWait" resultType="java.lang.Integer">
+        select count(*) from oa_calendar
+        <where>
+            ISNULL(i_fun_data_id)
+            <if test="sAddress != '' and sAddress != null">
+                and s_address = #{sAddress}
+            </if>
+            <if test="sTitle != '' and sTitle != null">
+                and s_title = #{sTitle}
+            </if>
+            <if test="iOpenType != '' and iOpenType != null">
+                and i_open_type = #{iOpenType}
+            </if>
+            <if test="username != '' and username != null">
+                and s_create_by = #{username}
+            </if>
+            <if test="date != '' and date != null">
+                and  (d_start_time &lt;= #{date} and  d_end_time &gt;= #{date})
+            </if>
+            <if test="Strdate != '' and Strdate != null">
+                and d_start_time &gt;= #{Strdate}
+            </if>
+            <if test="Enddate != '' and Enddate != null">
+                and d_end_time &lt;= #{Enddate}
+            </if>
+        </where>
+    </select>
+
+    <!-- 领导的日程 -->
+    <select id="findByLeader" resultType="com.cfcc.modules.oaBus.entity.oaCalendar">
+        select * from oa_calendar INNER  JOIN  sys_user s
+        <where>
+            ISNULL(i_fun_data_id)="" and i_is_leader = 1
+
+            <if test="oaCalendar.sAddress != '' and oaCalendar.sAddress != null">
+                and s_address = #{oaCalendar.sAddress}
+            </if>
+            <if test="oaCalendar.sCreateBy != '' and oaCalendar.sCreateBy != null">
+                and s_create_by = #{oaCalendar.sCreateBy}
+            </if>
+            <if test="oaCalendar.sTitle != '' and oaCalendar.sTitle != null">
+                and s_title = #{oaCalendar.sTitle}
+            </if>
+            <if test="oaCalendar.iOpenType != '' and oaCalendar.iOpenType != null">
+                and i_open_type = #{oaCalendar.iOpenType}
+            </if>
+            <if test="oaCalendar.date != '' and oaCalendar.date != null">
+                and  (d_start_time &lt;= #{oaCalendar.date} and  d_end_time &gt;= #{oaCalendar.date})
+            </if>
+            <if test="oaCalendar.Strdate != '' and oaCalendar.Strdate != null">
+                and ((  d_start_time &lt;= #{oaCalendar.Strdate}
+            </if>
+            <if test="oaCalendar.Enddate != '' and oaCalendar.Enddate != null">
+                and d_end_time &gt;= #{oaCalendar.Enddate}
+                )
+            </if>
+
+            <if test="oaCalendar.Strdate != '' and oaCalendar.Strdate != null">
+                or ( d_start_time &lt;=  #{oaCalendar.Strdate}
+            </if>
+            <if test="oaCalendar.Enddate != '' and oaCalendar.Enddate != null">
+                and d_end_time &gt;= #{oaCalendar.Enddate}))
+            </if>
+            and SUBSTRING_INDEX(s_user_names,',',1) = s.username
+        </where>
+        order by i_is_top desc ,s.show_order desc  limit
+        ${pageNo},${pageSize}
+    </select>
+    <!-- 共享日程-->
+    <select id="queryPageList" resultType="com.cfcc.modules.oaBus.entity.oaCalendar">
+        select * from oa_calendar INNER  JOIN  sys_user s
+        <where>
+            ISNULL(i_fun_data_id)="" and i_is_leader = 0
+            <if test="oaCalendar.sAddress != '' and oaCalendar.sAddress != null">
+                and s_address = #{oaCalendar.sAddress}
+            </if>
+            <if test="oaCalendar.sTitle != '' and oaCalendar.sTitle != null">
+                and s_title = #{oaCalendar.sTitle}
+            </if>
+            <if test="oaCalendar.iOpenType != '' and oaCalendar.iOpenType != null">
+                and i_open_type = #{oaCalendar.iOpenType}
+            </if>
+            <if test="oaCalendar.date != '' and oaCalendar.date != null">
+                and  (d_start_time &lt;= #{oaCalendar.date} and  d_end_time &gt;= #{oaCalendar.date})
+            </if>
+            <if test="oaCalendar.Strdate != '' and oaCalendar.Strdate != null">
+                and ((  d_start_time &lt;= #{oaCalendar.Strdate}
+            </if>
+            <if test="oaCalendar.Enddate != '' and oaCalendar.Enddate != null">
+                and d_end_time &gt;= #{oaCalendar.Enddate}
+                )
+            </if>
+
+            <if test="oaCalendar.Strdate != '' and oaCalendar.Strdate != null">
+                or ( d_start_time &lt;=  #{oaCalendar.Strdate}
+            </if>
+            <if test="oaCalendar.Enddate != '' and oaCalendar.Enddate != null">
+                and d_end_time &gt;= #{oaCalendar.Enddate}))
+            </if>
+            and SUBSTRING_INDEX(s_user_names,',',1) = s.username
+        </where>
+        order by i_is_top desc ,s.show_order desc limit ${pageNo},${pageSize}
+    </select>
+    <!--待办-->
+    <select id="findWait" resultType="com.cfcc.modules.oaBus.entity.oaCalendar">
+        select * from oa_calendar INNER  JOIN  sys_user s
+        <where>
+            ISNULL(i_fun_data_id)
+            <if test="oaCalendar.username != '' and oaCalendar.username != null">
+                and s_create_by = #{oaCalendar.username}
+            </if>
+            <if test="oaCalendar.date != '' and oaCalendar.date != null">
+                and  (d_start_time &lt;= #{oaCalendar.date} and d_end_time &gt;= #{oaCalendar.date})
+            </if>
+            and SUBSTRING_INDEX(s_user_names,',',1) = s.username
+        </where>
+        order by i_is_top desc ,s.show_order  desc limit
+        ${pageNo},${pageSize}
+    </select>
+    <!--待办-->
+    <select id="findWaitLimit" resultType="com.cfcc.modules.oaBus.entity.oaCalendar">
+        select * from oa_calendar INNER  JOIN  sys_user s
+        <where>
+            ISNULL(i_fun_data_id)
+            <if test="oaCalendar.username != '' and oaCalendar.username != null">
+                and s_create_by = #{oaCalendar.username}
+            </if>
+            <if test="oaCalendar.date != '' and oaCalendar.date != null">
+                and  (d_start_time&lt;= #{oaCalendar.date} and d_end_time &gt;= #{oaCalendar.date})
+            </if>
+            and SUBSTRING_INDEX(s_user_names,',',1) = s.username
+        </where>
+        order by i_is_top desc ,s.show_order  desc limit 0,6
+    </select>
+    <select id="getByIid" resultType="com.cfcc.modules.oaBus.entity.oaCalendar" parameterType="String">
+         select * from oa_calendar where i_id = #{id}
+    </select>
+    <!--根据部门id查出他是什么角色-->
+    <select id="findLeader" resultType="java.lang.String">
+        select r.role_name from sys_user_role s INNER JOIN sys_role r where user_id=${drafterId} and s.role_id = r.id
+    </select>
+    <!--根据show_order 查出用户-->
+    <select id="getByShowOrder" resultType="com.cfcc.modules.system.entity.SysUser">
+         select * from sys_user where show_order = #{showOrder}
+    </select>
+    <!--根据用户id查处是不是分管部门的人-->
+    <select id="getByUserId" resultType="java.lang.String">
+        select i_id from sys_user_managedepts where s_user_id =#{id}
+    </select>
+
+    <select id="getDepartId" resultType="java.lang.String">
+       select id from sys_depart  where org_code =(select org_code from sys_user   where  id = #{id})
+    </select>
+    <select id="getDepartIdList" resultType="java.lang.String">
+       select dep_id from sys_user_depart where user_id=#{userNameId}
+    </select>
+    <select id="findMostUser" resultType="java.util.Map">
+        select * from oa_busdata30 where i_bus_function_id = 107  and  s_title  is  not null  and s_title &lt;&gt; ""
+    </select>
+    <select id="busFunctionList" resultType="com.cfcc.modules.oaBus.entity.BusFunction">
+        SELECT i_id,i_bus_model_id,s_name  FROM oa_bus_function
+    </select>
+
+</mapper>

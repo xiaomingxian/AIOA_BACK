@@ -1,0 +1,218 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cfcc.modules.oaBus.mapper.OaBusDynamicTableMapper">
+    <update id="updateData">
+        update ${map.table} set
+        <foreach collection="map" item="value" index="key" separator=",">
+            <if test="key!='table' and key != 'i_id' and key != 'id' and value != null  ">
+                ${key} = #{value}
+            </if>
+        </foreach>
+        where
+        <foreach collection="map" item="value" index="key" separator=",">
+            <if test="key == 'i_id' or key == 'id' ">
+                ${key} = #{value}
+            </if>
+        </foreach>
+    </update>
+
+    <delete id="deleteData">
+        DELETE FROM ${map.table}
+        WHERE
+        <foreach collection="map" item="value" index="key" separator=",">
+            <if test="key == 'i_id' or key == 'id' ">
+                ${key} = #{value}
+            </if>
+        </foreach>
+    </delete>
+
+    <!--查询一条数据-->
+    <select id="queryDataById" resultType="map">
+
+        select * from ${query.table}
+        <if test="query.size>0">
+            where
+        </if>
+
+        <foreach collection="query" item="value" index="key" separator=" and ">
+
+            <if test="! key.contains('table')">
+                ${key} = #{value}
+            </if>
+
+        </foreach>
+
+
+    </select>
+
+
+    <!--查询数据支持like查询-->
+    <select id="queryByEquals" resultType="map">
+
+        select * from ${table}
+
+        <if test="query.size>0">
+            where
+        </if>
+
+        <foreach collection="query" item="value" index="key" separator=" and ">
+
+            <if test="key.contains('like')">
+                ${key.substring(0,key.length()-5)} like CONCAT('%',#{value},'%')
+            </if>
+            <if test="! key.contains('like')">
+                ${key} = #{value}
+            </if>
+
+        </foreach>
+
+        limit #{pageNo},#{pageSize}
+
+    </select>
+
+    <!--查询总量-->
+    <select id="queryCountByEquals" resultType="long">
+
+        select count(*) from ${table}
+
+        <if test="query.size>0">
+            where
+        </if>
+
+        <foreach collection="query" item="value" index="key" separator=" and ">
+
+            <if test="key.contains('like')">
+                ${key.substring(0,key.length()-5)} like CONCAT('%',#{value},'%')
+            </if>
+            <if test="! key.contains('like')">
+                ${key} = #{value}
+            </if>
+
+        </foreach>
+
+    </select>
+
+    <!--插入数据并返回主键-->
+    <insert id="insertData" parameterType="java.util.Map" useGeneratedKeys="true" keyProperty="i_id" keyColumn="i_id">
+
+        insert into ${map.table} (
+        <foreach collection="map" item="value" index="key" separator=",">
+            <if test="key!='id' and key!='table'">
+                ${key}
+            </if>
+        </foreach>
+        )
+        values (
+        <foreach collection="map" item="value" index="key" separator=",">
+            <if test="key!='id' and  key!='table'">
+                #{value}
+            </if>
+        </foreach>
+        )
+
+    </insert>
+
+    <!--根据业务id查询流程参与者-->
+    <select id="isReader" resultType="string">
+       SELECT DISTINCT  s_user_id
+      FROM ${table} where i_busdata_id=#{id}
+    </select>
+
+    <!--    //查询按钮信息-及相关权限-->
+    <select id="queryButtonId" resultType="com.cfcc.modules.oaBus.entity.ButtonPermit">
+        SELECT
+        b.*,
+        bs.i_permit_type permitType,
+        bs.i_is_creater isCreate,
+        bs.i_is_reader isReader,
+        bs.i_is_lastsender isLastsender,
+        bs.i_is_transactors isTransactors,
+        bs.i_is_default isDefault,
+        bs.i_TASK_DEF_KEY_ task,
+        bs.s_manager_role_id roleId
+        FROM
+        oa_button_set bs
+        LEFT JOIN oa_button b ON bs.i_button_id = b.i_id
+        WHERE
+        <if test="key == null or key == 'null' ">
+            bs.PROC_DEF_KEY_ is null
+        </if>
+        <if test="key != null and key != 'null' ">
+            bs.PROC_DEF_KEY_ =#{key}
+        </if>
+
+        <if test="taskDefKey == null or taskDefKey == 'null' ">
+            AND bs.TASK_DEF_KEY_ is null
+        </if>
+        <if test="taskDefKey != null and taskDefKey != 'null' ">
+            AND bs.TASK_DEF_KEY_ =#{taskDefKey}
+        </if>
+        AND bs.i_proc_button_id = #{btn}
+        and b.i_id is not null
+        ORDER BY
+        bs.i_order
+    </select>
+
+    <!--    //查询保存按钮信息-及相关权限-->
+    <select id="querySaveButton" resultType="com.cfcc.modules.oaBus.entity.ButtonPermit">
+        SELECT
+        b.*,
+        bs.i_permit_type permitType,
+        bs.i_is_creater isCreate,
+        bs.i_is_reader isReader,
+        bs.i_is_lastsender isLastsender,
+        bs.i_is_transactors isTransactors,
+        bs.i_is_default isDefault,
+        bs.i_TASK_DEF_KEY_ task,
+        bs.s_manager_role_id roleId
+        FROM
+        oa_button_set bs
+        LEFT JOIN oa_button b ON bs.i_button_id = b.i_id
+        WHERE
+        <if test="key == null or key == 'null' ">
+            bs.PROC_DEF_KEY_ is null
+        </if>
+        <if test="key != null and key != 'null' ">
+            bs.PROC_DEF_KEY_ =#{key}
+        </if>
+
+        <if test="taskDefKey == null or taskDefKey == 'null' ">
+            AND bs.TASK_DEF_KEY_ is null
+        </if>
+        <if test="taskDefKey != null and taskDefKey != 'null' ">
+            AND bs.TASK_DEF_KEY_ =#{taskDefKey}
+        </if>
+        AND bs.i_proc_button_id = #{btn}
+        and b.i_id is not null
+        and b.s_btn_name='保存'
+        ORDER BY
+        bs.i_order
+    </select>
+
+    <select id="getTableByUnitAndFunction" resultType="java.util.Map">
+      SELECT m.i_id modelId,f.i_id functionId, m.s_busdata_table btable,fu.s_unit_id unitId  FROM oa_bus_function f
+        LEFT JOIN oa_bus_model m ON m.i_id = f.i_bus_model_id
+        LEFT JOIN oa_bus_function_unit fu ON fu.i_bus_function_id = f.i_id
+      WHERE
+        fu.s_unit_id = #{unitId} AND fu.i_bus_function_id =#{functionId} AND f.s_name LIKE concat('收文','%')
+    </select>
+
+    <select id="queryUsersByUnit" resultType="java.util.Map">
+         SELECT  u.id userId,u.username username,d.id departId ,d.parent_id unitId
+            FROM sys_user u
+            LEFT JOIN sys_user_role ur ON ur.user_id = u.id
+            LEFT JOIN sys_role r ON ur.role_id = r.id
+            LEFT JOIN sys_user_depart ud on ud.user_id = u.id
+            LEFT JOIN sys_depart d on d.id = ud.dep_id
+        WHERE r.role_code = 710 AND u.org_code
+           IN ( SELECT org_code FROM sys_depart  WHERE parent_id = #{unitId})
+    </select>
+
+    <select id="queryUnitsByUser" resultType="java.util.Map">
+        SELECT id,parent_id,depart_name  FROM sys_depart
+        WHERE org_type = 1 AND parent_id in
+        (SELECT parent_id FROM sys_depart WHERE org_code = #{orgCode})
+    </select>
+
+
+</mapper>

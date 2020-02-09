@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cfcc.modules.oaBus.mapper.BusPageMapper">
+
+
+    <insert id="addBusPage">
+        INSERT INTO oa_bus_page (
+            i_id,
+            s_page_path,
+            i_file_id,
+            s_page_name,
+            i_pape_type,
+            s_page_remarks,
+            i_is_video,
+            i_is_send,
+            i_is_copy,
+            i_is_vip,
+            s_create_by,
+            d_create_time,
+            act_show
+        )VALUES(
+                NULL,
+                #{sPagePath},
+                #{iFileId},
+                #{sPageName},
+                #{iPapeType},
+                #{sPageRemarks},
+                #{iIsVideo},
+                #{iIsSend},
+                #{iIsCopy},
+                #{iIsVip},
+                #{sCreateBy},
+                #{dCreateTime},
+                #{actShow}
+            )
+
+
+    </insert>
+    <update id="updateBusPageById" >
+        UPDATE oa_bus_page SET
+         s_page_path = #{sPagePath},
+         i_file_id = #{iFileId},
+         s_page_name = #{sPageName},
+         i_pape_type = #{iPapeType},
+         s_page_remarks = #{sPageRemarks},
+         i_is_video = #{iIsVideo},
+         i_is_send = #{iIsSend},
+         i_is_copy = #{iIsCopy},
+         i_is_vip = #{iIsVip},
+         s_update_by = #{sUpdateBy},
+         d_update_time = #{dUpdateTime}
+        WHERE
+            i_id = #{iId}
+    </update>
+    <delete id="deleteBusPageById">
+        delete from oa_bus_page  where i_id = #{id}
+    </delete>
+
+    <select id="countBusPage" resultType="java.lang.Integer">
+
+        select count(*) from oa_bus_page c
+        <where>
+            <if test="iId != null and iId != '' ">
+                c.i_id = #{iId}
+            </if>
+            <if test="sPageName != null and sPageName != '' ">
+                and c.s_page_name like concat('%', #{sPageName},'%')
+            </if>
+            <if test="iPapeType != null and iPapeType != '' ">
+                and c.i_pape_type = #{iPapeType}
+            </if>
+
+        </where>
+    </select>
+
+    <select id="queryBusPage" resultType="com.cfcc.modules.oaBus.entity.BusPage">
+        select * from oa_bus_page c
+        <where>
+            <if test="busPage.iId != null and busPage.iId != '' ">
+                c.i_id = #{busPage.iId}
+            </if>
+            <if test="busPage.sPageRemarks != null and busPage.sPageRemarks != '' ">
+                c.s_page_remarks = #{busPage.sPageRemarks}
+            </if>
+            <if test="busPage.sPageName != null and busPage.sPageName != '' ">
+                and c.s_page_name like concat('%', #{busPage.sPageName},'%')
+            </if>
+            <if test="busPage.iPapeType != null and busPage.iPapeType != '' ">
+                and c.i_pape_type = #{busPage.iPapeType}
+            </if>
+
+        </where>
+        order by c.i_id desc limit #{pageNo},#{pageSize}
+    </select>
+    <select id="getBusPageById" resultType="com.cfcc.modules.oaBus.entity.BusPage">
+        select * from oa_bus_page c where c.i_id = #{id}
+    </select>
+</mapper>

@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cfcc.modules.oaBus.mapper.MeetingInformMapper">
+
+    <select id="queryMeetingInformTotal" resultType="java.lang.Integer">
+        SELECT
+        COUNT(*) as total
+        FROM oa_busdata40
+
+    </select>
+
+
+    <select id="queryMeetingInform" resultType="com.cfcc.modules.oaBus.entity.OaBusdata">
+        SELECT
+        *
+        FROM
+        oa_busdata50
+        <where>
+            <if test="mInform.svarchar2 != null  ">
+                s_title like CONCAT('%',#{mInform.svarchar2},'%')
+            </if>
+            <if test="mInform.screateName != null  ">
+                and s_varchar1 like CONCAT('%', #{mInform.screateName},'%')
+            </if>
+            <if test="mInform.screateDept != null  ">
+                and s_varchar2 like CONCAT('%',#{mInform.screateDept},'%')
+            </if>
+        </where>
+        ORDER by d_create_time DESC
+        limit #{pageNo},#{pageSize}
+    </select>
+
+    <select id="queryMeetingTotal" resultType="java.lang.Integer">
+        SELECT
+        COUNT(*) as total
+        FROM oa_busdata40
+        where s_varchar1 = #{s_varchar1}
+    </select>
+
+    <select id="queryMeeting" resultType="com.cfcc.modules.oaBus.entity.OaBusdata">
+        SELECT
+	    s_varchar2,d_datetime1,d_datetime2,i_is_state
+        FROM
+	    oa_busdata40
+        WHERE
+	    s_varchar1 = #{s_varchar1}
+        limit #{pageNo},#{pageSize}
+    </select>
+
+    <select id="queryMeetingTime" resultType="com.cfcc.modules.oaBus.entity.OaBusdata">
+        SELECT
+	    i_id,d_datetime1
+        FROM
+	    ${tableName}
+        WHERE
+        s_varchar4=#{s_varchar1}
+        AND
+        i_is_state=1
+    </select>
+</mapper>

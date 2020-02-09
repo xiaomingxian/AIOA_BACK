@@ -1,0 +1,123 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cfcc.modules.oaTeamwork.mapper.oaTeamworkSetMapper">
+    <insert id="Insert">
+        insert into oa_teamwork_set
+        (i_id,
+         i_order,
+         description,
+         i_teamwork_id,
+         i_bus_model_id,
+         i_bus_function_id,
+         s_create_by,
+         s_create_deptid,
+         s_create_unitid,
+         d_create_time,
+         d_update_time,
+         i_version
+        ) values
+        (null,
+        #{iOrder},
+        #{description},
+        #{iTeamworkId},
+        #{iBusModelId},
+        #{iBusFunctionId},
+        #{sCreateBy},
+        #{sCreateDeptid},
+        #{sCreateUnitid},
+        #{dCreateTime},
+        #{dUpdateTime},
+        #{iVersion}
+        )
+    </insert>
+    <!--  修改 -->
+    <update id="updateByIid" parameterType="com.cfcc.modules.oaTeamwork.entity.oaTeamworkSet">
+		UPDATE oa_teamwork_set SET i_order = #{iOrder} ,description = #{description},i_teamwork_id = #{iTeamworkId},i_bus_model_id = #{iBusModelId} ,i_bus_function_id = #{iBusFunctionId} ,s_create_by = #{sCreateBy},s_create_deptid = #{sCreateDeptid},s_create_unitid = #{sCreateUnitid},d_create_time = #{dCreateTime},d_update_time = #{dUpdateTime},i_version = #{iVersion} where i_id = #{iId}
+	</update>
+    <!-- 删除-->
+    <delete id="deleteByIid" parameterType="String">
+        DELETE  from oa_teamwork_set  where i_id = #{id}
+    </delete>
+
+    <!-- 根据Id查询-->
+    <!--resultType="com.cfcc.modules.oaTeamwork.entity.oaTeamwork" parameterType="integer"-->
+    <select id="findById" resultType="com.cfcc.modules.oaTeamwork.entity.oaTeamworkSet">
+        SELECT * from oa_teamwork_set  where i_id = #{iId}
+    </select>
+
+    <select id="count" resultType="integer">
+        select count(1) from oa_teamwork_set c
+        <where>
+            <if test="iId != null  ">
+                c.i_id = #{iId}
+            </if>
+            <if test="iTeamworkId!= null  ">
+                and c.i_teamwork_id = #{iTeamworkId}
+            </if>
+            <if test="description != null  ">
+                and c.description = #{description}
+            </if>
+            <if test="iBusFunctionId != null  ">
+                and c.i_bus_function_id = #{iBusFunctionId}
+            </if>
+            <if test="iVersion != null  ">
+                and c.i_version = #{iVersion}
+            </if>
+        </where>
+
+    </select>
+
+    <select id="findPage" resultType="com.cfcc.modules.oaTeamwork.entity.oaTeamworkSet">
+        select *  from oa_teamwork_set c
+        <where>
+            <if test="oaTeamworkSet.iTeamworkId != null and oaTeamworkSet.iTeamworkId != '' ">
+                c.i_teamwork_id = #{oaTeamworkSet.iTeamworkId}
+            </if>
+            <if test="oaTeamworkSet.description != null and oaTeamworkSet.description != '' ">
+                and c.description = #{oaTeamworkSet.description}
+            </if>
+            <if test="oaTeamworkSet.iVersion != null and oaTeamworkSet.iVersion != '' ">
+                and c.i_version = #{oaTeamworkSet.iVersion}
+            </if>
+        </where>
+        ORDER BY c.i_order asc
+        limit #{pageNo},#{pageSize}
+    </select>
+    <select id="findMax" resultType="java.lang.Integer">
+         select max(i_order) from oa_teamwork_set  where i_teamwork_id = #{iTeamworkId}
+    </select>
+    <select id="findTeamworkSet" resultType="com.cfcc.modules.oaTeamwork.entity.oaTeamworkSet">
+        SELECT * FROM oa_teamwork_set where i_teamwork_id = #{iTeamworkId}
+    </select>
+    <select id="findorder" resultType="java.lang.Integer">
+        select i_order from oa_teamwork_set
+    </select>
+    <select id="findListByteamworkId" resultType="com.cfcc.modules.oaTeamwork.entity.oaTeamworkSet">
+        select * from oa_teamwork_set where i_teamwork_id =(select i_id from oa_teamwork where s_teamwork_name =#{TeamworkName})
+    </select>
+    <select id="queryList" resultType="com.cfcc.modules.oaTeamwork.entity.oaTeamworkSet">
+        select s.* from  oa_teamwork t INNER JOIN oa_teamwork_set s
+        <where>
+            t.i_id = s.i_teamwork_id
+            and  s.i_order =1
+            <if test="oaTeamworkSet.iBusFunctionId != null and oaTeamworkSet.iBusFunctionId != '' ">
+                and s.i_bus_function_id = #{oaTeamworkSet.iBusFunctionId}
+            </if>
+        </where>
+        ORDER BY s.i_order asc
+        limit #{pageNo},#{pageSize}
+    </select>
+    <select id="findByTeamworkId" resultType="java.lang.String">
+        select f.s_name from oa_teamwork_set  s INNER JOIN oa_bus_function f where i_teamwork_id = #{iTeamworkId} and  f.i_id =  s.i_bus_function_id
+    </select>
+    <select id="findByFunctionId" resultType="java.lang.String">
+        select s.i_bus_function_id from oa_teamwork_set  s INNER JOIN oa_bus_function f where i_teamwork_id = #{iTeamworkId} and  f.i_id =  s.i_bus_function_id
+    </select>
+    <select id="findByModelId" resultType="java.lang.String">
+        select s.i_bus_model_id from oa_teamwork_set  s INNER JOIN oa_bus_function f where i_teamwork_id = #{iTeamworkId} and  f.i_id =  s.i_bus_function_id
+    </select>
+    <select id="select" resultType="com.cfcc.modules.oaTeamwork.entity.oaTeamworkSet">
+       select * from oa_teamwork_set where i_teamwork_id = #{iTeamworkId} and i_order = #{iOrder}
+    </select>
+
+</mapper>

@@ -1,0 +1,244 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cfcc.modules.oabutton.mapper.OaButtonSetMapper">
+    <insert id="insertoaButtonSet" parameterType="com.cfcc.modules.oabutton.entity.OaButtonSet">
+        insert into oa_button_set
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="procDefKey!=null and procDefKey!=''">
+                PROC_DEF_KEY_,
+            </if>
+            <if test="taskDefKey!=null and taskDefKey!=''">
+                TASK_DEF_KEY_,
+            </if>
+            <if test="iProcButtonId!=null and iProcButtonId!=''">
+                i_proc_button_id,
+            </if>
+            <if test="iButtonId!=null and iButtonId!=''">
+                i_button_id,
+            </if>
+            <if test="iOrder!=null and iOrder!=''">
+                i_order,
+            </if>
+            <if test="iPermitType==0 or iPermitType!=null and iPermitType!=''">
+                i_permit_type,
+            </if>
+            <if test="iIsCreater!=null and iIsCreater!=''">
+                i_is_creater,
+            </if>
+            <if test="iIsReader!=null and iIsReader!=''">
+                i_is_reader,
+            </if>
+            <if test="iIsLastsender!=null and iIsLastsender!=''">
+                i_is_lastsender,
+            </if>
+            <if test="iIsTransactors!=null and iIsTransactors!=''">
+                i_is_transactors,
+            </if>
+            <if test="iIsDefault!=null and iIsDefault!=''">
+                i_is_default,
+            </if>
+            <if test="iTaskDefKey!=null and iTaskDefKey!=''">
+                i_TASK_DEF_KEY_,
+            </if>
+            <if test="sManagerRoleId!=null and sManagerRoleId!=''">
+                s_manager_role_id,
+            </if>
+            <if test="sRoles!=null and sRoles!=''">
+                s_roles,
+            </if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="procDefKey!=null and procDefKey!=''">
+                #{procDefKey},
+            </if>
+            <if test="taskDefKey!=null and taskDefKey!=''">
+                #{taskDefKey},
+            </if>
+            <if test="iProcButtonId!=null and iProcButtonId!=''">
+                #{iProcButtonId},
+            </if>
+            <if test="iButtonId!=null and iButtonId!=''">
+                #{iButtonId},
+            </if>
+            <if test="iOrder!=null and iOrder!=''">
+                #{iOrder},
+            </if>
+            <if test="iPermitType==0 or iPermitType!=null and iPermitType!=''">
+                #{iPermitType},
+            </if>
+            <if test="iIsCreater!=null and iIsCreater!=''">
+                #{iIsCreater},
+            </if>
+            <if test="iIsReader!=null and iIsReader!=''">
+                #{iIsReader},
+            </if>
+            <if test="iIsLastsender!=null and iIsLastsender!=''">
+                #{iIsLastsender},
+            </if>
+            <if test="iIsTransactors!=null and iIsTransactors!=''">
+                #{iIsTransactors},
+            </if>
+            <if test="iIsDefault!=null and iIsDefault!=''">
+                #{iIsDefault},
+            </if>
+            <if test="iTaskDefKey!=null and iTaskDefKey!=''">
+                #{iTaskDefKey},
+            </if>
+            <if test="sManagerRoleId!=null and sManagerRoleId!=''">
+                #{sManagerRoleId},
+            </if>
+            <if test="sRoles!=null and sRoles!=''">
+                #{sRoles},
+            </if>
+        </trim>
+    </insert>
+
+    <!--编辑-->
+    <update id="updateOaButtonSetById" parameterType="com.cfcc.modules.oabutton.entity.OaButtonSet">
+        UPDATE oa_button_set
+        SET PROC_DEF_KEY_ =#{procDefKey},TASK_DEF_KEY_=#{taskDefKey},i_proc_button_id=#{iProcButtonId},i_button_id=#{iButtonId},i_order=#{iOrder},
+        i_permit_type=#{iPermitType},i_is_creater=#{iIsCreater},i_is_reader=#{iIsReader},i_is_lastsender=#{iIsLastsender},i_is_transactors=#{iIsTransactors},i_is_default=#{iIsDefault},
+        i_TASK_DEF_KEY_=#{iTaskDefKey},s_manager_role_id=#{sManagerRoleId},
+        s_roles=#{sRoles}
+        WHERE i_id = #{iId}
+    </update>
+    <!--根据id删除-->
+    <delete id="deleteOaButtonSetByID">
+          DELETE FROM oa_button_set WHERE i_id = #{id}
+    </delete>
+
+    <!--根据发布类id删除-->
+    <delete id="deleteOaButtonSetByProcId">
+          DELETE FROM oa_button_set WHERE i_proc_button_id=#{iProcButtonId}
+    </delete>
+
+    <!--条件查询统计条数-->
+    <select id="queryButtonCount" resultType="java.lang.Integer">
+        select count(1) as total from
+        (select b.i_id,b.PROC_DEF_KEY_,b.TASK_DEF_KEY_,b.i_proc_button_id,b.i_button_id,b.i_order,
+        b.i_permit_type,b.i_is_creater,b.i_is_reader,b.i_is_lastsender,b.i_is_transactors,b.i_is_default,
+        b.i_TASK_DEF_KEY_,b.s_manager_role_id,p.i_id as mid from oa_button_set b
+        inner join oa_proc_button p on p.i_id=b.i_proc_button_id) as mo where mo.mid=#{id}
+        <if test="buttonId!=null and buttonId !=''">
+            and mo.i_button_id=#{buttonId}
+        </if>
+        <!--<where>
+            <if test="iProcButtonId != null and iProcButtonId != ''">
+                i_proc_button_id=#{id}
+            </if>
+           &lt;!&ndash; <if test="iButtonId !=null and iButtonId!=''">
+                and i_button_id=#{iButtonId}
+            </if>
+            <if test="iOrder !=null and iOrder!=''">
+                and i_order=#{iOrder}
+            </if>
+            <if test="iPermitType !=null and iPermitType!=''">
+                and i_permit_type=#{iPermitType}
+            </if>
+            <if test="iIsCreater !=null and iIsCreater!=''">
+                and i_is_creater=#{iIsCreater}
+            </if>
+            <if test="iIsReader !=null and iIsReader!=''">
+                and i_is_reader=#{iIsReader}
+            </if>&ndash;&gt;
+        </where>-->
+    </select>
+    <!--分页查询-->
+    <select id="queryButton" resultType="com.cfcc.modules.oabutton.entity.OaButtonSet">
+        select  a.i_id,a.s_roles,a.PROC_DEF_KEY_,a.TASK_DEF_KEY_,a.i_proc_button_id,a.i_button_id,a.i_order,
+        a.i_permit_type,a.i_is_creater,a.i_is_reader,a.i_is_lastsender,a.i_is_transactors,a.i_is_default,
+        a.i_TASK_DEF_KEY_,a.s_manager_role_id
+        from (select b.i_id,b.s_roles,b.PROC_DEF_KEY_,b.TASK_DEF_KEY_,b.i_proc_button_id,b.i_button_id,b.i_order,
+        b.i_permit_type,b.i_is_creater,b.i_is_reader,b.i_is_lastsender,b.i_is_transactors,b.i_is_default,
+        b.i_TASK_DEF_KEY_,b.s_manager_role_id,p.i_id as mid from  oa_button_set b
+        inner join oa_proc_button p on p.i_id=b.i_proc_button_id order by b.i_id desc) as a where a.mid=#{id}
+        <if test="buttonId!=null and buttonId !=''">
+          and  a.i_button_id=#{buttonId}
+        </if>
+--         order by a.i_id
+        limit #{pageNo},#{pageSize}
+    </select>
+    <!--根据id查询-->
+    <select id="queryById" resultType="com.cfcc.modules.oabutton.entity.OaButtonSet">
+        select i_id,s_roles,PROC_DEF_KEY_,TASK_DEF_KEY_,i_proc_button_id,i_button_id,i_order,
+        i_permit_type,i_is_creater,i_is_reader,i_is_lastsender,i_is_transactors,i_is_default,
+        i_TASK_DEF_KEY_,s_manager_role_id
+        from oa_button_set where i_id = #{id}
+    </select>
+
+    <!--通过任务KEY和按钮ID查询-->
+    <select id="queryByTaskDefKeyAndBtnId" resultType="com.cfcc.modules.oabutton.entity.OaButtonSet"
+            parameterType="map">
+        select *
+        from oa_button_set
+        where PROC_DEF_KEY_ = #{procDefKey}
+        and i_proc_button_id = #{iProcButtonId}
+        and TASK_DEF_KEY_ = #{taskDefKey}
+        and i_button_id = #{iButtonId}
+    </select>
+
+    <!--根据oa_proc_button的主键id查询-->
+    <select id="findById" resultType="com.cfcc.modules.oabutton.entity.OaButtonSet">
+        select i_id,s_roles,PROC_DEF_KEY_,TASK_DEF_KEY_,i_proc_button_id,i_button_id,i_order,
+        i_permit_type,i_is_creater,i_is_reader,i_is_lastsender,i_is_transactors,i_is_default,
+        i_TASK_DEF_KEY_,s_manager_role_id from oa_button_set where i_proc_button_id =#{id}
+    </select>
+    <select id="buttonSetList" resultType="com.cfcc.modules.oabutton.entity.OaButtonSet">
+        select i_id,s_roles,PROC_DEF_KEY_,TASK_DEF_KEY_,i_proc_button_id,i_button_id,i_order,
+        i_permit_type,i_is_creater,i_is_reader,i_is_lastsender,i_is_transactors,i_is_default,
+        i_TASK_DEF_KEY_,s_manager_role_id from oa_button_set
+    </select>
+
+    <!--根据oa_proc_button的id查询-->
+    <select id="queryByProcButtonId" resultType="com.cfcc.modules.oabutton.entity.OaButtonSet">
+        select b.i_id,b.s_roles,b.PROC_DEF_KEY_,b.TASK_DEF_KEY_,b.i_proc_button_id,b.i_button_id,b.i_order,
+        b.i_permit_type,b.i_is_creater,b.i_is_reader,b.i_is_lastsender,b.i_is_transactors,b.i_is_default,
+        b.i_TASK_DEF_KEY_,b.s_manager_role_id
+        from oa_button_set b LEFT JOIN oa_proc_button a ON a.i_id = b.i_proc_button_id
+        where b.i_proc_button_id = #{id}
+    </select>
+    <!--根据oa_proc_button的id和KEY同时查询-->
+    <select id="queryByProcButtonIdAndProcDefKey" resultType="com.cfcc.modules.oabutton.entity.OaButtonSet">
+        select i_id,s_roles,PROC_DEF_KEY_,TASK_DEF_KEY_,i_proc_button_id,i_button_id,i_order,
+        i_permit_type,i_is_creater,i_is_reader,i_is_lastsender,i_is_transactors,i_is_default,
+        i_TASK_DEF_KEY_,s_manager_role_id from oa_button_set
+         where i_proc_button_id = #{id} and PROC_DEF_KEY_ = #{procDefKey}
+    </select>
+    <select id="findList" resultType="com.cfcc.modules.oabutton.entity.OaButtonSet">
+        select * from oa_button_set order by i_order
+    </select>
+
+
+    <!--批量写入数据(流程复制数据)-->
+    <insert id="insertBatch">
+
+        insert into oa_button_set(
+
+        PROC_DEF_KEY_,
+        TASK_DEF_KEY_,
+        i_proc_button_id,
+        i_button_id,
+        i_order,
+        i_permit_type,
+        s_roles,
+        i_is_creater,
+        i_is_reader,
+        i_is_lastsender,
+        i_is_transactors,
+        i_is_default,
+        i_TASK_DEF_KEY_,
+        s_manager_role_id
+        )VALUES
+        <foreach collection="list" item="pojo" separator=",">
+            (
+            #{pojo.procDefKey},#{pojo.taskDefKey},#{pojo.iProcButtonId},
+            #{pojo.iButtonId},#{pojo.iOrder},
+            #{pojo.iPermitType},#{pojo.sRoles},#{pojo.iIsCreater},#{pojo.iIsReader},
+            #{pojo.iIsLastsender},#{pojo.iIsTransactors},#{pojo.iIsDefault},
+            #{pojo.iTaskDefKey},#{pojo.sManagerRoleId}
+            )
+        </foreach>
+
+
+    </insert>
+</mapper>

@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cfcc.modules.oabutton.mapper.OaProcOpinionMapper">
+    <!--编辑-->
+    <update id="updateOaProcOpinionById" parameterType="com.cfcc.modules.oabutton.entity.OaProcOpinion">
+        UPDATE oa_proc_opinion
+        <set>
+            <if test="sProcOpinionName!=null and sProcOpinionName!=''">
+                s_proc_opinion_name =#{sProcOpinionName},
+            </if>
+            <if test="procDefKey!=null and procDefKey!=''">
+                PROC_DEF_KEY_=#{procDefKey},
+            </if>
+        </set>
+        WHERE i_id = #{iId}
+    </update>
+    <!--根据id删除-->
+    <delete id="deleteOaProcOpinionByID">
+         DELETE FROM oa_proc_opinion WHERE i_id = #{id}
+    </delete>
+
+    <!--条件查询统计条数-->
+    <select id="queryButtonCount" resultType="java.lang.Integer" parameterType="com.cfcc.modules.oabutton.entity.OaProcOpinion">
+        select  count(i_id) as total from oa_proc_opinion
+        <where>
+            <!--<if test="sProcOpinionName != null and sProcOpinionName != ''">-->
+                <!--and s_proc_opinion_name=#{sProcOpinionName}-->
+            <!--</if>-->
+            <if test="iId != null and iId != ''">
+                and s_btn_id=#{procopinion.sProcOpinionName}
+            </if>
+            <if test="sProcOpinionName != null and sProcOpinionName != ''">
+                and s_btn_id=#{procopinion.sProcOpinionName}
+            </if>
+            <if test="procDefKey != null and procDefKey != ''">
+                and PROC_DEF_KEY_=#{procDefKey}
+            </if>
+        </where>
+    </select>
+    <!--分页查询-->
+    <select id="queryButton" resultType="com.cfcc.modules.oabutton.entity.OaProcOpinion">
+        select i_id,s_proc_opinion_name,PROC_DEF_KEY_
+        from oa_proc_opinion
+        <where>
+            <if test="procopinion.iId != null and procopinion.iId != ''">
+                and s_btn_id=#{procopinion.sProcOpinionName}
+            </if>
+            <if test="procopinion.sProcOpinionName != null and procopinion.sProcOpinionName != ''">
+                and s_btn_id=#{procopinion.sProcOpinionName}
+            </if>
+            <!--<if test="procopinion.sBtsProcOpinionNamenId != null and procopinion.sProcOpinionName != ''">-->
+               <!--and s_btn_id=#{procopinion.sProcOpinionName}-->
+            <!--</if>-->
+            <if test="procopinion.procDefKey != null and procopinion.procDefKey != ''">
+               and PROC_DEF_KEY_=#{procopinion.procDefKey}
+            </if>
+        </where>
+        limit #{pageNo},#{pageSize}
+    </select>
+    <!--根据id查询-->
+    <select id="queryById" resultType="com.cfcc.modules.oabutton.entity.OaProcOpinion">
+         select s_proc_opinion_name,PROC_DEF_KEY_
+        from oa_proc_opinion where i_id = #{id}
+    </select>
+    <!--根据id查询-->
+    <select id="queryBysProcOpinionName" resultType="int">
+        select count(1)
+        from oa_proc_opinion where s_proc_opinion_name = #{sProcOpinionName}
+    </select>
+    <!--添加同时返回新生成Id-->
+    <insert id="insertOaProcOpinion" useGeneratedKeys="true" keyProperty="iId" keyColumn="i_id" parameterType="com.cfcc.modules.oabutton.entity.OaProcOpinion">
+        insert oa_proc_opinion (PROC_DEF_KEY_,s_proc_opinion_name)
+        values (#{procDefKey},#{sProcOpinionName})
+    </insert>
+</mapper>

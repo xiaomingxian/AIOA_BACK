@@ -1,0 +1,434 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:activiti="http://activiti.org/bpmn" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:omgdc="http://www.omg.org/spec/DD/20100524/DC" xmlns:omgdi="http://www.omg.org/spec/DD/20100524/DI" typeLanguage="http://www.w3.org/2001/XMLSchema" expressionLanguage="http://www.w3.org/1999/XPath" targetNamespace="http://www.activiti.org/test">
+  <process id="receiveFile" name="收文" isExecutable="true">
+    <startEvent id="startevent" name="开始"></startEvent>
+    <userTask id="usertask1" name="登记" activiti:candidateUsers="${drafter}">
+      <extensionElements>
+        <activiti:formProperty id="isCandidateUsers" name="是否多候选人抢占" type="string" default="true"></activiti:formProperty>
+        <activiti:formProperty id="SQLID" name="保存业务数据" type="string" default="savedemodata"></activiti:formProperty>
+        <activiti:formProperty id="BIZINVOKE" name="业务内容调用" type="string" default="{receiveFileBean.forProcessTaskPage}"></activiti:formProperty>
+        <activiti:formProperty id="UrlPath" name="弹出页面路径" type="string" default="/pages/newoa/officDoc/receiveFile/receiveFile.jsf"></activiti:formProperty>
+        <activiti:formProperty id="datarule" name="数据权限" type="string" default="false"></activiti:formProperty>
+        <activiti:formProperty id="nextStepAssignee" name="指定后续任务处理人" type="string" default="true"></activiti:formProperty>
+      </extensionElements>
+    </userTask>
+    <userTask id="usertask2" name="局来文分办" activiti:assignee="${assignee}">
+      <extensionElements>
+        <activiti:formProperty id="BIZINVOKE" name="业务内容调用" type="string" default="{receiveFileBean.forProcessTaskPage}"></activiti:formProperty>
+        <activiti:formProperty id="candidates" name="候选人" type="string" default="'局来文分办员'"></activiti:formProperty>
+        <activiti:formProperty id="isMultAssignee" name="候选人是否多选" type="string" default="false"></activiti:formProperty>
+        <activiti:formProperty id="rolescope" name="选择角色范围" type="string" default="currentorg"></activiti:formProperty>
+        <activiti:formProperty id="userOrRole" name="选择用户或角色" type="string" default="user"></activiti:formProperty>
+        <activiti:formProperty id="opinionType" name="意见类型" type="string" default="2"></activiti:formProperty>
+        <activiti:formProperty id="UrlPath" name="弹出页面路径" type="string" default="/pages/newoa/officDoc/receiveFile/receiveFile.jsf"></activiti:formProperty>
+        <activiti:formProperty id="datarule" name="数据权限" type="string" default="false"></activiti:formProperty>
+        <activiti:formProperty id="nextStepAssignee" name="指定后续任务处理人" type="string" default="true"></activiti:formProperty>
+      </extensionElements>
+    </userTask>
+    <userTask id="usertask3" name="行来文分办" activiti:assignee="${assignee}">
+      <extensionElements>
+        <activiti:formProperty id="BIZINVOKE" name="业务内容调用" type="string" default="{receiveFileBean.forProcessTaskPage}"></activiti:formProperty>
+        <activiti:formProperty id="candidates" name="候选人" type="string" default="'行来文分办员'"></activiti:formProperty>
+        <activiti:formProperty id="isMultAssignee" name="候选人是否多选" type="string" default="false"></activiti:formProperty>
+        <activiti:formProperty id="rolescope" name="选择角色范围" type="string" default="currentorg"></activiti:formProperty>
+        <activiti:formProperty id="userOrRole" name="选择用户或角色" type="string" default="user"></activiti:formProperty>
+        <activiti:formProperty id="opinionType" name="意见类型" type="string" default="2"></activiti:formProperty>
+        <activiti:formProperty id="UrlPath" name="弹出页面路径" type="string" default="/pages/newoa/officDoc/receiveFile/receiveFile.jsf"></activiti:formProperty>
+        <activiti:formProperty id="datarule" name="数据权限" type="string" default="false"></activiti:formProperty>
+        <activiti:formProperty id="nextStepAssignee" name="指定后续任务处理人" type="string" default="true"></activiti:formProperty>
+      </extensionElements>
+    </userTask>
+    <userTask id="usertask4" name="送局长批示" activiti:assignee="${assignee}">
+      <extensionElements>
+        <activiti:formProperty id="BIZINVOKE" name="业务内容调用" type="string" default="{receiveFileBean.forProcessTaskPage}"></activiti:formProperty>
+        <activiti:formProperty id="candidates" name="候选人" type="string" default="'局长'"></activiti:formProperty>
+        <activiti:formProperty id="isMultAssignee" name="候选人是否多选" type="string" default="false"></activiti:formProperty>
+        <activiti:formProperty id="rolescope" name="选择角色范围" type="string" default="currentorg"></activiti:formProperty>
+        <activiti:formProperty id="userOrRole" name="选择用户或角色" type="string" default="user"></activiti:formProperty>
+        <activiti:formProperty id="opinionType" name="意见类型" type="string" default="1"></activiti:formProperty>
+        <activiti:formProperty id="UrlPath" name="弹出页面路径" type="string" default="/pages/newoa/officDoc/receiveFile/receiveFile.jsf"></activiti:formProperty>
+        <activiti:formProperty id="datarule" name="数据权限" type="string" default="false"></activiti:formProperty>
+      </extensionElements>
+    </userTask>
+    <userTask id="usertask5" name="送行长批示" activiti:assignee="${assignee}">
+      <extensionElements>
+        <activiti:formProperty id="BIZINVOKE" name="业务内容调用" type="string" default="{receiveFileBean.forProcessTaskPage}"></activiti:formProperty>
+        <activiti:formProperty id="candidates" name="候选人" type="string" default="'行长'"></activiti:formProperty>
+        <activiti:formProperty id="isMultAssignee" name="候选人是否多选" type="string" default="false"></activiti:formProperty>
+        <activiti:formProperty id="rolescope" name="选择角色范围" type="string" default="currentorg"></activiti:formProperty>
+        <activiti:formProperty id="userOrRole" name="选择用户或角色" type="string" default="user"></activiti:formProperty>
+        <activiti:formProperty id="opinionType" name="意见类型" type="string" default="1"></activiti:formProperty>
+        <activiti:formProperty id="UrlPath" name="弹出页面路径" type="string" default="/pages/newoa/officDoc/receiveFile/receiveFile.jsf"></activiti:formProperty>
+        <activiti:formProperty id="datarule" name="数据权限" type="string" default="false"></activiti:formProperty>
+      </extensionElements>
+    </userTask>
+    <userTask id="usertask6" name="返机要分发" activiti:candidateUsers="${assignee}">
+      <extensionElements>
+        <activiti:formProperty id="isCandidateUsers" name="是否多候选人抢占" type="string" default="true"></activiti:formProperty>
+        <activiti:formProperty id="BIZINVOKE" name="业务内容调用" type="string" default="{receiveFileBean.forProcessTaskPage}"></activiti:formProperty>
+        <activiti:formProperty id="UrlPath" name="弹出页面路径" type="string" default="/pages/newoa/officDoc/receiveFile/receiveFile.jsf"></activiti:formProperty>
+        <activiti:formProperty id="isMultAssignee" name="候选人是否多选" type="string" default="false"></activiti:formProperty>
+        <activiti:formProperty id="userOrRole" name="选择角色范围" type="string" default="user"></activiti:formProperty>
+        <activiti:formProperty id="rolescope" name="选择角色范围" type="string" default="drafterdept"></activiti:formProperty>
+        <activiti:formProperty id="candidates" name="候选人" type="string" default="'收文登记员'"></activiti:formProperty>
+        <activiti:formProperty id="datarule" name="数据权限" type="string" default="true"></activiti:formProperty>
+        <activiti:formProperty id="nextStepAssignee" name="指定后续任务处理人" type="string" default="true"></activiti:formProperty>
+      </extensionElements>
+    </userTask>
+    <userTask id="countersign_leaderVerify" name="送行领导阅" activiti:assignee="${sub_assignee}">
+      <extensionElements>
+        <activiti:formProperty id="BIZINVOKE" name="业务内容调用" type="string" default="{receiveFileBean.forProcessTaskPage}"></activiti:formProperty>
+        <activiti:formProperty id="candidates" name="候选人" type="string" default="'行长'"></activiti:formProperty>
+        <activiti:formProperty id="isMultAssignee" name="候选人是否多选" type="string" default="true"></activiti:formProperty>
+        <activiti:formProperty id="rolescope" name="选择角色范围" type="string" default="currentorg"></activiti:formProperty>
+        <activiti:formProperty id="userOrRole" name="选择用户或角色" type="string" default="user"></activiti:formProperty>
+        <activiti:formProperty id="opinionType" name="意见类型" type="string" default="1"></activiti:formProperty>
+        <activiti:formProperty id="UrlPath" name="弹出页面路径" type="string" default="/pages/newoa/officDoc/receiveFile/receiveFile.jsf"></activiti:formProperty>
+        <activiti:formProperty id="IsReturnResult" name="是否返回结果" type="string" default="true" readable="false" required="true"></activiti:formProperty>
+        <activiti:formProperty id="isCompleteTask" name="填写意见是否完成任务" type="string" default="false" readable="false" required="true"></activiti:formProperty>
+        <activiti:formProperty id="datarule" name="数据权限" type="string" default="true"></activiti:formProperty>
+        <activiti:formProperty id="isOptionTask" name="是否为可选任务" type="string" default="true"></activiti:formProperty>
+      </extensionElements>
+      <multiInstanceLoopCharacteristics isSequential="false" activiti:collection="option_assignees" activiti:elementVariable="sub_assignee">
+        <loopCardinality>${option_assignSize}</loopCardinality>
+      </multiInstanceLoopCharacteristics>
+    </userTask>
+    <subProcess id="deliverProcess" name="分发处理">
+      <multiInstanceLoopCharacteristics isSequential="false" activiti:collection="assignees" activiti:elementVariable="sub_assignee">
+        <loopCardinality>${assignSize}</loopCardinality>
+      </multiInstanceLoopCharacteristics>
+      <startEvent id="subStartEvent" name="子流程开始"></startEvent>
+      <userTask id="countersign_receiveDepts" name="部门综合分发" activiti:assignee="${sub_assignee}">
+        <extensionElements>
+          <activiti:formProperty id="BIZINVOKE" name="业务内容调用" type="string" default="{receiveFileBean.forProcessTaskPage}"></activiti:formProperty>
+          <activiti:formProperty id="candidates" name="候选人" type="string" default="'文件管理员'"></activiti:formProperty>
+          <activiti:formProperty id="isMultAssignee" name="候选人是否多选" type="string" default="true"></activiti:formProperty>
+          <activiti:formProperty id="rolescope" name="选择角色范围" type="string" default="distribute"></activiti:formProperty>
+          <activiti:formProperty id="userOrRole" name="选择用户或角色" type="string" default="selrole"></activiti:formProperty>
+          <activiti:formProperty id="UrlPath" name="弹出页面路径" type="string" default="/pages/newoa/officDoc/receiveFile/receiveFile.jsf"></activiti:formProperty>
+          <activiti:formProperty id="isCompleteTask" name="提交意见是否完成任务" type="string" default="false" readable="false" required="true"></activiti:formProperty>
+          <activiti:formProperty id="datarule" name="数据权限" type="string" default="true"></activiti:formProperty>
+        </extensionElements>
+      </userTask>
+      <userTask id="countersign_receivePersons" name="收文传阅" activiti:assignee="${sub_assignee}">
+        <extensionElements>
+          <activiti:formProperty id="BIZINVOKE" name="业务内容调用" type="string" default="{receiveFileBean.forProcessTaskPage}"></activiti:formProperty>
+          <activiti:formProperty id="candidates" name="候选人" type="string" default="'alluser'"></activiti:formProperty>
+          <activiti:formProperty id="isMultAssignee" name="候选人是否多选" type="string" default="true"></activiti:formProperty>
+          <activiti:formProperty id="rolescope" name="选择角色范围" type="string" default="currentdept"></activiti:formProperty>
+          <activiti:formProperty id="userOrRole" name="选择用户或角色" type="string" default="user"></activiti:formProperty>
+          <activiti:formProperty id="UrlPath" name="弹出页面路径" type="string" default="/pages/newoa/officDoc/receiveFile/receiveFile.jsf"></activiti:formProperty>
+          <activiti:formProperty id="IsReturnResult" name="是否返回结果" type="string" default="true" readable="false" required="true"></activiti:formProperty>
+          <activiti:formProperty id="isCompleteTask" name="提交意见是否完成任务" type="string" default="false" readable="false" required="true"></activiti:formProperty>
+          <activiti:formProperty id="datarule" name="数据权限" type="string" default="true"></activiti:formProperty>
+        </extensionElements>
+        <multiInstanceLoopCharacteristics isSequential="false" activiti:collection="assignees" activiti:elementVariable="sub_assignee">
+          <loopCardinality>${assignSize}</loopCardinality>
+        </multiInstanceLoopCharacteristics>
+      </userTask>
+      <endEvent id="subEndEvent" name="子流程结束"></endEvent>
+      <exclusiveGateway id="isDeliverPerson" name="是否分发给部门人员"></exclusiveGateway>
+      <sequenceFlow id="flow101" sourceRef="subStartEvent" targetRef="countersign_receiveDepts"></sequenceFlow>
+      <sequenceFlow id="flow102" sourceRef="countersign_receiveDepts" targetRef="isDeliverPerson"></sequenceFlow>
+      <sequenceFlow id="flow103" sourceRef="isDeliverPerson" targetRef="countersign_receivePersons">
+        <conditionExpression xsi:type="tFormalExpression"><![CDATA[${finish=='in service'}]]></conditionExpression>
+      </sequenceFlow>
+      <sequenceFlow id="flow104" sourceRef="isDeliverPerson" targetRef="subEndEvent">
+        <conditionExpression xsi:type="tFormalExpression"><![CDATA[${finish=='end'}]]></conditionExpression>
+      </sequenceFlow>
+      <sequenceFlow id="flow105" sourceRef="countersign_receivePersons" targetRef="countersign_receiveDepts"></sequenceFlow>
+    </subProcess>
+    <userTask id="usertask7" name="来文分发" activiti:assignee="${nextStepAssignee}">
+      <extensionElements>
+        <activiti:formProperty id="BIZINVOKE" name="业务内容调用" type="string" default="{receiveFileBean.forProcessTaskPage}"></activiti:formProperty>
+        <activiti:formProperty id="UrlPath" name="弹出页面路径" type="string" default="/pages/newoa/officDoc/receiveFile/receiveFile.jsf"></activiti:formProperty>
+        <activiti:formProperty id="datarule" name="数据权限" type="string" default="true"></activiti:formProperty>
+      </extensionElements>
+    </userTask>
+    <userTask id="recordFile" name="综合管理员归档" activiti:assignee="${assignee}">
+      <extensionElements>
+        <activiti:formProperty id="BIZINVOKE" name="业务内容调用" type="string" default="{receiveFileBean.forProcessTaskPage}"></activiti:formProperty>
+        <activiti:formProperty id="UrlPath" name="弹出页面路径" type="string" default="/pages/newoa/officDoc/receiveFile/receiveFile.jsf"></activiti:formProperty>
+        <activiti:formProperty id="isMultAssignee" name="候选人是否多选" type="string" default="false"></activiti:formProperty>
+        <activiti:formProperty id="userOrRole" name="选择角色范围" type="string" default="user"></activiti:formProperty>
+        <activiti:formProperty id="rolescope" name="选择角色范围" type="string" default="drafterdept"></activiti:formProperty>
+        <activiti:formProperty id="candidates" name="候选人" type="string" default="'收文登记员'"></activiti:formProperty>
+        <activiti:formProperty id="datarule" name="数据权限" type="string" default="true"></activiti:formProperty>
+      </extensionElements>
+    </userTask>
+    <endEvent id="endevent" name="End"></endEvent>
+    <exclusiveGateway id="exclusivegateway1" name="Exclusive Gateway" default="flow3"></exclusiveGateway>
+    <exclusiveGateway id="exclusivegateway2" name="Exclusive Gateway" default="flow9"></exclusiveGateway>
+    <exclusiveGateway id="exclusivegateway3" name="Exclusive Gateway" default="flow12"></exclusiveGateway>
+    <exclusiveGateway id="deliverTarget" name="分发对象" default="flow16"></exclusiveGateway>
+    <sequenceFlow id="flow1" sourceRef="startevent" targetRef="usertask1"></sequenceFlow>
+    <sequenceFlow id="flow2" sourceRef="usertask1" targetRef="exclusivegateway1"></sequenceFlow>
+    <sequenceFlow id="flow4" sourceRef="exclusivegateway1" targetRef="usertask3">
+      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${nextTask=='usertask3'}]]></conditionExpression>
+    </sequenceFlow>
+    <sequenceFlow id="flow3" sourceRef="exclusivegateway1" targetRef="usertask2"></sequenceFlow>
+    <sequenceFlow id="flow5" sourceRef="inclusivegateway1" targetRef="countersign_leaderVerify">
+      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${option_branch=='true'}]]></conditionExpression>
+    </sequenceFlow>
+    <sequenceFlow id="flow6" sourceRef="exclusivegateway1" targetRef="deliverProcess">
+      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${nextTask=='countersign_receiveDepts'}]]></conditionExpression>
+    </sequenceFlow>
+    <sequenceFlow id="flow7" sourceRef="usertask2" targetRef="exclusivegateway2"></sequenceFlow>
+    <sequenceFlow id="flow8" sourceRef="usertask3" targetRef="exclusivegateway3"></sequenceFlow>
+    <sequenceFlow id="flow9" sourceRef="exclusivegateway2" targetRef="usertask4"></sequenceFlow>
+    <sequenceFlow id="flow10" sourceRef="exclusivegateway2" targetRef="usertask6">
+      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${nextTask=='usertask6'}]]></conditionExpression>
+    </sequenceFlow>
+    <sequenceFlow id="flow11" sourceRef="exclusivegateway2" targetRef="deliverProcess">
+      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${nextTask=='countersign_receiveDepts'}]]></conditionExpression>
+    </sequenceFlow>
+    <sequenceFlow id="flow12" sourceRef="exclusivegateway3" targetRef="usertask5"></sequenceFlow>
+    <sequenceFlow id="flow13" sourceRef="exclusivegateway3" targetRef="usertask6">
+      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${nextTask=='usertask6'}]]></conditionExpression>
+    </sequenceFlow>
+    <sequenceFlow id="flow14" sourceRef="exclusivegateway3" targetRef="deliverProcess">
+      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${nextTask=='countersign_receiveDepts'}]]></conditionExpression>
+    </sequenceFlow>
+    <sequenceFlow id="flow15" sourceRef="usertask6" targetRef="inclusivegateway1"></sequenceFlow>
+    <sequenceFlow id="flow16" sourceRef="deliverTarget" targetRef="deliverProcess"></sequenceFlow>
+    <sequenceFlow id="flow17" sourceRef="deliverTarget" targetRef="usertask4">
+      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${nextTask=='usertask4'}]]></conditionExpression>
+    </sequenceFlow>
+    <sequenceFlow id="flow18" sourceRef="deliverTarget" targetRef="usertask5">
+      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${nextTask=='usertask5'}]]></conditionExpression>
+    </sequenceFlow>
+    <sequenceFlow id="flow20" sourceRef="deliverTarget" targetRef="recordFile">
+      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${nextTask=='recordFile'}]]></conditionExpression>
+    </sequenceFlow>
+    <sequenceFlow id="flow21" sourceRef="deliverProcess" targetRef="usertask7"></sequenceFlow>
+    <sequenceFlow id="flow22" sourceRef="usertask7" targetRef="recordFile"></sequenceFlow>
+    <sequenceFlow id="flow23" sourceRef="recordFile" targetRef="inclusivegateway2"></sequenceFlow>
+    <sequenceFlow id="flow24" sourceRef="usertask4" targetRef="usertask6"></sequenceFlow>
+    <sequenceFlow id="flow25" sourceRef="usertask5" targetRef="usertask6"></sequenceFlow>
+    <sequenceFlow id="flow106" sourceRef="countersign_leaderVerify" targetRef="inclusivegateway2"></sequenceFlow>
+    <inclusiveGateway id="inclusivegateway1" name="拆分"></inclusiveGateway>
+    <sequenceFlow id="flow107" sourceRef="inclusivegateway1" targetRef="deliverTarget">
+      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${nextTask=='usertask4' or nextTask=='usertask5' or nextTask=='recordFile' or nextTask=='countersign_receiveDepts'}]]></conditionExpression>
+    </sequenceFlow>
+    <inclusiveGateway id="inclusivegateway2" name="合并"></inclusiveGateway>
+    <sequenceFlow id="flow108" sourceRef="inclusivegateway2" targetRef="endevent"></sequenceFlow>
+  </process>
+  <bpmndi:BPMNDiagram id="BPMNDiagram_receiveFile">
+    <bpmndi:BPMNPlane bpmnElement="receiveFile" id="BPMNPlane_receiveFile">
+      <bpmndi:BPMNShape bpmnElement="startevent" id="BPMNShape_startevent">
+        <omgdc:Bounds height="35.0" width="35.0" x="520.0" y="19.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="usertask1" id="BPMNShape_usertask1">
+        <omgdc:Bounds height="55.0" width="105.0" x="485.0" y="90.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="usertask2" id="BPMNShape_usertask2">
+        <omgdc:Bounds height="55.0" width="105.0" x="340.0" y="234.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="usertask3" id="BPMNShape_usertask3">
+        <omgdc:Bounds height="55.0" width="105.0" x="632.0" y="234.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="usertask4" id="BPMNShape_usertask4">
+        <omgdc:Bounds height="55.0" width="105.0" x="340.0" y="385.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="usertask5" id="BPMNShape_usertask5">
+        <omgdc:Bounds height="55.0" width="105.0" x="632.0" y="385.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="usertask6" id="BPMNShape_usertask6">
+        <omgdc:Bounds height="55.0" width="105.0" x="485.0" y="385.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="countersign_leaderVerify" id="BPMNShape_countersign_leaderVerify">
+        <omgdc:Bounds height="55.0" width="105.0" x="141.0" y="466.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="deliverProcess" id="BPMNShape_deliverProcess">
+        <omgdc:Bounds height="201.0" width="371.0" x="352.0" y="630.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="subStartEvent" id="BPMNShape_subStartEvent">
+        <omgdc:Bounds height="35.0" width="35.0" x="372.0" y="680.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="countersign_receiveDepts" id="BPMNShape_countersign_receiveDepts">
+        <omgdc:Bounds height="55.0" width="105.0" x="442.0" y="670.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="countersign_receivePersons" id="BPMNShape_countersign_receivePersons">
+        <omgdc:Bounds height="55.0" width="105.0" x="550.0" y="750.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="subEndEvent" id="BPMNShape_subEndEvent">
+        <omgdc:Bounds height="35.0" width="35.0" x="662.0" y="680.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="isDeliverPerson" id="BPMNShape_isDeliverPerson">
+        <omgdc:Bounds height="40.0" width="40.0" x="582.0" y="677.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="usertask7" id="BPMNShape_usertask7">
+        <omgdc:Bounds height="55.0" width="105.0" x="485.0" y="875.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="recordFile" id="BPMNShape_recordFile">
+        <omgdc:Bounds height="55.0" width="105.0" x="350.0" y="875.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="endevent" id="BPMNShape_endevent">
+        <omgdc:Bounds height="35.0" width="35.0" x="385.0" y="1030.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="exclusivegateway1" id="BPMNShape_exclusivegateway1">
+        <omgdc:Bounds height="40.0" width="40.0" x="517.0" y="180.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="exclusivegateway2" id="BPMNShape_exclusivegateway2">
+        <omgdc:Bounds height="40.0" width="40.0" x="372.0" y="315.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="exclusivegateway3" id="BPMNShape_exclusivegateway3">
+        <omgdc:Bounds height="40.0" width="40.0" x="664.0" y="315.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="deliverTarget" id="BPMNShape_deliverTarget">
+        <omgdc:Bounds height="40.0" width="40.0" x="517.0" y="545.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="inclusivegateway1" id="BPMNShape_inclusivegateway1">
+        <omgdc:Bounds height="40.0" width="40.0" x="517.0" y="473.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="inclusivegateway2" id="BPMNShape_inclusivegateway2">
+        <omgdc:Bounds height="40.0" width="40.0" x="382.0" y="960.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge bpmnElement="flow101" id="BPMNEdge_flow101">
+        <omgdi:waypoint x="407.0" y="697.0"></omgdi:waypoint>
+        <omgdi:waypoint x="442.0" y="697.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow102" id="BPMNEdge_flow102">
+        <omgdi:waypoint x="547.0" y="697.0"></omgdi:waypoint>
+        <omgdi:waypoint x="582.0" y="697.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow103" id="BPMNEdge_flow103">
+        <omgdi:waypoint x="602.0" y="717.0"></omgdi:waypoint>
+        <omgdi:waypoint x="602.0" y="750.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow104" id="BPMNEdge_flow104">
+        <omgdi:waypoint x="622.0" y="697.0"></omgdi:waypoint>
+        <omgdi:waypoint x="662.0" y="697.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow105" id="BPMNEdge_flow105">
+        <omgdi:waypoint x="550.0" y="777.0"></omgdi:waypoint>
+        <omgdi:waypoint x="494.0" y="777.0"></omgdi:waypoint>
+        <omgdi:waypoint x="494.0" y="725.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow1" id="BPMNEdge_flow1">
+        <omgdi:waypoint x="537.0" y="54.0"></omgdi:waypoint>
+        <omgdi:waypoint x="537.0" y="90.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow2" id="BPMNEdge_flow2">
+        <omgdi:waypoint x="537.0" y="145.0"></omgdi:waypoint>
+        <omgdi:waypoint x="537.0" y="180.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow4" id="BPMNEdge_flow4">
+        <omgdi:waypoint x="537.0" y="220.0"></omgdi:waypoint>
+        <omgdi:waypoint x="537.0" y="261.0"></omgdi:waypoint>
+        <omgdi:waypoint x="632.0" y="261.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow3" id="BPMNEdge_flow3">
+        <omgdi:waypoint x="537.0" y="220.0"></omgdi:waypoint>
+        <omgdi:waypoint x="537.0" y="261.0"></omgdi:waypoint>
+        <omgdi:waypoint x="445.0" y="261.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow5" id="BPMNEdge_flow5">
+        <omgdi:waypoint x="517.0" y="493.0"></omgdi:waypoint>
+        <omgdi:waypoint x="246.0" y="493.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow6" id="BPMNEdge_flow6">
+        <omgdi:waypoint x="557.0" y="200.0"></omgdi:waypoint>
+        <omgdi:waypoint x="879.0" y="200.0"></omgdi:waypoint>
+        <omgdi:waypoint x="879.0" y="731.0"></omgdi:waypoint>
+        <omgdi:waypoint x="723.0" y="730.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow7" id="BPMNEdge_flow7">
+        <omgdi:waypoint x="392.0" y="289.0"></omgdi:waypoint>
+        <omgdi:waypoint x="392.0" y="315.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow8" id="BPMNEdge_flow8">
+        <omgdi:waypoint x="684.0" y="289.0"></omgdi:waypoint>
+        <omgdi:waypoint x="684.0" y="315.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow9" id="BPMNEdge_flow9">
+        <omgdi:waypoint x="392.0" y="355.0"></omgdi:waypoint>
+        <omgdi:waypoint x="392.0" y="385.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow10" id="BPMNEdge_flow10">
+        <omgdi:waypoint x="412.0" y="335.0"></omgdi:waypoint>
+        <omgdi:waypoint x="537.0" y="335.0"></omgdi:waypoint>
+        <omgdi:waypoint x="537.0" y="385.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow11" id="BPMNEdge_flow11">
+        <omgdi:waypoint x="372.0" y="335.0"></omgdi:waypoint>
+        <omgdi:waypoint x="277.0" y="335.0"></omgdi:waypoint>
+        <omgdi:waypoint x="277.0" y="731.0"></omgdi:waypoint>
+        <omgdi:waypoint x="352.0" y="730.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow12" id="BPMNEdge_flow12">
+        <omgdi:waypoint x="684.0" y="355.0"></omgdi:waypoint>
+        <omgdi:waypoint x="684.0" y="385.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow13" id="BPMNEdge_flow13">
+        <omgdi:waypoint x="664.0" y="335.0"></omgdi:waypoint>
+        <omgdi:waypoint x="537.0" y="335.0"></omgdi:waypoint>
+        <omgdi:waypoint x="537.0" y="385.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow14" id="BPMNEdge_flow14">
+        <omgdi:waypoint x="704.0" y="335.0"></omgdi:waypoint>
+        <omgdi:waypoint x="795.0" y="335.0"></omgdi:waypoint>
+        <omgdi:waypoint x="795.0" y="731.0"></omgdi:waypoint>
+        <omgdi:waypoint x="723.0" y="730.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow15" id="BPMNEdge_flow15">
+        <omgdi:waypoint x="537.0" y="440.0"></omgdi:waypoint>
+        <omgdi:waypoint x="537.0" y="473.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow16" id="BPMNEdge_flow16">
+        <omgdi:waypoint x="537.0" y="585.0"></omgdi:waypoint>
+        <omgdi:waypoint x="537.0" y="630.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow17" id="BPMNEdge_flow17">
+        <omgdi:waypoint x="517.0" y="565.0"></omgdi:waypoint>
+        <omgdi:waypoint x="392.0" y="565.0"></omgdi:waypoint>
+        <omgdi:waypoint x="392.0" y="440.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow18" id="BPMNEdge_flow18">
+        <omgdi:waypoint x="557.0" y="565.0"></omgdi:waypoint>
+        <omgdi:waypoint x="684.0" y="565.0"></omgdi:waypoint>
+        <omgdi:waypoint x="684.0" y="440.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow20" id="BPMNEdge_flow20">
+        <omgdi:waypoint x="517.0" y="565.0"></omgdi:waypoint>
+        <omgdi:waypoint x="315.0" y="565.0"></omgdi:waypoint>
+        <omgdi:waypoint x="315.0" y="730.0"></omgdi:waypoint>
+        <omgdi:waypoint x="315.0" y="902.0"></omgdi:waypoint>
+        <omgdi:waypoint x="350.0" y="902.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow21" id="BPMNEdge_flow21">
+        <omgdi:waypoint x="537.0" y="831.0"></omgdi:waypoint>
+        <omgdi:waypoint x="537.0" y="875.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow22" id="BPMNEdge_flow22">
+        <omgdi:waypoint x="485.0" y="902.0"></omgdi:waypoint>
+        <omgdi:waypoint x="455.0" y="902.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow23" id="BPMNEdge_flow23">
+        <omgdi:waypoint x="402.0" y="930.0"></omgdi:waypoint>
+        <omgdi:waypoint x="402.0" y="960.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow24" id="BPMNEdge_flow24">
+        <omgdi:waypoint x="445.0" y="412.0"></omgdi:waypoint>
+        <omgdi:waypoint x="485.0" y="412.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow25" id="BPMNEdge_flow25">
+        <omgdi:waypoint x="632.0" y="412.0"></omgdi:waypoint>
+        <omgdi:waypoint x="590.0" y="412.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow106" id="BPMNEdge_flow106">
+        <omgdi:waypoint x="193.0" y="521.0"></omgdi:waypoint>
+        <omgdi:waypoint x="193.0" y="980.0"></omgdi:waypoint>
+        <omgdi:waypoint x="382.0" y="980.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow107" id="BPMNEdge_flow107">
+        <omgdi:waypoint x="537.0" y="513.0"></omgdi:waypoint>
+        <omgdi:waypoint x="537.0" y="545.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow108" id="BPMNEdge_flow108">
+        <omgdi:waypoint x="402.0" y="1000.0"></omgdi:waypoint>
+        <omgdi:waypoint x="402.0" y="1030.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</definitions>
