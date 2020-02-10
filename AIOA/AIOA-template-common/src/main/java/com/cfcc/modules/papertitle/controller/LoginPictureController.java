@@ -188,9 +188,15 @@ public class LoginPictureController {
     @GetMapping(value = "/updatePicText")
     public Result<?> updatePicText(String picText) {
         Result<String> result = new Result<>();
-        Integer fileType = 9;
-        Boolean b = oaFileService.updatePicText(fileType,picText);
-        if (b){
+        Integer fileType = 12;
+        String oldPicText = oaFileService.findPicText(fileType);
+        Boolean flag = false;
+        if (oldPicText == null){
+            flag = oaFileService.savePicText(fileType,picText);
+        }else {
+            flag = oaFileService.updatePicText(fileType,picText);
+        }
+        if (flag){
             result.setSuccess(true);
             result.setMessage("修改登录页面成功");
         }else {
@@ -200,4 +206,12 @@ public class LoginPictureController {
         return result;
     }
 
+    @PostMapping(value = "/getPictrueText")
+    public Result<?> getPictrueText() {
+        Result<String> result = new Result<>();
+        Integer fileType = 12;
+        String picText = oaFileService.findPicText(fileType);
+        result.setResult(picText);
+        return result;
+    }
 }

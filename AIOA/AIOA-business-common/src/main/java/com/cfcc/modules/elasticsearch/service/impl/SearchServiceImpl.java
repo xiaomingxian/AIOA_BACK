@@ -23,7 +23,6 @@ import org.elasticsearch.client.RequestOptions;
 import org.elasticsearch.client.RestHighLevelClient;
 import org.elasticsearch.common.text.Text;
 import org.elasticsearch.common.xcontent.XContentType;
-import org.elasticsearch.index.query.BoolQueryBuilder;
 import org.elasticsearch.index.query.QueryBuilders;
 import org.elasticsearch.rest.RestStatus;
 import org.elasticsearch.search.SearchHit;
@@ -164,11 +163,15 @@ public class SearchServiceImpl implements SearchService {
      */
     @Override
     public IPage<Map<String,Object>> query(String keyWord,Integer pageNo,Integer pageSize,String INDEX_NAME,String INDEX_TYPE )  {
+        System.out.println("-----------keyword:"+keyWord);
+        System.out.println("-----------INDEX_NAME:"+INDEX_NAME);
+//        keyWord = "admin";
+//        pageNo = 3;
+//        pageSize = 10;
+//        INDEX_NAME = "elasticsearch2";
         //searchRequest  搜索请求对象
         SearchRequest searchRequest = new SearchRequest();
         searchRequest.types(INDEX_NAME);//索引
-//        searchRequest.indices(INDEX_TYPE);
-
         //查询
         SearchSourceBuilder searchSourceBuilder = new SearchSourceBuilder();
         //分页部分
@@ -176,75 +179,16 @@ public class SearchServiceImpl implements SearchService {
         searchSourceBuilder.size(pageSize);//pageSize
         searchSourceBuilder.from(start);//起始记录
         //查询条件
-        BoolQueryBuilder queryBuilder = QueryBuilders.boolQuery();
-        queryBuilder.should(QueryBuilders.matchQuery("i_safetylevel",keyWord));
-        queryBuilder.should(QueryBuilders.matchQuery("i_urgency",keyWord));
-        queryBuilder.should(QueryBuilders.matchQuery("s_signer",keyWord));
-        queryBuilder.should(QueryBuilders.matchQuery("s_create_dept",keyWord));
-        queryBuilder.should(QueryBuilders.matchQuery("s_main_unit_names",keyWord));
-        queryBuilder.should(QueryBuilders.matchQuery("s_cc_unit_names",keyWord));
-        queryBuilder.should(QueryBuilders.matchQuery("s_inside_deptnames",keyWord));
-        queryBuilder.should(QueryBuilders.matchQuery("s_report_nuit_names",keyWord));
-        queryBuilder.should(QueryBuilders.matchQuery("s_crc_deptnames",keyWord));
-        queryBuilder.should(QueryBuilders.matchQuery("s_title",keyWord));
-        queryBuilder.should(QueryBuilders.matchQuery("s_left_parameter",keyWord));
-        queryBuilder.should(QueryBuilders.matchQuery("s_unit_name",keyWord));
-        queryBuilder.should(QueryBuilders.matchQuery("s_dept_name",keyWord));
-        queryBuilder.should(QueryBuilders.matchQuery("s_middle_parameter",keyWord));
-        queryBuilder.should(QueryBuilders.matchQuery("s_right_parameter",keyWord));
-        queryBuilder.should(QueryBuilders.matchQuery("s_file_num",keyWord));
-        queryBuilder.should(QueryBuilders.matchQuery("i_is_state",keyWord));
-        queryBuilder.should(QueryBuilders.matchQuery("i_is_archives",keyWord));
-        queryBuilder.should(QueryBuilders.matchQuery("i_is_approve",keyWord));
-        queryBuilder.should(QueryBuilders.matchQuery("s_remarks",keyWord));
-        queryBuilder.should(QueryBuilders.matchQuery("i_phone",keyWord));
-        queryBuilder.should(QueryBuilders.matchQuery("s_create_name",keyWord));
-        queryBuilder.should(QueryBuilders.matchQuery("i_bigint1",keyWord));
-        queryBuilder.should(QueryBuilders.matchQuery("i_bigint2",keyWord));
-        queryBuilder.should(QueryBuilders.matchQuery("i_bigint3",keyWord));
-        queryBuilder.should(QueryBuilders.matchQuery("i_bigint4",keyWord));
-        queryBuilder.should(QueryBuilders.matchQuery("s_varchar1",keyWord));
-        queryBuilder.should(QueryBuilders.matchQuery("s_varchar2",keyWord));
-        queryBuilder.should(QueryBuilders.matchQuery("s_varchar3",keyWord));
-        queryBuilder.should(QueryBuilders.matchQuery("s_varchar4",keyWord));
-        queryBuilder.should(QueryBuilders.matchQuery("s_varchar5",keyWord));
-        queryBuilder.should(QueryBuilders.matchQuery("s_varchar6",keyWord));
-        queryBuilder.should(QueryBuilders.matchQuery("s_varchar7",keyWord));
-        queryBuilder.should(QueryBuilders.matchQuery("s_varchar8",keyWord));
-        queryBuilder.should(QueryBuilders.matchQuery("s_varchar9",keyWord));
-        queryBuilder.should(QueryBuilders.matchQuery("s_varchar10",keyWord));
-        queryBuilder.should(QueryBuilders.matchQuery("s_varchar11",keyWord));
-        queryBuilder.should(QueryBuilders.matchQuery("s_varchar12",keyWord));
-        queryBuilder.should(QueryBuilders.matchQuery("s_varchar13",keyWord));
-        queryBuilder.should(QueryBuilders.matchQuery("s_varchar14",keyWord));
-        queryBuilder.should(QueryBuilders.matchQuery("s_varchar15",keyWord));
-        queryBuilder.should(QueryBuilders.matchQuery("s_varchar16",keyWord));
-        queryBuilder.should(QueryBuilders.matchQuery("s_varchar17",keyWord));
-        queryBuilder.should(QueryBuilders.matchQuery("s_varchar18",keyWord));
-        queryBuilder.should(QueryBuilders.matchQuery("s_varchar19",keyWord));
-        queryBuilder.should(QueryBuilders.matchQuery("s_varchar20",keyWord));
-        queryBuilder.should(QueryBuilders.matchQuery("i_is_publish",keyWord));
-
-        queryBuilder.should(QueryBuilders.matchQuery("sCreateBy",keyWord));
-        queryBuilder.should(QueryBuilders.matchQuery("sFileName",keyWord));
-        queryBuilder.should(QueryBuilders.matchQuery("sFilePath",keyWord));
-        queryBuilder.should(QueryBuilders.matchQuery("sFileType",keyWord));
-        queryBuilder.should(QueryBuilders.matchQuery("sFileType",keyWord));
-        queryBuilder.should(QueryBuilders.matchQuery("sTitle",keyWord));
-
-        searchSourceBuilder.query(queryBuilder);
-//        searchSourceBuilder.query(QueryBuilders.queryStringQuery(keyWord));
+        searchSourceBuilder.query(QueryBuilders.queryStringQuery(keyWord));
         //高亮查询
         HighlightBuilder highlightBuilder = new HighlightBuilder();
         highlightBuilder.field("*").requireFieldMatch(false);//高亮字段
         //highlightBuilder.fields();
         highlightBuilder.preTags("<big style=\"color:red;\">");
         highlightBuilder.postTags("</big>");
-
         searchSourceBuilder.highlighter(highlightBuilder);
         searchRequest.source(searchSourceBuilder);
-
-        SearchResponse response  = null;
+        SearchResponse response = null;
         try {
             response = restHighLevelClient.search(searchRequest, RequestOptions.DEFAULT);
         } catch (IOException e) {
@@ -252,11 +196,10 @@ public class SearchServiceImpl implements SearchService {
         }
         SearchHits searchHits = response.getHits();
         //总数据
-        long  total = searchHits.getTotalHits();
-
-        List<Map<String,Object>> sourceList = new ArrayList<>();
-        SearchHit hit [] = searchHits.getHits();
-        for (SearchHit searchHit:hit){
+        long total = searchHits.getTotalHits();
+        List<Map<String, Object>> sourceList = new ArrayList<>();
+        SearchHit hit[] = searchHits.getHits();
+        for (SearchHit searchHit : hit) {
             Map<String, Object> sourceAsMap = searchHit.getSourceAsMap();
             Map<String, HighlightField> highlightFields = searchHit.getHighlightFields();
             Set<String> set = highlightFields.keySet();
@@ -267,6 +210,12 @@ public class SearchServiceImpl implements SearchService {
             }
             sourceList.add(sourceAsMap);
         }
+
+        for (Map<String, Object> map : sourceList) {
+            System.out.println(map);
+        }
+        System.out.println("总条数：" + total);
+
         IPage<Map<String,Object>> pageList = new Page<Map<String,Object>>();
         pageList.setRecords(sourceList);
         pageList.setTotal(total);
@@ -295,7 +244,17 @@ public class SearchServiceImpl implements SearchService {
 
     @Override
     public RestStatus saveOrUpdate(String json, String id, String indexName, String indexType) throws Exception {
-        return null;
+        IndexRequest request = new IndexRequest(indexName,indexType,id);
+//        System.out.println("-------"+json);
+        request.source(json,XContentType.JSON);//指定添加的数据
+
+        //IndexRequest indexRequest, RequestOptions options
+        IndexResponse indexResponse =  restHighLevelClient.index(request,RequestOptions.DEFAULT);
+
+        logger.info("新增/修改："+indexResponse.status());
+
+        RestStatus status = indexResponse.status();
+        return status;
     }
 
 

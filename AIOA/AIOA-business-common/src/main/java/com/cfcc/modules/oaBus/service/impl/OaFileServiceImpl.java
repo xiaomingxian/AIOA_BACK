@@ -57,7 +57,6 @@ public class OaFileServiceImpl extends ServiceImpl<OaFileMapper, OaFile> impleme
     @Autowired
     private SysDictMapper sysDictMapper;
 
-
     @Autowired
     @Lazy
     private IOaFileService oaFileService;
@@ -71,10 +70,17 @@ public class OaFileServiceImpl extends ServiceImpl<OaFileMapper, OaFile> impleme
     private String tempPath;
 
 
-//    @Override
-//    public String getOneFileByType(){
-//        return null;
-//    }
+    @Override
+    public Boolean savePicText(Integer fileType, String picText) {
+        Boolean a = oaFileMapper.savePicText( fileType, picText);
+        return a;
+    }
+
+    @Override
+    public String findPicText(Integer fileType) {
+        String picText = oaFileMapper.findPicText(fileType);
+        return picText;
+    }
 
     @Override
     public List<OaFile> getOaFileByType0(Integer fileType) {
@@ -151,7 +157,6 @@ public class OaFileServiceImpl extends ServiceImpl<OaFileMapper, OaFile> impleme
         return true;
     }
 
-
     @Override
     public List<OaFile> getOaFileByType(Integer fileType) {
         return oaFileMapper.getOaFileByTypeAndOrderAndChecked(fileType);
@@ -161,8 +166,6 @@ public class OaFileServiceImpl extends ServiceImpl<OaFileMapper, OaFile> impleme
     public void deleteOneFileByType(Integer id) {
         oaFileMapper.deleteOneFileByType(id);
     }
-
-    //#####################################
 
     @Override
     public IPage<OaFile> getPage(Integer pageNo, Integer pageSize, OaFile oaFile) {
@@ -468,6 +471,9 @@ public class OaFileServiceImpl extends ServiceImpl<OaFileMapper, OaFile> impleme
             List<String> isEsColumnLists = busPageDetailMapper.getCloumnNameByTableAndEsquery(sBusdataTable, busFunction.getIId());
             //要检索字段变为字符串格式
             String columnLists = getColumList(sBusdataTable, busFunction.getIId());
+            if (columnLists.equals("")){
+                continue;
+            }
 /*        }
         for (BusModel busModel : busModels) {
             //该表名
@@ -527,6 +533,7 @@ public class OaFileServiceImpl extends ServiceImpl<OaFileMapper, OaFile> impleme
             if (oaBusdata == null) {
                 continue;
             }
+
             oaBusdataList.addAll(oaBusdata);
         }
         System.out.println("*****************************");

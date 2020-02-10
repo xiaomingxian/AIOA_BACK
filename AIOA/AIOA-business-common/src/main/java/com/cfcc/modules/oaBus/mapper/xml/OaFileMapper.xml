@@ -52,6 +52,11 @@
           values
           (#{sFileType},#{sFileName},#{sFilePath}, #{sCreateBy}, #{dCreateTime})
     </insert>
+    <insert id="savePicText">
+        insert into oa_file (s_table, s_file_type)
+          values
+          (#{picText}, #{fileType})
+    </insert>
 
     <select id="queryById" resultType="com.cfcc.modules.oaBus.entity.OaFile">
         select * from oa_file where i_id = #{id}
@@ -122,6 +127,9 @@
     <select id="queryFileButton" resultType="java.lang.Integer">
       SELECT s_button_id FROM oa_file_button
     </select>
+    <select id="findPicText" resultType="java.lang.String">
+        SELECT s_table FROM oa_file WHERE s_file_type = #{fileType}
+    </select>
 
     <!--修改附件名称-->
     <update id="updateDocNameById">
@@ -139,6 +147,6 @@
          update oa_file set i_order = 1 where i_id = #{id}
     </update>
     <update id="updatePicText">
-        update oa_file set s_table = #{picText} where s_file_type = #{fileType} and i_order = 1
+        update oa_file set s_table = #{picText} where s_file_type = #{fileType}
     </update>
 </mapper>
