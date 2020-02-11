@@ -121,7 +121,8 @@ spring:
       datasource:
         master:
 #          &allowMultiQueries=true
-          url: jdbc:mysql://49.234.25.12:3306/aioa_activiti_test?characterEncoding=UTF-8&useUnicode=true&useSSL=false&tinyInt1isBit=false
+#          url: jdbc:mysql://10.1.15.201:3306/aioa_activiti_test?characterEncoding=UTF-8&useUnicode=true&useSSL=false&tinyInt1isBit=false
+          url: jdbc:mysql://49.234.25.12:3306/aioa_demo?characterEncoding=UTF-8&useUnicode=true&useSSL=false&tinyInt1isBit=false
           username: root
           password: Mysql_root_123456
           driver-class-name: com.mysql.jdbc.Driver
@@ -134,7 +135,7 @@ spring:
   #redis 配置
   redis:
     database: 0
-    host: 49.234.25.12
+    host: localhost
     lettuce:
       pool:
         max-active: 8   #最大连接数据库连接数,设 0 为没有限制
@@ -200,4 +201,3 @@ logging:
     com.len.mapper: DEBUG
     org.activiti.engine.impl.persistence.entity: trace
   config: classpath:logback-spring.xml
-  #测试提交

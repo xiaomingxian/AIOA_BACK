@@ -36,6 +36,8 @@
         <activiti.version>5.22.0</activiti.version>
     </properties>
 
+
+
     <dependencies>
         <!--poi解析pdf文档-->
         <dependency>

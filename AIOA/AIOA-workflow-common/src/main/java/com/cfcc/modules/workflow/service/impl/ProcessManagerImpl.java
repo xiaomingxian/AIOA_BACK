@@ -321,6 +321,9 @@ public class ProcessManagerImpl implements ProcessManagerService {
 
     @Override
     public List<Activity> actsList(String processDefinitionId, boolean haveSub) {
+
+        if (null == processDefinitionId) throw new AIOAException("流程定义id为空,未查询到流程");
+
         ProcessDefinitionEntity proc = (ProcessDefinitionEntity) repositoryService.getProcessDefinition(processDefinitionId);
         List<ActivityImpl> activities = proc.getActivities();
 
@@ -410,7 +413,9 @@ public class ProcessManagerImpl implements ProcessManagerService {
      */
     @Override
     public List<Activity> showBackAct(String processDefinitionId, String processInstanceId, String taskDefinitionKey) {
-
+        if (processDefinitionId == null) {
+            throw new AIOAException("流程定义id为空,未查询到流程");
+        }
         ProcessDefinitionEntity proc = (ProcessDefinitionEntity) repositoryService.getProcessDefinition(processDefinitionId);
         //所有节点
         List<ActivityImpl> actsAll = proc.getActivities();
