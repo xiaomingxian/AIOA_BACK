@@ -19,6 +19,10 @@ import java.util.Map;
  */
 public interface IOaFileService extends IService<OaFile> {
 
+    Boolean savePicText(Integer fileType, String picText);
+
+    String findPicText(Integer fileType);
+
     List<OaFile> getOaFileByType0(Integer fileType);
 
     Boolean checkDefault(Integer fileType ,Integer id,Integer checked);

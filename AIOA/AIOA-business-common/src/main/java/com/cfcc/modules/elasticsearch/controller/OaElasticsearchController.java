@@ -78,23 +78,27 @@ public class OaElasticsearchController {
 
     /**
      * 分页列表查询
-     * @param pageNo
-     * @param pageSize
      * @return
      */
     @AutoLog(value = "全文检索-分页列表查询")
     @ApiOperation(value="业务配置表[全文检索]-分页列表查询", notes="业务配置表[全文检索]-分页列表查询")
     @RequestMapping(value = "/list")
-    public Result<IPage<Map<String, Object>>> queryOaBusDataList(@RequestBody String keyWord,
-                                                    @RequestParam(name="pageNo", defaultValue="1") Integer pageNo,
-                                                    @RequestParam(name="pageSize", defaultValue="10") Integer pageSize) {
+    public Result<IPage<Map<String, Object>>> queryOaBusDataList(@RequestBody String keyWord
+//                                                    @RequestParam(name="pageNo", defaultValue="1") Integer pageNo,
+//                                                    @RequestParam(name="pageSize", defaultValue="10") Integer pageSize
+    ) {
         Result<IPage<Map<String, Object>>> result = new Result<IPage<Map<String, Object>>>();
         IPage<Map<String, Object>> sourceList = null;
+        Map map = (Map) JSONObject.parse(keyWord);
+        String keyWord1 =  map.get("keyWord").toString().trim();
+        Integer pageNo = Integer.parseInt(map.get("pageNo").toString());
+        Integer pageSize = 10;
+        INDEX_NAME1 = "elasticsearch1";
         try {
-            if (keyWord.equals("")){   //输入查询的数据为空时，则为全查
-                sourceList = searchService.queryAll(INDEX_NAME1,pageNo,pageSize);
-            }else {
-                sourceList = searchService.query(keyWord,pageNo,pageSize,INDEX_NAME1,INDEX_TYPE1);
+            if (!keyWord.equals("")){   //输入查询的数据为空时，则为全查
+//                sourceList = searchService.queryAll(INDEX_NAME1,pageNo,pageSize);
+//            }else {
+                sourceList = searchService.query(keyWord1,pageNo,pageSize,INDEX_NAME1,INDEX_TYPE1);
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -113,23 +117,23 @@ public class OaElasticsearchController {
     @AutoLog(value = "全文检索-分页列表查询")
     @ApiOperation(value="业务配置表[全文检索]-分页列表查询", notes="业务配置表[全文检索]-分页列表查询")
     @RequestMapping(value = "/oafile")
-    public Result<IPage<Map<String, Object>>> queryOaFileList(@RequestBody String keyWord,
-                                                           @RequestParam(name="pageNo", defaultValue="1") Integer pageNo,
-                                                           @RequestParam(name="pageSize", defaultValue="10") Integer pageSize) {
+    public Result<IPage<Map<String, Object>>> queryOaFileList(@RequestBody String keyWord
+//                                                           @RequestParam(name="pageNo", defaultValue="1") Integer pageNo,
+//                                                           @RequestParam(name="pageSize", defaultValue="10") Integer pageSize
+    ) {
         Result<IPage<Map<String, Object>>> result = new Result<IPage<Map<String, Object>>>();
-//        Map map = (Map) JSONObject.parse(json);
-//        String keyWord =  map.get("keyWord").toString().trim();
+        Map map = (Map) JSONObject.parse(keyWord);
+        String keyWord1 =  map.get("keyWord").toString().trim();
+        Integer pageNo = Integer.parseInt(map.get("pageNo").toString());
+        Integer pageSize = 10;
         IPage<Map<String, Object>> sourceList = null;
         System.out.println("---oafile------"+keyWord);
+        INDEX_NAME2 = "elasticsearch2";
         try {
-            if (keyWord.equals("")){  //输入查询的数据为空时，则为全查
-                sourceList = searchService.queryAll(INDEX_NAME2,(pageNo-1)*pageSize,pageSize);
-            }else {
-//                map.put("pageNo", (pageNo-1)*pageSize);
-//                map.put("pageSize", pageSize);
-//                map.put("indexName", INDEX_NAME2);  //索引
-//                map.put("indexType", INDEX_TYPE2);
-                sourceList = searchService.query(keyWord,pageNo,pageSize,INDEX_NAME2,INDEX_TYPE2);
+            if (!keyWord.equals("")){  //输入查询的数据为空时，则为不查
+//                sourceList = searchService.queryAll(INDEX_NAME2,(pageNo-1)*pageSize,pageSize);
+//            }else {
+                sourceList = searchService.query(keyWord1,pageNo,pageSize,INDEX_NAME2,INDEX_TYPE2);
             }
         } catch (Exception e) {
             e.printStackTrace();

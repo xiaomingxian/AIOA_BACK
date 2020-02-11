@@ -15,6 +15,10 @@ import java.util.List;
  */
 public interface OaFileMapper extends BaseMapper<OaFile> {
 
+    Boolean savePicText(@Param("fileType") Integer fileType,@Param("picText") String picText);
+
+    String findPicText(@Param("fileType") Integer fileType);
+
     void updateFileOrder0(@Param("fileType")int fileType);
 
     void updateFileOrder(@Param("id")Integer id);
