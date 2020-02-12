@@ -53,7 +53,7 @@ public interface TaskCommonService {
 
     List<Map<String, String>> queryAllHaveDone(String assignee, String procInstId);
 
-    Result queryTaskMonitor(TaskInfoVO taskInfoVO, Integer pageNo, Integer pageSize);
+    Result queryTaskMonitor(TaskInfoVO taskInfoVO, Integer pageNo, Integer pageSize,boolean isAdmin);
 
     boolean isLastsender(String userId, String proInstanId, String taskDefKey, String busDataId);
 

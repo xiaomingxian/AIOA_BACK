@@ -29,10 +29,13 @@ public interface TaskMapper {
 
     List<TaskInfoJsonAble> allUndoltLimitTimeHaveAssignee();
 
-    int monitorCount(@Param("pojo") TaskInfoVO taskInfoVO);
+    int monitorCount(@Param("pojo") TaskInfoVO taskInfoVO,@Param("isAdmin")boolean isAdmin);
 
     List<TaskInfoJsonAble> monitorData(@Param("pojo") TaskInfoVO taskInfoVO,
-                                       @Param("pageNo") Integer pageNo, @Param("pageSize") Integer pageSize);
+                                       @Param("pageNo") Integer pageNo,
+                                       @Param("pageSize") Integer pageSize,
+                                       @Param("isAdmin")boolean isAdmin
+    );
 
     Long deptTaskCount(@Param("pojo") TaskInfoVO taskInfoVO, @Param("type") String type);
 
@@ -42,12 +45,17 @@ public interface TaskMapper {
     Long deptTaskHaveDoneCount(@Param("pojo") TaskInfoVO taskInfoVO, @Param("type") String type);
 
     List<TaskInfoJsonAble> deptTaskHaveDone(@Param("pojo") TaskInfoVO taskInfoVO, @Param("type") String type,
-                                            @Param("pageNo") Integer pageNo, @Param("pageSize") Integer pageSize);
+                                            @Param("pageNo") Integer pageNo, @Param("pageSize") Integer pageSize
+    );
 
-    Long deptTaskMonitorCount(@Param("pojo") TaskInfoVO taskInfoVO, @Param("type") String type);
+    Long deptTaskMonitorCount(@Param("pojo") TaskInfoVO taskInfoVO,
+                              @Param("type") String type,
+                              @Param("isAdmin") boolean isAdmin
+    );
 
     List<TaskInfoJsonAble> deptTaskMonitorQuery(@Param("pojo") TaskInfoVO taskInfoVO, @Param("type") String type,
-                                                @Param("pageNo") Integer pageNo, @Param("pageSize") Integer pageSizee);
+                                                @Param("pageNo") Integer pageNo, @Param("pageSize") Integer pageSizee,
+                                 @Param("isAdmin") boolean isAdmin);
 
     String queryTaskDefId(@Param("proDefKey") String proDefKey, @Param("userId") String userId, @Param("bussinessKey") String bussinessKey);
 

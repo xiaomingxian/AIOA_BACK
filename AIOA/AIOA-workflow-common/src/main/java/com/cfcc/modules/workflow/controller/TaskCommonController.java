@@ -4,6 +4,7 @@ package com.cfcc.modules.workflow.controller;
 import com.cfcc.common.api.vo.Result;
 import com.cfcc.common.exception.AIOAException;
 import com.cfcc.modules.system.entity.LoginInfo;
+import com.cfcc.modules.system.entity.SysRole;
 import com.cfcc.modules.system.entity.SysUser;
 import com.cfcc.modules.system.service.ISysUserService;
 import com.cfcc.modules.utils.IWfConstant;
@@ -63,10 +64,6 @@ public class TaskCommonController {
     }
 
 
-
-
-
-
     @GetMapping("queryTask")
     @ApiOperation("任务查询")
     public Result queryTask(TaskInfoVO taskInfoVO, @RequestParam(required = false, defaultValue = "1") Integer pageNo,
@@ -74,6 +71,7 @@ public class TaskCommonController {
                             HttpServletRequest request) {
         try {
 
+            LoginInfo loginInfo = sysUserService.getLoginInfo(request);
             String operstatus = taskInfoVO.getOperstatus();
 
             //判断查询条件是否有用户(作为查询条件)
@@ -84,7 +82,7 @@ public class TaskCommonController {
             } else {
                 //查询当前用户，作为assignee
                 if (operstatus != null && !operstatus.equals(IWfConstant.JUMP)) {//重置是管理员权限(不用必须加用户)
-                    LoginInfo loginInfo = sysUserService.getLoginInfo(request);
+
                     taskInfoVO.setUserId(loginInfo.getId());
                     taskInfoVO.setUserName(loginInfo.getUsername());
                 }
@@ -104,7 +102,17 @@ public class TaskCommonController {
                     break;
                 //流程监控数据
                 case IWfConstant.TASK_MONITOR:
-                    result = taskCommonService.queryTaskMonitor(taskInfoVO, pageNo, pageSize);
+                    //判断是不是超级管理员 是的话展示所有人
+                    List<SysRole> roles = loginInfo.getRoles();
+                    boolean isAdmin=false;
+                    for (SysRole role : roles) {
+                        String roleName = role.getRoleName();
+                        if ("系统管理员".equalsIgnoreCase(roleName)) {
+                            isAdmin=true;
+                            break;
+                        }
+                    }
+                    result = taskCommonService.queryTaskMonitor(taskInfoVO, pageNo, pageSize,isAdmin);
                     break;
                 //我的委托
                 case IWfConstant.MY_AGENT:
@@ -119,7 +127,8 @@ public class TaskCommonController {
                     break;
             }
             return result;
-        } catch (Exception e) {
+        } catch (
+                Exception e) {
             log.error("任务查询失败" + e.toString());
             return Result.error("任务查询失败");
         }

@@ -203,7 +203,7 @@ public class TaskCommonServiceImpl implements TaskCommonService {
      * 流程监控数据  所有参与过的数据(直接参与与身为候选人)
      */
     @Override
-    public Result queryTaskMonitor(TaskInfoVO taskInfoVO, Integer pageNo, Integer pageSize) {
+    public Result queryTaskMonitor(TaskInfoVO taskInfoVO, Integer pageNo, Integer pageSize,boolean isAdmin) {
 
         //TODO 考虑代理人情况
 
@@ -211,16 +211,16 @@ public class TaskCommonServiceImpl implements TaskCommonService {
         Boolean isDept = taskInfoVO.getIsDept();
         if (isDept != null && isDept) {
             //查询部门类型
-            return deptTaskMonitor(taskInfoVO, taskInfoVO.getDeptType(), pageNo, pageSize);
+            return deptTaskMonitor(taskInfoVO, taskInfoVO.getDeptType(), pageNo, pageSize,isAdmin);
         }
 
 
         Result<IPage> iPageResult = new Result<>();
         IPage iPage = new Page(pageNo, pageSize);
 
-        int count = taskMapper.monitorCount(taskInfoVO);
+        int count = taskMapper.monitorCount(taskInfoVO,isAdmin);
 
-        List<TaskInfoJsonAble> list = taskMapper.monitorData(taskInfoVO, (pageNo - 1) * pageSize, pageSize);
+        List<TaskInfoJsonAble> list = taskMapper.monitorData(taskInfoVO, (pageNo - 1) * pageSize, pageSize,isAdmin);
 
         //分页参数
         iPage.setTotal(count);
@@ -232,15 +232,15 @@ public class TaskCommonServiceImpl implements TaskCommonService {
         return iPageResult;
     }
 
-    private Result deptTaskMonitor(TaskInfoVO taskInfoVO, String type, Integer pageNo, Integer pageSize) {
+    private Result deptTaskMonitor(TaskInfoVO taskInfoVO, String type, Integer pageNo, Integer pageSize,boolean isAdmin) {
 
         Result<IPage> iPageResult = new Result<>();
         IPage iPage = new Page(pageNo, pageSize);
 
-        Long count = taskMapper.deptTaskMonitorCount(taskInfoVO, type);
+        Long count = taskMapper.deptTaskMonitorCount(taskInfoVO, type,isAdmin);
         count = count == null ? 0 : count;
 
-        List<TaskInfoJsonAble> list = taskMapper.deptTaskMonitorQuery(taskInfoVO, type, (pageNo - 1) * pageSize, pageSize);
+        List<TaskInfoJsonAble> list = taskMapper.deptTaskMonitorQuery(taskInfoVO, type, (pageNo - 1) * pageSize, pageSize,isAdmin);
 
         //分页参数
         iPage.setTotal(count);
