@@ -123,7 +123,7 @@ public class OaTemplateServiceImpl extends ServiceImpl<OaTemplateMapper, OaTempl
                     c.setEntity(oaFile);
                     OaFile ad = oaFileService.getOne(c);
                     fileIds.add(ad);
-                    oaFileService.updateIorderById(ad.getIId());
+                    oaFileService.updateIorderById(oaFile.getIId());
                 }
             }
         } catch (IOException e) {
