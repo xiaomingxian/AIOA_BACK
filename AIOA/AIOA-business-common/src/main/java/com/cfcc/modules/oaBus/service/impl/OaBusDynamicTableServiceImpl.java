@@ -7,14 +7,12 @@ import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.cfcc.common.api.vo.Result;
 import com.cfcc.common.util.HttpClientUtil;
+import com.cfcc.common.util.workflow.VarsWithBus;
 import com.cfcc.modules.oaBus.entity.*;
 import com.cfcc.modules.oaBus.mapper.BusFunctionMapper;
 import com.cfcc.modules.oaBus.mapper.OaBusDynamicTableMapper;
 import com.cfcc.modules.oaBus.mapper.OaFileMapper;
-import com.cfcc.modules.oaBus.service.IBusProcSetService;
-import com.cfcc.modules.oaBus.service.IOaBusdataService;
-import com.cfcc.modules.oaBus.service.IOaFileService;
-import com.cfcc.modules.oaBus.service.OaBusDynamicTableService;
+import com.cfcc.modules.oaBus.service.*;
 import com.cfcc.modules.system.entity.LoginInfo;
 import com.cfcc.modules.system.entity.SysDepart;
 import com.cfcc.modules.system.entity.SysUser;
@@ -134,13 +132,65 @@ public class OaBusDynamicTableServiceImpl implements OaBusDynamicTableService {
 
     @Override
     public int updateData(Map<String, Object> map) {
-          return dynamicTableMapper.updateData(map);
+        return dynamicTableMapper.updateData(map);
     }
+
+
+    @Autowired
+    private IBusFunctionService busFunctionService;
 
 
     @Override
     public boolean deleteData(Map<String, Object> map) {
         return dynamicTableMapper.deleteData(map);
+    }
+
+    private void busDataSet(TaskInfoVO taskInfoVO) {
+        Map<String, Object> vars = taskInfoVO.getVars();
+        Map<String, Object> busData = taskInfoVO.getBusData();
+        //根据functionId查出function名称
+        String i_bus_function_id = busData.get("i_bus_function_id").toString();
+        BusFunction busFunction = busFunctionService.getOneByFunId(i_bus_function_id);
+        String sName = busFunction.getSName();
+        String sLevel = busFunction.getSLevel();
+        busData.put("ilevel", sLevel);
+        busData.put("functionName", sName);
+
+        String mainDept = "";
+        String s_receive_num = "";
+        Object file_num = busData.get("s_file_num");
+        String s_file_num = null;
+        if (file_num != null) {
+            s_file_num = busData.get("s_file_num").toString();
+        }
+
+        String sourceFileNum = busData.get("s_file_num") == null ? null : busData.get("s_file_num").toString();
+        if (sName.contains("收文")) {//
+            if (taskInfoVO.getIsDept()) {
+                mainDept = taskInfoVO.getTaskWithDepts().getMainDept();
+            }
+            busData.put("s_create_dept", mainDept);
+            s_receive_num = busData.get("s_receive_num") == null ? "" : busData.get("s_receive_num").toString();
+            busData.put("s_file_num", s_receive_num);
+        } else {
+            mainDept = busData.get("s_create_dept") == null ? "" : busData.get("s_create_dept").toString();
+        }
+        busData.put("mainDept", mainDept);
+
+
+        String busMsg = VarsWithBus.getBusMsg(busData);
+
+        busData.put("s_file_num", sourceFileNum);
+
+
+        if (vars == null) {
+            vars = new HashMap<String, Object>();
+        }
+        vars.put("busMsg", busMsg);
+        taskInfoVO.setVars(vars);
+        if (sName.contains("收文")) {
+            busData.put("s_file_num", s_file_num);
+        }
     }
 
 
@@ -193,6 +243,7 @@ public class OaBusDynamicTableServiceImpl implements OaBusDynamicTableService {
                 map.put("mainDept", map.get("s_create_dept") == null ? "" : map.get("s_create_dept").toString());
             }
 
+            busDataSet(taskInfoVO);
             String nextMsg = taskCommonService.doTask(taskInfoVO);
             map.put("s_cur_task_name", nextMsg);
             if (claim) map.put("s_create_by", "");
@@ -393,7 +444,7 @@ public class OaBusDynamicTableServiceImpl implements OaBusDynamicTableService {
     public String provinceToCityReceiveFile(Map<String, Object> param) {
         JSONObject object = JSONObject.parseObject(JSON.toJSONString(param));
         JSONObject busData = object.getJSONObject("busData");
-        List<Map<String,Object>> httpUrl = (List<Map<String, Object>>) object.get("cityUrl");
+        List<Map<String, Object>> httpUrl = (List<Map<String, Object>>) object.get("cityUrl");
         String fileTable = busData.get("table") + "";
         String fileTableId = busData.get("i_id") + "";
         String fileSfileType = "4,6";
@@ -406,21 +457,21 @@ public class OaBusDynamicTableServiceImpl implements OaBusDynamicTableService {
         }
         busData.put("fileList", fileList); //附件key名称固定
         String status = "";
-        if (httpUrl.size()>0){
-            for (Map<String,Object> map :httpUrl) {
-                busData.put("org_schema",map.get("value"));
-                String url = "http://"+map.get("description")+"/AIOA/oaBus/dynamic/provinceToCityReceviceClient";
+        if (httpUrl.size() > 0) {
+            for (Map<String, Object> map : httpUrl) {
+                busData.put("org_schema", map.get("value"));
+                String url = "http://" + map.get("description") + "/AIOA/oaBus/dynamic/provinceToCityReceviceClient";
                 status = HttpClientUtil.doPostFileStreamAndJsonObj(url, files, busData);
             }
         }
-        return  status;
+        return status;
     }
 
     @Override
     public String provinceToCityInsideFile(Map<String, Object> param) {
         JSONObject object = JSONObject.parseObject(JSON.toJSONString(param));
         JSONObject busData = object.getJSONObject("busData");
-        List<Map<String,Object>> httpUrl = (List<Map<String, Object>>) object.get("cityUrl");
+        List<Map<String, Object>> httpUrl = (List<Map<String, Object>>) object.get("cityUrl");
         String fileTable = busData.get("table") + "";
         String fileTableId = busData.get("i_id") + "";
         String fileSfileType = "4,6";
@@ -433,14 +484,14 @@ public class OaBusDynamicTableServiceImpl implements OaBusDynamicTableService {
         }
         busData.put("fileList", fileList); //附件key名称固定
         String status = "";
-        if (httpUrl.size()>0){
-            for (Map<String,Object> map :httpUrl) {
-                busData.put("org_schema",map.get("value"));
-                String url = "http://"+map.get("description")+"/AIOA/oaBus/dynamic/provinceToCityInsideClient";
+        if (httpUrl.size() > 0) {
+            for (Map<String, Object> map : httpUrl) {
+                busData.put("org_schema", map.get("value"));
+                String url = "http://" + map.get("description") + "/AIOA/oaBus/dynamic/provinceToCityInsideClient";
                 status = HttpClientUtil.doPostFileStreamAndJsonObj(url, files, busData);
             }
         }
-        return  status;
+        return status;
     }
 
     @Override
@@ -520,7 +571,7 @@ public class OaBusDynamicTableServiceImpl implements OaBusDynamicTableService {
                         parseString += line;
                     }
                     jsonParam = JSONObject.parseObject(parseString);
-                    String sceam = jsonParam.get("org_schema")+"";
+                    String sceam = jsonParam.get("org_schema") + "";
                     request.setAttribute("orgSchema", sceam);
                     fileList = (List<Map<String, Object>>) jsonParam.get("fileList");
 //                    System.out.println("=====业务数据为=======" + jsonParam.toString());
@@ -591,9 +642,9 @@ public class OaBusDynamicTableServiceImpl implements OaBusDynamicTableService {
                 Integer iTableId = 0;
                 String sFileType = "4";
                 for (Map<String, Object> map : fileList) {
-                    String pathFileName = (map.get("sFilePath") + "").substring((map.get("sFilePath") + "").lastIndexOf(File.separator)+1);
+                    String pathFileName = (map.get("sFilePath") + "").substring((map.get("sFilePath") + "").lastIndexOf(File.separator) + 1);
                     if (mf.getOriginalFilename().equals(pathFileName)) {
-                        sTable = result.getResult().get("tableName")+"";
+                        sTable = result.getResult().get("tableName") + "";
                         iTableId = Integer.valueOf(result.getResult().get("busdataId") + "");
                         oaFileService.batchUploads(mf, sTable, iTableId, sFileType, request, response);
                     }
@@ -630,7 +681,7 @@ public class OaBusDynamicTableServiceImpl implements OaBusDynamicTableService {
                         parseString += line;
                     }
                     jsonParam = JSONObject.parseObject(parseString);
-                    String sceam = jsonParam.get("org_schema")+"";
+                    String sceam = jsonParam.get("org_schema") + "";
                     request.setAttribute("orgSchema", sceam);
                     fileList = (List<Map<String, Object>>) jsonParam.get("fileList");
 //                    System.out.println("=====业务数据为=======" + jsonParam.toString());
@@ -643,8 +694,8 @@ public class OaBusDynamicTableServiceImpl implements OaBusDynamicTableService {
             String unitId = functonDict.get(0).get("dictItem") + "";
             Map<String, Object> tableData = dynamicTableMapper.queryModelByFunctionId(functonDict.get(0).get("dictVal") + "");
             Map<String, Object> functionMap = new HashMap<>();
-            functionMap.put("i_id",functionId);
-            functionMap.put("table","oa_bus_function");
+            functionMap.put("i_id", functionId);
+            functionMap.put("table", "oa_bus_function");
             Map<String, Object> functionData = dynamicTableMapper.queryDataById(functionMap);
             String table = tableData.get("s_busdata_table") + "";
 //            String modelId = tableData.get("i_id") + "";
@@ -683,7 +734,7 @@ public class OaBusDynamicTableServiceImpl implements OaBusDynamicTableService {
             updateMap.put("i_create_month", nowDate.getMonthValue());
             updateMap.put("i_create_day", nowDate.getDayOfMonth());
             updateMap.put("s_create_unitid", unitId);
-            BusProcSet busProcSet = iBusProcSetService.getById(functionData.get("i_proc_set_id")+"");
+            BusProcSet busProcSet = iBusProcSetService.getById(functionData.get("i_proc_set_id") + "");
             if (busProcSet == null) return Result.error("无此类数据配置");
             int iVsersion = busProcSet.getIVersion() == null ? 1 : busProcSet.getIVersion();
             updateMap.put("i_fun_version", iVsersion);
@@ -717,7 +768,7 @@ public class OaBusDynamicTableServiceImpl implements OaBusDynamicTableService {
                 Integer iTableId = 0;
                 String sFileType = "4";
                 for (Map<String, Object> map : fileList) {
-                    String pathFileName = (map.get("sFilePath") + "").substring((map.get("sFilePath") + "").lastIndexOf(File.separator)+1);
+                    String pathFileName = (map.get("sFilePath") + "").substring((map.get("sFilePath") + "").lastIndexOf(File.separator) + 1);
                     if (mf.getOriginalFilename().equals(pathFileName)) {
                         sTable = table;
                         iTableId = Integer.valueOf(updateMap.get("i_id") + "");
