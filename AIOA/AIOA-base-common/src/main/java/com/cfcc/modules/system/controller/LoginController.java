@@ -70,11 +70,11 @@ public class LoginController {
         }
 //        String cIp = iSysLogService.get(map.get("username").toString());
         String cIp = iOaIpService.getIpByUserName(map.get("username").toString(),ip);
-        if (cIp == null){
-            result.setResult("初次登录");
-        }else {
+//        if (cIp == null){
+//            result.setResult("");
+//        }else {
             result.setResult(cIp);
-        }
+//        }
         result.setSuccess(true);
         return result;
     }
