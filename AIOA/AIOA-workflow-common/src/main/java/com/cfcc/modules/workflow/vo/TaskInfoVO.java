@@ -25,6 +25,8 @@ public class TaskInfoVO implements Serializable {
 
     private String taskId;//任务id
 
+    private String executionId;
+
     private String taskDefKey;//任务环节id
 
     private String taskName;//任务名称

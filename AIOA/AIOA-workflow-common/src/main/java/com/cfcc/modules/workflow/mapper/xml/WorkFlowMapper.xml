@@ -108,7 +108,7 @@
     <!--代办-->
     <select id="queryTaskToDo" resultType="com.cfcc.modules.workflow.pojo.TaskInfoJsonAble">
         select
-        GROUP_CONCAT(DISTINCT id) id,
+        GROUP_CONCAT( id) id,
         GROUP_CONCAT(distinct NAME) NAME,
         GROUP_CONCAT( NAME) allNames,
 
@@ -1118,7 +1118,7 @@
     <!--部门待办-->
     <select id="deptTaskQuery" resultType="com.cfcc.modules.workflow.pojo.TaskInfoJsonAble">
         SELECT
-        GROUP_CONCAT(DISTINCT s.id) id,
+        GROUP_CONCAT( s.id) id,
         GROUP_CONCAT(DISTINCT s.NAME) name,
         GROUP_CONCAT(  s.NAME) allNames,
 

@@ -8,11 +8,17 @@ import com.cfcc.modules.oaBus.service.IBusFunctionService;
 import com.cfcc.modules.oaBus.service.TaskInActService;
 import com.cfcc.modules.system.entity.LoginInfo;
 import com.cfcc.modules.system.service.ISysUserService;
+import com.cfcc.modules.utils.AddUserCmd;
 import com.cfcc.modules.utils.JumpTaskCmd;
 import com.cfcc.modules.workflow.service.OaBusDataPermitService;
 import com.cfcc.modules.workflow.service.TaskCommonService;
 import com.cfcc.modules.workflow.vo.TaskInfoVO;
 import lombok.extern.slf4j.Slf4j;
+import org.activiti.engine.RuntimeService;
+import org.activiti.engine.TaskService;
+import org.activiti.engine.impl.TaskServiceImpl;
+import org.activiti.engine.impl.interceptor.CommandExecutor;
+import org.activiti.engine.task.Task;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -37,7 +43,7 @@ public class TaskInActServiceImpl implements TaskInActService {
     @Autowired
     private ISysUserService sysUserService;
     @Autowired
-    private IBusFunctionService busFunctionService;
+    private TaskServiceImpl taskServiceImpl;
 
 
     @Override
@@ -89,17 +95,39 @@ public class TaskInActServiceImpl implements TaskInActService {
     }
 
 
+    @Autowired
+    private RuntimeService runtimeService;
+
+    @Autowired
+    private TaskService taskService;
     /**
      * 并行/包容 追加用户
      * @param taskInfoVOS
      */
     @Override
     public void doAddUsers(ArrayList<TaskInfoVO> taskInfoVOS) {
+        CommandExecutor commandExecutor = taskServiceImpl.getCommandExecutor();
+
+        String descript=null;
+        for (TaskInfoVO taskInfoVO : taskInfoVOS) {
+
+            String taskId = taskInfoVO.getTaskId();
+
+            Task task = taskService.createTaskQuery().taskId(taskId).singleResult();
+            String parentTaskId = task.getParentTaskId();
+            if (descript!=null){
+                descript = task.getDescription();
+            }
+
+            String executionId = taskInfoVO.getExecutionId();
+            List<String> assignee = (List<String>)taskInfoVO.getAssignee();
+
+            for (String userId : assignee) {
+                commandExecutor.execute(new AddUserCmd(executionId,userId,descript,parentTaskId,runtimeService,taskService));
+            }
 
 
-        //commandExecutor.execute(new JumpTaskCmd(jumpMsg.getTaskId(), jumpMsg.getExecutionId(),
-        //        jumpMsg.getProcessInstanceId(), dest, jumpMsg.getVars(), curr, jumpMsg.getDeleteReason()));
-
+        }
 
     }
 

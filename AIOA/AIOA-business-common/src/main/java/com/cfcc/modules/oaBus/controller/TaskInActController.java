@@ -60,6 +60,7 @@ public class TaskInActController {
     public Result addUsersQuery(String taskId, HttpServletRequest request) {
 
         try {
+            //TODO 加上部门追加
             //查找是自己发出的任务
             List<TaskInfoJsonAble> taskJsonAbles = taskCommonService.sendByMe(taskId);
             if (taskJsonAbles == null || (taskJsonAbles != null && taskJsonAbles.size() <= 0)) {
@@ -69,11 +70,14 @@ public class TaskInActController {
             ArrayList<String> taskIds = new ArrayList<>();
             //记录taskId去查询已选择的用户
             Map<String, String> idAndKey = new HashMap<>();
+            Map<String, String> idAndExecutionId = new HashMap<>();
             taskJsonAbles.stream().forEach(task -> {
                 String id = task.getId();
+                String executionId = task.getExecutionId();
                 String taskDefinitionKey = task.getTaskDefinitionKey();
                 taskIds.add(id);
                 idAndKey.put(taskDefinitionKey, id);
+                idAndExecutionId.put(taskDefinitionKey, executionId);
             });
             List<Map<String, String>> choices = taskCommonService.userHaveChoice(taskIds);
             Map<String, List<String>> choiceIds = new HashMap<>();
@@ -103,12 +107,12 @@ public class TaskInActController {
                     Map<String, Object> actMsg = iterator.next();
 
                     Activity activity = (Activity) actMsg.get("actMsg");
-                    List<Map<String,Object>> nextUsers = (List<Map<String,Object>> ) actMsg.get("nextUsers");
+                    List<Map<String, Object>> nextUsers = (List<Map<String, Object>>) actMsg.get("nextUsers");
                     String taskDefKey = activity.getId();
                     boolean allowMulti = activity.isAllowMulti();
                     OaProcActinst oaProcActinst = (OaProcActinst) actMsg.get("oaProcActinst");
                     boolean multAssignee = oaProcActinst.isMultAssignee();
-                    if ((!allowMulti) || (!multAssignee)){
+                    if ((!allowMulti) || (!multAssignee)) {
                         iterator.remove();
                         continue;
                     }
@@ -124,12 +128,15 @@ public class TaskInActController {
                     List<String> uids = choiceIds.get(taskIdRecord);
 
 
-                    if ("user".equalsIgnoreCase(oaProcActinst.getUserOrRole())){
+                    if ("user".equalsIgnoreCase(oaProcActinst.getUserOrRole())) {
                         //区分已选和未选
-                        nextUsers.stream().forEach(user->{
-                            String  uid = (String) user.get("uid");
-                            if (uids.contains(uid))user.put("status","处理人");
-                            else user.put("status","可追加");
+                        nextUsers.stream().forEach(user -> {
+                            String uid = (String) user.get("uid");
+                            if (uids.contains(uid)) user.put("status", "处理人");
+                            else user.put("status", "可追加");
+                            String actId = oaProcActinst.getActId();
+                            user.put("taskId", idAndKey.get(actId));
+                            user.put("executionId", idAndExecutionId.get(actId));
 
                         });
 
@@ -145,7 +152,6 @@ public class TaskInActController {
             return Result.error("查询可追加用户失败");
         }
     }
-
 
 
     @PostMapping("doAddUsers")
@@ -169,6 +175,8 @@ public class TaskInActController {
                 return Result.error("信息不完善,拒绝追加");
             }
             return Result.ok("任务追加成功");
+        } catch (AIOAException e) {
+            return Result.error(e.getMessage());
         } catch (Exception e) {
             log.error("追加任务失败" + e.toString());
             return Result.error("追加任务失败");
@@ -429,6 +437,7 @@ public class TaskInActController {
             }
             return Result.ok("任务办理成功");
         } catch (Exception e) {
+            e.printStackTrace();
             log.error("办理任务失败" + e.toString());
             return Result.error("办理任务失败");
         }

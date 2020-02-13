@@ -402,14 +402,4 @@ public class TaskCommonController {
     }
 
 
-    @ApiOperation("追加办理人")
-    @PostMapping("addUsers")
-    public Result addUsers(@RequestBody AddUsersMsg addUsersMsg) {
-
-        taskCommonService.addUsers(addUsersMsg);
-
-        return null;
-    }
-
-
 }

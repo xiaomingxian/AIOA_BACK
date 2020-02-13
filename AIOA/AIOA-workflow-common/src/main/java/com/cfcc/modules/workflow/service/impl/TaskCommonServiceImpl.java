@@ -410,6 +410,12 @@ public class TaskCommonServiceImpl implements TaskCommonService {
                     .orderByTaskDueDate().asc()
                     .orderByTaskCreateTime().asc()
                     .list();
+            //再查一遍 待办中的加签类型
+            List<Task> list1 = taskService.createTaskQuery().processInstanceId(proInstId).list();
+            for (Task task : list1) {
+
+
+            }
         } else {//只查待办
             list = historyService.createHistoricTaskInstanceQuery().processInstanceId(proInstId)
                     .orderByTaskDueDate().asc()
@@ -607,7 +613,9 @@ public class TaskCommonServiceImpl implements TaskCommonService {
     @Override
     public String doTasksMore(List<TaskInfoVO> taskInfoVOs) {
         //将数据变成一条
-        TaskInfoVO taskInfoVO = taskInfoVOs.get(0);
+        TaskInfoVO taskInfoVOSource = taskInfoVOs.get(0);
+        TaskInfoVO taskInfoVO = new TaskInfoVO();
+        BeanUtils.copyProperties(taskInfoVOSource,taskInfoVO);
         String taskId = taskInfoVO.getTaskId();
         //判断有没有开启流程
         Map<String, Object> map = taskInfoVO.getBusData();

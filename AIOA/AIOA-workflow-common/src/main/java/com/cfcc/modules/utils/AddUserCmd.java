@@ -8,7 +8,6 @@ import org.activiti.engine.impl.persistence.entity.ExecutionEntity;
 import org.activiti.engine.impl.persistence.entity.TaskEntity;
 import org.activiti.engine.runtime.Execution;
 import org.activiti.engine.task.Task;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.util.Date;
@@ -20,14 +19,29 @@ public class AddUserCmd implements Command<Void> {
 
     protected String assignee;//办理人
 
-    @Autowired
+    //@Autowired
     private RuntimeService runtimeService;
 
-    @Autowired
+    //@Autowired
     private TaskService taskService;
+
+    private String descript;
+    private String parentTaskId;
 
     //@Autowired
     //private IdGenerator idGenerator;
+    public AddUserCmd() {
+    }
+
+    public AddUserCmd(String executionId, String assignee, String descript,String parentTaskId,
+                      RuntimeService runtimeService, TaskService taskService) {
+        this.executionId = executionId;
+        this.assignee = assignee;
+        this.runtimeService = runtimeService;
+        this.taskService = taskService;
+        this.descript = descript;
+        this.parentTaskId = parentTaskId;
+    }
 
 
     @Override
@@ -58,12 +72,13 @@ public class AddUserCmd implements Command<Void> {
         taskEntity.setName(t.getName());
         taskEntity.setExecution(newExecution);
         taskEntity.setAssignee(assignee);
+        taskEntity.setParentTaskId(parentTaskId);
         //保存
+        taskEntity.setDescription(descript);
         taskService.saveTask(taskEntity);
 
         Integer nrOfInstances = LoopVariableUtils.getLoopVariable(newExecution, "nrOfInstances");
         Integer nrOfActiveInstances = LoopVariableUtils.getLoopVariable(newExecution, "nrOfActiveInstances");
-
 
         LoopVariableUtils.setLoopVariable(newExecution, "nrOfInstances", nrOfInstances + 1);
         LoopVariableUtils.setLoopVariable(newExecution, "nrOfActiveInstances", nrOfActiveInstances + 1);
