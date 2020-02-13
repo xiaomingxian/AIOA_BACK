@@ -7,8 +7,10 @@ import com.cfcc.common.api.vo.Result;
 import com.cfcc.common.aspect.annotation.AutoLog;
 import com.cfcc.common.system.query.QueryGenerator;
 import com.cfcc.common.util.oConvertUtils;
+import com.cfcc.modules.system.entity.SysUser;
 import com.cfcc.modules.system.entity.SysUserOpinion;
 import com.cfcc.modules.system.service.ISysUserOpinionService;
+import com.cfcc.modules.system.service.ISysUserService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
@@ -45,6 +47,8 @@ import java.util.Map;
 public class SysUserOpinionController {
     @Autowired
     private ISysUserOpinionService sysUserOpinionService;
+    @Autowired
+    private ISysUserService userService;
 
     /**
      * 分页列表查询
@@ -52,7 +56,7 @@ public class SysUserOpinionController {
      * @param sysUserOpinion
      * @param pageNo
      * @param pageSize
-     * @param req
+     * @param request
      * @return
      */
     @AutoLog(value = "快捷意见-分页列表查询")
@@ -61,11 +65,14 @@ public class SysUserOpinionController {
     public Result<IPage<SysUserOpinion>> queryPageList(SysUserOpinion sysUserOpinion,
                                                        @RequestParam(name = "pageNo", defaultValue = "1") Integer pageNo,
                                                        @RequestParam(name = "pageSize", defaultValue = "10") Integer pageSize,
-                                                       HttpServletRequest req) {
+                                                       HttpServletRequest request) {
 		/*Result<IPage<SysUserOpinion>> result = new Result<IPage<SysUserOpinion>>();
 		QueryWrapper<SysUserOpinion> queryWrapper = QueryGenerator.initQueryWrapper(sysUserOpinion, req.getParameterMap());
 		Page<SysUserOpinion> page = new Page<SysUserOpinion>(pageNo, pageSize);*/
         Result<IPage<SysUserOpinion>> result = new Result<IPage<SysUserOpinion>>();
+        SysUser currentUser = userService.getCurrentUser(request);
+        String id = currentUser.getId();
+        sysUserOpinion.setSUserId(id);
         IPage<SysUserOpinion> pageList = sysUserOpinionService.findPage(pageNo, pageSize, sysUserOpinion);
         result.setSuccess(true);
         result.setResult(pageList);
@@ -81,9 +88,12 @@ public class SysUserOpinionController {
     @AutoLog(value = "快捷意见-添加")
     @ApiOperation(value = "快捷意见-添加", notes = "快捷意见-添加")
     @PostMapping(value = "/add")
-    public Result<SysUserOpinion> add(@RequestBody SysUserOpinion sysUserOpinion) {
+    public Result<SysUserOpinion> add(@RequestBody SysUserOpinion sysUserOpinion, HttpServletRequest request) {
         Result<SysUserOpinion> result = new Result<SysUserOpinion>();
         try {
+            SysUser currentUser = userService.getCurrentUser(request);
+            String id = currentUser.getId();
+            sysUserOpinion.setSUserId(id);
             sysUserOpinionService.save(sysUserOpinion);
             result.success("添加成功！");
         } catch (Exception e) {
