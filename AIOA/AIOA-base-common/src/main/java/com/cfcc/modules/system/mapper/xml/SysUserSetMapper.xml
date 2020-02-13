@@ -13,7 +13,7 @@
     </insert>
     <!--  修改 -->
     <update id="updateByIid" parameterType="com.cfcc.modules.system.entity.SysUserSet">
-		UPDATE sys_user_set SET s_user_id = #{sUserId} ,i_is_ai = #{iIsAi} ,i_is_messages = #{iIsMessages},i_is_calendar = #{iIsCalendar},i_calendar_day=#{iCalendarDay},i_is_fold = #{iIsFold},i_bus1_id = #{iBus1Id},i_bus2_id = #{iBus2Id},i_bus3_id = #{iBus3Id},i_bus4_id = #{iBus4Id} where i_id = #{iId}
+		UPDATE sys_user_set SET s_user_id = #{sUserId},i_fontSize = #{iFontSize} ,i_is_ai = #{iIsAi} ,i_is_messages = #{iIsMessages},i_is_calendar = #{iIsCalendar},i_calendar_day=#{iCalendarDay},i_is_fold = #{iIsFold},i_bus1_id = #{iBus1Id},i_bus2_id = #{iBus2Id},i_bus3_id = #{iBus3Id},i_bus4_id = #{iBus4Id} where i_id = #{iId}
 	</update>
     <!-- 删除-->
     <delete id="deleteByIidd" parameterType="String">
