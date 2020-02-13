@@ -430,11 +430,11 @@
         SELECT d.item_text,d.item_value FROM sys_dict_item d INNER JOIN sys_dict s
         WHERE d.dict_id=s.id and dict_code=#{urgencyDegree}
  AND EXISTS(
-        SELECT t.ID_ id FROM act_hi_taskinst t
+        (SELECT t.ID_ id FROM act_hi_taskinst t
          LEFT JOIN act_hi_varinst v ON t.PROC_INST_ID_ = v.PROC_INST_ID_ AND v.name_ = 'busMsg'
          WHERE  EXISTS(select * from act_ru_execution where  PROC_INST_ID_=t.PROC_INST_ID_)
          AND v.name_ = 'busMsg' and t.ASSIGNEE_ =  #{pojo.userId}
-					AND SUBSTRING_INDEX(v.TEXT_,',',1)=d.item_value LIMIT 1
+					AND SUBSTRING_INDEX(v.TEXT_,',',1)=d.item_value LIMIT 1)
         UNION
         SELECT
         t.ID_ id
