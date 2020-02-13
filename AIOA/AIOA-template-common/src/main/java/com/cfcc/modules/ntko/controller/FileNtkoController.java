@@ -58,24 +58,18 @@ public class FileNtkoController {
      * @return
      * @Author
      */
-
     @PostMapping(value = "/upload")
     public Result<String> upload(HttpServletRequest request,
                                  @RequestParam(value = "stable", required = true) String stable,
                                  @RequestParam(value = "tableid", required = true) String tableid,
                                  @RequestParam(value = "fileType", required = true) String fileType) {
         Result<String> result = new Result<>();
-
         try {
-
             String ctxPath = uploadpath;
-            String tempPath = uploadfilepath;
-
-            Map<String, Object> map = FileUtils.Upload(ctxPath, tempPath, request);
-
+//            String tempPath = uploadfilepath;
+            Map<String, Object> map = FileUtils.Upload(ctxPath, request);
             String fileName = (String) map.get("fileName");
             String savePath = (String) map.get("savePath");
-
             OaFile oaFile = new OaFile();
             oaFile.setSTable(stable);
             oaFile.setITableId(Integer.parseInt(tableid));
@@ -101,9 +95,7 @@ public class FileNtkoController {
                 }
                 dynamicTableMapper.updateData(busdataMap);
             }
-
             System.out.println("---------------->>>>>>>>>>>>>>>创建保存成功");
-
             //----开启webSocket，起草底稿后向前端发一个请求，表明已经保存成功。
             sendWebSocketMessage(tableid,message) ;
             result.setSuccess(true);
@@ -187,7 +179,7 @@ public class FileNtkoController {
         String ctxPath = uploadpath;
         String tempPath = uploadfilepath;
 
-        Map<String, Object> map = FileUtils.Upload(ctxPath, tempPath, request);
+        Map<String, Object> map = FileUtils.Upload(ctxPath, request);
 
         String fileName = (String) map.get("fileName");
         String savePath = (String) map.get("savePath");
@@ -268,7 +260,6 @@ public class FileNtkoController {
         } else {
             result.setMessage("编辑功能出现问题，请联系管理员");
         }
-
         return result;
     }
 
@@ -281,7 +272,7 @@ public class FileNtkoController {
         try {
             String ctxPath = uploadpath;
             String tempPath = uploadfilepath;
-            Map<String, Object> map = FileUtils.Upload(ctxPath, tempPath, request);
+            Map<String, Object> map = FileUtils.Upload(ctxPath, request);
             String fileName = (String) map.get("fileName");
             String savePath = (String) map.get("savePath");
             OaFile oaFile = new OaFile();
