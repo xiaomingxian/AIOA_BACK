@@ -33,6 +33,10 @@ public class SysUserSet implements Serializable {
 	@Excel(name = "用户id", width = 15)
 	@ApiModelProperty(value = "用户id")
 	private java.lang.String sUserId;
+	/**字体大小*/
+	@Excel(name = "字体大小", width = 15)
+	@ApiModelProperty(value = "字体大小")
+	private java.lang.Integer iFontSize;
 	/**是否AI阅读*/
 	@Excel(name = "是否AI阅读", width = 15)
     @ApiModelProperty(value = "是否AI阅读")
