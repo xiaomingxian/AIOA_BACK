@@ -203,7 +203,7 @@ public class TaskCommonServiceImpl implements TaskCommonService {
      * 流程监控数据  所有参与过的数据(直接参与与身为候选人)
      */
     @Override
-    public Result queryTaskMonitor(TaskInfoVO taskInfoVO, Integer pageNo, Integer pageSize,boolean isAdmin) {
+    public Result queryTaskMonitor(TaskInfoVO taskInfoVO, Integer pageNo, Integer pageSize, boolean isAdmin) {
 
         //TODO 考虑代理人情况
 
@@ -211,16 +211,16 @@ public class TaskCommonServiceImpl implements TaskCommonService {
         Boolean isDept = taskInfoVO.getIsDept();
         if (isDept != null && isDept) {
             //查询部门类型
-            return deptTaskMonitor(taskInfoVO, taskInfoVO.getDeptType(), pageNo, pageSize,isAdmin);
+            return deptTaskMonitor(taskInfoVO, taskInfoVO.getDeptType(), pageNo, pageSize, isAdmin);
         }
 
 
         Result<IPage> iPageResult = new Result<>();
         IPage iPage = new Page(pageNo, pageSize);
 
-        int count = taskMapper.monitorCount(taskInfoVO,isAdmin);
+        int count = taskMapper.monitorCount(taskInfoVO, isAdmin);
 
-        List<TaskInfoJsonAble> list = taskMapper.monitorData(taskInfoVO, (pageNo - 1) * pageSize, pageSize,isAdmin);
+        List<TaskInfoJsonAble> list = taskMapper.monitorData(taskInfoVO, (pageNo - 1) * pageSize, pageSize, isAdmin);
 
         //分页参数
         iPage.setTotal(count);
@@ -232,15 +232,15 @@ public class TaskCommonServiceImpl implements TaskCommonService {
         return iPageResult;
     }
 
-    private Result deptTaskMonitor(TaskInfoVO taskInfoVO, String type, Integer pageNo, Integer pageSize,boolean isAdmin) {
+    private Result deptTaskMonitor(TaskInfoVO taskInfoVO, String type, Integer pageNo, Integer pageSize, boolean isAdmin) {
 
         Result<IPage> iPageResult = new Result<>();
         IPage iPage = new Page(pageNo, pageSize);
 
-        Long count = taskMapper.deptTaskMonitorCount(taskInfoVO, type,isAdmin);
+        Long count = taskMapper.deptTaskMonitorCount(taskInfoVO, type, isAdmin);
         count = count == null ? 0 : count;
 
-        List<TaskInfoJsonAble> list = taskMapper.deptTaskMonitorQuery(taskInfoVO, type, (pageNo - 1) * pageSize, pageSize,isAdmin);
+        List<TaskInfoJsonAble> list = taskMapper.deptTaskMonitorQuery(taskInfoVO, type, (pageNo - 1) * pageSize, pageSize, isAdmin);
 
         //分页参数
         iPage.setTotal(count);
@@ -615,7 +615,7 @@ public class TaskCommonServiceImpl implements TaskCommonService {
         //将数据变成一条
         TaskInfoVO taskInfoVOSource = taskInfoVOs.get(0);
         TaskInfoVO taskInfoVO = new TaskInfoVO();
-        BeanUtils.copyProperties(taskInfoVOSource,taskInfoVO);
+        BeanUtils.copyProperties(taskInfoVOSource, taskInfoVO);
         String taskId = taskInfoVO.getTaskId();
         //判断有没有开启流程
         Map<String, Object> map = taskInfoVO.getBusData();
@@ -767,14 +767,25 @@ public class TaskCommonServiceImpl implements TaskCommonService {
     }
 
     @Override
-    public ActivityImpl currentAct(String taskId, String procDefkey) {
+    public ActivityImpl currentAct(String taskId, String processDefinitionId, String procDefkey) {
 
 
-        String processDefinitionId = null;
+        //String processDefinitionId = null;
         HistoricTaskInstance task = null;
         if (taskId == null) {
-            ProcessDefinition processDefinition = repositoryService.createProcessDefinitionQuery()
-                    .processDefinitionKey(procDefkey).latestVersion().singleResult();
+            ProcessDefinition processDefinition = null;
+            if (processDefinitionId == null) {
+                processDefinition = repositoryService.createProcessDefinitionQuery()
+                        .processDefinitionKey(procDefkey)
+                        .latestVersion().singleResult();
+            } else {
+                processDefinition = repositoryService.createProcessDefinitionQuery()
+                        .processDefinitionId(processDefinitionId)
+                        //.processDefinitionKey(procDefkey)
+                        .latestVersion().singleResult();
+            }
+            if (processDefinition==null)throw new AIOAException("未找到对应的流程信息");
+
             processDefinitionId = processDefinition.getId();
         } else {
             task = historyService.createHistoricTaskInstanceQuery().taskId(taskId).singleResult();
@@ -818,7 +829,7 @@ public class TaskCommonServiceImpl implements TaskCommonService {
     public void addUsers(AddUsersMsg addUsersMsg) {
         //先判断 当前节点是否是可追加性质的节点
         Task task = taskService.createTaskQuery().taskId(addUsersMsg.getTaskId()).singleResult();
-        ActivityImpl activity = currentAct(task.getId(), null);
+        ActivityImpl activity = currentAct(task.getId(), null,null);
         ActivityBehavior activityBehavior = activity.getActivityBehavior();
 
         //只有多实例
@@ -1230,7 +1241,7 @@ public class TaskCommonServiceImpl implements TaskCommonService {
 
         String processDefinitionId = task.getProcessDefinitionId();
 
-        List<Activity> nextActs = searchNextActs(taskId, processDefinitionId);
+        List<Activity> nextActs = searchNextActs(taskId, processDefinitionId,null);
 
         //找出选择的下一个环节
         Activity nextAct = null;
@@ -1585,14 +1596,23 @@ public class TaskCommonServiceImpl implements TaskCommonService {
 
 
     @Override
-    public List<Activity> searchNextActs(String taskId, String proDefKey) {
+    public List<Activity> searchNextActs(String taskId,String processDefinitionId, String proDefKey) {
 
 
-        String processDefinitionId = null;
         HistoricTaskInstance task = null;
         if (taskId == null) {
-            ProcessDefinition processDefinition = repositoryService.createProcessDefinitionQuery().
-                    processDefinitionKey(proDefKey).latestVersion().singleResult();
+            ProcessDefinition processDefinition=null;
+            if (processDefinitionId==null){
+                 processDefinition = repositoryService.createProcessDefinitionQuery()
+                        .processDefinitionKey(proDefKey)
+                        .latestVersion().singleResult();
+            }else {
+                 processDefinition = repositoryService.createProcessDefinitionQuery()
+                        .processDefinitionId(processDefinitionId)
+                        .latestVersion().singleResult();
+            }
+            if (processDefinition==null)throw new AIOAException("未找到对应的流程信息");
+
             processDefinitionId = processDefinition.getId();
         } else {
             task = historyService.createHistoricTaskInstanceQuery().taskId(taskId).singleResult();
@@ -1682,7 +1702,7 @@ public class TaskCommonServiceImpl implements TaskCommonService {
             return Result.error("批量批阅失败:存在不是传阅类型的数据");
         }
         for (String id : ids) {
-            List<Activity> nextAs = searchNextActs(id, null);
+            List<Activity> nextAs = searchNextActs(id, null,null);
             Activity end = null;
             for (Activity activity : nextAs) {
                 if ("endevent".equalsIgnoreCase(activity.getType())) {
@@ -1704,7 +1724,7 @@ public class TaskCommonServiceImpl implements TaskCommonService {
         Map<String, Object> nextActNeed = new HashMap<>();
 
         //当前节点的下几个节点
-        List<Activity> nextActs = searchNextActs(taskId, null);
+        List<Activity> nextActs = searchNextActs(taskId, null,null);
         Activity endAct = null;
         for (Activity activity : nextActs) {
             if ("endevent".equalsIgnoreCase(activity.getType())) {

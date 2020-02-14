@@ -45,7 +45,7 @@ public interface TaskCommonService {
 
     void taskShift(String taskId, String sourceUserId, String sourceUsername, String destUserId);
 
-    List<Activity> searchNextActs(String taskId, String proDefKey);
+    List<Activity> searchNextActs(String taskId, String proDefKey,String procDefkey);
 
     void batchEnd(String[] ids, SysUser user);
 
@@ -78,7 +78,7 @@ public interface TaskCommonService {
 
     void updateTitle(Map<String, Object> query);
 
-    ActivityImpl currentAct(String taskId, String procDefkey);
+    ActivityImpl currentAct(String taskId, String processDefinitionId,String procDefkey);
 
     void addUsers(AddUsersMsg addUsersMsg);
 
