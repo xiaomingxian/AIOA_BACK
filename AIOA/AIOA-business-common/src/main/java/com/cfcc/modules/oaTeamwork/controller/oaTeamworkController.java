@@ -23,6 +23,7 @@ import com.cfcc.modules.oaTeamwork.entity.oaTeamworkSet;
 import com.cfcc.modules.oaTeamwork.service.IoaTeamworkService;
 import com.cfcc.modules.system.entity.LoginInfo;
 import com.cfcc.modules.system.entity.SysDepart;
+import com.cfcc.modules.system.entity.SysUser;
 import com.cfcc.modules.system.entity.SysUserOpinion;
 import com.cfcc.modules.system.service.ISysDepartService;
 import com.cfcc.modules.system.service.ISysUserService;
@@ -65,7 +66,7 @@ public class oaTeamworkController {
 	 * @param oaTeamwork
 	 * @param pageNo
 	 * @param pageSize
-	 * @param req
+	 * @param request
 	 * @return
 	 */
 	@AutoLog(value = "个人协同办公业务配置分类-分页列表查询")
@@ -74,11 +75,13 @@ public class oaTeamworkController {
 	public Result<IPage<oaTeamwork>> queryPageList(oaTeamwork oaTeamwork,
 												   @RequestParam(name="pageNo", defaultValue="1") Integer pageNo,
 												   @RequestParam(name="pageSize", defaultValue="10") Integer pageSize,
-												   HttpServletRequest req) {
+												   HttpServletRequest request) {
 
 		Result<IPage<oaTeamwork>> result = new Result<IPage<oaTeamwork>>();
+		SysUser currentUser = iSysUserService.getCurrentUser(request);
+		String id = currentUser.getId();
+		oaTeamwork.setSCreateBy(id);
 		IPage<oaTeamwork> pageList = oaTeamworkService.findPage(pageNo, pageSize, oaTeamwork);
-
 		result.setSuccess(true);
 		result.setResult(pageList);
 		return result;
