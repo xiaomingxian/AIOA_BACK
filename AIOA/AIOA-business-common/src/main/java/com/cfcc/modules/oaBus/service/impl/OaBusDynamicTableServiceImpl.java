@@ -166,10 +166,12 @@ public class OaBusDynamicTableServiceImpl implements OaBusDynamicTableService {
 
         String sourceFileNum = busData.get("s_file_num") == null ? null : busData.get("s_file_num").toString();
         if (sName.contains("收文")) {//
-            if (taskInfoVO.getIsDept()) {
+            if (null!=taskInfoVO.getIsDept() && taskInfoVO.getIsDept()) {
                 mainDept = taskInfoVO.getTaskWithDepts().getMainDept();
             }
-            busData.put("s_create_dept", mainDept);
+            if (StringUtils.isNotBlank(mainDept)){
+                busData.put("s_create_dept", mainDept);
+            }
             s_receive_num = busData.get("s_receive_num") == null ? "" : busData.get("s_receive_num").toString();
             busData.put("s_file_num", s_receive_num);
         } else {
