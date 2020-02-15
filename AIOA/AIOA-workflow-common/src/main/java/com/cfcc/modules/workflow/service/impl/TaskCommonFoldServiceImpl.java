@@ -66,9 +66,9 @@ public class TaskCommonFoldServiceImpl implements TaskCommonFoldService {
 
 //流程监控一级折叠
     @Override
-    public Result monitorFoldUrgency(String urgencyDegree, TaskInfoVO taskInfoVO) {
+    public Result monitorFoldUrgency(String urgencyDegree, TaskInfoVO taskInfoVO,boolean isAdmin) {
         Result<List<SysDictItem>> SysDictResult = new Result<>();
-        List<SysDictItem> sysDictItems = taskFoldMapper.monitorFoldUrgency(urgencyDegree, taskInfoVO);
+        List<SysDictItem> sysDictItems = taskFoldMapper.monitorFoldUrgency(urgencyDegree, taskInfoVO,isAdmin);
         SysDictResult.setResult(sysDictItems);
         return SysDictResult;
     }
@@ -128,23 +128,23 @@ public class TaskCommonFoldServiceImpl implements TaskCommonFoldService {
      * 流程监控数据  所有参与过的数据(直接参与与身为候选人)
      */
     @Override
-    public Result queryTaskMonitor(String urgencyDegree,TaskInfoVO taskInfoVO, Integer pageNo, Integer pageSize,Integer jY) {
+    public Result queryTaskMonitor(String urgencyDegree,TaskInfoVO taskInfoVO, Integer pageNo, Integer pageSize,Integer jY,boolean isAdmin) {
 
 
         //判断是否是部门类型
         Boolean isDept = taskInfoVO.getIsDept();
         if (isDept != null && isDept) {
             //查询部门类型
-            return deptTaskMonitor(urgencyDegree,taskInfoVO, taskInfoVO.getDeptType(), pageNo, pageSize);
+            return deptTaskMonitor(urgencyDegree,taskInfoVO, taskInfoVO.getDeptType(), pageNo, pageSize,isAdmin);
         }
 
 
         Result<IPage> iPageResult = new Result<>();
         IPage iPage = new Page(pageNo, pageSize);
 
-        int count = taskFoldMapper.monitorCountFold(urgencyDegree,taskInfoVO);
+        int count = taskFoldMapper.monitorCountFold(urgencyDegree,taskInfoVO,isAdmin);
 
-        List<TaskInfoJsonAble> list = taskFoldMapper.monitorDataFold(urgencyDegree,taskInfoVO, (pageNo - 1) * pageSize, pageSize);
+        List<TaskInfoJsonAble> list = taskFoldMapper.monitorDataFold(urgencyDegree,taskInfoVO, (pageNo - 1) * pageSize, pageSize,isAdmin);
 
         //分页参数
         iPage.setTotal(count);
@@ -156,15 +156,15 @@ public class TaskCommonFoldServiceImpl implements TaskCommonFoldService {
         return iPageResult;
     }
 
-    private Result deptTaskMonitor(String urgencyDegree,TaskInfoVO taskInfoVO, String type, Integer pageNo, Integer pageSize) {
+    private Result deptTaskMonitor(String urgencyDegree,TaskInfoVO taskInfoVO, String type, Integer pageNo, Integer pageSize,boolean isAdmin) {
 
         Result<IPage> iPageResult = new Result<>();
         IPage iPage = new Page(pageNo, pageSize);
 
-        Long count = taskFoldMapper.deptTaskMonitorCountFold(urgencyDegree,taskInfoVO, type);
+        Long count = taskFoldMapper.deptTaskMonitorCountFold(urgencyDegree,taskInfoVO, type,isAdmin);
         count = count == null ? 0 : count;
 
-        List<TaskInfoJsonAble> list = taskFoldMapper.deptTaskMonitorQueryFold(urgencyDegree,taskInfoVO, type, (pageNo - 1) * pageSize, pageSize);
+        List<TaskInfoJsonAble> list = taskFoldMapper.deptTaskMonitorQueryFold(urgencyDegree,taskInfoVO, type, (pageNo - 1) * pageSize, pageSize,isAdmin);
 
         //分页参数
         iPage.setTotal(count);

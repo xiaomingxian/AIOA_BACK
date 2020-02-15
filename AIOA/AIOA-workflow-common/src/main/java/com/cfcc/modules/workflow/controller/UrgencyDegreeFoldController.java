@@ -3,6 +3,7 @@ package com.cfcc.modules.workflow.controller;
 import com.cfcc.common.api.vo.Result;
 import com.cfcc.common.system.util.JwtUtil;
 import com.cfcc.modules.system.entity.LoginInfo;
+import com.cfcc.modules.system.entity.SysRole;
 import com.cfcc.modules.system.entity.SysUser;
 import com.cfcc.modules.system.service.ISysUserService;
 import com.cfcc.modules.utils.IWfConstant;
@@ -17,6 +18,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
+import java.util.List;
 import java.util.Map;
 
 @Api(tags = "缓急程度折叠列表")
@@ -43,7 +45,7 @@ public class UrgencyDegreeFoldController {
                             @RequestParam(required = false, defaultValue = "100") Integer pageSize,
                             HttpServletRequest request) {
         try {
-
+            LoginInfo loginInfo = sysUserService.getLoginInfo(request);
             String operstatus = taskInfoVO.getOperstatus();
 
             //判断查询条件是否有用户(作为查询条件)
@@ -54,7 +56,6 @@ public class UrgencyDegreeFoldController {
             } else {
                 //查询当前用户，作为assignee
                 if (operstatus != null && !operstatus.equals(IWfConstant.JUMP)) {//重置是管理员权限(不用必须加用户)
-                    LoginInfo loginInfo = sysUserService.getLoginInfo(request);
                     taskInfoVO.setUserId(loginInfo.getId());
                     taskInfoVO.setUserName(loginInfo.getUsername());
                 }
@@ -70,7 +71,17 @@ public class UrgencyDegreeFoldController {
             //默认排序
             taskInfoVO.setTableOrder(true);
             taskInfoVO.setOrederByTime(-1);
-            Result result = taskCommonService.monitorFoldUrgency(urgencyDegree, taskInfoVO);
+            //判断是不是超级管理员 是的话展示所有人
+            List<SysRole> roles = loginInfo.getRoles();
+            boolean isAdmin=false;
+            for (SysRole role : roles) {
+                String roleName = role.getRoleName();
+                if ("系统管理员".equalsIgnoreCase(roleName)) {
+                    isAdmin=true;
+                    break;
+                }
+            }
+            Result result = taskCommonService.monitorFoldUrgency(urgencyDegree, taskInfoVO,isAdmin);
             return result;
         } catch (Exception e) {
             log.error("任务查询失败" + e.toString());
@@ -87,7 +98,7 @@ public class UrgencyDegreeFoldController {
                             HttpServletRequest request) {
 
         try {
-
+            LoginInfo loginInfo = sysUserService.getLoginInfo(request);
             String operstatus = taskInfoVO.getOperstatus();
 
             //判断查询条件是否有用户(作为查询条件)
@@ -98,7 +109,6 @@ public class UrgencyDegreeFoldController {
             } else {
                 //查询当前用户，作为assignee
                 if (operstatus != null && !operstatus.equals(IWfConstant.JUMP)) {//重置是管理员权限(不用必须加用户)
-                    LoginInfo loginInfo = sysUserService.getLoginInfo(request);
                     taskInfoVO.setUserId(loginInfo.getId());
                     taskInfoVO.setUserName(loginInfo.getUsername());
                 }
@@ -120,7 +130,17 @@ public class UrgencyDegreeFoldController {
                     break;
                 //流程监控数据
                 case IWfConstant.TASK_MONITOR:
-                    result = taskCommonService.queryTaskMonitor(urgencyDegree,taskInfoVO, pageNo, pageSize,jY);
+                    //判断是不是超级管理员 是的话展示所有人
+                    List<SysRole> roles = loginInfo.getRoles();
+                    boolean isAdmin=false;
+                    for (SysRole role : roles) {
+                        String roleName = role.getRoleName();
+                        if ("系统管理员".equalsIgnoreCase(roleName)) {
+                            isAdmin=true;
+                            break;
+                        }
+                    }
+                    result = taskCommonService.queryTaskMonitor(urgencyDegree,taskInfoVO, pageNo, pageSize,jY,isAdmin);
                     break;
                 //我的委托
                 case IWfConstant.MY_AGENT:
