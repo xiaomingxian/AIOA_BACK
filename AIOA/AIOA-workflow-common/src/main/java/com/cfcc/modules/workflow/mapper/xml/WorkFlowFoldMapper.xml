@@ -433,7 +433,10 @@
         (SELECT t.ID_ id FROM act_hi_taskinst t
          LEFT JOIN act_hi_varinst v ON t.PROC_INST_ID_ = v.PROC_INST_ID_ AND v.name_ = 'busMsg'
          WHERE  EXISTS(select * from act_ru_execution where  PROC_INST_ID_=t.PROC_INST_ID_)
-         AND v.name_ = 'busMsg' and t.ASSIGNEE_ =  #{pojo.userId}
+         AND v.name_ = 'busMsg'
+        <if test="!isAdmin">
+            and t.ASSIGNEE_ =  #{pojo.userId}
+        </if>
 					AND SUBSTRING_INDEX(v.TEXT_,',',1)=d.item_value LIMIT 1)
         UNION
         SELECT
@@ -444,7 +447,9 @@
         LEFT JOIN act_hi_varinst v ON t.PROC_INST_ID_ = v.PROC_INST_ID_
         WHERE
         v.name_ = 'busMsg'
-        AND i.user_id_ =  #{pojo.userId}
+        <if test="!isAdmin">
+            AND i.user_id_ = #{pojo.userId}
+        </if>
         AND i.TYPE_ = 'candidate'
         AND t.ASSIGNEE_ IS NULL
 		AND SUBSTRING_INDEX(v.TEXT_,',',1)=d.item_value LIMIT 1
@@ -484,9 +489,9 @@ ORDER BY d.sort_order
         WHERE
         EXISTS(select * from act_ru_execution where  PROC_INST_ID_=t.PROC_INST_ID_)
         AND v.name_ = 'busMsg'
-
-        and t.ASSIGNEE_ = #{pojo.userId}
-
+        <if test="!isAdmin">
+            and t.ASSIGNEE_ = #{pojo.userId}
+        </if>
         UNION
         SELECT
         t.ID_ id,
@@ -512,7 +517,9 @@ ORDER BY d.sort_order
         LEFT JOIN act_hi_varinst v ON t.PROC_INST_ID_ = v.PROC_INST_ID_
         WHERE
         v.name_ = 'busMsg'
-        AND i.user_id_ = #{pojo.userId}
+        <if test="!isAdmin">
+            AND i.user_id_ = #{pojo.userId}
+        </if>
         AND i.TYPE_ = 'candidate'
         AND t.ASSIGNEE_ IS NULL
         <if test="urgencyDegree !=null and urgencyDegree !=''">
@@ -595,8 +602,9 @@ ORDER BY d.sort_order
         WHERE
         EXISTS(select * from act_ru_execution where  PROC_INST_ID_=t.PROC_INST_ID_)
         AND v.name_ = 'busMsg'
-
-        and t.ASSIGNEE_ = #{pojo.userId}
+        <if test="!isAdmin">
+            and t.ASSIGNEE_ = #{pojo.userId}
+        </if>
         <if test="urgencyDegree !=null and urgencyDegree !=''">
             and SUBSTRING_INDEX(v.TEXT_,',',1)=#{urgencyDegree}
         </if>
@@ -625,7 +633,9 @@ ORDER BY d.sort_order
         LEFT JOIN act_hi_varinst v ON t.PROC_INST_ID_ = v.PROC_INST_ID_
         WHERE
         v.name_ = 'busMsg'
-        AND i.user_id_ = #{pojo.userId}
+        <if test="!isAdmin">
+            AND i.user_id_ = #{pojo.userId}
+        </if>
         AND i.TYPE_ = 'candidate'
         AND t.ASSIGNEE_ IS NULL
         <if test="urgencyDegree !=null and urgencyDegree !=''">
@@ -1225,9 +1235,9 @@ ORDER BY d.sort_order
         WHERE
         EXISTS(select * from act_ru_execution where  PROC_INST_ID_=t.PROC_INST_ID_)
         AND v.name_ = 'busMsg'
-
-        and t.ASSIGNEE_ =  #{pojo.userId}
-
+        <if test="!isAdmin">
+            and t.ASSIGNEE_ = #{pojo.userId}
+        </if>
         UNION
         SELECT
         t.ID_ id,
@@ -1253,17 +1263,25 @@ ORDER BY d.sort_order
         LEFT JOIN act_hi_varinst v ON t.PROC_INST_ID_ = v.PROC_INST_ID_
         WHERE
         v.name_ = 'busMsg'
+        <if test="!isAdmin">
+            AND i.user_id_ =  #{pojo.userId}
+        </if>
         AND i.user_id_ =  #{pojo.userId}
         AND i.TYPE_ = 'candidate'
         AND t.ASSIGNEE_ IS NULL
 
         ) l left JOIN
         oa_task_dept td on td.proc_inst_id =l.processInstanceId and td.task_id =  l.id and td.task_def_key=l.taskDefinitionKey
-        and td.type=#{type} and td.user_id= #{pojo.userId}
+        and td.type=#{type}
+        <if test="!isAdmin">
+            and td.user_id= #{pojo.userId}
+        </if>
         where
         td.proc_inst_id =l.processInstanceId and td.task_id =  l.id and td.task_def_key=l.taskDefinitionKey
-        and td.type=#{type} and td.user_id= #{pojo.userId}
-
+        and td.type=#{type}
+        <if test="!isAdmin">
+            and td.user_id= #{pojo.userId}
+        </if>
         <if test="pojo.startQueryTime!=null ">
             and l.createTime &gt;= #{pojo.startQueryTime}
         </if>
@@ -1340,8 +1358,9 @@ ORDER BY d.sort_order
         WHERE
         EXISTS(select * from act_ru_execution where  PROC_INST_ID_=t.PROC_INST_ID_)
         AND v.name_ = 'busMsg'
-
-        and t.ASSIGNEE_ =  #{pojo.userId}
+        <if test="!isAdmin">
+            and t.ASSIGNEE_ =  #{pojo.userId}
+        </if>
 
         UNION
         SELECT
@@ -1368,16 +1387,24 @@ ORDER BY d.sort_order
         LEFT JOIN act_hi_varinst v ON t.PROC_INST_ID_ = v.PROC_INST_ID_
         WHERE
         v.name_ = 'busMsg'
-        AND i.user_id_ =  #{pojo.userId}
+        <if test="!isAdmin">
+            AND i.user_id_ =  #{pojo.userId}
+        </if>
         AND i.TYPE_ = 'candidate'
         AND t.ASSIGNEE_ IS NULL
 
         )  l left JOIN
         oa_task_dept td on td.proc_inst_id =l.processInstanceId and td.task_id =  l.id and td.task_def_key=l.taskDefinitionKey
-        and td.type= #{type} and td.user_id= #{pojo.userId}
+        and td.type= #{type}
+        <if test="!isAdmin">
+            and td.user_id= #{pojo.userId}
+        </if>
         where
         td.proc_inst_id =l.processInstanceId and td.task_id =  l.id and td.task_def_key=l.taskDefinitionKey
-        and td.type= #{type} and td.user_id= #{pojo.userId}
+        and td.type= #{type}
+        <if test="!isAdmin">
+            and td.user_id= #{pojo.userId}
+        </if>
         <if test="pojo.startQueryTime!=null ">
             and l.createTime &gt;= #{pojo.startQueryTime}
         </if>

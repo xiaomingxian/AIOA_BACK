@@ -3,10 +3,10 @@
 <mapper namespace="com.cfcc.modules.system.mapper.SysUserSetMapper">
     <insert id="insertinto">
         insert into sys_user_set
-        (s_user_id ,i_is_ai,i_is_messages,i_is_calendar,i_is_fold ,i_calendar_day,i_bus1_id,i_bus2_id ,i_bus3_id ,i_bus4_id )
+        (s_user_id ,i_is_ai,i_is_messages,i_is_calendar,i_is_fold ,i_calendar_day,i_bus1_id,i_bus2_id ,i_bus3_id ,i_bus4_id,i_is_fontSize )
         values
         (
-         #{sUserId},#{iIsAi},#{iIsMessages},#{iIsCalendar},#{iCalendarDay},#{iIsFold},#{iBus1Id},#{iBus2Id},#{iBus3Id},#{iBus4Id}
+         #{sUserId},#{iIsAi},#{iIsMessages},#{iIsCalendar},#{iCalendarDay},#{iIsFold},#{iBus1Id},#{iBus2Id},#{iBus3Id},#{iBus4Id},#{iIsFontSize}
         )
 
 

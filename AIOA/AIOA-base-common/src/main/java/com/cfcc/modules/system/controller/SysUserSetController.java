@@ -116,7 +116,7 @@ public class SysUserSetController {
 		try {
 			List<SysUserSet> sysUserSetList=sysUserSetService.findByIId(sysUserSet.getIId());
 			if(sysUserSetList.contains(sysUserSet.getIId())){
-				result.error500("该用户已选择");
+				result.error500("该用户已添加");
 				return result;
 			}
 			String token = request.getHeader("X-Access-Token");
@@ -126,7 +126,7 @@ public class SysUserSetController {
 				String userId = sysUser.getId();
 				sysUserSet.setSUserId(userId);
 			}
-			sysUserSetService.save(sysUserSet);
+			sysUserSetService.insert(sysUserSet);
 			result.success("添加成功！");
 
 		} catch (Exception e) {
@@ -167,34 +167,6 @@ public class SysUserSetController {
 		 return result;
 	 }
 
-
-	 @AutoLog(value = "权限设置-编辑和修改")
-	 @ApiOperation(value="权限设置-编辑和修改", notes="权限设置-编辑和修改")
-	 @PutMapping(value = "/SaveAndUpdate")
-	 public Result<SysUserSet> SaveAndUpdate(@RequestBody SysUserSet sysUserSet,HttpServletRequest request) {
-		 Result<SysUserSet> result = new Result<SysUserSet>();
-
-		 Integer iId = sysUserSet.getIId();
-		 if( iId == null ){
-			 String token = request.getHeader("X-Access-Token");
-			 String username = JwtUtil.getUsername(token);
-			 SysUser sysUser = sysUserService.getUserByName(username);
-			 if(sysUser != null ){
-				 String userId = sysUser.getId();
-				 sysUserSet.setSUserId(userId);
-			 }
-			 sysUserSetService.save(sysUserSet);
-			 result.success("添加成功！");
-		 }
-		 else{
-
-			 boolean ok = sysUserSetService.updateBYIid(sysUserSet);
-			 if(ok) {
-				 result.success("修改成功!");
-			 }
-		 }
-		 return result;
-	 }
 
 	 /**
 	  *   通过id删除
