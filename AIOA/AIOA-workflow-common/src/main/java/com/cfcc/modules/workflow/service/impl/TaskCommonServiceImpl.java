@@ -410,7 +410,7 @@ public class TaskCommonServiceImpl implements TaskCommonService {
                     .orderByTaskDueDate().asc()
                     .orderByTaskCreateTime().asc()
                     .list();
-            //再查一遍 待办中的加签类型
+            //TODO 再查一遍 待办中的加签类型
             List<Task> list1 = taskService.createTaskQuery().processInstanceId(proInstId).list();
             for (Task task : list1) {
 

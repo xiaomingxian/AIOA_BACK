@@ -12,7 +12,10 @@ import com.cfcc.modules.oaBus.service.TaskInActService;
 import com.cfcc.modules.system.entity.LoginInfo;
 import com.cfcc.modules.system.entity.SysUser;
 import com.cfcc.modules.system.service.ISysUserService;
-import com.cfcc.modules.workflow.pojo.*;
+import com.cfcc.modules.workflow.pojo.Activity;
+import com.cfcc.modules.workflow.pojo.OaProcActinst;
+import com.cfcc.modules.workflow.pojo.TaskInfoJsonAble;
+import com.cfcc.modules.workflow.pojo.TaskWithDepts;
 import com.cfcc.modules.workflow.service.IoaProcActinstService;
 import com.cfcc.modules.workflow.service.TaskCommonService;
 import com.cfcc.modules.workflow.vo.TaskInfoVO;
@@ -26,7 +29,6 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.*;
-import java.util.concurrent.atomic.AtomicReference;
 
 
 @Slf4j
@@ -99,7 +101,7 @@ public class TaskInActController {
             String key = taskInfoJsonAble.getProDefName();
             String processDefinitionId = taskInfoJsonAble.getProcessDefinitionId();
 
-            Result result = nextUserQuery(key,processDefinitionId, drafterId, taskId, request);
+            Result result = nextUserQuery(key, processDefinitionId, drafterId, taskId, request);
             //查找已经选择的用户 标记出来
             if (result.isSuccess()) {
                 List<Map<String, Object>> actMsgs = (List<Map<String, Object>>) result.getResult();
@@ -147,6 +149,8 @@ public class TaskInActController {
                 }
 
             }
+            List<Map<String, Object>> actMsgs = (List<Map<String, Object>>) result.getResult();
+            if (actMsgs.size() == 0) return Result.error("没有可追加环节");
             return result;
         } catch (AIOAException e) {
             return Result.error(e.getMessage());
@@ -187,12 +191,12 @@ public class TaskInActController {
 
     @ApiOperation(value = "查询下一办理人")
     @GetMapping("nextUserQuery")
-    public Result nextUserQuery(String procDefkey, String drafterId,String processDefinitionId,
+    public Result nextUserQuery(String procDefkey, String drafterId, String processDefinitionId,
                                 @RequestParam(required = false) String taskId, HttpServletRequest request) {
 
         try {
 
-            List<Map<String, Object>> list = nexUserQuery(procDefkey,processDefinitionId, drafterId, taskId, request);
+            List<Map<String, Object>> list = nexUserQuery(procDefkey, processDefinitionId, drafterId, taskId, request);
 
             return Result.ok(list);
         } catch (AIOAException e) {
@@ -204,7 +208,7 @@ public class TaskInActController {
     }
 
 
-    private List<Map<String, Object>> nexUserQuery(String procDefkey,String processDefinitionId, String drafterId,
+    private List<Map<String, Object>> nexUserQuery(String procDefkey, String processDefinitionId, String drafterId,
                                                    @RequestParam(required = false) String taskId, HttpServletRequest request) {
         if (StringUtils.isBlank(procDefkey)) {
             throw new AIOAException("传入的流程定义为空，请检查此业务是否配置了流程");
@@ -213,17 +217,23 @@ public class TaskInActController {
         LoginInfo user = sysUserService.getLoginInfo(request);
         String id = user.getId();
         //查询下n个节点属性
-        ActivityImpl current = taskCommonService.currentAct(taskId, processDefinitionId,procDefkey);
-        List<Activity> acts = taskCommonService.searchNextActs(taskId, processDefinitionId,procDefkey);
+        ActivityImpl current = taskCommonService.currentAct(taskId, processDefinitionId, procDefkey);
+        List<Activity> acts = taskCommonService.searchNextActs(taskId, processDefinitionId, procDefkey);
         if (acts == null) throw new AIOAException("环节配置信息不完善请检查");
 
         //组装代办列表
         List<Map<String, Object>> list = new ArrayList();
-        Map<String, String> conditionContext=null;
+        Map<String, String> conditionContext = new HashMap<>();
 
         //遍历节点 查询相关业务信息(避免循环中查询(但是此数据较少))
         for (Activity i : acts) {
-            if (i.getConditionContext()!=null)conditionContext=i.getConditionContext();
+            if (i.getConditionContext() != null) {
+                Map<String, String> conditionContext1 = i.getConditionContext();
+                for (String key : conditionContext1.keySet()) {
+                    String val = conditionContext1.get(key);
+                    conditionContext.put(key, val);
+                }
+            }
             HashMap<String, Object> oneAct = new HashMap<>();
             //查询节点信息(配置的form信息)
             QueryWrapper<OaProcActinst> queryWrapper = new QueryWrapper<>();
@@ -265,10 +275,10 @@ public class TaskInActController {
             }
         }
         for (Activity act : acts) {
-            if (act.getConditionContext()==null&&conditionContext!=null){//处理排他网关不设置条件的情况
-                Map.Entry<String, String> next = conditionContext.entrySet().iterator().next();
-                String key = next.getKey();
-                conditionContext.put(key,UUID.randomUUID().toString());
+            if (act.getConditionContext() == null && conditionContext != null) {//处理排他网关不设置条件的情况
+                for (String key : conditionContext.keySet()) {
+                    conditionContext.put(key, UUID.randomUUID().toString());
+                }
                 act.setConditionContext(conditionContext);
             }
         }

@@ -2,6 +2,7 @@ package com.cfcc.modules.utils;
 
 import org.activiti.engine.RuntimeService;
 import org.activiti.engine.TaskService;
+import org.activiti.engine.impl.HistoryServiceImpl;
 import org.activiti.engine.impl.interceptor.Command;
 import org.activiti.engine.impl.interceptor.CommandContext;
 import org.activiti.engine.impl.persistence.entity.ExecutionEntity;
@@ -11,6 +12,7 @@ import org.activiti.engine.task.Task;
 import org.springframework.stereotype.Component;
 
 import java.util.Date;
+import java.util.List;
 
 @Component
 public class AddUserCmd implements Command<Void> {
@@ -33,7 +35,7 @@ public class AddUserCmd implements Command<Void> {
     public AddUserCmd() {
     }
 
-    public AddUserCmd(String executionId, String assignee, String descript,String parentTaskId,
+    public AddUserCmd(String executionId, String assignee, String descript, String parentTaskId,
                       RuntimeService runtimeService, TaskService taskService) {
         this.executionId = executionId;
         this.assignee = assignee;
@@ -77,11 +79,26 @@ public class AddUserCmd implements Command<Void> {
         taskEntity.setDescription(descript);
         taskService.saveTask(taskEntity);
 
+        //一般只会有一个
+        List<Task> list = taskService.createTaskQuery().processInstanceId(t.getProcessInstanceId())
+                .processDefinitionKey(t.getProcessDefinitionId())
+                .taskDefinitionKey(t.getTaskDefinitionKey())
+                .taskCandidateOrAssigned(t.getAssignee())
+                .list();
+
+        for (Task task : list) {
+            String parentTaskId = task.getParentTaskId();
+            if (parentTaskId.equalsIgnoreCase(t.getParentTaskId())){
+                taskService.saveTask(task);
+            }
+        }
+
         Integer nrOfInstances = LoopVariableUtils.getLoopVariable(newExecution, "nrOfInstances");
         Integer nrOfActiveInstances = LoopVariableUtils.getLoopVariable(newExecution, "nrOfActiveInstances");
 
         LoopVariableUtils.setLoopVariable(newExecution, "nrOfInstances", nrOfInstances + 1);
         LoopVariableUtils.setLoopVariable(newExecution, "nrOfActiveInstances", nrOfActiveInstances + 1);
+
 
         return null;
     }

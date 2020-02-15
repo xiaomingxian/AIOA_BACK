@@ -26,7 +26,9 @@ import com.cfcc.modules.workflow.service.ProcessManagerService;
 import com.cfcc.modules.workflow.service.TaskCommonService;
 import lombok.extern.slf4j.Slf4j;
 import org.activiti.engine.HistoryService;
+import org.activiti.engine.TaskService;
 import org.activiti.engine.history.HistoricTaskInstance;
+import org.activiti.engine.task.Task;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -88,6 +90,8 @@ public class OaBusdataServiceImpl extends ServiceImpl<OaBusdataMapper, OaBusdata
     private IBusFunctionPermitService iBusFunctionPermitService;
     @Autowired
     private HistoryService historyService;
+    @Autowired
+    private TaskService taskService;
 
 
     //private Logger logger = LoggerFactory.getLogger(OaBusdataServiceImpl.class);
@@ -437,10 +441,18 @@ public class OaBusdataServiceImpl extends ServiceImpl<OaBusdataMapper, OaBusdata
 
         if (taskId != null) {
             HistoricTaskInstance historicTaskInstance = historyService.createHistoricTaskInstanceQuery().taskId(taskId).singleResult();
-            if(historicTaskInstance==null)throw new AIOAException( "当前任务不存在,可能已经被和删除,请重新进入页面");
-
+            if (historicTaskInstance == null) throw new AIOAException("当前任务不存在,可能已经被和删除,请重新进入页面");
             processDefinitionId = historicTaskInstance.getProcessDefinitionId();
             processInstanceId = historicTaskInstance.getProcessInstanceId();
+            if (processDefinitionId == null || processInstanceId == null) {
+                Task task = taskService.createTaskQuery().taskId(taskId).singleResult();
+                if (task != null) {
+                    processDefinitionId = task.getProcessDefinitionId();
+                    processInstanceId = task.getProcessInstanceId();
+                }else {
+                    throw  new AIOAException("该流程存在追加的任务【"+historicTaskInstance.getName()+"】,信息有误");
+                }
+            }
         }
 
         String optionTable = tableName + "_opinion";

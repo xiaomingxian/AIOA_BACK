@@ -115,7 +115,7 @@ public class TaskInActServiceImpl implements TaskInActService {
 
             Task task = taskService.createTaskQuery().taskId(taskId).singleResult();
             String parentTaskId = task.getParentTaskId();
-            if (descript!=null){
+            if (descript==null){
                 descript = task.getDescription();
             }
 
