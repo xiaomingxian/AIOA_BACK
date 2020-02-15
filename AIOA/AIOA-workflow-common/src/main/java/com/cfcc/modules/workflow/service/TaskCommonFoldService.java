@@ -11,8 +11,8 @@ import java.util.List;
 import java.util.Map;
 
 public interface TaskCommonFoldService {
-
-    Result monitorFoldUrgency(String urgencyDegree, TaskInfoVO taskInfoVO);
+//流程监控一级折叠
+    Result monitorFoldUrgency(String urgencyDegree, TaskInfoVO taskInfoVO,boolean isAdmin);
 
     Result queryTaskToDo(String urgencyDegree, TaskInfoVO taskInfoVO, Integer pageNo, Integer pageSize,Integer jY);
 //待办部门类型
@@ -22,7 +22,7 @@ public interface TaskCommonFoldService {
 
     Result queryTaskDone(String urgencyDegree,TaskInfoVO taskInfoVO, Integer pageNo, Integer pageSize ,Integer jY);
 
-    Result queryTaskMonitor(String urgencyDegree,TaskInfoVO taskInfoVO, Integer pageNo, Integer pageSize ,Integer jY);
+    Result queryTaskMonitor(String urgencyDegree,TaskInfoVO taskInfoVO, Integer pageNo, Integer pageSize ,Integer jY,boolean isAdmin);
 
     Result queryTaskMyAgent(String urgencyDegree,TaskInfoVO taskInfoVO, Integer pageNo, Integer pageSize ,Integer jY);
 

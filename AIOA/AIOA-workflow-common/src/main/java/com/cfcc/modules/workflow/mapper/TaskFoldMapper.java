@@ -26,15 +26,16 @@ public interface TaskFoldMapper {
             @Param("pojo") TaskInfoVO taskInfoVO);
 //流程監控折疊數據---------缓急一级折叠------------------
     List<SysDictItem> monitorFoldUrgency(@Param("urgencyDegree") String urgencyDegree,
-                                              @Param("pojo") TaskInfoVO taskInfoVO);
+                                              @Param("pojo") TaskInfoVO taskInfoVO,@Param("isAdmin")boolean isAdmin);
 
 //流程监控数据：直接参与的数据, 身为候选人的信息
     int monitorCountFold(@Param("urgencyDegree") String urgencyDegree,
-            @Param("pojo") TaskInfoVO taskInfoVO);
+            @Param("pojo") TaskInfoVO taskInfoVO,@Param("isAdmin")boolean isAdmin);
 
     List<TaskInfoJsonAble> monitorDataFold(@Param("urgencyDegree") String urgencyDegree,
             @Param("pojo") TaskInfoVO taskInfoVO,
-                                       @Param("pageNo") Integer pageNo, @Param("pageSize") Integer pageSize);
+            @Param("pageNo") Integer pageNo, @Param("pageSize") Integer pageSize,
+                                           @Param("isAdmin")boolean isAdmin);
 //部门待办数量
     Long deptTaskCountFold(@Param("urgencyDegree") String urgencyDegree,
             @Param("pojo") TaskInfoVO taskInfoVO, @Param("type") String type);
@@ -51,11 +52,12 @@ public interface TaskFoldMapper {
                                             @Param("pageNo") Integer pageNo, @Param("pageSize") Integer pageSize);
 //部门监控数量
     Long deptTaskMonitorCountFold(@Param("urgencyDegree") String urgencyDegree,
-            @Param("pojo") TaskInfoVO taskInfoVO, @Param("type") String type);
+            @Param("pojo") TaskInfoVO taskInfoVO, @Param("type") String type,@Param("isAdmin")boolean isAdmin);
 
     List<TaskInfoJsonAble> deptTaskMonitorQueryFold(@Param("urgencyDegree") String urgencyDegree,
             @Param("pojo") TaskInfoVO taskInfoVO, @Param("type") String type,
-                                                @Param("pageNo") Integer pageNo, @Param("pageSize") Integer pageSizee);
+                                                @Param("pageNo") Integer pageNo, @Param("pageSize") Integer pageSize,
+                                                    @Param("isAdmin")boolean isAdmin);
 
 //时间限制范围内的数据
     List<TaskInfoJsonAble> allUndoltLimitTimeHaveAssigneeFold();
