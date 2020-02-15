@@ -37,6 +37,7 @@ import org.activiti.engine.impl.form.DefaultTaskFormHandler;
 import org.activiti.engine.impl.form.FormPropertyHandler;
 import org.activiti.engine.impl.identity.Authentication;
 import org.activiti.engine.impl.interceptor.CommandExecutor;
+import org.activiti.engine.impl.persistence.entity.HistoricTaskInstanceEntity;
 import org.activiti.engine.impl.persistence.entity.ProcessDefinitionEntity;
 import org.activiti.engine.impl.pvm.ReadOnlyProcessDefinition;
 import org.activiti.engine.impl.pvm.delegate.ActivityBehavior;
@@ -410,10 +411,20 @@ public class TaskCommonServiceImpl implements TaskCommonService {
                     .orderByTaskDueDate().asc()
                     .orderByTaskCreateTime().asc()
                     .list();
+            ArrayList<String> hisIds = new ArrayList<>();
+            list.stream().forEach(t -> {
+                String id = t.getId();
+                hisIds.add(id);
+            });
             //TODO 再查一遍 待办中的加签类型
             List<Task> list1 = taskService.createTaskQuery().processInstanceId(proInstId).list();
             for (Task task : list1) {
-
+                String id = task.getId();
+                if (!hisIds.contains(id)) {
+                    HistoricTaskInstanceEntity historicTaskInstance = new HistoricTaskInstanceEntity();
+                    BeanUtils.copyProperties(task, historicTaskInstance);
+                    list.add(historicTaskInstance);
+                }
 
             }
         } else {//只查待办
@@ -784,12 +795,18 @@ public class TaskCommonServiceImpl implements TaskCommonService {
                         //.processDefinitionKey(procDefkey)
                         .latestVersion().singleResult();
             }
-            if (processDefinition==null)throw new AIOAException("未找到对应的流程信息");
+            if (processDefinition == null) throw new AIOAException("未找到对应的流程信息");
 
             processDefinitionId = processDefinition.getId();
         } else {
             task = historyService.createHistoricTaskInstanceQuery().taskId(taskId).singleResult();
             processDefinitionId = task.getProcessDefinitionId();
+            if (processDefinitionId==null) {
+                //可能是追加的 没有在历史表里产生数据
+                Task task1 = taskService.createTaskQuery().taskId(taskId).singleResult();
+                if (task1==null)throw new AIOAException("追加用户信息不完整");
+                processDefinitionId=task1.getProcessDefinitionId();
+            }
         }
 
         ProcessDefinitionEntity proc = (ProcessDefinitionEntity) repositoryService
@@ -829,7 +846,7 @@ public class TaskCommonServiceImpl implements TaskCommonService {
     public void addUsers(AddUsersMsg addUsersMsg) {
         //先判断 当前节点是否是可追加性质的节点
         Task task = taskService.createTaskQuery().taskId(addUsersMsg.getTaskId()).singleResult();
-        ActivityImpl activity = currentAct(task.getId(), null,null);
+        ActivityImpl activity = currentAct(task.getId(), null, null);
         ActivityBehavior activityBehavior = activity.getActivityBehavior();
 
         //只有多实例
@@ -1241,7 +1258,7 @@ public class TaskCommonServiceImpl implements TaskCommonService {
 
         String processDefinitionId = task.getProcessDefinitionId();
 
-        List<Activity> nextActs = searchNextActs(taskId, processDefinitionId,null);
+        List<Activity> nextActs = searchNextActs(taskId, processDefinitionId, null);
 
         //找出选择的下一个环节
         Activity nextAct = null;
@@ -1596,27 +1613,33 @@ public class TaskCommonServiceImpl implements TaskCommonService {
 
 
     @Override
-    public List<Activity> searchNextActs(String taskId,String processDefinitionId, String proDefKey) {
+    public List<Activity> searchNextActs(String taskId, String processDefinitionId, String proDefKey) {
 
 
         HistoricTaskInstance task = null;
         if (taskId == null) {
-            ProcessDefinition processDefinition=null;
-            if (processDefinitionId==null){
-                 processDefinition = repositoryService.createProcessDefinitionQuery()
+            ProcessDefinition processDefinition = null;
+            if (processDefinitionId == null) {
+                processDefinition = repositoryService.createProcessDefinitionQuery()
                         .processDefinitionKey(proDefKey)
                         .latestVersion().singleResult();
-            }else {
-                 processDefinition = repositoryService.createProcessDefinitionQuery()
+            } else {
+                processDefinition = repositoryService.createProcessDefinitionQuery()
                         .processDefinitionId(processDefinitionId)
                         .latestVersion().singleResult();
             }
-            if (processDefinition==null)throw new AIOAException("未找到对应的流程信息");
+            if (processDefinition == null) throw new AIOAException("未找到对应的流程信息");
 
             processDefinitionId = processDefinition.getId();
         } else {
             task = historyService.createHistoricTaskInstanceQuery().taskId(taskId).singleResult();
             processDefinitionId = task.getProcessDefinitionId();
+            if (processDefinitionId==null) {
+                //可能是追加的 没有在历史表里产生数据
+                Task task1 = taskService.createTaskQuery().taskId(taskId).singleResult();
+                if (task1==null)throw new AIOAException("追加用户信息不完整");
+                processDefinitionId=task1.getProcessDefinitionId();
+            }
         }
 
         ProcessDefinitionEntity proc = (ProcessDefinitionEntity) repositoryService.getProcessDefinition(processDefinitionId);
@@ -1702,7 +1725,7 @@ public class TaskCommonServiceImpl implements TaskCommonService {
             return Result.error("批量批阅失败:存在不是传阅类型的数据");
         }
         for (String id : ids) {
-            List<Activity> nextAs = searchNextActs(id, null,null);
+            List<Activity> nextAs = searchNextActs(id, null, null);
             Activity end = null;
             for (Activity activity : nextAs) {
                 if ("endevent".equalsIgnoreCase(activity.getType())) {
@@ -1724,7 +1747,7 @@ public class TaskCommonServiceImpl implements TaskCommonService {
         Map<String, Object> nextActNeed = new HashMap<>();
 
         //当前节点的下几个节点
-        List<Activity> nextActs = searchNextActs(taskId, null,null);
+        List<Activity> nextActs = searchNextActs(taskId, null, null);
         Activity endAct = null;
         for (Activity activity : nextActs) {
             if ("endevent".equalsIgnoreCase(activity.getType())) {

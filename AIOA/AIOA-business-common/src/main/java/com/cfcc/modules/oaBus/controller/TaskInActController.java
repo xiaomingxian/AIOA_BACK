@@ -184,6 +184,7 @@ public class TaskInActController {
         } catch (AIOAException e) {
             return Result.error(e.getMessage());
         } catch (Exception e) {
+            e.printStackTrace();
             log.error("追加任务失败" + e.toString());
             return Result.error("追加任务失败");
         }
