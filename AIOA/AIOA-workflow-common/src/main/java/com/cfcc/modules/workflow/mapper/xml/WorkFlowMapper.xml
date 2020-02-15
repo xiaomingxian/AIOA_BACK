@@ -1507,7 +1507,12 @@
         EXISTS(select * from act_ru_execution where  PROC_INST_ID_=t.PROC_INST_ID_)
         AND v.name_ = 'busMsg'
 
-        and t.ASSIGNEE_ =  #{pojo.userId}
+
+        <if test="!isAdmin">
+            and t.ASSIGNEE_ =  #{pojo.userId}
+
+        </if>
+
 
         UNION
         SELECT
@@ -1534,7 +1539,13 @@
         LEFT JOIN act_hi_varinst v ON t.PROC_INST_ID_ = v.PROC_INST_ID_
         WHERE
         v.name_ = 'busMsg'
-        AND i.user_id_ =  #{pojo.userId}
+
+        <if test="!isAdmin">
+            AND i.user_id_ =  #{pojo.userId}
+
+        </if>
+
+
         AND i.TYPE_ = 'candidate'
         AND t.ASSIGNEE_ IS NULL
 
@@ -1623,7 +1634,11 @@
         EXISTS(select * from act_ru_execution where  PROC_INST_ID_=t.PROC_INST_ID_)
         AND v.name_ = 'busMsg'
 
-        and t.ASSIGNEE_ =  #{pojo.userId}
+        <if test="!isAdmin">
+            and t.ASSIGNEE_ =  #{pojo.userId}
+
+        </if>
+
 
         UNION
         SELECT
@@ -1650,7 +1665,11 @@
         LEFT JOIN act_hi_varinst v ON t.PROC_INST_ID_ = v.PROC_INST_ID_
         WHERE
         v.name_ = 'busMsg'
-        AND i.user_id_ =  #{pojo.userId}
+        <if test="!isAdmin">
+            AND i.user_id_ =  #{pojo.userId}
+
+        </if>
+
         AND i.TYPE_ = 'candidate'
         AND t.ASSIGNEE_ IS NULL
 
