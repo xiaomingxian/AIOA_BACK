@@ -332,8 +332,8 @@ public class OaTemplateController {
             //获取后台项目路径
             String projectPath = System.getProperty("user.dir");
             String path1 = projectPath.substring(0, projectPath.lastIndexOf(File.separator));
-            String path2 = path1.substring(0, path1.lastIndexOf(File.separator));
-            File template = new File(path2+File.separator+templatePath+File.separator+orgName);
+//            String path2 = path1.substring(0, path1.lastIndexOf(File.separator));
+            File template = new File(path1+File.separator+templatePath+File.separator+orgName);
             FileCopyUtils.copy(mf.getBytes(), template);
             OaFile oaFile = new OaFile();
             oaFile.setSFileType("7");        // 附件类型为 4 附件
