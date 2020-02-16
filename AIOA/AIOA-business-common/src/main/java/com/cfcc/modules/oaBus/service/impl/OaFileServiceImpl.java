@@ -61,11 +61,15 @@ public class OaFileServiceImpl extends ServiceImpl<OaFileMapper, OaFile> impleme
     @Lazy
     private IOaFileService oaFileService;
 
-    //上传文件地址
+    //附件上传地址
     @Value(value = "${jeecg.path.upload}")
     private String uploadpath;
 
-    //上传文件地址
+    //临时文件
+    @Value(value = "${jeecg.path.uploadfile}")
+    private String tempFiles;
+
+    //上传模板文件地址
     @Value(value = "${jeecg.path.tempFilePath}")
     private String tempPath;
 
@@ -382,7 +386,7 @@ public class OaFileServiceImpl extends ServiceImpl<OaFileMapper, OaFile> impleme
             String projectPath = System.getProperty("user.dir");
             String path = projectPath.substring(0, projectPath.lastIndexOf(File.separator));
             String path2 = path.substring(0, path.lastIndexOf(File.separator));
-            File temp = new File(path2+File.separator+tempPath);
+            File temp = new File(path2+File.separator+tempFiles);
             if (!temp.exists()) {
                 temp.mkdirs();
             }

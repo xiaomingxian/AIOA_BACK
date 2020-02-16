@@ -58,9 +58,13 @@ public class OaTemplateController {
     @Value(value = "${jeecg.path.upload}")
     private String uploadpath;
 
+    //附件临时路径
     @Value(value = "${jeecg.path.uploadfile}")
     private String uploadfile;
 
+    //上传模板文件地址
+    @Value(value = "${jeecg.path.tempFilePath}")
+    private String templatePath;
     /**
      * 分页列表查询
      *
@@ -305,7 +309,7 @@ public class OaTemplateController {
             String token = request.getHeader("X-Access-Token");
             String username = JwtUtil.getUsername(token);
 
-            String ctxPath = uploadpath;
+            String ctxPath = templatePath;
             String fileName = null;
             Calendar calendar = Calendar.getInstance();
             String path = ctxPath.replace("//", "/" +
@@ -324,6 +328,14 @@ public class OaTemplateController {
             String savePath = file.getPath() + File.separator + fileName;
             File savefile = new File(savePath);
             FileCopyUtils.copy(mf.getBytes(), savefile);
+
+            //获取后台项目路径
+            String projectPath = System.getProperty("user.dir");
+            String path1 = projectPath.substring(0, projectPath.lastIndexOf(File.separator));
+            String path2 = path1.substring(0, path1.lastIndexOf(File.separator));
+            File template = new File(path2+File.separator+templatePath+File.separator+orgName);
+            FileCopyUtils.copy(mf.getBytes(), template);
+
             OaFile oaFile = new OaFile();
             oaFile.setSFileType("7");        // 附件类型为 4 附件
             oaFile.setSFileName(orgName);        //设置附件名字
