@@ -37,7 +37,6 @@ import org.activiti.engine.impl.form.DefaultTaskFormHandler;
 import org.activiti.engine.impl.form.FormPropertyHandler;
 import org.activiti.engine.impl.identity.Authentication;
 import org.activiti.engine.impl.interceptor.CommandExecutor;
-import org.activiti.engine.impl.persistence.entity.HistoricTaskInstanceEntity;
 import org.activiti.engine.impl.persistence.entity.ProcessDefinitionEntity;
 import org.activiti.engine.impl.pvm.ReadOnlyProcessDefinition;
 import org.activiti.engine.impl.pvm.delegate.ActivityBehavior;
@@ -923,9 +922,18 @@ public class TaskCommonServiceImpl implements TaskCommonService {
         String processInstanceId = historicTaskInstance.getProcessInstanceId();
         List<HistoricTaskInstance> list = historyService.createHistoricTaskInstanceQuery().processInstanceId(processInstanceId).list();
         ArrayList<String> taskDefs = new ArrayList<>();
+        //记录选择的用户
+        HashMap<String, TaskInfoJsonAble> usersHaveChoice = new HashMap<>();
         list.stream().forEach(task -> {
             String parentTaskId = task.getParentTaskId();
             String taskDefinitionKey = task.getTaskDefinitionKey();
+            String assignee = task.getAssignee();
+            //记录已经选择过的用户
+            if (taskId.equals(parentTaskId) && taskDefs.contains(taskDefinitionKey)) {
+                TaskInfoJsonAble taskInfoJsonAble = usersHaveChoice.get(taskDefinitionKey);
+                taskInfoJsonAble.getUsersHaveChoice().add(assignee);
+            }
+            //是自己发出且 已经记录过节点
             if (taskId.equals(parentTaskId) && !taskDefs.contains(taskDefinitionKey)) {
                 taskDefs.add(taskDefinitionKey);
                 TaskInfoJsonAble hisTaskJsonAble = new TaskInfoJsonAble();
@@ -933,7 +941,10 @@ public class TaskCommonServiceImpl implements TaskCommonService {
                 hisTaskJsonAble.setBusMsg(task.getDescription());
                 hisTaskJsonAble.setProDefName(processDefinition.getKey());
                 sendByMes.add(hisTaskJsonAble);
+                hisTaskJsonAble.getUsersHaveChoice().add(assignee);
+                usersHaveChoice.put(taskDefinitionKey, hisTaskJsonAble);
             }
+
 
         });
 
@@ -942,7 +953,6 @@ public class TaskCommonServiceImpl implements TaskCommonService {
 
     @Override
     public List<Map<String, String>> userHaveChoice(ArrayList<String> taskIds) {
-
 
         return taskMapper.userHaveChoice(taskIds);
     }

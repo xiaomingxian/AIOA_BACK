@@ -3,7 +3,9 @@ package com.cfcc.modules.workflow.pojo;
 import lombok.Data;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 import java.util.Map;
 
 @Data
@@ -60,6 +62,8 @@ public class TaskInfoJsonAble extends TaskCommon implements Serializable {
     private String agentUserName;
 
     private String deleteReason;//删除原因 用来区分是已办还是待办
+
+    private List<String> usersHaveChoice=new ArrayList<>();//是已经参与的用户
 
 
 }

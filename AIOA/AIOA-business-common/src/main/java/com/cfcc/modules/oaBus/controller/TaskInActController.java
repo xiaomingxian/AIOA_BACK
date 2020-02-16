@@ -74,6 +74,9 @@ public class TaskInActController {
             //记录taskId去查询已选择的用户
             Map<String, String> idAndKey = new HashMap<>();
             Map<String, String> idAndExecutionId = new HashMap<>();
+            //已经选择过的用户
+            Map<String, List<String>> choiceIds = new HashMap<>();
+
             taskJsonAbles.stream().forEach(task -> {
                 String id = task.getId();
                 String executionId = task.getExecutionId();
@@ -81,18 +84,7 @@ public class TaskInActController {
                 taskIds.add(id);
                 idAndKey.put(taskDefinitionKey, id);
                 idAndExecutionId.put(taskDefinitionKey, executionId);
-            });
-            List<Map<String, String>> choices = taskCommonService.userHaveChoice(taskIds);
-            Map<String, List<String>> choiceIds = new HashMap<>();
-            choices.stream().forEach(choice -> {
-                String id = choice.get("id");
-                String userId = choice.get("userId");
-                List<String> userIds = choiceIds.get(id);
-                if (userIds == null) {
-                    userIds = new ArrayList<>();
-                    choiceIds.put(id, userIds);
-                }
-                userIds.add(userId);
+                choiceIds.put(id, task.getUsersHaveChoice());
             });
 
 
@@ -107,6 +99,7 @@ public class TaskInActController {
                 List<Map<String, Object>> actMsgs = (List<Map<String, Object>>) result.getResult();
                 ListIterator<Map<String, Object>> iterator = actMsgs.listIterator();
 
+                //下n个节点遍历
                 while (iterator.hasNext()) {
                     Map<String, Object> actMsg = iterator.next();
 
@@ -134,15 +127,24 @@ public class TaskInActController {
 
                     if ("user".equalsIgnoreCase(oaProcActinst.getUserOrRole())) {
                         //区分已选和未选
-                        nextUsers.stream().forEach(user -> {
+                        //定义是否需要追加用户的标志
+                        boolean donotAddUser = true;
+                        for (Map<String, Object> user : nextUsers) {
                             String uid = (String) user.get("uid");
-                            if (uids.contains(uid)) user.put("status", "处理人");
-                            else user.put("status", "可追加");
+                            if (uids.contains(uid)) {
+                                user.put("status", "处理人");
+                            } else {
+                                user.put("status", "可追加");
+                                donotAddUser = false;
+                            }
                             String actId = oaProcActinst.getActId();
                             user.put("taskId", idAndKey.get(actId));
                             user.put("executionId", idAndExecutionId.get(actId));
-
-                        });
+                        }
+                        if (donotAddUser){
+                            iterator.remove();
+                            continue;
+                        }
 
                     }
 
