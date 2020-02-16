@@ -92,7 +92,7 @@ public interface OaBusdataMapper extends BaseMapper<OaBusdata> {
                              @Param("userDepart")String userDepart);
 
     @Select("select s_table_column,s_column_name,i_column_type from oa_bus_page_detail c where c.i_bus_function_id = #{funcId} and c.i_is_listquery = 1")
-    List<Map<String, String>> getQueryCOnditionDao(int funcId);
+    List<Map<String, Object>> getQueryCOnditionDao(int funcId);
 
     List<Map<String, Object>> getSelFunDao(@Param("modelId")String modelId);
     @Select("select * from ${tableName} where i_id = #{busdataId}")

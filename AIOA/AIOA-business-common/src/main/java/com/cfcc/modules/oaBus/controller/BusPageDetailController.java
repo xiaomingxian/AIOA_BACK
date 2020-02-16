@@ -115,8 +115,8 @@ public class BusPageDetailController {
 @AutoLog(value = "业务页面详情表（实际业务字段含义说明）-通过functionId查询字段")
     @ApiOperation(value = "业务页面详情表（实际业务字段含义说明）-通过functionId查询字段", notes = "业务页面详情表（实际业务字段含义说明）-通过functionId查询字段")
     @GetMapping(value = "/getConditionByFunId")
-    public List<Map<String, String>> getConditionByFunId(int functionId) {
-        List<Map<String, String>> colList = iOaBusdataService.getQueryCondition(functionId);
+    public List<Map<String, Object>> getConditionByFunId(int functionId) {
+        List<Map<String, Object>> colList = iOaBusdataService.getQueryCondition(functionId);
         return colList;
     }
 

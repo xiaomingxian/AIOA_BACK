@@ -315,7 +315,7 @@ public class OaBusdataServiceImpl extends ServiceImpl<OaBusdataMapper, OaBusdata
      * @return
      */
     @Override
-    public List<Map<String, String>> getQueryCondition(int funcId) {
+    public List<Map<String, Object>> getQueryCondition(int funcId) {
         return oaBusdataMapper.getQueryCOnditionDao(funcId);
     }
 
