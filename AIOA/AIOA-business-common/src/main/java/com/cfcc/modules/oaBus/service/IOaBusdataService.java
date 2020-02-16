@@ -63,7 +63,7 @@ public interface IOaBusdataService  extends  IService<OaBusdata>{
 
     Boolean updateApproveById(String sTable, Integer iTableId);
 
-    List<Map<String, String>> getQueryCondition(int funcId);
+    List<Map<String, Object>> getQueryCondition(int funcId);
 
     List<Map<String, Object>> getSelFun(String modelId);
 
