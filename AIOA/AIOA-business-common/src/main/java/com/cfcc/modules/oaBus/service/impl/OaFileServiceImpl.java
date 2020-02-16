@@ -378,18 +378,22 @@ public class OaFileServiceImpl extends ServiceImpl<OaFileMapper, OaFile> impleme
         String initFile = map.get("sFilePath") + "";
         String fileName = initFile.substring(initFile.lastIndexOf(File.separator) + 1, initFile.length());
         try {
-            File temp = new File(tempPath);
+            //获取后台项目路径
+            String projectPath = System.getProperty("user.dir");
+            String path = projectPath.substring(0, projectPath.lastIndexOf(File.separator));
+            String path2 = path.substring(0, path.lastIndexOf(File.separator));
+            File temp = new File(path2+File.separator+tempPath);
             if (!temp.exists()) {
                 temp.mkdirs();
             }
             FileInputStream oldfile = new FileInputStream(initFile);
-            FileOutputStream newfile = new FileOutputStream(tempPath + File.separator + fileName);
+            FileOutputStream newfile = new FileOutputStream(temp + File.separator + fileName);
             byte[] bytes = new byte[1024];
             int i = 0;
             while ((i = oldfile.read(bytes)) > 0) {
                 newfile.write(bytes);
             }
-            file.setSFilePath(tempPath + File.separator + fileName);
+            file.setSFilePath(temp + File.separator + fileName);
             file.setSFileName(fileName);
         } catch (FileNotFoundException e) {
             e.printStackTrace();
