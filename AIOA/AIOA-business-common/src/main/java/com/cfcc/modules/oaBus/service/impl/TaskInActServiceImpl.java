@@ -123,7 +123,8 @@ public class TaskInActServiceImpl implements TaskInActService {
             List<String> assignee = (List<String>)taskInfoVO.getAssignee();
 
             for (String userId : assignee) {
-                commandExecutor.execute(new AddUserCmd(executionId,userId,descript,parentTaskId,runtimeService,taskService));
+                commandExecutor.execute(new AddUserCmd(executionId,userId,descript,parentTaskId
+                        ,runtimeService,taskService,taskCommonService));
             }
 
 

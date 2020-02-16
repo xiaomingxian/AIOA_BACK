@@ -1,20 +1,21 @@
 package com.cfcc.modules.utils;
 
+import com.cfcc.modules.workflow.service.TaskCommonService;
 import org.activiti.engine.RuntimeService;
 import org.activiti.engine.TaskService;
-import org.activiti.engine.impl.HistoryServiceImpl;
 import org.activiti.engine.impl.interceptor.Command;
 import org.activiti.engine.impl.interceptor.CommandContext;
 import org.activiti.engine.impl.persistence.entity.ExecutionEntity;
 import org.activiti.engine.impl.persistence.entity.TaskEntity;
 import org.activiti.engine.runtime.Execution;
 import org.activiti.engine.task.Task;
-import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Date;
-import java.util.List;
 
-@Component
+@Service
+@Transactional
 public class AddUserCmd implements Command<Void> {
 
     protected String executionId;//执行实例id
@@ -27,6 +28,8 @@ public class AddUserCmd implements Command<Void> {
     //@Autowired
     private TaskService taskService;
 
+    private TaskCommonService taskCommonService;
+
     private String descript;
     private String parentTaskId;
 
@@ -35,14 +38,18 @@ public class AddUserCmd implements Command<Void> {
     public AddUserCmd() {
     }
 
-    public AddUserCmd(String executionId, String assignee, String descript, String parentTaskId,
-                      RuntimeService runtimeService, TaskService taskService) {
+    public AddUserCmd(String executionId, String assignee, String descript,
+                      String parentTaskId,
+                      RuntimeService runtimeService,
+                      TaskService taskService,
+                      TaskCommonService taskCommonService) {
         this.executionId = executionId;
         this.assignee = assignee;
         this.runtimeService = runtimeService;
         this.taskService = taskService;
         this.descript = descript;
         this.parentTaskId = parentTaskId;
+        this.taskCommonService = taskCommonService;
     }
 
 
@@ -79,19 +86,10 @@ public class AddUserCmd implements Command<Void> {
         taskEntity.setDescription(descript);
         taskService.saveTask(taskEntity);
 
-        //一般只会有一个
-        List<Task> list = taskService.createTaskQuery().processInstanceId(t.getProcessInstanceId())
-                .processDefinitionKey(t.getProcessDefinitionId())
-                .taskDefinitionKey(t.getTaskDefinitionKey())
-                .taskCandidateOrAssigned(t.getAssignee())
-                .list();
+        //同步历史表中数据(部分数据确实)
+        taskCommonService.updateHisAct(newTask);
 
-        for (Task task : list) {
-            String parentTaskId = task.getParentTaskId();
-            if (parentTaskId.equalsIgnoreCase(t.getParentTaskId())){
-                taskService.saveTask(task);
-            }
-        }
+
 
         Integer nrOfInstances = LoopVariableUtils.getLoopVariable(newExecution, "nrOfInstances");
         Integer nrOfActiveInstances = LoopVariableUtils.getLoopVariable(newExecution, "nrOfActiveInstances");

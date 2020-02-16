@@ -93,4 +93,6 @@ public interface TaskCommonService {
     List<TaskInfoJsonAble> sendByMe(String taskId);
 
     List<Map<String, String>> userHaveChoice(ArrayList<String> taskIds);
+
+    void updateHisAct(Task newTask);
 }

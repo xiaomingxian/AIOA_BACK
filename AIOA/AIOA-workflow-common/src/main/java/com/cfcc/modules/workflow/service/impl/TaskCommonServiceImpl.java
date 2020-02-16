@@ -411,22 +411,6 @@ public class TaskCommonServiceImpl implements TaskCommonService {
                     .orderByTaskDueDate().asc()
                     .orderByTaskCreateTime().asc()
                     .list();
-            ArrayList<String> hisIds = new ArrayList<>();
-            list.stream().forEach(t -> {
-                String id = t.getId();
-                hisIds.add(id);
-            });
-            //TODO 再查一遍 待办中的加签类型
-            List<Task> list1 = taskService.createTaskQuery().processInstanceId(proInstId).list();
-            for (Task task : list1) {
-                String id = task.getId();
-                if (!hisIds.contains(id)) {
-                    HistoricTaskInstanceEntity historicTaskInstance = new HistoricTaskInstanceEntity();
-                    BeanUtils.copyProperties(task, historicTaskInstance);
-                    list.add(historicTaskInstance);
-                }
-
-            }
         } else {//只查待办
             list = historyService.createHistoricTaskInstanceQuery().processInstanceId(proInstId)
                     .orderByTaskDueDate().asc()
@@ -961,6 +945,11 @@ public class TaskCommonServiceImpl implements TaskCommonService {
 
 
         return taskMapper.userHaveChoice(taskIds);
+    }
+
+    @Override
+    public void updateHisAct(Task newTask) {
+        taskMapper.updateHisAct(newTask);
     }
 
 

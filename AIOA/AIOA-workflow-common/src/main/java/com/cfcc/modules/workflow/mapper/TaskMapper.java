@@ -5,6 +5,7 @@ import com.cfcc.modules.workflow.pojo.HisTaskJsonAble;
 import com.cfcc.modules.workflow.pojo.OaProcActinst;
 import com.cfcc.modules.workflow.pojo.TaskInfoJsonAble;
 import com.cfcc.modules.workflow.vo.TaskInfoVO;
+import org.activiti.engine.task.Task;
 import org.apache.ibatis.annotations.*;
 import org.springframework.stereotype.Service;
 
@@ -205,4 +206,8 @@ public interface TaskMapper {
             "</foreach> " +
             "</script>")
     List<Map<String, String>> userHaveChoice(@Param("ids") ArrayList<String> taskIds);
+
+    @Update("UPDATE act_hi_taskinst set PROC_DEF_ID_=#{processDefinitionId} ,PROC_INST_ID_=#{processInstanceId}," +
+            " EXECUTION_ID_=#{executionId} where PARENT_TASK_ID_=#{parentTaskId}")
+    void updateHisAct(Task newTask);
 }
