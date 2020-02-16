@@ -115,7 +115,6 @@ public class FormalFileController {
                     String itemValue= map.get(sTableColumn)+"";
                     String iSafetyLevelTest= iOaBusdataService.getDictText(sDictId,itemValue);
                     map.put(sTableColumn,iSafetyLevelTest);
-
                 }
                 //判断自定义含义对应word书签字段
                 if (busPageDetail.getSMarkKey()!=null){
