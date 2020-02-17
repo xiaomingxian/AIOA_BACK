@@ -439,9 +439,11 @@ public class OaFileServiceImpl extends ServiceImpl<OaFileMapper, OaFile> impleme
     @Override
     public String getColumList(String sBusdataTable, Integer iId) {
         List<String> isEsColumnLists = busPageDetailMapper.getCloumnNameByTableAndEsquery(sBusdataTable, iId);
-        System.out.println("getCloumnNameByTableAndEsquery:" + isEsColumnLists.toString());
-        String columnList = isEsColumnLists.toString().replace("[", "");
-        String columnLists = columnList.toString().replace("]", "");
+        String columnLists = "";
+        if (isEsColumnLists != null){
+            String columnList = isEsColumnLists.toString().replace("[", "");
+            columnLists = columnList.toString().replace("]", "");
+        }
         return columnLists;
     }
 
@@ -471,46 +473,48 @@ public class OaFileServiceImpl extends ServiceImpl<OaFileMapper, OaFile> impleme
         for (BusFunction busFunction : busFunctionList) {
             //表名
             String sBusdataTable = busFunction.getSBusdataTable();
-            //要检索的字段
-            List<String> isEsColumnLists = busPageDetailMapper.getCloumnNameByTableAndEsquery(sBusdataTable, busFunction.getIId());
             //要检索字段变为字符串格式
             String columnLists = getColumList(sBusdataTable, busFunction.getIId());
             if (columnLists.equals("")){
                 continue;
             }
-/*        }
-        for (BusModel busModel : busModels) {
-            //该表名
-            String sBusdataTable = busModel.getSBusdataTable();
-            List<String> isEsColumnLists = busPageDetailMapper.getCloumnNameByTableAndEsquery(sBusdataTable);
-            String columnLists = getColumList(sBusdataTable);*/
-            //获取查询条件
-//            List<BusPageDetail> clumnNameLists = getDetailColums(sBusdataTable,isEsColumnLists);
-
-//            System.out.println("---------clumnNameLists: "+clumnNameLists.toString());
             //根据表名和业务模块id查询数据
             List<Map<String, Object>> oaBusdata = oaBusdataMapper.getBusdataByTable(columnLists, busFunction);
             if (oaBusdata.size() == 0) {  //执行下一循环
                 System.out.println("-----------无数据存入ES库！！！！！-----------");
                 continue;
             }
-            //遍历map集合，将特定字符的数据赋予其含义
-            for (Map<String, Object> oaBusdatum : oaBusdata) {
+            Iterator<Map<String, Object>> iterator = oaBusdata.iterator();
+            while (iterator.hasNext()){
+                Map<String, Object> oaBusdatum = iterator.next();
                 Integer functionId = (Integer) oaBusdatum.get("i_bus_function_id");
                 if (functionId == null) {
                     continue;
                 }
-//                Long i_id = (Long) oaBusdatum.get("i_id");
                 Set<String> set = oaBusdatum.keySet();
                 for (String key : set) {
                     Object value = oaBusdatum.get(key);
                     System.out.println("key:"+key+",  sBusdataTable:"+sBusdataTable+"， functionId" + functionId);
-                    List<String> sDictIdlist = busPageDetailMapper.getSDictIdByKey(key, sBusdataTable, functionId);
+                    List<String> sDictIdlist = busPageDetailMapper.getSDictIdByKey(functionId, sBusdataTable, key);
                     System.out.println("................." + sDictIdlist + ".................");
-                    if (sDictIdlist.size() == 1) {  //如果有返回值，则对其赋值
+                    String aa = null;
+                    if (sDictIdlist.size() == 0){
+                        continue;
+                    }
+                    boolean flag = false;
+                    for (int i = 0; i < sDictIdlist.size(); i++) {
+                        aa = sDictIdlist.get(i);
+                        System.out.println(aa);
+                        if (aa==null){
+                            flag = true;
+                            break;
+                        }
+                    }
+                    if (flag){
+                        continue;
+                    }
+                    if ( sDictIdlist.size() == 1) {  //如果有返回值，则对其赋值
                         if (sDictIdlist.get(0) != null && sDictIdlist.get(0).trim().length() >0){
-                            System.out.println("aaaaaaaaaaaaaaaa" +sDictIdlist.get(0));
-                            System.out.println("-------------sDictId" + sDictIdlist.get(0) + ",value:" + value + "-------------");
                             String sysDictId = sysDictMapper.getDictIdByDictCode(sDictIdlist.get(0));
                             String itemValue = sysDictItemMapper.getItemTextById(sysDictId, value);
                             if (itemValue == null) {
@@ -519,29 +523,18 @@ public class OaFileServiceImpl extends ServiceImpl<OaFileMapper, OaFile> impleme
                                 oaBusdatum.put(key, itemValue);
                             }
                         }
-                    }else {
-                        oaBusdatum.put(key, value);
                     }
                     if(key.equals("s_title")){
-                        oaBusdatum.put(key,value+"("+busFunction.getSName()+")");
+                        oaBusdatum.put("【"+busFunction.getSName()+"】" + key,value);
                     }
                 }
-                //往map里存放表名
                 oaBusdatum.put("table_name", sBusdataTable);
-//                System.out.println(oaBusdatum.toString());
-                /*for (BusPageDetail clumnNameList : clumnNameLists) {
-                    oaBusdatum.put("sColumnName" , clumnNameList.getSColumnName());
-                }*/
             }
-
             if (oaBusdata == null) {
                 continue;
             }
-
             oaBusdataList.addAll(oaBusdata);
         }
-        System.out.println("*****************************");
-        System.out.println("oaBusdataList:   " + oaBusdataList.toString());
         return oaBusdataList;
     }
 
