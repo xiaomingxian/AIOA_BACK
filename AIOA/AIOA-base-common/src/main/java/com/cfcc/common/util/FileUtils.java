@@ -30,18 +30,19 @@ public class FileUtils {
     /**
      * 文件上传
      */
-    public static Map<String,Object> Upload(String Path1, HttpServletRequest request){
+    public static Map<String,Object> Upload(String Path1,String Path2, HttpServletRequest request){
         Map<String,Object> map = new HashMap<>();
         try {
 //            String Path = Path1;//服务器路径
 //            String fileName = null;
 //			String bizPath = "files";
-            File filePath=new File("FileUtils.java");
-            String apath=filePath.getAbsolutePath();
+//            File filePath=new File("FileUtils.java");
+//            String apath=filePath.getAbsolutePath();
+            String apath=System.getProperty("user.dir");
             String bpath=apath.substring(0,apath.lastIndexOf("\\"));
-            String cpath=bpath.substring(0,bpath.lastIndexOf("\\"));
-            String newpath=cpath.replace("\\","/");
-            String path2=newpath+"/AIOA_VUE/public/ntko/files";
+//            String cpath=bpath.substring(0,bpath.lastIndexOf("\\"));
+            String newpath=bpath.replace("\\","/");
+            String path2=newpath+"/"+Path2;
 
             Calendar calendar = Calendar.getInstance();
             String path = Path1.replace("//", "/" +

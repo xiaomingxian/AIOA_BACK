@@ -66,8 +66,8 @@ public class FileNtkoController {
         Result<String> result = new Result<>();
         try {
             String ctxPath = uploadpath;
-//            String tempPath = uploadfilepath;
-            Map<String, Object> map = FileUtils.Upload(ctxPath, request);
+            String tempPath = uploadfilepath;
+            Map<String, Object> map = FileUtils.Upload(ctxPath,uploadfilepath, request);
             String fileName = (String) map.get("fileName");
             String savePath = (String) map.get("savePath");
             OaFile oaFile = new OaFile();
@@ -179,7 +179,7 @@ public class FileNtkoController {
         String ctxPath = uploadpath;
         String tempPath = uploadfilepath;
 
-        Map<String, Object> map = FileUtils.Upload(ctxPath, request);
+        Map<String, Object> map = FileUtils.Upload(ctxPath, tempPath,request);
 
         String fileName = (String) map.get("fileName");
         String savePath = (String) map.get("savePath");
@@ -272,7 +272,7 @@ public class FileNtkoController {
         try {
             String ctxPath = uploadpath;
             String tempPath = uploadfilepath;
-            Map<String, Object> map = FileUtils.Upload(ctxPath, request);
+            Map<String, Object> map = FileUtils.Upload(ctxPath,tempPath, request);
             String fileName = (String) map.get("fileName");
             String savePath = (String) map.get("savePath");
             OaFile oaFile = new OaFile();

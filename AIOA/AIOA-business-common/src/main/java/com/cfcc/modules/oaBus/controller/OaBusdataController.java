@@ -415,7 +415,7 @@ public class OaBusdataController {
                 return null;
             }
         }
-        List<Map<String, String>> colList = oaBusdataService.getQueryCondition(Integer.parseInt(functionId));
+        List<Map<String, Object>> colList = oaBusdataService.getQueryCondition(Integer.parseInt(functionId));
         result.put("colList", colList);
         String tableName = ibusModelService.getById(Integer.parseInt(modelId)).getSBusdataTable();
         int year = LocalDate.now().getYear();

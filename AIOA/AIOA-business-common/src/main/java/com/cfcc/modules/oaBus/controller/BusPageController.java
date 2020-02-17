@@ -52,6 +52,8 @@ public class BusPageController {
     private IBusPageService busPageService;
     @Value("${spring.freemarker.template-loader-path}")
     private String filePath;
+    @Value("${jeecg.path.upload}")
+    private String upFile;
     @Value("${actShow.default}")
     private String atcShow;
 
@@ -278,6 +280,56 @@ public class BusPageController {
         mv.addObject(NormalExcelConstants.PARAMS, new ExportParams("业务页面表列表数据", "导出人:Jeecg", "导出信息"));
         mv.addObject(NormalExcelConstants.DATA_LIST, pageList);
         return mv;
+    }
+    /**
+     * 上传图片
+     *
+     * @param request
+     * @param response
+     * @return
+     */
+    @RequestMapping(value = "/upPic", method = RequestMethod.POST)
+    public Result<?> upPic(HttpServletRequest request, HttpServletResponse response) {
+        Result<OaFile> result = new Result<OaFile>();
+        String token = request.getHeader("X-Access-Token");
+        String username = JwtUtil.getUsername(token);
+        MultipartHttpServletRequest multipartRequest = (MultipartHttpServletRequest) request;
+        Map<String, MultipartFile> fileMap = multipartRequest.getFileMap();
+        for (Map.Entry<String, MultipartFile> entity : fileMap.entrySet()) {
+            MultipartFile file = entity.getValue();// 获取上传文件对象
+            if (file != null) {
+                try {
+                    Calendar calendar = Calendar.getInstance();
+                    String path = upFile + calendar.get(Calendar.YEAR) +
+                            "/" + (calendar.get(Calendar.MONTH) + 1) +
+                            "/" + calendar.get(Calendar.DATE) + "/";        //
+
+                    File newFile = new File(path);
+                    if (!newFile.exists()) {
+                        newFile.mkdirs();
+                    }
+                    File upFile = new File(path, file.getOriginalFilename());
+
+                    file.transferTo(upFile);
+                    OaFile oaFile = new OaFile();
+                    oaFile.setSFileType("4");                               // 附件类型为 4 附件
+                    //oaFile.setSFileName(upFile.getOriginalFilename());        //设置附件名字
+                    oaFile.setSFileName(upFile.getName());        //设置附件名字
+                    oaFile.setSFilePath(upFile.getAbsolutePath() );        //设置文件路径
+                    oaFile.setSCreateBy(username);
+                    oaFile.setDCreateTime(new Date());
+                    oaFileService.save(oaFile);
+                    log.info(oaFile.toString());
+                    result.setResult(oaFile);
+                    result.success("附件上传成功");
+
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+            System.out.println(filePath);
+        }
+        return result;
     }
 
     /**

@@ -309,7 +309,7 @@ public class OaTemplateController {
             String token = request.getHeader("X-Access-Token");
             String username = JwtUtil.getUsername(token);
 
-            String ctxPath = templatePath;
+            String ctxPath = uploadpath;
             String fileName = null;
             Calendar calendar = Calendar.getInstance();
             String path = ctxPath.replace("//", "/" +
@@ -332,10 +332,9 @@ public class OaTemplateController {
             //获取后台项目路径
             String projectPath = System.getProperty("user.dir");
             String path1 = projectPath.substring(0, projectPath.lastIndexOf(File.separator));
-            String path2 = path1.substring(0, path1.lastIndexOf(File.separator));
-            File template = new File(path2+File.separator+templatePath+File.separator+orgName);
+//            String path2 = path1.substring(0, path1.lastIndexOf(File.separator));
+            File template = new File(path1+File.separator+templatePath+File.separator+orgName);
             FileCopyUtils.copy(mf.getBytes(), template);
-
             OaFile oaFile = new OaFile();
             oaFile.setSFileType("7");        // 附件类型为 4 附件
             oaFile.setSFileName(orgName);        //设置附件名字
@@ -343,10 +342,10 @@ public class OaTemplateController {
             oaFile.setSCreateBy(username);
             oaFile.setDCreateTime(new Date());
             oaFileService.save(oaFile);
-            QueryWrapper<OaFile> c = new QueryWrapper<>();
-            c.setEntity(oaFile);
-            OaFile ad = oaFileService.getOne(c);        //查询刚刚插入的那条数据的id
-            result.setResult(ad);
+//            QueryWrapper<OaFile> c = new QueryWrapper<>();
+//            c.setEntity(oaFile);
+//            OaFile ad = oaFileService.getOne(c);        //查询刚刚插入的那条数据的id
+            result.setResult(oaFile);
             result.setMessage(savePath);
             result.setSuccess(true);
         } catch (IOException e) {
