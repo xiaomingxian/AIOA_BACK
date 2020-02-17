@@ -64,7 +64,8 @@ public class OaProcActinst extends Model<OaProcActinst> {
      */
     @Excel(name = "流程定义的活动节点TYPE", width = 15)
     @ApiModelProperty(value = "流程定义的活动节点TYPE")
-    private java.lang.String actType;
+    @TableField(value = "ACT_TYPE")
+    private String actType;
     /**
      * 候选人角色id
      */
@@ -116,7 +117,7 @@ public class OaProcActinst extends Model<OaProcActinst> {
 
 
     @TableField(value = "s_signer")
-    private Boolean signer;//是否是签发人
+    private boolean signer;//是否是签发人
 
 
     /**

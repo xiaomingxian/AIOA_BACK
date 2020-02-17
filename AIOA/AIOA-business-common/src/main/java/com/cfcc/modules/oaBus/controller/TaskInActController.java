@@ -63,7 +63,6 @@ public class TaskInActController {
     public Result addUsersQuery(String taskId, HttpServletRequest request) {
 
         try {
-            //TODO 加上部门追加
             //查找是自己发出的任务
             List<TaskInfoJsonAble> taskJsonAbles = taskCommonService.sendByMe(taskId);
             if (taskJsonAbles == null || (taskJsonAbles != null && taskJsonAbles.size() <= 0)) {
@@ -108,6 +107,7 @@ public class TaskInActController {
                     String taskDefKey = activity.getId();
                     boolean allowMulti = activity.isAllowMulti();
                     OaProcActinst oaProcActinst = (OaProcActinst) actMsg.get("oaProcActinst");
+
                     boolean isDept = false;
                     String userOrRole = oaProcActinst.getUserOrRole();
                     if ("dept".equalsIgnoreCase(userOrRole)) {
@@ -154,6 +154,8 @@ public class TaskInActController {
                             while (deptsIterator.hasNext()) {
                                 Map<String, Object> next = deptsIterator.next();
                                 Object id = next.get("id");
+                                next.put("taskId", idAndKey.get(firstSonKey));
+                                next.put("executionId", idAndExecutionId.get(firstSonKey));
                                 if (deptIds.contains(id)) {
                                     deptsIterator.remove();
                                 }
@@ -185,9 +187,8 @@ public class TaskInActController {
                                 user.put("status", "可追加");
                                 donotAddUser = false;
                             }
-                            String actId = oaProcActinst.getActId();
-                            user.put("taskId", idAndKey.get(actId));
-                            user.put("executionId", idAndExecutionId.get(actId));
+                            user.put("taskId", idAndKey.get(taskDefKey));
+                            user.put("executionId", idAndExecutionId.get(taskDefKey));
                         }
                         if (donotAddUser) {
                             iterator.remove();

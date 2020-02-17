@@ -1132,7 +1132,7 @@ public class TaskCommonServiceImpl implements TaskCommonService {
                 .eq(OaProcActinst::getActName, task.getName());
         List<OaProcActinst> list1 = ioaProcActinstService.list(wrapper);
         if (list1.size() > 0) {
-            Boolean signer = list1.get(0).getSigner();
+            Boolean signer = list1.get(0).isSigner();
             signer = signer == null ? false : signer;
             return signer;
         } else {
