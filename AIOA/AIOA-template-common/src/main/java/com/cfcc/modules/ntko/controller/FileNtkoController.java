@@ -78,14 +78,13 @@ public class FileNtkoController {
             oaFile.setSFilePath(savePath);
             oaFile.setDCreateTime(new Date());
             Boolean flag = oaFileService.save(oaFile);
-            String message = "" ;
+            String message = "kongjian" ;
             if (flag) {
                 Map<String,Object> busdataMap=new HashMap<>();
                 busdataMap.put("table",stable);
                 busdataMap.put("i_id",Integer.parseInt(tableid));
                 if ("1".equals(fileType)) {
                     busdataMap.put("i_is_draft",1);
-                    message = "qiCao" ;
                 }
                 if ("2".equals(fileType)) {
                     busdataMap.put("i_is_typeset",1);
