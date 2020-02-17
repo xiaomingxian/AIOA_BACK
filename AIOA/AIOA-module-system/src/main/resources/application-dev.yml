@@ -164,12 +164,14 @@ mybatis-plus:
 #jeecg专用配置
 jeecg:
   path:
-    #文件上传根目录 设置
+    #文件上传根目录
     upload: D://upFiles
-    #文件在项目目录中的临时文件路径
-    uploadfile: D://code/real/jeecg-boot/ant-design-vue-jeecg/public/ntko/files
-    #临时路径
-    tempFilePath: D://cwk//idea_workspace//ant-design-vue-jeecg//public//ntko//templateFile
+    #底稿临时路径
+    uploadfile: AIOA_VUE//public//ntko//files
+    #附件临时路径
+    tempFilePath: AIOA_VUE//public//ntko//templateFile
+    #模板路径
+    templateFilePath: AIOA_VUE//public//ntko//templateFiles
     #webapp文件路径6
     webapp: D://webapp
     #数据库备份路径
