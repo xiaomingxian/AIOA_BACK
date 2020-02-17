@@ -252,4 +252,13 @@ public interface SysUserMapper extends BaseMapper<SysUser> {
     SysUser findById(String sysUserId);
 
     String getUserIdByUserName(String username);
+
+    @Select("<script>" +
+            "select DISTINCT d.id from sys_user u LEFT JOIN sys_user_depart ud on u.id=ud.user_id left join sys_depart d on d.id=ud.dep_id " +
+            "where u.id in " +
+            "        <foreach collection='ids' separator=',' item='id' open='(' close=')'>\n" +
+            "           #{id} "+
+            "        </foreach>" +
+            "</script>")
+    List<String> selectDeptsBysUsers(@Param("ids") List<String> deptUsers);
 }

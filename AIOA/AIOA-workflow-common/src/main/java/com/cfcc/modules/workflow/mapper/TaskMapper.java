@@ -207,7 +207,26 @@ public interface TaskMapper {
             "</script>")
     List<Map<String, String>> userHaveChoice(@Param("ids") ArrayList<String> taskIds);
 
+    //replace into t(id, update_time) values(1, now());
+    //SELECT id_,PROC_DEF_ID_,TASK_DEF_KEY_,PROC_INST_ID_,EXECUTION_ID_,NAME_,PARENT_TASK_ID_,DESCRIPTION_,ASSIGNEE_,START_TIME_,PRIORITY_ from act_hi_taskinst where  PROC_INST_ID_=80111
     @Update("UPDATE act_hi_taskinst set PROC_DEF_ID_=#{processDefinitionId} ,PROC_INST_ID_=#{processInstanceId}," +
             " EXECUTION_ID_=#{executionId} where PARENT_TASK_ID_=#{parentTaskId}")
-    void updateHisAct(Task newTask);
+    //@Insert("<script>" +
+    //        "replace into act_hi_taskinst " +
+    //        "(id_,PROC_DEF_ID_,TASK_DEF_KEY_,PROC_INST_ID_,EXECUTION_ID_," +
+    //        "NAME_,PARENT_TASK_ID_,DESCRIPTION_,ASSIGNEE_,START_TIME_,PRIORITY_) " +
+    //        "values " +
+    //        "<foreach collection='tasks' item='task'  separator=',' >" +
+    //        "(#{task.id},#{task.processDefinitionId},#{task.taskDefinitionKey},#{task.processInstanceId},#{task.executionId}," +
+    //        "#{task.name},#{task.parentTaskId},#{task.description},#{task.assignee},#{task.createTime},#{task.priority})" +
+    //        "</foreach> " +
+    //        "</script>")
+    void updateHisAct( Task task);
+
+    @Select("select count(*)  FROM oa_task_dept where task_id=#{v} and type like '%主办%'")
+    int haveMainDept(String taskIdRecord);
+
+    @Select("select DISTINCT user_id  FROM oa_task_dept where task_id=#{v}")
+    List<String> deptUsers(String taskIdRecord);
+//
 }

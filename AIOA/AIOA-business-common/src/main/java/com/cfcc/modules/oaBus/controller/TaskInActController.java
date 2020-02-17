@@ -108,26 +108,74 @@ public class TaskInActController {
                     String taskDefKey = activity.getId();
                     boolean allowMulti = activity.isAllowMulti();
                     OaProcActinst oaProcActinst = (OaProcActinst) actMsg.get("oaProcActinst");
+                    boolean isDept = false;
+                    String userOrRole = oaProcActinst.getUserOrRole();
+                    if ("dept".equalsIgnoreCase(userOrRole)) {
+                        isDept = true;
+                    }
+
                     boolean multAssignee = oaProcActinst.isMultAssignee();
-                    if ((!allowMulti) || (!multAssignee)) {
+                    if ((!allowMulti) || (!multAssignee) && !isDept) {
                         iterator.remove();
                         continue;
                     }
 
-                    //根据任务定义key获取记录的流程id
-                    String taskIdRecord = idAndKey.get(taskDefKey);
-                    if (taskIdRecord == null) {
-                        iterator.remove();
-                        continue;
+                    //部门与非部门的处理方式不同
+                    if (isDept) {
+                        String firstSonKey = activity.getFirstSonKey();
+                        //去部门记录任务记录表里查询相关信息
+                        //查看是否有主办
+                        String taskIdRecord = idAndKey.get(firstSonKey);
+                        if (taskIdRecord == null) {
+                            iterator.remove();
+                            continue;
+                        }
 
-                    }
-                    //已经选择的用户id
-                    List<String> uids = choiceIds.get(taskIdRecord);
+                        int count = taskCommonService.haveMainDept(taskIdRecord);//主办数量大于就排除主办
+                        if (count > 0) {
+                            String depts = oaProcActinst.getDepts();
+                            if (depts != null && depts.contains(",")) {
+                                String[] split = depts.split(",");
+                                ArrayList<String> list = new ArrayList<>();
+                                for (String s : split) {
+                                    if (!s.contains("主办")) {
+                                        list.add(s);
+                                    }
+                                }
+                                oaProcActinst.setDepts(list.toString());
+                            }
+                        }
+                        //查出所有用户,排除他们所在部门
+                        List<String> deptUsers = taskCommonService.deptUsers(taskIdRecord);
+                        if (deptUsers.size() > 0) {
+
+                            List<String> deptIds = sysUserService.selectDeptsBysUsers(deptUsers);
+                            Iterator<Map<String, Object>> deptsIterator = nextUsers.iterator();
+                            while (deptsIterator.hasNext()) {
+                                Map<String, Object> next = deptsIterator.next();
+                                Object id = next.get("id");
+                                if (deptIds.contains(id)) {
+                                    deptsIterator.remove();
+                                }
+                            }
+
+                        }
 
 
-                    if ("user".equalsIgnoreCase(oaProcActinst.getUserOrRole())) {
+                    } else {
                         //区分已选和未选
                         //定义是否需要追加用户的标志
+                        //根据任务定义key获取记录的流程id(不是部门类型)
+                        String taskIdRecord = idAndKey.get(taskDefKey);
+                        if (taskIdRecord == null && !isDept) {
+                            iterator.remove();
+                            continue;
+                        }
+
+                        //已经选择的用户id
+                        List<String> uids = choiceIds.get(taskIdRecord);
+
+
                         boolean donotAddUser = true;
                         for (Map<String, Object> user : nextUsers) {
                             String uid = (String) user.get("uid");
@@ -141,14 +189,13 @@ public class TaskInActController {
                             user.put("taskId", idAndKey.get(actId));
                             user.put("executionId", idAndExecutionId.get(actId));
                         }
-                        if (donotAddUser){
+                        if (donotAddUser) {
                             iterator.remove();
                             continue;
                         }
-
+                        }
                     }
 
-                }
 
             }
             List<Map<String, Object>> actMsgs = (List<Map<String, Object>>) result.getResult();

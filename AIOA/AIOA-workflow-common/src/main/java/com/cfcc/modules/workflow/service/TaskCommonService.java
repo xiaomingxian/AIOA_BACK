@@ -94,5 +94,9 @@ public interface TaskCommonService {
 
     List<Map<String, String>> userHaveChoice(ArrayList<String> taskIds);
 
-    void updateHisAct(Task newTask);
+    void updateHisAct(Task list);
+
+    int haveMainDept(String taskIdRecord);
+
+    List<String> deptUsers(String taskIdRecord);
 }

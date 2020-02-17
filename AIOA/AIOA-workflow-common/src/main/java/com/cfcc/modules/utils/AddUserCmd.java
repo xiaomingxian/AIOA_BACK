@@ -13,6 +13,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Date;
+import java.util.List;
 
 @Service
 @Transactional
@@ -86,8 +87,7 @@ public class AddUserCmd implements Command<Void> {
         taskEntity.setDescription(descript);
         taskService.saveTask(taskEntity);
 
-        //同步历史表中数据(部分数据确实)
-        taskCommonService.updateHisAct(newTask);
+
 
 
 
@@ -96,6 +96,8 @@ public class AddUserCmd implements Command<Void> {
 
         LoopVariableUtils.setLoopVariable(newExecution, "nrOfInstances", nrOfInstances + 1);
         LoopVariableUtils.setLoopVariable(newExecution, "nrOfActiveInstances", nrOfActiveInstances + 1);
+
+
 
 
         return null;

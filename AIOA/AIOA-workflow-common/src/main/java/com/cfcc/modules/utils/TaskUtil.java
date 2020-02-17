@@ -75,6 +75,12 @@ public class TaskUtil /*extends WorkFlowService implements ApplicationContextAwa
                 } else if (type.equalsIgnoreCase("subProcess")) {
                     //子流程 就直接获取该节点的信息
                     ParallelMultiInstanceOrUserTaskActivity(activity, activityBehavior, outLine, acts, destination);
+                    List<? extends PvmActivity> activities = destination.getActivities();
+                    if(activities.size()>0){
+                        PvmActivity pvmActivity = activities.get(0);
+                        String id = pvmActivity.getId();
+                        activity.setFirstSonKey(id);//子流程下的第一个环节
+                    }
                     nexts.add(activity);
                 } else if (type.equalsIgnoreCase("endEvent")) {
                     //结束事件--判断是否有父节点(可能是子流程中的结束事件)

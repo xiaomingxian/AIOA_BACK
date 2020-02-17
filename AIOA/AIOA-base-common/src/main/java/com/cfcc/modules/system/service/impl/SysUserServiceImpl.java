@@ -443,4 +443,9 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser> impl
     public SysUser selectById(String sysUserId) {
         return userMapper.findById(sysUserId);
     }
+
+    @Override
+    public List<String> selectDeptsBysUsers(List<String> deptUsers) {
+        return userMapper.selectDeptsBysUsers(deptUsers);
+    }
 }

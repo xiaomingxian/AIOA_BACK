@@ -958,8 +958,18 @@ public class TaskCommonServiceImpl implements TaskCommonService {
     }
 
     @Override
-    public void updateHisAct(Task newTask) {
-        taskMapper.updateHisAct(newTask);
+    public void updateHisAct(Task tasks) {
+        taskMapper.updateHisAct(tasks);
+    }
+
+    @Override
+    public int haveMainDept(String taskIdRecord) {
+        return taskMapper.haveMainDept(taskIdRecord);
+    }
+
+    @Override
+    public List<String> deptUsers(String taskIdRecord) {
+        return taskMapper.deptUsers(taskIdRecord);
     }
 
 

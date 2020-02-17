@@ -1,8 +1,6 @@
 package com.cfcc.modules.workflow.pojo;
 
-import com.cfcc.modules.system.entity.SysUser;
 import lombok.Data;
-import org.activiti.engine.impl.task.TaskDefinition;
 
 import java.io.Serializable;
 import java.util.*;
@@ -51,6 +49,9 @@ public class Activity implements Serializable {
     //回退相关
     Set<String> userIds;
     List<String> userNames;
+
+    //追加相关
+    private String firstSonKey;//部门(子流程)下的第一个环节
 
 
     @Override

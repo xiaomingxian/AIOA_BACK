@@ -108,6 +108,7 @@ public class TaskInActServiceImpl implements TaskInActService {
     public void doAddUsers(ArrayList<TaskInfoVO> taskInfoVOS) {
         CommandExecutor commandExecutor = taskServiceImpl.getCommandExecutor();
 
+
         String descript=null;
         for (TaskInfoVO taskInfoVO : taskInfoVOS) {
 
@@ -125,7 +126,10 @@ public class TaskInActServiceImpl implements TaskInActService {
             for (String userId : assignee) {
                 commandExecutor.execute(new AddUserCmd(executionId,userId,descript,parentTaskId
                         ,runtimeService,taskService,taskCommonService));
+
             }
+            taskCommonService.updateHisAct(task);
+
 
 
         }
