@@ -414,7 +414,7 @@
     </update>
 
     <select id="queryValue" resultType="java.lang.String">
-        select #{sTableColumn} from ${tableName} where i_id=#{tableid}
+        select ${sTableColumn} from ${tableName} where i_id=#{tableid}
     </select>
 
     <select id="listCountBytableName" resultType="java.lang.Integer">
