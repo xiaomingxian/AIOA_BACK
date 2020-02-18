@@ -10,6 +10,8 @@ import com.cfcc.modules.system.entity.LoginInfo;
 import com.cfcc.modules.system.service.ISysUserService;
 import com.cfcc.modules.utils.AddUserCmd;
 import com.cfcc.modules.utils.JumpTaskCmd;
+import com.cfcc.modules.workflow.mapper.DepartWithTaskMapper;
+import com.cfcc.modules.workflow.pojo.TaskWithDepts;
 import com.cfcc.modules.workflow.service.OaBusDataPermitService;
 import com.cfcc.modules.workflow.service.TaskCommonService;
 import com.cfcc.modules.workflow.vo.TaskInfoVO;
@@ -18,6 +20,7 @@ import org.activiti.engine.RuntimeService;
 import org.activiti.engine.TaskService;
 import org.activiti.engine.impl.TaskServiceImpl;
 import org.activiti.engine.impl.interceptor.CommandExecutor;
+import org.activiti.engine.runtime.Execution;
 import org.activiti.engine.task.Task;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -44,6 +47,14 @@ public class TaskInActServiceImpl implements TaskInActService {
     private ISysUserService sysUserService;
     @Autowired
     private TaskServiceImpl taskServiceImpl;
+    @Autowired
+    private DepartWithTaskMapper departWithTaskMapper;
+
+    @Autowired
+    private RuntimeService runtimeService;
+
+    @Autowired
+    private TaskService taskService;
 
 
     @Override
@@ -91,17 +102,22 @@ public class TaskInActServiceImpl implements TaskInActService {
 
         String nextTaskMsg = taskCommonService.doTasksMore(taskInfoVOs);
         //TODO 业务信息
+        //if (nextTaskMsg.endsWith("  ")) {
+        //    Map<String, Object> busData = taskInfoVO.getBusData();
+        //    LoginInfo loginInfo = sysUserService.getLoginInfo(request);
+        //    busData.put("s_signer", loginInfo.getUsername());
+        //
+        //    busData.put("d_date1", new Date());//new SimpleDateFormat("yyyy-MM-dd").format(new Date()));//
+        //}
+        //busAbout(taskInfoVO, nextTaskMsg);
 
     }
 
 
-    @Autowired
-    private RuntimeService runtimeService;
 
-    @Autowired
-    private TaskService taskService;
     /**
      * 并行/包容 追加用户
+     *
      * @param taskInfoVOS
      */
     @Override
@@ -109,47 +125,72 @@ public class TaskInActServiceImpl implements TaskInActService {
         CommandExecutor commandExecutor = taskServiceImpl.getCommandExecutor();
 
 
-        String descript=null;
+        String descript = null;
         for (TaskInfoVO taskInfoVO : taskInfoVOS) {
 
             String taskId = taskInfoVO.getTaskId();
 
             Task task = taskService.createTaskQuery().taskId(taskId).singleResult();
+            String processInstanceId = task.getProcessInstanceId();
             String parentTaskId = task.getParentTaskId();
-            if (descript==null){
+            if (descript == null) {
                 descript = task.getDescription();
             }
 
             String executionId = taskInfoVO.getExecutionId();
-            if(taskInfoVO.getIsDept()!=null &&!taskInfoVO.getIsDept()){
-                List<String> assignee = (List<String>)taskInfoVO.getAssignee();
+            if (taskInfoVO.getIsDept() != null && !taskInfoVO.getIsDept()) {
+                List<String> assignee = (List<String>) taskInfoVO.getAssignee();
 
                 for (String userId : assignee) {
-                    commandExecutor.execute(new AddUserCmd(executionId,userId,descript,parentTaskId
-                            ,runtimeService,taskService,taskCommonService));
+                    commandExecutor.execute(new AddUserCmd(executionId, userId, descript, parentTaskId
+                            , runtimeService, taskService, false));
                 }
-            }else {
-                List<List<String>> assignee = (List<List<String>>)taskInfoVO.getAssignee();
-                commandExecutor.execute(new AddUserCmd(executionId,null,descript,parentTaskId
-                        ,runtimeService,taskService,taskCommonService));
-                //部门用户 抢签
-                for (List<String> list : assignee) {
-                    for (String uid : list) {
-                        taskService.addCandidateUser(taskId, uid);
+                taskCommonService.updateHisAct(task);
+
+            } else {
+                List<List<String>> assignee = (List<List<String>>) taskInfoVO.getAssignee();
+                String randomParent = UUID.randomUUID().toString().replaceAll("-", "");
+                commandExecutor.execute(new AddUserCmd(executionId, null, descript, randomParent
+                        , runtimeService, taskService, true));
+
+
+                List<Task> addDeptTask = taskService.createTaskQuery().processInstanceId(processInstanceId).list();
+                TaskWithDepts taskWithDepts = taskInfoVO.getTaskWithDepts();
+
+                if (addDeptTask.size() > 0) {
+                    for (Task taskDept : addDeptTask) {
+                        //部门用户 抢签
+                        taskId = taskDept.getId();
+                        if (randomParent.equalsIgnoreCase(taskDept.getParentTaskId())){
+                            //TODO 同一类型 多个部门如何区分
+                            for (List<String> list : assignee) {
+                                for (String uid : list) {
+                                    taskService.addCandidateUser(taskId, uid);
+                                }
+                                String taskDefinitionKey = taskDept.getTaskDefinitionKey();
+                                taskWithDepts.setTaskDefKey(taskDefinitionKey);
+                                //存储下个节点的任务id---主办/辐办/传阅等类型都存储起来(会有重复数据)[数量=用户量*种类]
+                                taskWithDepts.setTskId(taskId);
+                                //请求数据库 2-3 次
+                                departWithTaskMapper.save(processInstanceId, taskWithDepts);
+                            }
+                        }
                     }
+
+
                 }
+                taskCommonService.updateHisActDept(task, randomParent);
+                taskCommonService.updateRuActDept(task, randomParent);
+
+
             }
-            taskCommonService.updateHisAct(task);
-            //TODO 参与表中添加   taskInfoVO.getTaskWithDepts().getDeptMsg();  部门信息需要前端构造
             //********************* 写入参与人 *********************
-            Map<String,Object> busData=taskInfoVO.getBusData();
+            Map<String, Object> busData = taskInfoVO.getBusData();
             String table = busData.get("table") + "_permit";
-            oaBusDynamicTableMapper.updateData(busData);
 
             //4 存储用户信息到 业务数据权限表 - 构造用户信息
             saveDataPermit(taskInfoVO, table);
         }
-
 
 
     }
@@ -158,11 +199,11 @@ public class TaskInActServiceImpl implements TaskInActService {
         ArrayList<String> uids = new ArrayList<>();
         Boolean isDept = taskInfoVO.getIsDept();
         if (null != isDept && isDept) {
-            Map<String, String[]> deptMsg = taskInfoVO.getTaskWithDepts().getDeptMsg();
+            Map<String, List<String>> deptMsg = taskInfoVO.getTaskWithDepts().getDeptMsg();
 
-            for (Map.Entry<String, String[]> entry : deptMsg.entrySet()) {
-                String[] ids = entry.getValue();
-                Arrays.stream(ids).forEach(id -> {
+            for (Map.Entry<String, List<String>> entry : deptMsg.entrySet()) {
+                List<String> ids = entry.getValue();
+                ids.stream().forEach(id -> {
                     uids.add(id);
                 });
             }

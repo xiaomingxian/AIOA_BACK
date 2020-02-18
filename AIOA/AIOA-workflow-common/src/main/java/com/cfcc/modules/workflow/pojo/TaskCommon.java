@@ -50,7 +50,8 @@ public class TaskCommon implements Serializable {
         if ("1".equals(huanJi)) huanJi = "[特急]";
         else if ("2".equals(huanJi)) huanJi = "[紧急]";
         else if ("3".equals(huanJi)) huanJi = "[加急]";
-        else if ("4".equals(huanJi)) huanJi = "[一般]";
+        //else if ("4".equals(huanJi)) huanJi = "[一般]";
+        else if ("4".equals(huanJi)) huanJi = "";
         else huanJi = "";
         String s = busMsg.split(",")[3];
 

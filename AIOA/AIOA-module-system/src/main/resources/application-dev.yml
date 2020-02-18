@@ -143,7 +143,7 @@ spring:
         max-wait: -1ms  #最大建立连接等待时间。如果超过此时间将接到异常。设为-1表示无限制。
         min-idle: 0     #最小等待连接中的数量,设 0 为没有限制
       shutdown-timeout: 100ms
-    password: ''
+#    password: ''
     port: 6379
 #mybatis plus 设置
 mybatis-plus:
@@ -196,10 +196,12 @@ system:
   runDate : 2014
 actShow:
   default: i_urgency,ilevel,s_file_num,s_title,s_create_name,s_create_by,i_id,table,page_ref,iprocSetId,i_bus_function_id,functionName,i_is_important,mainDept
+#有追加权限的角色
+canAddUserRoles: 单位信息整理员,局长,基础管理员,系统管理员
 logging:
   level:
     root: info
 #    activiti日志
-    com.len.mapper: DEBUG
-    org.activiti.engine.impl.persistence.entity: trace
+#    com.len.mapper: DEBUG
+#    org.activiti.engine.impl.persistence.entity: trace
   config: classpath:logback-spring.xml

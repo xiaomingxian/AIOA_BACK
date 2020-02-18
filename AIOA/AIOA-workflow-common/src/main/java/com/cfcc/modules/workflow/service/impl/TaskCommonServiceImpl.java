@@ -972,6 +972,16 @@ public class TaskCommonServiceImpl implements TaskCommonService {
         return taskMapper.deptUsers(taskIdRecord);
     }
 
+    @Override
+    public void updateHisActDept(Task task, String randomParent) {
+        taskMapper.updateHisActDept(task,randomParent);
+    }
+
+    @Override
+    public void updateRuActDept(Task task, String randomParent) {
+        taskMapper.updateRuActDept(task,randomParent);
+    }
+
 
     private String nextActMore(List<TaskInfoVO> taskInfoVOs, Task task) {
         String processInstanceId = task.getProcessInstanceId();

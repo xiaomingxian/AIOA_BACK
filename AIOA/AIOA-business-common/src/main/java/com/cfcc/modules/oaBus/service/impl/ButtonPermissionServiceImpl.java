@@ -14,6 +14,7 @@ import com.cfcc.modules.oabutton.entity.OaButtonSet;
 import com.cfcc.modules.oabutton.service.IOaButtonService;
 import com.cfcc.modules.oabutton.service.IOaButtonSetService;
 import com.cfcc.modules.system.entity.LoginInfo;
+import com.cfcc.modules.system.entity.SysRole;
 import com.cfcc.modules.system.entity.SysUser;
 import com.cfcc.modules.workflow.mapper.TaskMapper;
 import com.cfcc.modules.workflow.service.IoaProcActinstService;
@@ -24,6 +25,7 @@ import org.activiti.engine.HistoryService;
 import org.activiti.engine.history.HistoricTaskInstance;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -58,6 +60,9 @@ public class ButtonPermissionServiceImpl implements ButtonPermissionService {
 
     @Autowired
     private TaskMapper taskMapper;
+
+    @Value("${canAddUserRoles}")
+    private String canAddUserRoles;
 
 
     @Override
@@ -112,7 +117,7 @@ public class ButtonPermissionServiceImpl implements ButtonPermissionService {
                     LoginInfo loginInfo = (LoginInfo) result.get("loginInfo");
                     Boolean isDaiBan = null;
                     Object status = result.get("status");
-                    if (status != null ) {
+                    if (status != null) {
                         String s = status.toString();
                         if ("todo".equalsIgnoreCase(s)) isDaiBan = true;
                         if ("newtask".equalsIgnoreCase(s)) isDaiBan = true;
@@ -511,7 +516,6 @@ public class ButtonPermissionServiceImpl implements ButtonPermissionService {
             if (!currentUserPermission.get("deptFinsh")) return false;
         }
 
-
         Boolean permitType = buttonPermit.getPermitType();
         if (permitType == null || !permitType) {//如果不区分权限,直接安返回true,否则进行下面一系列判断
             return true;
@@ -528,11 +532,12 @@ public class ButtonPermissionServiceImpl implements ButtonPermissionService {
         if (null != isReader && isReader && currentUserPermission.get("isReader")) return true;
         if (null != isLastsender && isLastsender && currentUserPermission.get("isLastsender")) return true;
         if (null != isTransactors && isTransactors && currentUserPermission.get("isTransactors")) return true;
+        //追加
+        if ("addUserOrDepart".equals(buttonPermit.getSMethod()) && currentUserPermission.get("canAddUser")) return true;
 
 
         return false;
     }
-
 
 
     /**
@@ -540,7 +545,7 @@ public class ButtonPermissionServiceImpl implements ButtonPermissionService {
      */
     @Override
     public Map<String, Boolean> currentUserPermission(String key, Map<String, Object> query,
-                                                      SysUser currentUser,
+                                                      LoginInfo currentUser,
                                                       String taskDefKey, String proInstanId,
                                                       String taskId,
                                                       Boolean isDaiBan) {
@@ -558,7 +563,6 @@ public class ButtonPermissionServiceImpl implements ButtonPermissionService {
         List<String> reader = dynamicTableMapper.isReader(busDataId, tableName + "_permit");
         //参与者
         currentUserPermission.put("isReader", reader.contains(userId));
-        //TODO 追加
         //已办用户(有流程)
         boolean isLastsender = false;
         boolean isTransactors = false;//代办
@@ -573,14 +577,15 @@ public class ButtonPermissionServiceImpl implements ButtonPermissionService {
                     isTransactors = true;
                     isLastsender = false;
                 }
-            }else {
-                if (isDaiBan){
+            } else {
+                if (isDaiBan) {
                     isTransactors = true;
                     isLastsender = false;
-                }else {
+                } else {
                     isTransactors = false;
                 }
             }
+
             //判断是否是可部门完成环节
             //查询当前节点是否是可部门完成的节点[如果当前环节不是那就不能部门完成]
             deptFinsh = procActinstService.isDeptFinish(key, taskDefKey);
@@ -592,9 +597,28 @@ public class ButtonPermissionServiceImpl implements ButtonPermissionService {
                 deptFinsh = deptFinsh && b;
             }
         }
+        //是否可追加
+        boolean canAddUser = false;
+        boolean havaAddRole = false;
+        if (canAddUserRoles != null) {
+            List<SysRole> roles = currentUser.getRoles();
+            for (SysRole role : roles) {
+                String roleName = role.getRoleName();
+                if (canAddUserRoles.contains(roleName)) {
+                    havaAddRole = true;
+                    break;
+                }
+            }
+        }
+
+        if (isLastsender || havaAddRole) {//是已办或者
+            canAddUser = true;
+        }
         currentUserPermission.put("isLastsender", isLastsender);
         currentUserPermission.put("isTransactors", isTransactors);
         currentUserPermission.put("deptFinsh", deptFinsh);
+        currentUserPermission.put("canAddUser", canAddUser);
+
         return currentUserPermission;
     }
 

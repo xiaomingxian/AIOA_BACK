@@ -3,6 +3,7 @@ package com.cfcc.modules.workflow.pojo;
 import lombok.Data;
 
 import java.io.Serializable;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -19,6 +20,7 @@ public class TaskWithDepts implements Serializable {
      * key:主办/辅办/传阅
      * val:用户id
      */
-    private Map<String, String[]> deptMsg;
+    private Map<String, List<String>> deptMsg;
+    //private Map<String, String[]> deptMsg2;
 
 }

@@ -529,7 +529,7 @@ public class TaskInActController {
         org.apache.commons.beanutils.BeanUtils.populate(taskInfoVO, map);
         TaskWithDepts taskWithDepts = new TaskWithDepts();
         if (taskWithDeptsMap != null) {
-            Map<String, String[]> deptMsg = (Map<String, String[]>) taskWithDeptsMap.get("deptMsg");
+            Map<String, List<String>> deptMsg = (Map<String, List<String>>) taskWithDeptsMap.get("deptMsg");
             taskWithDeptsMap.remove("deptMsg");
             org.apache.commons.beanutils.BeanUtils.populate(taskWithDepts, taskWithDeptsMap);
             taskWithDepts.setDeptMsg(deptMsg);

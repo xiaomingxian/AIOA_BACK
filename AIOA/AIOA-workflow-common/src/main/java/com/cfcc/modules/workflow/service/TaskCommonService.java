@@ -99,4 +99,8 @@ public interface TaskCommonService {
     int haveMainDept(String taskIdRecord);
 
     List<String> deptUsers(String taskIdRecord);
+
+    void updateHisActDept(Task task, String randomParent);
+
+    void updateRuActDept(Task task, String randomParent);
 }
