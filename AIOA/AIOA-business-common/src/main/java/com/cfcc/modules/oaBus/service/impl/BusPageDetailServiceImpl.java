@@ -102,6 +102,12 @@ public class BusPageDetailServiceImpl extends ServiceImpl<BusPageDetailMapper, B
         return busPageDetailMapper.updatePageDetail(busPageDetail) ;
     }
 
+    @Override
+    public List<BusPageDetail> getListByFunIDAndIPageId(String functionId, String iPageId) {
+
+        return busPageDetailMapper.getListByFunIDAndIPageIdDao(functionId,iPageId);
+    }
+
     public void test() {
         List<String> funList = new LinkedList<String>();//缓存
         List depts = new LinkedList();

@@ -54,4 +54,12 @@ public interface BusPageDetailMapper extends BaseMapper<BusPageDetail> {
     int getBusPageDetailCount(String functionId, String pageId, String tableName);
 
 
+    /**
+     * 通过IFunctionId和iFunVersion查询出对应的iPageId，再查出对应的PageDetail
+     *  中的数据
+     * @param functionId
+     * @param iFunVersion
+     * @return
+     */
+    List<BusPageDetail> getListByFunIDAndIPageIdDao(@Param("functionId")String functionId, @Param("iPageId")String iPageId);
 }

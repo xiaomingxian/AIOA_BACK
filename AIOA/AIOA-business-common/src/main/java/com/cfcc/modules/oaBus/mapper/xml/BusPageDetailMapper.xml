@@ -189,7 +189,10 @@
 		select * from oa_bus_page_detail c
 		where c.s_busdata_table = #{tableName} and c.i_bus_function_id = #{functionId} and c.i_is_listtitle = 1
 	</select>
-	<update id="updatePageDetail" >
+    <select id="getListByFunIDAndIPageIdDao" resultType="com.cfcc.modules.oaBus.entity.BusPageDetail">
+		select * from oa_bus_page_detail c where c.i_bus_function_id = #{functionId} and c.i_bus_page_id = #{iPageId} ;
+	</select>
+    <update id="updatePageDetail" >
 		UPDATE oa_bus_page_detail SET
 		<if test="sSendKey != null and sSendKey != ''">
 			s_send_key= #{sSendKey}
