@@ -1120,14 +1120,20 @@ public class OaBusdataServiceImpl extends ServiceImpl<OaBusdataMapper, OaBusdata
             List<BusFunctionUnit> busFunctionUnitList = iBusFunctionUnitService.list(wrapper);
             if (busFunctionUnitList != null && busFunctionUnitList.size() > 0) {
                 for (BusFunctionUnit funUnit : busFunctionUnitList) {
-                    if (funUnit.getSDeptId() == depart.getId()
-                            || (funUnit.getSUnitId() == depart.getParentId() && funUnit.getSDeptId() == null)) {
+                    if ((funUnit.getSDeptId()!=null && funUnit.getSDeptId().equals( depart.getId()))
+                            || (funUnit.getSUnitId().equals(depart.getParentId()) && funUnit.getSDeptId() == null)){
                         return true;
                     } else {
+                        List<String> unitList = sysDepartService.getUnitList(depart.getParentId());
+                        for(String str : unitList){
+                            if(funUnit.getSUnitId().equals(str)){
+                                return true ;
+                            }
+                        }
                         return false;
                     }
                 }
-                ;
+
             }
             return true;
 

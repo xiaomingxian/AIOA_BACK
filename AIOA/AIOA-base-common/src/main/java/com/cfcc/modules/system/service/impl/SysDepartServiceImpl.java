@@ -202,6 +202,7 @@ public class SysDepartServiceImpl extends ServiceImpl<SysDepartMapper, SysDepart
 	 * 迭代部门id查询出对应的机构数据
 	 * @param id
 	 * @return
+	 * feng
 	 */
 	@Override
 	public SysDepart getUnitByDeptId(String id) {
@@ -217,6 +218,7 @@ public class SysDepartServiceImpl extends ServiceImpl<SysDepartMapper, SysDepart
 	 * 迭代部门id查询出对应的最大机构数据
 	 * @param id
 	 * @return
+	 * feng
 	 */
 	@Override
 	public SysDepart getMaxUnitByDeptId(String id) {
@@ -225,6 +227,28 @@ public class SysDepartServiceImpl extends ServiceImpl<SysDepartMapper, SysDepart
 			sysDepart = getMaxUnitByDeptId(sysDepart.getParentId());
 		}
 		return sysDepart;
+	}
+
+	/**
+	 * 查询一个部门的所有父机构id
+	 * @param id
+	 * @return
+	 * feng
+	 */
+	@Override
+	public List<String> getUnitList(String id) {
+		List<String> list = new ArrayList<>() ;
+		String departId = id ;
+		while(true){
+			SysDepart sysDepart = sysDepartMapper.getById(departId) ;
+			if(sysDepart != null && sysDepart.getParentId()!= null && !("".equals(sysDepart.getParentId()))){ //如果父机构不为空的话， 就继续往上找，否则直接返回
+				list.add(sysDepart.getParentId()) ;
+				departId = sysDepart.getParentId() ;
+			}else{
+				break ;
+			}
+		}
+		return list;
 	}
 
 	/**
