@@ -212,6 +212,7 @@ public class BusFunctionServiceImpl extends ServiceImpl<BusFunctionMapper, BusFu
                 }
                 busProcSet.setIVersion(busProcSet.getIVersion() + 1);  //将版本号加一
                 busProcSet.setIId(null);            //将之前的id置为空
+                busProcSet.setIPageId(busFunction.getIPageId());            //将之前的id置为空
                 //查询结果为空的话，说明没这条记录（已修改），就将版本号加1，将id置为空，重新插入一条记录
                 iBusProcSetService.save(busProcSet);
                 QueryWrapper<BusProcSet> procSetQueryWrapper = new QueryWrapper<>();
