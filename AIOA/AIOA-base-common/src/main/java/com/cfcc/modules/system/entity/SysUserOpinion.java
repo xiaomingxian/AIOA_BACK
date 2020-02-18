@@ -32,9 +32,10 @@ public class SysUserOpinion {
 	/**主键id*/
 	@Excel(name = "主键id", width = 15)
     @ApiModelProperty(value = "主键id")
+	@TableId(value = "i_id", type = IdType.AUTO)
 	private java.lang.Integer iId;
 	/**用户id*/
-	@Excel(name = "用户id", width = 15)
+	/*@Excel(name = "用户id", width = 15)*/
     @ApiModelProperty(value = "用户id")
 	private java.lang.String sUserId;
 	/**序号*/

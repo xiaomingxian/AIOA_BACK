@@ -6,7 +6,9 @@ import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.cfcc.common.api.vo.Result;
 import com.cfcc.common.aspect.annotation.AutoLog;
 import com.cfcc.common.system.query.QueryGenerator;
+import com.cfcc.common.system.util.JwtUtil;
 import com.cfcc.common.util.oConvertUtils;
+import com.cfcc.modules.shiro.vo.DefContants;
 import com.cfcc.modules.system.entity.SysUser;
 import com.cfcc.modules.system.entity.SysUserOpinion;
 import com.cfcc.modules.system.service.ISysUserOpinionService;
@@ -204,14 +206,21 @@ public class SysUserOpinionController {
     @RequestMapping(value = "/exportXls")
     public ModelAndView exportXls(HttpServletRequest request, HttpServletResponse response) {
         // Step.1 组装查询条件
-        QueryWrapper<SysUserOpinion> queryWrapper = null;
+        QueryWrapper<SysUserOpinion> queryWrapper = new QueryWrapper<SysUserOpinion>();
         try {
             String paramsStr = request.getParameter("paramsStr");
+            SysUserOpinion sysUserOpinion = new SysUserOpinion() ;
             if (oConvertUtils.isNotEmpty(paramsStr)) {
                 String deString = URLDecoder.decode(paramsStr, "UTF-8");
-                SysUserOpinion sysUserOpinion = JSON.parseObject(deString, SysUserOpinion.class);
-                queryWrapper = QueryGenerator.initQueryWrapper(sysUserOpinion, request.getParameterMap());
+                sysUserOpinion = JSON.parseObject(deString, SysUserOpinion.class);
+
             }
+            SysUser currentUser = userService.getCurrentUser(request);
+            String id = currentUser.getId();
+            sysUserOpinion.setSUserId(id) ;
+            //queryWrapper = QueryGenerator.initQueryWrapper(sysUserOpinion, request.getParameterMap());
+            queryWrapper.setEntity(sysUserOpinion) ;
+            System.out.println(queryWrapper+"]]]]]");
         } catch (UnsupportedEncodingException e) {
             e.printStackTrace();
         }
