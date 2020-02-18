@@ -79,6 +79,8 @@ public interface ISysDepartService extends IService<SysDepart>{
 
     SysDepart getUnitByDeptId(String id);
 
+    List<String> getUnitList(String id);
+
     SysDepart queryUserDepartByOrgCode(String orgCode);
 
     /**

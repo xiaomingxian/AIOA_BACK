@@ -75,9 +75,10 @@ public class BusFunctionPermitServiceImpl extends ServiceImpl<BusFunctionPermitM
                 }
             }
             else if( "2".equals(functionPermitList.get(i).getSPermitType())){      // 部门
-                SysDepart sysDepart = sysDepartMapper.selectById(functionPermitList.get(i).getITypeId());
+                SysDepart sysDepart = sysDepartMapper.selectById( functionPermitList.get(i).getITypeId());
                 if(! (sysDepart == null)){
                     functionPermitList.get(i).setItypeName(sysDepart.getDepartName());
+                    functionPermitList.get(i).setParentName(sysDepartMapper.selectById( sysDepart.getParentId()).getDepartName());
                 }
             }
             else if("3".equals(functionPermitList.get(i).getSPermitType()) ){      // 人员
@@ -157,8 +158,10 @@ public class BusFunctionPermitServiceImpl extends ServiceImpl<BusFunctionPermitM
                 }
             }
             else if( "2".equals(functionPermitList.get(i).getSPermitType())){      // 部门
+
                 SysDepart sysDepart = sysDepartMapper.selectById(functionPermitList.get(i).getITypeId());
                 if(! (sysDepart == null)){
+                    functionPermitList.get(i).setParentName(sysDepartMapper.selectById( sysDepart.getParentId()).getDepartName());
                     functionPermitList.get(i).setItypeName(sysDepart.getDepartName());
                 }
             }

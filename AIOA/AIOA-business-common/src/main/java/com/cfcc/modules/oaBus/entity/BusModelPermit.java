@@ -63,5 +63,7 @@ public class BusModelPermit implements Serializable {
 
     @TableField(exist = false)
     private java.lang.String itypeName;
+    @TableField(exist = false)
+    private java.lang.String parentName;
 
 }

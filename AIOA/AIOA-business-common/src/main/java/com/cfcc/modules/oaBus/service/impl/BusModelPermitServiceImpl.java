@@ -99,9 +99,10 @@ public class BusModelPermitServiceImpl extends ServiceImpl<BusModelPermitMapper,
             }
             else if( "2".equals(modelPermitList.get(i).getSPermitType())){      // 部门
                 SysDepart sysDepart = sysDepartMapper.selectById(modelPermitList.get(i).getITypeId());
-                if(! (sysDepart == null)){
 
+                if(! (sysDepart == null)){
                     modelPermitList.get(i).setItypeName(sysDepart.getDepartName());
+                    modelPermitList.get(i).setParentName(sysDepartMapper.selectById( sysDepart.getParentId()).getDepartName());
                 }
             }
             else if("3".equals(modelPermitList.get(i).getSPermitType()) ){      // 人员
@@ -148,7 +149,7 @@ public class BusModelPermitServiceImpl extends ServiceImpl<BusModelPermitMapper,
             else if( "2".equals(busModelPermitList.get(i).getSPermitType())){      // 部门
                 SysDepart sysDepart = sysDepartMapper.selectById(busModelPermitList.get(i).getITypeId());
                 if(! (sysDepart == null)){
-
+                    busModelPermitList.get(i).setParentName(sysDepartMapper.selectById( sysDepart.getParentId()).getDepartName());
                     busModelPermitList.get(i).setItypeName(sysDepart.getDepartName());
                 }
             }

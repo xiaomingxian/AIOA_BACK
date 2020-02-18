@@ -341,11 +341,11 @@ public class OaFileServiceImpl extends ServiceImpl<OaFileMapper, OaFile> impleme
                 saveFile.setSFilePath(uploadPath.getPath());
                 saveFile.setDCreateTime(new Date());
                 oaFileService.save(saveFile);
-                QueryWrapper<OaFile> c = new QueryWrapper<>();
-                c.setEntity(saveFile);
-                OaFile ad = oaFileService.getOne(c);
-                oaFileService.updateIorderById(ad.getIId());
-                returnList.add(ad);
+//                QueryWrapper<OaFile> c = new QueryWrapper<>();
+//                c.setEntity(saveFile);
+//                OaFile ad = oaFileService.getOne(c);
+                oaFileService.updateIorderById(saveFile.getIId());
+                returnList.add(saveFile);
             } catch (IOException e) {
                 e.printStackTrace();
             }

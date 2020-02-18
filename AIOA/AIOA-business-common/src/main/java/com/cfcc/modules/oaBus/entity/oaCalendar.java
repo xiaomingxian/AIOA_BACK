@@ -41,7 +41,7 @@ public class oaCalendar {
     @ApiModelProperty(value = "日程内容")
 	private java.lang.String sTitle;
 	/**日程对象（默认自己，可多选，只记录名称）*/
-	@Excel(name = "日程对象（默认自己，可多选，只记录名称）", width = 15)
+	@Excel(name = "日程对象", width = 15)
     @ApiModelProperty(value = "日程对象（默认自己，可多选，只记录名称）")
 	private java.lang.String sUserNames;
 	/**日程发生地点*/
@@ -57,11 +57,11 @@ public class oaCalendar {
     @ApiModelProperty(value = "是否领导日程")
 	private java.lang.Integer iIsLeader;
 	/**即时消息提醒类型:1.10分钟前 2.30分钟前;3.1小时前;4.2小时前;*/
-	@Excel(name = "即时消息提醒类型:1.10分钟前 2.30分钟前;3.1小时前;4.2小时前;", width = 15)
+	@Excel(name = "即时消息提醒类型", width = 15)
     @ApiModelProperty(value = "即时消息提醒类型:1.10分钟前 2.30分钟前;3.1小时前;4.2小时前;")
 	private java.lang.Integer iRemindType;
 	/**公开类型:1.全行 2.分管;3.部门内;*/
-	@Excel(name = "公开类型:1.全行 2.分管;3.部门内;", width = 15)
+	@Excel(name = "公开类型", width = 15)
     @ApiModelProperty(value = "公开类型:1.全行 2.分管;3.部门内;")
 	private java.lang.Integer iOpenType;
 	/**开始时间*/

@@ -91,6 +91,8 @@ public class OaBusdataServiceImpl extends ServiceImpl<OaBusdataMapper, OaBusdata
     @Autowired
     private HistoryService historyService;
     @Autowired
+    private IBusPageService iBusPageService;
+    @Autowired
     private TaskService taskService;
 
 
@@ -373,10 +375,29 @@ public class OaBusdataServiceImpl extends ServiceImpl<OaBusdataMapper, OaBusdata
         result.put("oaBusdata", oaBusdata);
         // 查出对应列的名字数据
         String functionId = oaBusdata.get("i_bus_function_id") + "";
-        List<BusPageDetail> busPageDetailList = ibusPageDetailService.getListByFunID(functionId);
-        Map<String, Object> pageMap = getPageUrlSer(functionId);
-        result.put("pageRef", pageMap.get("pageRef"));
-        result.put("actShow", pageMap.get("actShow"));
+        //获取对应的版本号
+        String iFunVersion = oaBusdata.get("i_fun_version") + "";
+        //增加根据版本查询对应点的IPageID，通过IPageId，和FunctionID查询出对应的字段含义
+        //为兼容以前的版本，先查询iPageId，如果有iPageId的话，则用iPageId查询，如果没有的话，就直接查
+        QueryWrapper<BusProcSet> queryWrapper = new QueryWrapper<>() ;
+        BusProcSet busProcSet1 = new BusProcSet() ;
+        busProcSet1.setIBusFunctionId(Integer.parseInt(functionId)) ;
+        busProcSet1.setIVersion(Integer.parseInt(iFunVersion)) ;
+        queryWrapper.setEntity(busProcSet1);
+        busProcSet1 = iBusProcSetService.getOne(queryWrapper) ;
+        List<BusPageDetail> busPageDetailList = new ArrayList<BusPageDetail>() ;
+        if(busProcSet1.getIPageId() == null){
+            busPageDetailList = ibusPageDetailService.getListByFunID(functionId);
+            Map<String, Object> pageMap = getPageUrlSer(functionId);
+            result.put("pageRef", pageMap.get("pageRef"));
+            result.put("actShow", pageMap.get("actShow"));
+        }else{ // 不为空的话
+            String iPageId = busProcSet1.getIPageId() + "" ;
+            busPageDetailList = ibusPageDetailService.getListByFunIDAndIPageId(functionId,iPageId);
+            BusPage busPage = iBusPageService.getById(iPageId) ;
+            result.put("pageRef", busPage.getSPagePath());
+            result.put("actShow", busPage.getActShow());
+        }
         Map<String, String> map = new HashMap<>();
         Map<String, Object> optionMap = new HashMap<>();
         //存放校验规则,字典数据，detail数据
@@ -1099,14 +1120,20 @@ public class OaBusdataServiceImpl extends ServiceImpl<OaBusdataMapper, OaBusdata
             List<BusFunctionUnit> busFunctionUnitList = iBusFunctionUnitService.list(wrapper);
             if (busFunctionUnitList != null && busFunctionUnitList.size() > 0) {
                 for (BusFunctionUnit funUnit : busFunctionUnitList) {
-                    if (funUnit.getSDeptId() == depart.getId()
-                            || (funUnit.getSUnitId() == depart.getParentId() && funUnit.getSDeptId() == null)) {
+                    if ((funUnit.getSDeptId()!=null && funUnit.getSDeptId().equals( depart.getId()))
+                            || (funUnit.getSUnitId().equals(depart.getParentId()) && funUnit.getSDeptId() == null)){
                         return true;
                     } else {
+                        List<String> unitList = sysDepartService.getUnitList(depart.getParentId());
+                        for(String str : unitList){
+                            if(funUnit.getSUnitId().equals(str)){
+                                return true ;
+                            }
+                        }
                         return false;
                     }
                 }
-                ;
+
             }
             return true;
 
