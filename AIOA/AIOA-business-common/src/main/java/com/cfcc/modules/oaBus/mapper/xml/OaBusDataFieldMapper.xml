@@ -135,6 +135,9 @@
             <if test="i_is_typeset !=null and i_is_typeset !=''">
                 i_is_typeset=#{i_is_typeset},
             </if>
+            <if test="i_is_draft !=null and i_is_draft !=''">
+                i_is_typeset=#{i_is_draft},
+            </if>
             <if test="i_is_approve !=null and i_is_approve !=''">
                 i_is_approve=#{i_is_approve},
             </if>
