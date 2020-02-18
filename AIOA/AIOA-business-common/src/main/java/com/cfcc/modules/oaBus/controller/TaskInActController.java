@@ -504,7 +504,7 @@ public class TaskInActController {
 
 
             if (taskInfoVOS != null && taskInfoVOS.size() > 0) {
-                taskInActService.doTaskMore(taskInfoVOS);
+                taskInActService.doTaskMore(taskInfoVOS,request);
             } else {
                 return Result.error("信息不完善,拒绝办理");
             }

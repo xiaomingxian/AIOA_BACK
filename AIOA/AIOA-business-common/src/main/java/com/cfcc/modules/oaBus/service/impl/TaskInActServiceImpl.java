@@ -97,22 +97,44 @@ public class TaskInActServiceImpl implements TaskInActService {
 
 
     @Override
-    public void doTaskMore(List<TaskInfoVO> taskInfoVOs) {
+    public void doTaskMore(List<TaskInfoVO> taskInfoVOs, HttpServletRequest request) {
 
 
         String nextTaskMsg = taskCommonService.doTasksMore(taskInfoVOs);
-        //TODO 业务信息
-        //if (nextTaskMsg.endsWith("  ")) {
-        //    Map<String, Object> busData = taskInfoVO.getBusData();
-        //    LoginInfo loginInfo = sysUserService.getLoginInfo(request);
-        //    busData.put("s_signer", loginInfo.getUsername());
-        //
-        //    busData.put("d_date1", new Date());//new SimpleDateFormat("yyyy-MM-dd").format(new Date()));//
-        //}
-        //busAbout(taskInfoVO, nextTaskMsg);
+        if (nextTaskMsg.endsWith("  ")) {
+            Map<String, Object> busData = taskInfoVOs.get(0).getBusData();
+            LoginInfo loginInfo = sysUserService.getLoginInfo(request);
+            busData.put("s_signer", loginInfo.getUsername());
+
+            busData.put("d_date1", new Date());//new SimpleDateFormat("yyyy-MM-dd").format(new Date()));//
+        }
+        busAboutMore(taskInfoVOs, nextTaskMsg);
 
     }
 
+    private void busAboutMore(List<TaskInfoVO> taskInfoVOs, String nextTaskMsg) {
+        //2 更新流程对应的业务数据......
+        //排除掉多余的字段
+        //移除多余字段
+        Map<String, Object> busData = taskInfoVOs.get(0).getBusData();
+        //更新当前节点信息
+        busData.put("s_cur_task_name", nextTaskMsg);
+        if ("end-已结束".equals(nextTaskMsg)) {
+            busData.put("i_is_state", 1);
+        }
+        for (String remove : TaskConstant.REMOVEFILEDS) {
+            busData.remove(remove);
+        }
+        busData.put("i_is_display", '0');
+        //********************* 写入参与人 *********************
+        String table = busData.get("table") + "_permit";
+        oaBusDynamicTableMapper.updateData(busData);
+
+        //4 存储用户信息到 业务数据权限表 - 构造用户信息
+        for (TaskInfoVO taskInfoVO : taskInfoVOs) {
+            saveDataPermit(taskInfoVO, table);
+        }
+    }
 
 
     /**
@@ -161,7 +183,7 @@ public class TaskInActServiceImpl implements TaskInActService {
                     for (Task taskDept : addDeptTask) {
                         //部门用户 抢签
                         taskId = taskDept.getId();
-                        if (randomParent.equalsIgnoreCase(taskDept.getParentTaskId())){
+                        if (randomParent.equalsIgnoreCase(taskDept.getParentTaskId())) {
                             //TODO 同一类型 多个部门如何区分
                             for (List<String> list : assignee) {
                                 for (String uid : list) {

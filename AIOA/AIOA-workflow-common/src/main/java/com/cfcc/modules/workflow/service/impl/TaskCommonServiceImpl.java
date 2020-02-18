@@ -623,7 +623,6 @@ public class TaskCommonServiceImpl implements TaskCommonService {
             addTaskDescript(task.getProcessInstanceId(), busMsg);
         } else {
             task = taskService.createTaskQuery().taskId(taskId).singleResult();
-
         }
 
         String assignee = task.getAssignee();
@@ -638,11 +637,11 @@ public class TaskCommonServiceImpl implements TaskCommonService {
         });
         taskInfoVO.setVars(vars);
 
-        //boolean qinaFa = isQinaFa(task);
+        boolean qinaFa = isQinaFa(task);
 
 
         //判断下一环节是否需要记录用户与使用记录的用户
-        //recordKeyAndUse(taskInfoVO, taskId, task);
+        recordKeyAndUse(taskInfoVO, taskId, task);
         //1 流程已办
         taskService.complete(taskId, taskInfoVO.getVars());
         // 记录接下来的待办的上一环节 用来撤回
@@ -658,14 +657,14 @@ public class TaskCommonServiceImpl implements TaskCommonService {
         addTaskDescript(task.getProcessInstanceId(), busMsg);
 
 
-        ////2 查询下n任务节点信息
-        //if (qinaFa) {
-        //    return nextActMore(taskInfoVOs, task) + "  ";
-        //} else {
-        //    return nextActMore(taskInfoVOs, task);
-        //}
+        //2 查询下n任务节点信息
+        if (qinaFa) {
+            return nextActMore(taskInfoVOs, task) + "  ";
+        } else {
+            return nextActMore(taskInfoVOs, task);
+        }
         //2 查询下一任务节点信息
-        return nextActMore(taskInfoVOs, task);
+        //return nextActMore(taskInfoVOs, task);
     }
 
     /**
@@ -784,11 +783,11 @@ public class TaskCommonServiceImpl implements TaskCommonService {
         } else {
             task = historyService.createHistoricTaskInstanceQuery().taskId(taskId).singleResult();
             processDefinitionId = task.getProcessDefinitionId();
-            if (processDefinitionId==null) {
+            if (processDefinitionId == null) {
                 //可能是追加的 没有在历史表里产生数据
                 Task task1 = taskService.createTaskQuery().taskId(taskId).singleResult();
-                if (task1==null)throw new AIOAException("追加用户信息不完整");
-                processDefinitionId=task1.getProcessDefinitionId();
+                if (task1 == null) throw new AIOAException("追加用户信息不完整");
+                processDefinitionId = task1.getProcessDefinitionId();
             }
         }
 
@@ -974,12 +973,12 @@ public class TaskCommonServiceImpl implements TaskCommonService {
 
     @Override
     public void updateHisActDept(Task task, String randomParent) {
-        taskMapper.updateHisActDept(task,randomParent);
+        taskMapper.updateHisActDept(task, randomParent);
     }
 
     @Override
     public void updateRuActDept(Task task, String randomParent) {
-        taskMapper.updateRuActDept(task,randomParent);
+        taskMapper.updateRuActDept(task, randomParent);
     }
 
 
@@ -1032,10 +1031,10 @@ public class TaskCommonServiceImpl implements TaskCommonService {
 
 
             }
-
             String s = next.get(0);
             //TODO 暂时这么做,后续修改
             nextTaskMsg.append(s);
+
         }
         return nextTaskMsg.toString();
     }
@@ -1123,7 +1122,6 @@ public class TaskCommonServiceImpl implements TaskCommonService {
     /**
      * 是否是签发人
      *
-     * @param task
      * @return
      */
     private boolean isQinaFa(Task task) {
@@ -1255,10 +1253,10 @@ public class TaskCommonServiceImpl implements TaskCommonService {
         Set<Expression> candidateUserIdExpressions = taskDefinition.getCandidateUserIdExpressions();
         //Set<Expression> candidateGroupIdExpressions = taskDefinition.getCandidateGroupIdExpressions();
         if (assigneeExpression == null && candidateUserIdExpressions.size() == 0) {//不能都没设置
-            throw new AIOAException("签收人与候选人必须设置一个,请检查流程图是设计");
+            throw new AIOAException("签收人与候选人必须设置一个,请检查流程图设计");
         }
         if (assigneeExpression != null && candidateUserIdExpressions.size() > 0) {//不能都设置
-            throw new AIOAException("签收人与候选人只能设置一个,请检查流程图是设计");
+            throw new AIOAException("签收人与候选人只能设置一个,请检查流程图设计");
 
         }
         if (assigneeExpression != null) vars.put(ElParse.parseNormal(assigneeExpression.getExpressionText()), true);
@@ -1652,11 +1650,11 @@ public class TaskCommonServiceImpl implements TaskCommonService {
         } else {
             task = historyService.createHistoricTaskInstanceQuery().taskId(taskId).singleResult();
             processDefinitionId = task.getProcessDefinitionId();
-            if (processDefinitionId==null) {
+            if (processDefinitionId == null) {
                 //可能是追加的 没有在历史表里产生数据
                 Task task1 = taskService.createTaskQuery().taskId(taskId).singleResult();
-                if (task1==null)throw new AIOAException("追加用户信息不完整");
-                processDefinitionId=task1.getProcessDefinitionId();
+                if (task1 == null) throw new AIOAException("追加用户信息不完整");
+                processDefinitionId = task1.getProcessDefinitionId();
             }
         }
 

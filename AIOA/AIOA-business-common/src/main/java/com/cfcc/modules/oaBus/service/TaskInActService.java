@@ -10,7 +10,7 @@ import java.util.Map;
 public interface TaskInActService {
     void doTask(TaskInfoVO taskInfoVO, HttpServletRequest request);
 
-    void doTaskMore(List<TaskInfoVO> taskInfoVOs);
+    void doTaskMore(List<TaskInfoVO> taskInfoVOs, HttpServletRequest request);
 
     void doAddUsers(ArrayList<TaskInfoVO> taskInfoVOS);
 }

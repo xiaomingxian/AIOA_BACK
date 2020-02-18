@@ -487,6 +487,7 @@ public class OaBusdataController {
         } catch (AIOAException e) {
             return Result.error(e.getMessage());
         } catch (Exception e) {
+            e.printStackTrace();
             log.error("新增数据失败:" + e.toString());
             return Result.error("新增数据失败");
         }
