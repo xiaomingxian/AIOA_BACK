@@ -81,7 +81,7 @@ public class TaskInActServiceImpl implements TaskInActService {
         oaBusDynamicTableMapper.updateData(busData);
 
         //4 存储用户信息到 业务数据权限表 - 构造用户信息
-        SaveDataPermit(taskInfoVO, table);
+        saveDataPermit(taskInfoVO, table);
     }
 
 
@@ -121,22 +121,40 @@ public class TaskInActServiceImpl implements TaskInActService {
             }
 
             String executionId = taskInfoVO.getExecutionId();
-            List<String> assignee = (List<String>)taskInfoVO.getAssignee();
+            if(taskInfoVO.getIsDept()!=null &&!taskInfoVO.getIsDept()){
+                List<String> assignee = (List<String>)taskInfoVO.getAssignee();
 
-            for (String userId : assignee) {
-                commandExecutor.execute(new AddUserCmd(executionId,userId,descript,parentTaskId
+                for (String userId : assignee) {
+                    commandExecutor.execute(new AddUserCmd(executionId,userId,descript,parentTaskId
+                            ,runtimeService,taskService,taskCommonService));
+                }
+            }else {
+                List<List<String>> assignee = (List<List<String>>)taskInfoVO.getAssignee();
+                commandExecutor.execute(new AddUserCmd(executionId,null,descript,parentTaskId
                         ,runtimeService,taskService,taskCommonService));
-
+                //部门用户 抢签
+                for (List<String> list : assignee) {
+                    for (String uid : list) {
+                        taskService.addCandidateUser(taskId, uid);
+                    }
+                }
             }
             taskCommonService.updateHisAct(task);
+            //TODO 参与表中添加   taskInfoVO.getTaskWithDepts().getDeptMsg();  部门信息需要前端构造
+            //********************* 写入参与人 *********************
+            Map<String,Object> busData=taskInfoVO.getBusData();
+            String table = busData.get("table") + "_permit";
+            oaBusDynamicTableMapper.updateData(busData);
 
-
-
+            //4 存储用户信息到 业务数据权限表 - 构造用户信息
+            saveDataPermit(taskInfoVO, table);
         }
+
+
 
     }
 
-    private void SaveDataPermit(TaskInfoVO taskInfoVO, String table) {
+    private void saveDataPermit(TaskInfoVO taskInfoVO, String table) {
         ArrayList<String> uids = new ArrayList<>();
         Boolean isDept = taskInfoVO.getIsDept();
         if (null != isDept && isDept) {

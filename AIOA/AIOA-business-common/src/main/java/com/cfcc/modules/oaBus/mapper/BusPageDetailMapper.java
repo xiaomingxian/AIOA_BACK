@@ -16,7 +16,7 @@ import java.util.Map;
  */
 public interface BusPageDetailMapper extends BaseMapper<BusPageDetail> {
 
-    List<String> getSDictIdByKey(@Param("key") Object key, @Param("sBusdataTable") String sBusdataTable, @Param("functionId") Integer i_bus_function_id);
+    List<String> getSDictIdByKey(@Param("functionId") Integer i_bus_function_id, @Param("sBusdataTable") String sBusdataTable, @Param("key") String key);
 
     int queryBusPageDetailCount(BusPageDetail busPageDetail);
 
