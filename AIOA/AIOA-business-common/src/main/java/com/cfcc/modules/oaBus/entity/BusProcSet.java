@@ -34,6 +34,10 @@ public class BusProcSet {
 	@Excel(name = "业务配置ID", width = 15)
     @ApiModelProperty(value = "业务配置ID")
 	private java.lang.Integer iBusFunctionId;
+	/**页面模板ID*/
+	@Excel(name = "页面模板ID", width = 15)
+    @ApiModelProperty(value = "页面模板ID")
+	private java.lang.Integer iPageId;
 	/**流程按钮配置ID*/
 	@Excel(name = "流程按钮配置ID", width = 15)
     @ApiModelProperty(value = "流程按钮配置ID")

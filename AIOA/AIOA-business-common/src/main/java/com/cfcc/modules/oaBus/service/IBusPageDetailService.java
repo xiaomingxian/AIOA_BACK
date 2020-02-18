@@ -35,6 +35,14 @@ public interface IBusPageDetailService extends IService<BusPageDetail> {
     int getBusPageDetailCount(String functionId, String pageId, String tableName);
 
     boolean updatePageDetail(BusPageDetail busPageDetail);
+
+    /**
+     * 根据functionId和VersionId查询出对应的iPageId,在根据IPageId和functionId查询出对应的pageDetetail
+     * @param functionId
+     * @param iPageId
+     * @return
+     */
+    List<BusPageDetail> getListByFunIDAndIPageId(String functionId, String iPageId);
 }
 
 

@@ -161,6 +161,7 @@ public class BusFunctionServiceImpl extends ServiceImpl<BusFunctionMapper, BusFu
         busProcSet.setIBusModelId(queryBusFunction.getIBusModelId());
         //2.插入到procset表中
         busProcSet.setIVersion(1);      //将版本设为0
+        busProcSet.setIPageId(busFunction.getIPageId()) ;
         iBusProcSetService.save(busProcSet);   //插入到对应的数据
         QueryWrapper<BusProcSet> queryWrapperProc = new QueryWrapper<>();
         queryWrapperProc.setEntity(busProcSet);
@@ -195,30 +196,42 @@ public class BusFunctionServiceImpl extends ServiceImpl<BusFunctionMapper, BusFu
     @CacheEvict(value = CacheConstant.FUNCTION_CACHE, allEntries = true)
     public void updateFunction(BusFunction busFunction, List<BusFunctionUnit> busFunctionUnit, BusProcSet busProcSet, List<BusFunctionView> busFunctionView,String schema) {
         busFunction.setDUpdateTime(new Date());
+        boolean updateProc = false ;        //是否修改proc标志
+        BusFunction busFunctionBefore = busFunctionMapper.selectByIid(busFunction.getIId()) ;
+
+        if(busFunction.getIPageId()!= busFunctionBefore.getIPageId()){
+            updateProc = true ;
+        }
+        StringUtil stringUtil = new StringUtil();
+        busProcSet.setIBusFunctionId(busFunction.getIId());
+        busProcSet = (BusProcSet) stringUtil.changeToNull(busProcSet);
         busFunctionMapper.updateById(busFunction);
         if (busProcSet != null) {
-            StringUtil stringUtil = new StringUtil();
-            busProcSet.setIBusFunctionId(busFunction.getIId());
-            busProcSet = (BusProcSet) stringUtil.changeToNull(busProcSet);
+
             //更新流程按钮逻辑，如果通过当前数据能查询出对应的数据，这没有发生改变，这样就不用更新，如果没有数据的话，
             //就再插入一条数据,修改版本号且将数据id更新到对应的function中
             QueryWrapper<BusProcSet> busProcSetqueryWrapper = new QueryWrapper<>();
             busProcSetqueryWrapper.setEntity(busProcSet);
             BusProcSet res = iBusProcSetService.getOne(busProcSetqueryWrapper);
             if (res == null) {
-                if (busProcSet.getIVersion() == null) {
-                    busProcSet.setIVersion(0);      //如果没有版本号的话，就将版本号设为0
-                }
-                busProcSet.setIVersion(busProcSet.getIVersion() + 1);  //将版本号加一
-                busProcSet.setIBusModelId(busFunction.getIBusModelId());
-                busProcSet.setIId(null);            //将之前的id置为空
-                iBusProcSetService.save(busProcSet);
-                QueryWrapper<BusProcSet> procSetQueryWrapper = new QueryWrapper<>();
-                procSetQueryWrapper.setEntity(busProcSet);
-                busProcSet = iBusProcSetService.getOne(procSetQueryWrapper);
-                busFunction.setIProcSetId(busProcSet.getIId());
-                busFunctionMapper.updateById(busFunction);          //将新插入的数据id保存到function表中
+                updateProc = true ;
             }
+
+        }
+        if(updateProc){
+            if (busProcSet.getIVersion() == null) {
+                busProcSet.setIVersion(0);      //如果没有版本号的话，就将版本号设为0
+            }
+            busProcSet.setIVersion(busProcSet.getIVersion() + 1);  //将版本号加一
+            busProcSet.setIId(null);            //将之前的id置为空
+            busProcSet.setIPageId(busFunction.getIPageId());            //将之前的id置为空
+            //查询结果为空的话，说明没这条记录（已修改），就将版本号加1，将id置为空，重新插入一条记录
+            iBusProcSetService.save(busProcSet);
+            QueryWrapper<BusProcSet> procSetQueryWrapper = new QueryWrapper<>();
+            procSetQueryWrapper.setEntity(busProcSet);
+            busProcSet = iBusProcSetService.getOne(procSetQueryWrapper);
+            busFunction.setIProcSetId(busProcSet.getIId());
+            busFunctionMapper.updateById(busFunction);          //将新插入的数据id保存到function表中
         }
 
 
