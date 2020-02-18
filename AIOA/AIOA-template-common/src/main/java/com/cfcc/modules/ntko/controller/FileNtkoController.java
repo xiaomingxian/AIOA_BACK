@@ -3,6 +3,7 @@ package com.cfcc.modules.ntko.controller;
 import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.cfcc.common.api.vo.Result;
+import com.cfcc.common.aspect.annotation.AutoLog;
 import com.cfcc.common.util.FileUtils;
 import com.cfcc.modules.message.websocket.WebSocket;
 import com.cfcc.modules.oaBus.entity.OaBusdata;
@@ -10,6 +11,7 @@ import com.cfcc.modules.oaBus.entity.OaFile;
 import com.cfcc.modules.oaBus.mapper.OaBusDynamicTableMapper;
 import com.cfcc.modules.oaBus.service.IOaBusdataService;
 import com.cfcc.modules.oaBus.service.IOaFileService;
+import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -143,15 +145,15 @@ public class FileNtkoController {
 
             OaFile ad = oaFileService.getOne(c);
 
-            String fileName = ad.getSFileName();
-
+//            String fileName = ad.getSFileName();
+            String filePath=ad.getSFilePath();
             if (null == ad) {
                 result.setMessage("文件控件系统出现问题，请联系管理");
             } else {
-                result.setResult(fileName);
+                result.setResult(filePath);
             }
 
-            System.out.println("----------------->>>>查看文件名" + fileName);
+            System.out.println("----------------->>>>查看文件路径" + filePath);
             return result;
         } catch (Exception e) {
             e.printStackTrace();
@@ -262,6 +264,32 @@ public class FileNtkoController {
         return result;
     }
 
+    /**
+     * 单文件复制
+     *
+     * @param
+     * @return
+     */
+    @AutoLog(value = "单文件复制")
+    @ApiOperation(value = "单文件复制", notes = "单文件复制")
+    @PostMapping(value = "/singleCopyFile")
+    public Result singleCopyFile(@RequestParam(value = "filepath", required = false) String filepath) {
+        Result<String> result = new Result< String >();
+        Map<String,Object> map=new HashMap<>();
+        map.put("sFilePath",filepath);
+        OaFile oa = oaFileService.singleCopyFile(map);
+        String fileName=oa.getSFileName();
+        try {
+            if (oa != null){
+                result.success("复制成功！");
+                result.setResult(fileName);
+            }
+        } catch (Exception e) {
+            log.error(e.getMessage(), e);
+            result.error500("复制失败");
+        }
+        return result;
+    }
 
     @PostMapping(value = "/fileupload")
     public Result<String> fileupload(HttpServletRequest request,

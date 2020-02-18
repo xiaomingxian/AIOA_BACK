@@ -86,7 +86,7 @@ public class FormalFileController {
             QueryWrapper<OaFile> c = new QueryWrapper<>();
             c.setEntity(oaFile);
             OaFile ad = oaFileService.getOne(c);
-            String zwFileName = ad.getSFileName();
+            String zwFileNamePath = ad.getSFilePath();
             //根据文号id查模板名
             DocNumManage docNumManage = documentMangeService.queryById(Integer.parseInt(id));
             Integer tmplateId = iDocNumSetService.queryByIdAndSendObj(docNumManage);
@@ -133,7 +133,7 @@ public class FormalFileController {
             String nowTime = calendar.get(Calendar.YEAR) + "年" + calendar.get(Calendar.MONTH + 1) + "月" + calendar.get(Calendar.DATE) + "日";
             map.put("CurDate", nowTime);
             map.put("fileName", fileName);
-            map.put("zwFileName", zwFileName);
+            map.put("zwFileNamePath", zwFileNamePath);
             result.setResult(map);
         } catch (RuntimeErrorException e) {
             log.error("系统正在升级，请联系管理员");
@@ -159,7 +159,8 @@ public class FormalFileController {
             Integer tmplateId = iDocNumSetService.queryByTemplateId(docNumManage);
             OaTemplate oaTemplate = iOaTemplateService.queryById(tmplateId);
             OaFile oaFile = iOaFileService.queryById(oaTemplate.getIFileId());
-            String fileName = oaFile.getSFileName();
+            //获取路径
+            String fileName = oaFile.getSFilePath();
             Map<String, Object> map = iOaBusdataService.getBusDataById(stable, tableid);
             //修改是否保存办文单
             if (map.size() != 0) {

@@ -38,11 +38,11 @@ public class FileUtils {
 //			String bizPath = "files";
 //            File filePath=new File("FileUtils.java");
 //            String apath=filePath.getAbsolutePath();
-            String apath=System.getProperty("user.dir");
-            String bpath=apath.substring(0,apath.lastIndexOf("\\"));
+//            String apath=System.getProperty("user.dir");
+//            String bpath=apath.substring(0,apath.lastIndexOf("\\"));
 //            String cpath=bpath.substring(0,bpath.lastIndexOf("\\"));
-            String newpath=bpath.replace("\\","/");
-            String path2=newpath+"/"+Path2;
+//            String newpath=bpath.replace("\\","/");
+//            String path2=newpath+"/"+Path2;
 
             Calendar calendar = Calendar.getInstance();
             String path = Path1.replace("//", "/" +
@@ -51,7 +51,6 @@ public class FileUtils {
                     "/" + calendar.get(Calendar.DATE) + "/";
             File file = new File(path);
             if (!file.exists()) {
-//                System.out.println("--------------------------->>>>>>文件目录没有！！！！");
                 file.mkdirs();// 创建文件根目录
             }
             MultipartHttpServletRequest multipartRequest = (MultipartHttpServletRequest) request;
@@ -61,14 +60,14 @@ public class FileUtils {
             String savePath = file.getPath() + File.separator + fileName;
             File savefile = new File(savePath);
             FileCopyUtils.copy(mf.getBytes(), savefile);
-            String tempPath=path2;//临时文件路径
+            /*String tempPath=path2;//临时文件路径
             File tempfile = new File(tempPath);
             String tempFile=tempfile.getPath()+File.separator+ fileName;
             File file1 = new File(tempFile);
 //            if (!file1.exists()) {
 //                file1.mkdirs();// 创建临时文件目录
 //            }
-            FileCopyUtils.copy(mf.getBytes(),file1 );
+            FileCopyUtils.copy(mf.getBytes(),file1 );*/
             map.put("fileName",fileName);
             map.put("savePath",savePath);
         } catch (IOException e) {
