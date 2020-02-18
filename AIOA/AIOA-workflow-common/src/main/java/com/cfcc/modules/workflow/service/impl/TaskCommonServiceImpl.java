@@ -1047,7 +1047,6 @@ public class TaskCommonServiceImpl implements TaskCommonService {
             addTaskDescript(task.getProcessInstanceId(), busMsg);
         } else {
             task = taskService.createTaskQuery().taskId(taskId).singleResult();
-
         }
 
 
@@ -1677,9 +1676,8 @@ public class TaskCommonServiceImpl implements TaskCommonService {
             if (null != task && task.getTaskDefinitionKey().equals(id)) {
                 currentAct = activity;
             }
-            if ("endEvent".equalsIgnoreCase(activity.getProperty("type").toString())) continue;//结束
-            if ("startevent".equalsIgnoreCase(activity.getProperty("type").toString())) continue;//开始
             if ((activity.getProperty("type").toString()).endsWith("Gateway")) continue;//网关
+            if ((activity.getProperty("type").toString()).endsWith("Event")) continue;//事件排除
             count++;
         }
 
@@ -2006,7 +2004,6 @@ public class TaskCommonServiceImpl implements TaskCommonService {
 
         //获取该实例所有运行中的任务
         List<Task> list = taskService.createTaskQuery().processInstanceId(taskInfoVO.getProcessId()).list();
-
 
         //流程实例Id
         ProcessInstance processInstance = runtimeService.createProcessInstanceQuery()
