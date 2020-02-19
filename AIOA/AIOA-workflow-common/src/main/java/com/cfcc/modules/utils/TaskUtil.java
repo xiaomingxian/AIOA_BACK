@@ -52,10 +52,10 @@ public class TaskUtil /*extends WorkFlowService implements ApplicationContextAwa
                 //节点属性存储实体 网关连着而且可能存储完成条件(条件要接起来)
                 if (activity == null) {
                     activity = new Activity();
-                }else {
+                } else {
                     //获取上一存储完成条件 追加在下一个(新建对象属性都为空,不会串过多的条件) [网关连着的情况]
                     Map<String, String> conditionContext = activity.getConditionContext();
-                    activity=new Activity();
+                    activity = new Activity();
                     activity.setConditionContext(conditionContext);
                 }
                 /**
@@ -78,13 +78,18 @@ public class TaskUtil /*extends WorkFlowService implements ApplicationContextAwa
                 exclusiveGateWayNoCondition(activity, source, conditionText);
 
 
-
                 if (type.contains("Gateway")) {//当前节点为网关
                     // 网关连着的情况
                     if (sourceType.contains("Gateway")) {
                         if (conditionText != null) {
                             Map<String, String> parse = ElParse.parseCondition((String) conditionText);
                             activity.setConditionContext(parse);
+                            if (sourceType.equalsIgnoreCase("exclusiveGateway"))
+                                activity.setExclusiveGatewayParent(true);
+                            if (sourceType.equalsIgnoreCase("InclusiveGateway"))
+                                activity.setInclusiveGatewayParent(true);
+                            if (sourceType.equalsIgnoreCase("ParallelGateway"))
+                                activity.setParallelGatewayParent(true);
                         }
                     }
                     //递归--查询
@@ -134,12 +139,12 @@ public class TaskUtil /*extends WorkFlowService implements ApplicationContextAwa
     }
 
     /**
-     *
      * 排他网关存在
+     *
      * @param activity
      * @param conditionText
      */
-    private static void exclusiveGateWayNoCondition(Activity activity,  PvmActivity source, Object conditionText) {
+    private static void exclusiveGateWayNoCondition(Activity activity, PvmActivity source, Object conditionText) {
         String sourceType = (String) source.getProperty("type");
 
         if (sourceType.equalsIgnoreCase("ExclusiveGateway") && conditionText == null) {
