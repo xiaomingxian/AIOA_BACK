@@ -39,7 +39,7 @@ public interface IOaBusdataService  extends  IService<OaBusdata>{
      *
      * @return
      */
-    Result<IPage<Map<String, Object>>> getByModelId(String json, String userName) ;
+    Result<IPage<Map<String, Object>>> getByModelId(String json, String realName, String username) ;
 
     /**
      * 通过model_id，任务环节返回，返回map

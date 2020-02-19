@@ -183,11 +183,13 @@ public class OaBusdataServiceImpl extends ServiceImpl<OaBusdataMapper, OaBusdata
      * 根据modelId和functionId以及相应的权限查出对应的busdata数据列表
      *
      * @param json
+     * @param realName
+     * @param username
      * @return
      * @throws Exception
      */
     @Override
-    public Result<IPage<Map<String, Object>>> getByModelId(String json, String userName) {
+    public Result<IPage<Map<String, Object>>> getByModelId(String json, String realName, String username) {
         log.info(json);
         Result<IPage<Map<String, Object>>> result = new Result<>();
         Map maps = (Map) JSONObject.parse(json);
@@ -257,21 +259,21 @@ public class OaBusdataServiceImpl extends ServiceImpl<OaBusdataMapper, OaBusdata
         }
 
         //处理是否为查询 由我创建
-        String selType = "1";
+        String selType = "1";       //默认为1
         if (condition.containsKey("selType")) {
             selType = condition.get("selType") + "";
             condition.remove("selType");
         }
-        if ("0".equals(selType)) {
-            int count = oaBusdataMapper.getBusdataByCreateNameCount(tableName, condition, userName);
+        if ("0".equals(selType)) {      // 0 查询为由我创建
+            int count = oaBusdataMapper.getBusdataByCreateNameCount(tableName, condition, realName);
             List<Map<String, Object>> dataList = oaBusdataMapper.getBusdataByCreateName((pageNo - 1) * pageSize,
-                    pageSize, col, tableName, condition, userName, orderFlag);
+                    pageSize, col, tableName, condition, realName, orderFlag);
             page.setRecords(dataList);
             page.setTotal(count);
             result.setResult(page);
 
         } else {
-            Map<String, String> permitData = permit(functionId, tableName, userName);       //根据权限，查询出对应的查询条件
+            Map<String, String> permitData = permit(functionId, tableName, username);       //根据权限，查询出对应的查询条件
             String userId = permitData.get("userId");
             String userUnit = permitData.get("userUnit");
             String userDepart = permitData.get("userDepart");
