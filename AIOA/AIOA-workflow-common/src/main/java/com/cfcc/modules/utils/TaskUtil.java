@@ -34,7 +34,10 @@ public class TaskUtil /*extends WorkFlowService implements ApplicationContextAwa
      * 0 包容
      * 1 并行
      */
-    public static void searchNextActsInfo(List<Activity> nexts, PvmActivity currentAct, Map<String, Map<String, Object>> acts, int gateWayType) {
+    public static void searchNextActsInfo(List<Activity> nexts, PvmActivity currentAct,
+                                          Map<String, Map<String, Object>> acts,
+                                          int gateWayType, Activity activity
+    ) {
 
         //获取输出连线
         List<PvmTransition> outTransitions = currentAct.getOutgoingTransitions();
@@ -43,10 +46,18 @@ public class TaskUtil /*extends WorkFlowService implements ApplicationContextAwa
             // 当前节点有后续连线的情况下---遍历输输出连线(跳过网关,事件)
             for (PvmTransition outLine : outTransitions) {
                 PvmActivity destination = outLine.getDestination();
+                PvmActivity source = outLine.getSource();
                 //解析节点属性-需要转换类型
                 ActivityBehavior activityBehavior = ((ActivityImpl) destination).getActivityBehavior();
-                //节点属性存储实体
-                Activity activity = new Activity();
+                //节点属性存储实体 网关连着而且可能存储完成条件(条件要接起来)
+                if (activity == null) {
+                    activity = new Activity();
+                }else {
+                    //获取上一存储完成条件 追加在下一个(新建对象属性都为空,不会串过多的条件) [网关连着的情况]
+                    Map<String, String> conditionContext = activity.getConditionContext();
+                    activity=new Activity();
+                    activity.setConditionContext(conditionContext);
+                }
                 /**
                  * 所属网关类型
                  */
@@ -61,22 +72,37 @@ public class TaskUtil /*extends WorkFlowService implements ApplicationContextAwa
 
                 //节点类型
                 String type = (String) destination.getProperty("type");
+                String sourceType = (String) source.getProperty("type");
+                Object conditionText = outLine.getProperty("conditionText");
+                //排他网关存在一个没有条件的情况
+                exclusiveGateWayNoCondition(activity, source, conditionText);
+
+
+
                 if (type.contains("Gateway")) {//当前节点为网关
+                    // 网关连着的情况
+                    if (sourceType.contains("Gateway")) {
+                        if (conditionText != null) {
+                            Map<String, String> parse = ElParse.parseCondition((String) conditionText);
+                            activity.setConditionContext(parse);
+                        }
+                    }
                     //递归--查询
                     //判断网关类型
                     if (activityBehavior instanceof InclusiveGatewayActivityBehavior) {//包容网关
-                        searchNextActsInfo(nexts, destination, acts, 0);
+                        searchNextActsInfo(nexts, destination, acts, 0, activity);
                     } else if (activityBehavior instanceof ParallelMultiInstanceBehavior) {//并行网关
-                        searchNextActsInfo(nexts, destination, acts, 1);
+                        searchNextActsInfo(nexts, destination, acts, 1, activity);
                     } else {
-                        searchNextActsInfo(nexts, destination, acts, -1);
+                        searchNextActsInfo(nexts, destination, acts, -1, activity);
                     }
 
                 } else if (type.equalsIgnoreCase("subProcess")) {
                     //子流程 就直接获取该节点的信息
+
                     ParallelMultiInstanceOrUserTaskActivity(activity, activityBehavior, outLine, acts, destination);
                     List<? extends PvmActivity> activities = destination.getActivities();
-                    if(activities.size()>0){
+                    if (activities.size() > 0) {
                         PvmActivity pvmActivity = activities.get(0);
                         String id = pvmActivity.getId();
                         activity.setFirstSonKey(id);//子流程下的第一个环节
@@ -84,8 +110,8 @@ public class TaskUtil /*extends WorkFlowService implements ApplicationContextAwa
                     nexts.add(activity);
                 } else if (type.equalsIgnoreCase("endEvent")) {
                     //结束事件--判断是否有父节点(可能是子流程中的结束事件)
-                    //TODO
                     //判断是否流程最终的结束时间
+
                     ParallelMultiInstanceOrUserTaskActivity(activity, activityBehavior, outLine, acts, destination);
                     activity.setType("endEvent");
                     activity.setName("办结");
@@ -94,6 +120,7 @@ public class TaskUtil /*extends WorkFlowService implements ApplicationContextAwa
                 } else {
                     //普通节点
                     //判断节点是否是设计上的多实例
+                    //如果网关是排他 没有完成条件时 得设置一个 用来办理任务
                     ParallelMultiInstanceOrUserTaskActivity(activity, activityBehavior, outLine, acts, destination);
                     nexts.add(activity);
                 }
@@ -101,10 +128,37 @@ public class TaskUtil /*extends WorkFlowService implements ApplicationContextAwa
             }
         } else {
             //如果当前步骤定义信息为空，尝试获取父节点的Transition
-
             //TODO
         }
 
+    }
+
+    /**
+     *
+     * 排他网关存在
+     * @param activity
+     * @param conditionText
+     */
+    private static void exclusiveGateWayNoCondition(Activity activity,  PvmActivity source, Object conditionText) {
+        String sourceType = (String) source.getProperty("type");
+
+        if (sourceType.equalsIgnoreCase("ExclusiveGateway") && conditionText == null) {
+            HashMap<String, String> condition = new HashMap<>();
+            List<PvmTransition> outgoingTransitions = source.getOutgoingTransitions();
+            for (PvmTransition outgoingTransition : outgoingTransitions) {
+                Object conditionTextHaveContext = outgoingTransition.getProperty("conditionText");
+                if (conditionTextHaveContext != null) {
+                    Map<String, String> parse = ElParse.parseCondition((String) conditionTextHaveContext);
+                    for (String k : parse.keySet()) {
+                        //为排他网关下没有 条件的节点设置随机值 使其他节点条件不成立
+                        String randomCondition = UUID.randomUUID().toString().replaceAll("-", "");
+                        condition.put(k, randomCondition);
+                    }
+                    activity.setConditionContext(condition);
+                    break;
+                }
+            }
+        }
     }
 
     /**

@@ -28,7 +28,9 @@ public class Activity implements Serializable {
      * @return
      */
     private boolean InclusiveGateway;
+    private boolean InclusiveGatewayParent;//网关连着的情况，包含父网关
     private boolean ParallelGateway;
+    private boolean ParallelGatewayParent;//网关连着的情况，并行父网关
 
 
     public List<String> getDeptsList() {

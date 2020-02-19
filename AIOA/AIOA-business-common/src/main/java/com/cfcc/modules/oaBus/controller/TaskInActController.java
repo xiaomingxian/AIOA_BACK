@@ -325,14 +325,6 @@ public class TaskInActController {
                 list.add(oneAct);
             }
         }
-        for (Activity act : acts) {
-            if (act.getConditionContext() == null && conditionContext != null) {//处理排他网关不设置条件的情况
-                for (String key : conditionContext.keySet()) {
-                    conditionContext.put(key, UUID.randomUUID().toString());
-                }
-                act.setConditionContext(conditionContext);
-            }
-        }
 
         return list;
     }

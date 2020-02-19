@@ -1694,7 +1694,7 @@ public class TaskCommonServiceImpl implements TaskCommonService {
         if (count != acts.size()) return null;//环节配置信息不完善请检查
 
         //查询下几个节点
-        TaskUtil.searchNextActsInfo(nexts, currentAct, acts, -1);
+        TaskUtil.searchNextActsInfo(nexts, currentAct, acts, -1,null);
 
         return nexts;
     }
