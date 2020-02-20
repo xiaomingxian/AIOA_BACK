@@ -263,7 +263,7 @@ public class NewTaskController {
                 result.error500("未找到对应实体");
             }
             List<Map<String, String>> listAll = new ArrayList<>();
-            for (BusModel model : ModelList) {
+           /* for (BusModel model : ModelList) {
                 Map<String, String> map = new HashMap<>();
                 String modelid = model.getIId().toString();
                 String modelSName = model.getSName();
@@ -272,7 +272,17 @@ public class NewTaskController {
                     map.put("modelSName", modelSName);
                     listAll.add(map);
                 }
-            }
+            }*/
+            ModelList.forEach(model -> {
+                Map<String, String> map = new HashMap<>();
+                String modelid = model.getIId().toString();
+                String modelSName = model.getSName();
+                if (list1.contains(modelid)) {
+                    map.put("modelid", modelid);
+                    map.put("modelSName", modelSName);
+                    listAll.add(map);
+                }
+            });
             result.setResult(listAll);
 
         }
@@ -410,7 +420,7 @@ public class NewTaskController {
                 result.error500("未找到对应实体");
             }
             List<Map<String, String>> listAll = new ArrayList<>();
-            for (BusFunction function : FunctionList) {
+            /*for (BusFunction function : FunctionList) {
                 Map<String, String> map = new HashMap<>();
                 if (modelId == function.getIBusModelId()) {
                     String functionid = function.getIId().toString();
@@ -421,7 +431,19 @@ public class NewTaskController {
                         listAll.add(map);
                     }
                 }
-            }
+            }*/
+            FunctionList.forEach(function -> {
+                Map<String, String> map = new HashMap<>();
+                if (modelId == function.getIBusModelId()) {
+                    String functionid = function.getIId().toString();
+                    String functionSName = function.getSName();
+                    if (list1.contains(functionid)) {
+                        map.put("functionid", functionid);
+                        map.put("functionSName", functionSName);
+                        listAll.add(map);
+                    }
+                }
+            });
             result.setResult(listAll);
         }
 
