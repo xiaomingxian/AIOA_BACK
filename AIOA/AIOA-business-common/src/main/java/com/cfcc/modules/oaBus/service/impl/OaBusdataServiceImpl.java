@@ -381,22 +381,22 @@ public class OaBusdataServiceImpl extends ServiceImpl<OaBusdataMapper, OaBusdata
         String iFunVersion = oaBusdata.get("i_fun_version") + "";
         //增加根据版本查询对应点的IPageID，通过IPageId，和FunctionID查询出对应的字段含义
         //为兼容以前的版本，先查询iPageId，如果有iPageId的话，则用iPageId查询，如果没有的话，就直接查
-        QueryWrapper<BusProcSet> queryWrapper = new QueryWrapper<>() ;
-        BusProcSet busProcSet1 = new BusProcSet() ;
-        busProcSet1.setIBusFunctionId(Integer.parseInt(functionId)) ;
-        busProcSet1.setIVersion(Integer.parseInt(iFunVersion)) ;
+        QueryWrapper<BusProcSet> queryWrapper = new QueryWrapper<>();
+        BusProcSet busProcSet1 = new BusProcSet();
+        busProcSet1.setIBusFunctionId(Integer.parseInt(functionId));
+        busProcSet1.setIVersion(Integer.parseInt(iFunVersion));
         queryWrapper.setEntity(busProcSet1);
-        busProcSet1 = iBusProcSetService.getOne(queryWrapper) ;
-        List<BusPageDetail> busPageDetailList = new ArrayList<BusPageDetail>() ;
-        if(busProcSet1.getIPageId() == null){
+        busProcSet1 = iBusProcSetService.getOne(queryWrapper);
+        List<BusPageDetail> busPageDetailList = new ArrayList<BusPageDetail>();
+        if (busProcSet1.getIPageId() == null) {
             busPageDetailList = ibusPageDetailService.getListByFunID(functionId);
             Map<String, Object> pageMap = getPageUrlSer(functionId);
             result.put("pageRef", pageMap.get("pageRef"));
             result.put("actShow", pageMap.get("actShow"));
-        }else{ // 不为空的话
-            String iPageId = busProcSet1.getIPageId() + "" ;
-            busPageDetailList = ibusPageDetailService.getListByFunIDAndIPageId(functionId,iPageId);
-            BusPage busPage = iBusPageService.getById(iPageId) ;
+        } else { // 不为空的话
+            String iPageId = busProcSet1.getIPageId() + "";
+            busPageDetailList = ibusPageDetailService.getListByFunIDAndIPageId(functionId, iPageId);
+            BusPage busPage = iBusPageService.getById(iPageId);
             result.put("pageRef", busPage.getSPagePath());
             result.put("actShow", busPage.getActShow());
         }
@@ -422,13 +422,13 @@ public class OaBusdataServiceImpl extends ServiceImpl<OaBusdataMapper, OaBusdata
             throw new AIOAException("数据版本与设置版本不一致请检查版本");
         }
 
-        //TODO 后期会优化 删掉
         Map<String, Object> procSet = iBusProcSetService.getProcSetNewTask(modelId + "", functionId, i_fun_version.toString());
         //读取该流程的第一个环节
         String processInstanceId = null;
         String processDefinitionId = null;
         String proKey = null;
         String taskDef = null;
+        String executionId = null;
         Object proKey1 = procSet.get("proKey");
         if (proKey1 == null || (proKey1 != null && "".equals(proKey1))) {//没有流程
             taskDef = null;//新建任务
@@ -467,13 +467,15 @@ public class OaBusdataServiceImpl extends ServiceImpl<OaBusdataMapper, OaBusdata
             if (historicTaskInstance == null) throw new AIOAException("当前任务不存在,可能已经被和删除,请重新进入页面");
             processDefinitionId = historicTaskInstance.getProcessDefinitionId();
             processInstanceId = historicTaskInstance.getProcessInstanceId();
+            executionId = historicTaskInstance.getExecutionId();
             if (processDefinitionId == null || processInstanceId == null) {
                 Task task = taskService.createTaskQuery().taskId(taskId).singleResult();
                 if (task != null) {
                     processDefinitionId = task.getProcessDefinitionId();
                     processInstanceId = task.getProcessInstanceId();
-                }else {
-                    throw  new AIOAException("该流程存在追加的任务【"+historicTaskInstance.getName()+"】,信息有误");
+                    executionId = task.getExecutionId();
+                } else {
+                    throw new AIOAException("该流程存在追加的任务【" + historicTaskInstance.getName() + "】,信息有误");
                 }
             }
         }
@@ -487,6 +489,9 @@ public class OaBusdataServiceImpl extends ServiceImpl<OaBusdataMapper, OaBusdata
         result.put("processDefinitionId", processDefinitionId);
         result.put("processInstanceId", processInstanceId);
         result.put("status", status);
+        result.put("table", tableName);
+        result.put("executionId", executionId);
+        result.put("functionId", functionId);
         log.info(result.toString());
 
         //******************************************   按钮/意见
@@ -1122,14 +1127,14 @@ public class OaBusdataServiceImpl extends ServiceImpl<OaBusdataMapper, OaBusdata
             List<BusFunctionUnit> busFunctionUnitList = iBusFunctionUnitService.list(wrapper);
             if (busFunctionUnitList != null && busFunctionUnitList.size() > 0) {
                 for (BusFunctionUnit funUnit : busFunctionUnitList) {
-                    if ((funUnit.getSDeptId()!=null && funUnit.getSDeptId().equals( depart.getId()))
-                            || (funUnit.getSUnitId().equals(depart.getParentId()) && funUnit.getSDeptId() == null)){
+                    if ((funUnit.getSDeptId() != null && funUnit.getSDeptId().equals(depart.getId()))
+                            || (funUnit.getSUnitId().equals(depart.getParentId()) && funUnit.getSDeptId() == null)) {
                         return true;
                     } else {
                         List<String> unitList = sysDepartService.getUnitList(depart.getParentId());
-                        for(String str : unitList){
-                            if(funUnit.getSUnitId().equals(str)){
-                                return true ;
+                        for (String str : unitList) {
+                            if (funUnit.getSUnitId().equals(str)) {
+                                return true;
                             }
                         }
                         return false;
