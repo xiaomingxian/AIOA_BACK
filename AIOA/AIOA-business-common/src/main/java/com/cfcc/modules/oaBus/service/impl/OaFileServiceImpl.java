@@ -494,7 +494,7 @@ public class OaFileServiceImpl extends ServiceImpl<OaFileMapper, OaFile> impleme
                 Set<String> set = oaBusdatum.keySet();
                 for (String key : set) {
                     Object value = oaBusdatum.get(key);
-                    System.out.println("key:"+key+",  sBusdataTable:"+sBusdataTable+"， functionId" + functionId);
+//                    System.out.println("key:"+key+",  sBusdataTable:"+sBusdataTable+"， functionId" + functionId);
                     List<String> sDictIdlist = busPageDetailMapper.getSDictIdByKey(functionId, sBusdataTable, key);
                     System.out.println("................." + sDictIdlist + ".................");
                     String aa = null;

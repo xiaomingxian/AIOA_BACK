@@ -28,7 +28,10 @@ public class Activity implements Serializable {
      * @return
      */
     private boolean InclusiveGateway;
+    private boolean InclusiveGatewayParent;//网关连着的情况，包含父网关
     private boolean ParallelGateway;
+    private boolean ParallelGatewayParent;//网关连着的情况，并行父网关
+    private boolean exclusiveGatewayParent;//网关连着的情况，排他父网关
 
 
     public List<String> getDeptsList() {
@@ -44,7 +47,7 @@ public class Activity implements Serializable {
     }
 
 
-    private Map<String, String> conditionContext;//完成条件 key-value
+    private Map<String, String> conditionContext=new HashMap<>();//完成条件 key-value
 
     //回退相关
     Set<String> userIds;

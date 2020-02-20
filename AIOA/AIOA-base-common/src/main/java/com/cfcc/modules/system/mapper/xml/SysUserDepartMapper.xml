@@ -1,9 +1,25 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.cfcc.modules.system.mapper.SysUserDepartMapper">
+    <insert id="saveDepartIdByUserId">
+        insert into sys_user_depart (user_id, dept_id)values (#{userId}, #{departId})
+    </insert>
     <select id="getUserDepartByUid" parameterType="String" resultType="com.cfcc.modules.system.entity.SysUserDepart">
 		SELECT *
 		FROM sys_user_depart
 		WHERE user_id = #{userId, jdbcType=VARCHAR}
+    </select>
+
+    <select id="findDepartIdByUserId" resultType="java.lang.Long">
+        select count(i_id) from sys_user_depart
+        <where>
+            1 = 1
+            <if test="userId != null and userId != ''">
+                and user_id = #{userId}
+            </if>
+            <if test="departId != null and departId != ''">
+                and dept_id = #{departId}
+            </if>
+        </where>
     </select>
 </mapper>

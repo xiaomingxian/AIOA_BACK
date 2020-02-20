@@ -80,7 +80,7 @@ public class TaskInActServiceImpl implements TaskInActService {
         Map<String, Object> busData = taskInfoVO.getBusData();
         //更新当前节点信息
         busData.put("s_cur_task_name", nextTaskMsg);
-        if ("end-已结束".equals(nextTaskMsg)) {
+        if (nextTaskMsg!=null && nextTaskMsg.contains("已结束")){
             busData.put("i_is_state", 1);
         }
         for (String remove : TaskConstant.REMOVEFILEDS) {

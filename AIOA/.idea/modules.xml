@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ProjectModuleManager">
+    <modules>
+      <module fileurl="file://$PROJECT_DIR$/AIOA.iml" filepath="$PROJECT_DIR$/AIOA.iml" />
+      <module fileurl="file://$PROJECT_DIR$/AIOA-base-common/AIOA-base-common.iml" filepath="$PROJECT_DIR$/AIOA-base-common/AIOA-base-common.iml" />
+      <module fileurl="file://$PROJECT_DIR$/AIOA-business-common/AIOA-business-common.iml" filepath="$PROJECT_DIR$/AIOA-business-common/AIOA-business-common.iml" />
+      <module fileurl="file://$PROJECT_DIR$/AIOA-module-system/AIOA-module-system.iml" filepath="$PROJECT_DIR$/AIOA-module-system/AIOA-module-system.iml" />
+      <module fileurl="file://$PROJECT_DIR$/AIOA-template-common/AIOA-template-common.iml" filepath="$PROJECT_DIR$/AIOA-template-common/AIOA-template-common.iml" />
+      <module fileurl="file://$PROJECT_DIR$/AIOA-workflow-common/AIOA-workflow-common.iml" filepath="$PROJECT_DIR$/AIOA-workflow-common/AIOA-workflow-common.iml" />
+    </modules>
+  </component>
+</project>

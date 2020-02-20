@@ -2,7 +2,9 @@ package com.cfcc.modules.system.service.impl;
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.cfcc.modules.system.entity.SysUserDepart;
 import com.cfcc.modules.system.entity.sysUserManagedepts;
+import com.cfcc.modules.system.mapper.SysUserDepartMapper;
 import com.cfcc.modules.system.mapper.SysUserManagedeptsMapper;
 import com.cfcc.modules.system.service.ISysUserManagedeptsService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,6 +28,9 @@ public class SysUserManagedeptsServiceImpl extends ServiceImpl<SysUserManagedept
 
     @Autowired
     private SysUserManagedeptsMapper sysUserManagedeptsMapper;
+
+    @Autowired
+    private SysUserDepartMapper sysUserDepartMapper;
 
     public void deleteListById(List<String> departMapId){
         if (departMapId != null){

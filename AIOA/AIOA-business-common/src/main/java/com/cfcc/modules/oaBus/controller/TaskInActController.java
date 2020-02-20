@@ -253,6 +253,7 @@ public class TaskInActController {
         } catch (AIOAException e) {
             return Result.error(e.getMessage());
         } catch (Exception e) {
+            e.printStackTrace();
             log.error(e.toString());
             return Result.error("查询失败");
         }
@@ -323,14 +324,6 @@ public class TaskInActController {
             }
             if (i.getType().equalsIgnoreCase("endevent") && acts.size() == 1) {
                 list.add(oneAct);
-            }
-        }
-        for (Activity act : acts) {
-            if (act.getConditionContext() == null && conditionContext != null) {//处理排他网关不设置条件的情况
-                for (String key : conditionContext.keySet()) {
-                    conditionContext.put(key, UUID.randomUUID().toString());
-                }
-                act.setConditionContext(conditionContext);
             }
         }
 
