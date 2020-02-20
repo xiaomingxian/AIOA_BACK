@@ -253,6 +253,7 @@ public class TaskInActController {
         } catch (AIOAException e) {
             return Result.error(e.getMessage());
         } catch (Exception e) {
+            e.printStackTrace();
             log.error(e.toString());
             return Result.error("查询失败");
         }

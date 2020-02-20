@@ -25,30 +25,30 @@ public class ElParse {
             ss = ss.replace("(", "").replace(")", "");
         }
 
-        if (ss.contains("||") && ss.contains("&&")) {
-            ss = ss.replace("||", "-");
-            ss = ss.replace("&&", "-");
+        if (ss.contains(" || ") && ss.contains(" && ")) {
+            ss = ss.replace(" || ", "-");
+            ss = ss.replace(" && ", "-");
         }
-        if (ss.contains("||") && !ss.contains("&&")) {
+        if (ss.contains(" || ") && !ss.contains(" && " )) {
             ss = ss.replace("||", "-");
         }
-        if (!ss.contains("||") && ss.contains("&&")) {
-            ss = ss.replace("&&", "-");
+        if (!ss.contains(" || ") && ss.contains(" && ")) {
+            ss = ss.replace(" && ", "-");
         }
         /**
          * todo 待验证
          */
 
-        if (ss.contains("and") && ss.contains("or")) {
-            ss = ss.replace("and", "-");
-            ss = ss.replace("or", "-");
+        if (ss.contains(" and ") && ss.contains(" or ")) {
+            ss = ss.replace(" and ", "-");
+            ss = ss.replace(" or ", "-");
         }
-        if (!ss.contains("or") && ss.contains("and")) {
-            ss = ss.replace("and", "-");
+        if (!ss.contains(" or ") && ss.contains(" and ")) {
+            ss = ss.replace(" and ", "-");
         }
 
-        if (!ss.contains("and") && ss.contains("or")) {
-            ss = ss.replace("or", "-");
+        if (!ss.contains(" and ") && ss.contains(" or ")) {
+            ss = ss.replace(" or ", "-");
         }
         if (ss.contains("-")) {
             String[] split = ss.split("-");

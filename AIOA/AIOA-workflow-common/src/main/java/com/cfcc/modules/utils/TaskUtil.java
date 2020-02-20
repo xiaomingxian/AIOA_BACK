@@ -36,7 +36,7 @@ public class TaskUtil /*extends WorkFlowService implements ApplicationContextAwa
      */
     public static void searchNextActsInfo(List<Activity> nexts, PvmActivity currentAct,
                                           Map<String, Map<String, Object>> acts,
-                                          int gateWayType, Activity activity
+                                          int gateWayType, PvmTransition outLineInGateWay
     ) {
 
         //获取输出连线
@@ -50,14 +50,10 @@ public class TaskUtil /*extends WorkFlowService implements ApplicationContextAwa
                 //解析节点属性-需要转换类型
                 ActivityBehavior activityBehavior = ((ActivityImpl) destination).getActivityBehavior();
                 //节点属性存储实体 网关连着而且可能存储完成条件(条件要接起来)
-                if (activity == null) {
-                    activity = new Activity();
-                } else {
-                    //获取上一存储完成条件 追加在下一个(新建对象属性都为空,不会串过多的条件) [网关连着的情况]
-                    Map<String, String> conditionContext = activity.getConditionContext();
-                    activity = new Activity();
-                    activity.setConditionContext(conditionContext);
-                }
+                Activity activity = new Activity();
+
+
+
                 /**
                  * 所属网关类型
                  */
@@ -72,7 +68,7 @@ public class TaskUtil /*extends WorkFlowService implements ApplicationContextAwa
 
                 //节点类型
                 String type = (String) destination.getProperty("type");
-                String sourceType = (String) source.getProperty("type");
+                //String sourceType = (String) source.getProperty("type");
                 Object conditionText = outLine.getProperty("conditionText");
                 //排他网关存在一个没有条件的情况
                 exclusiveGateWayNoCondition(activity, source, conditionText);
@@ -80,30 +76,19 @@ public class TaskUtil /*extends WorkFlowService implements ApplicationContextAwa
 
                 if (type.contains("Gateway")) {//当前节点为网关
                     // 网关连着的情况
-                    if (sourceType.contains("Gateway")) {
-                        if (conditionText != null) {
-                            Map<String, String> parse = ElParse.parseCondition((String) conditionText);
-                            activity.setConditionContext(parse);
-                            if (sourceType.equalsIgnoreCase("exclusiveGateway"))
-                                activity.setExclusiveGatewayParent(true);
-                            if (sourceType.equalsIgnoreCase("InclusiveGateway"))
-                                activity.setInclusiveGatewayParent(true);
-                            if (sourceType.equalsIgnoreCase("ParallelGateway"))
-                                activity.setParallelGatewayParent(true);
-                        }
-                    }
-                    //递归--查询
                     //判断网关类型
                     if (activityBehavior instanceof InclusiveGatewayActivityBehavior) {//包容网关
-                        searchNextActsInfo(nexts, destination, acts, 0, activity);
+                        searchNextActsInfo(nexts, destination, acts, 0, outLine);
                     } else if (activityBehavior instanceof ParallelMultiInstanceBehavior) {//并行网关
-                        searchNextActsInfo(nexts, destination, acts, 1, activity);
+                        searchNextActsInfo(nexts, destination, acts, 1, outLine);
                     } else {
-                        searchNextActsInfo(nexts, destination, acts, -1, activity);
+                        searchNextActsInfo(nexts, destination, acts, -1, outLine);
                     }
 
                 } else if (type.equalsIgnoreCase("subProcess")) {
                     //子流程 就直接获取该节点的信息
+                    //上上条线(可能是多个,选择两头都是网关的情况)
+                    gateWayMore(outLineInGateWay, activity);
 
                     ParallelMultiInstanceOrUserTaskActivity(activity, activityBehavior, outLine, acts, destination);
                     List<? extends PvmActivity> activities = destination.getActivities();
@@ -116,6 +101,8 @@ public class TaskUtil /*extends WorkFlowService implements ApplicationContextAwa
                 } else if (type.equalsIgnoreCase("endEvent")) {
                     //结束事件--判断是否有父节点(可能是子流程中的结束事件)
                     //判断是否流程最终的结束时间
+                    //上上条线(可能是多个,选择两头都是网关的情况)
+                    gateWayMore(outLineInGateWay, activity);
 
                     ParallelMultiInstanceOrUserTaskActivity(activity, activityBehavior, outLine, acts, destination);
                     activity.setType("endEvent");
@@ -126,6 +113,8 @@ public class TaskUtil /*extends WorkFlowService implements ApplicationContextAwa
                     //普通节点
                     //判断节点是否是设计上的多实例
                     //如果网关是排他 没有完成条件时 得设置一个 用来办理任务
+                    //上上条线(可能是多个,选择两头都是网关的情况)
+                    gateWayMore(outLineInGateWay, activity);
                     ParallelMultiInstanceOrUserTaskActivity(activity, activityBehavior, outLine, acts, destination);
                     nexts.add(activity);
                 }
@@ -136,6 +125,37 @@ public class TaskUtil /*extends WorkFlowService implements ApplicationContextAwa
             //TODO
         }
 
+    }
+
+    private static void gateWayMore(PvmTransition outLineInGateWay, Activity activity) {
+        //网关1指向网关2 的情况只允许有一种(不允许多个网关指向同一个网关)[规范]
+        if (outLineInGateWay != null) {
+            PvmActivity source = outLineInGateWay.getSource();
+            PvmActivity destination = outLineInGateWay.getDestination();
+            if (source != null && ((String) source.getProperty("type")).endsWith("Gateway")
+                    && destination!=null&& ((String) destination.getProperty("type")).endsWith("Gateway")) {
+
+                Object conditionText = outLineInGateWay.getProperty("conditionText");
+                Map<String, String> parse = null;
+                if (conditionText != null) {
+                    parse = ElParse.parseCondition((String) conditionText);
+                }
+                if (null != parse) activity.getConditionContext().putAll(parse);
+
+
+
+                String sourceType = (String) source.getProperty("type");
+
+                if (sourceType.equalsIgnoreCase("exclusiveGateway"))
+                    activity.setExclusiveGatewayParent(true);
+                if (sourceType.equalsIgnoreCase("InclusiveGateway"))
+                    activity.setInclusiveGatewayParent(true);
+                if (sourceType.equalsIgnoreCase("ParallelGateway"))
+                    activity.setParallelGatewayParent(true);
+
+            }
+
+        }
     }
 
     /**
@@ -174,7 +194,7 @@ public class TaskUtil /*extends WorkFlowService implements ApplicationContextAwa
         Object conditionText = outLine.getProperty("conditionText");
         if (conditionText != null) {
             Map<String, String> parse = ElParse.parseCondition((String) conditionText);
-            activity.setConditionContext(parse);
+            activity.getConditionContext().putAll(parse);
         }
 
 

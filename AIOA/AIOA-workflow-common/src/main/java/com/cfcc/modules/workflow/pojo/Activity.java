@@ -47,7 +47,7 @@ public class Activity implements Serializable {
     }
 
 
-    private Map<String, String> conditionContext;//完成条件 key-value
+    private Map<String, String> conditionContext=new HashMap<>();//完成条件 key-value
 
     //回退相关
     Set<String> userIds;
