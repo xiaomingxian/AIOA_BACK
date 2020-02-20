@@ -20,8 +20,10 @@ import org.activiti.engine.RuntimeService;
 import org.activiti.engine.TaskService;
 import org.activiti.engine.impl.TaskServiceImpl;
 import org.activiti.engine.impl.interceptor.CommandExecutor;
+import org.activiti.engine.impl.persistence.entity.TaskEntity;
 import org.activiti.engine.runtime.Execution;
 import org.activiti.engine.task.Task;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -80,7 +82,7 @@ public class TaskInActServiceImpl implements TaskInActService {
         Map<String, Object> busData = taskInfoVO.getBusData();
         //更新当前节点信息
         busData.put("s_cur_task_name", nextTaskMsg);
-        if ("end-已结束".equals(nextTaskMsg)) {
+        if (nextTaskMsg != null && nextTaskMsg.contains("已结束")) {
             busData.put("i_is_state", 1);
         }
         for (String remove : TaskConstant.REMOVEFILEDS) {
@@ -153,6 +155,13 @@ public class TaskInActServiceImpl implements TaskInActService {
             String taskId = taskInfoVO.getTaskId();
 
             Task task = taskService.createTaskQuery().taskId(taskId).singleResult();
+            //用来记录产生的属性
+            TaskEntity taskAfter = new TaskEntity();
+            taskAfter.setExecutionId(task.getExecutionId());
+            taskAfter.setProcessInstanceId(task.getProcessInstanceId());
+            taskAfter.setProcessDefinitionId(task.getProcessDefinitionId());
+            taskAfter.setParentTaskId(task.getParentTaskId());
+
             String processInstanceId = task.getProcessInstanceId();
             String parentTaskId = task.getParentTaskId();
             if (descript == null) {
@@ -165,7 +174,7 @@ public class TaskInActServiceImpl implements TaskInActService {
 
                 for (String userId : assignee) {
                     commandExecutor.execute(new AddUserCmd(executionId, userId, descript, parentTaskId
-                            , runtimeService, taskService, false));
+                            , runtimeService, taskService, false, taskAfter));
                 }
                 taskCommonService.updateHisAct(task);
 
@@ -173,7 +182,7 @@ public class TaskInActServiceImpl implements TaskInActService {
                 List<List<String>> assignee = (List<List<String>>) taskInfoVO.getAssignee();
                 String randomParent = UUID.randomUUID().toString().replaceAll("-", "");
                 commandExecutor.execute(new AddUserCmd(executionId, null, descript, randomParent
-                        , runtimeService, taskService, true));
+                        , runtimeService, taskService, true, taskAfter));
 
 
                 List<Task> addDeptTask = taskService.createTaskQuery().processInstanceId(processInstanceId).list();
@@ -201,8 +210,8 @@ public class TaskInActServiceImpl implements TaskInActService {
 
 
                 }
-                taskCommonService.updateHisActDept(task, randomParent);
-                taskCommonService.updateRuActDept(task, randomParent);
+                taskCommonService.updateHisActDept(taskAfter, randomParent);
+                taskCommonService.updateRuActDept(taskAfter, randomParent);
 
 
             }

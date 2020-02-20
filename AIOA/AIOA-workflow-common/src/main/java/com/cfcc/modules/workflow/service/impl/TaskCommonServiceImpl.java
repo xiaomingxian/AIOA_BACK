@@ -844,7 +844,24 @@ public class TaskCommonServiceImpl implements TaskCommonService {
 
     @Override
     public List<BackRecord> backRecord(String procInstId, String table) {
+        if (StringUtils.isBlank(table)) {
+            List<HistoricTaskInstance> list = historyService.createHistoricTaskInstanceQuery().processInstanceId(procInstId).list();
+            for (HistoricTaskInstance historicTaskInstance : list) {
+                if (StringUtils.isNotBlank(historicTaskInstance.getDescription())) {
+                    if (historicTaskInstance.getDescription()!=null){
+                        TaskCommon taskCommon = new TaskCommon();
+                        taskCommon.setBusMsg(historicTaskInstance.getDescription());
+                        table = taskCommon.getTable();
+                        if (StringUtils.isBlank(table))continue;
+                        table=table+"_opinion";
+                    }
 
+                    break;
+                }
+
+            }
+        }
+        if (StringUtils.isBlank(table))throw  new AIOAException("未找到业务信息");
 
         return taskMapper.backRecord(procInstId, table);
     }
@@ -1694,7 +1711,7 @@ public class TaskCommonServiceImpl implements TaskCommonService {
         if (count != acts.size()) return null;//环节配置信息不完善请检查
 
         //查询下几个节点
-        TaskUtil.searchNextActsInfo(nexts, currentAct, acts, -1);
+        TaskUtil.searchNextActsInfo(nexts, currentAct, acts, -1, null);
 
         return nexts;
     }
