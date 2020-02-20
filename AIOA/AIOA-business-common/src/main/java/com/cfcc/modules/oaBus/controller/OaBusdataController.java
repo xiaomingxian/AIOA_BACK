@@ -362,12 +362,13 @@ public class OaBusdataController {
     public Result<IPage<Map<String, Object>>> queryByModelId(@RequestBody String json, HttpServletRequest request) {
         log.info(json);
         //查询当前用户，作为assignee
-        String token = request.getHeader(DefContants.X_ACCESS_TOKEN);
-        String username = JwtUtil.getUsername(token);
+        LoginInfo loginInfo = isysUserService.getLoginInfo(request);
+        String realname = loginInfo.getRealname();
+        String username = loginInfo.getUsername();
 
         Result<IPage<Map<String, Object>>> result = new Result<>();
         try {
-            result = oaBusdataService.getByModelId(json, username);
+            result = oaBusdataService.getByModelId(json, realname,username);
         } catch (Exception e) {
             log.error(e.toString());
             result.setSuccess(false);

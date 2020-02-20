@@ -1,17 +1,13 @@
 package com.cfcc.modules.oaBus.controller;
 
-import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.cfcc.common.api.vo.Result;
 import com.cfcc.common.mycat.MycatSchema;
-import com.cfcc.common.system.util.JwtUtil;
 import com.cfcc.modules.oaBus.entity.BusFunction;
-import com.cfcc.modules.oaBus.entity.BusModel;
 import com.cfcc.modules.oaBus.service.IBusFunctionPermitService;
 import com.cfcc.modules.oaBus.service.IBusFunctionService;
 import com.cfcc.modules.oaBus.service.IBusModelService;
 import com.cfcc.modules.oaBus.service.IOaBusdataService;
-import com.cfcc.modules.shiro.vo.DefContants;
 import com.cfcc.modules.system.entity.SysUser;
 import com.cfcc.modules.system.entity.SysUserSet;
 import com.cfcc.modules.system.service.ISysUserService;
@@ -150,7 +146,7 @@ public class HomeAnalysis {
             strBuf.append(busFunction.getIId()) ;
             strBuf.append(",\"d_create_time\":\"" + createTime + "\"") ;
             strBuf.append("}} ") ;
-            Result<IPage<Map<String, Object>>> byModelId = oaBusdataService.getByModelId(strBuf.toString(), username);
+            Result<IPage<Map<String, Object>>> byModelId = oaBusdataService.getByModelId(strBuf.toString(), username, username);
             log.info(byModelId.toString());
             List<Map<String, Object>> oaList1 = byModelId.getResult().getRecords() ;
             oaList.addAll(oaList1 ) ;
