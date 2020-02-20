@@ -9,4 +9,7 @@
 	<select id="getById" resultType="com.cfcc.modules.system.entity.SysDepart">
 		select * from sys_depart where id = #{id}
 	</select>
+    <select id="findUserDepartByDepart" resultType="java.lang.String">
+		SELECT org_type from sys_depart WHERE id = #{departId}
+	</select>
 </mapper>

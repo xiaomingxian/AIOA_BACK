@@ -96,7 +96,7 @@
     </select>
 
     <select id="findDepartNameByDeptId" resultType="java.util.Map">
-        select depart_name departName, parent_id parentId from sys_depart where id = #{sDeptId}
+        select depart_name departName, parent_id parentId, org_type  from sys_depart where id = #{sDeptId}
     </select>
 
     <select id="findUserIdByUserName" resultType="java.util.Map">

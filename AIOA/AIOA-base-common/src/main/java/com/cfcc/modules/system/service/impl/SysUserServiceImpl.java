@@ -289,6 +289,10 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser> impl
         if (oConvertUtils.isNotEmpty(departs)) {
             String[] arr = departs.split(",");
             for (String departId : arr) {
+                String orgType = sysDepartMapper.findUserDepartByDepart(departId);
+                if (orgType.equals("1")){
+                    continue;
+                }
                 SysUserDepart userDepart = new SysUserDepart(user.getId(), departId);
                 sysUserDepartMapper.insert(userDepart);
             }
