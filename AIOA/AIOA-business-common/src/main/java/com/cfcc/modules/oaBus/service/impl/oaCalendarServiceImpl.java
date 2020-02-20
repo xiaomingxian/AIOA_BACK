@@ -174,6 +174,14 @@ public class oaCalendarServiceImpl extends ServiceImpl<oaCalendarMapper, oaCalen
     @Override
     public List<Map<String, Object>> MostUserLink() {
         List<Map<String, Object>> list = oaCalendarMapper.findMostUser();
+         for (int i = 0; i <list.size() ; i++) {
+             Map<String, Object> stringObjectMap = list.get(i);
+             String i_id = stringObjectMap.get("i_id").toString();
+             String url = oaCalendarMapper.selectUrl(Integer.parseInt(i_id));
+            /* Map<String, Object>  map = new HashMap<>();
+             map.put("url",url);*/
+             list.get(i).put("url",url) ;
+        }
         return list;
     }
 
