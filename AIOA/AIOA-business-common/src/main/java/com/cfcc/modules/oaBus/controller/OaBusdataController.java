@@ -462,6 +462,23 @@ public class OaBusdataController {
     }
 
 
+    /**
+     * 查询一个当前用户是否可以查看这条数据
+     * @param table
+     * @param id
+     * @param request
+     * @return
+     */
+    @ApiOperation(value = "查询一个当前用户是否可以查看这条数据", notes = "查询一个当前用户是否可以查看这条数据")
+    @PostMapping("/checkBusData")
+    public boolean checkBusData(String tableName, String id, HttpServletRequest request) {
+        LoginInfo loginInfo = isysUserService.getLoginInfo(request);
+        String userName = loginInfo.getUsername();
+        boolean res =false ;
+        res = oaBusdataService.checkBusDataSer(tableName,id,userName) ;
+        return res;
+    }
+
     @GetMapping("haveSavePermission")
     public Result haveSavePermission(String table, String id, HttpServletRequest request) {
 

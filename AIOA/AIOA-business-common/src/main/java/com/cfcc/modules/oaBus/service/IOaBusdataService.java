@@ -121,4 +121,6 @@ public interface IOaBusdataService  extends  IService<OaBusdata>{
     Map<String,Object> getFuncitonDataById(String functionId);
 
     Map<String, Object> queryStateById(String stable, Integer tableid);
+
+    boolean checkBusDataSer(String tableName, String id, String userName);
 }

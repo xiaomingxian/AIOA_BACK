@@ -570,6 +570,53 @@ public class OaBusdataServiceImpl extends ServiceImpl<OaBusdataMapper, OaBusdata
         return map;
     }
 
+    /**
+     * 查询当前用户是否有查看数据的权限
+     * @param tableName
+     * @param id
+     * @param userName
+     * @return
+     */
+    @Override
+    public boolean checkBusDataSer(String tableName, String id, String userName) {
+        boolean res = false ;
+        if (tableName == null || "".equals(tableName)) {
+            log.info("查询失败：表名为空");
+            return false ;
+        }
+        if (id == null || "".equals(id)) {
+            log.info("查询失败：id为空");
+            return false ;
+        }
+        Map<String, Object> oaBusdata = oaBusdataMapper.getBusdataMapByIdDao(tableName, id);
+        if (null == oaBusdata) {
+            // 数据不存在
+            log.info("数据不存在可能已被删除");
+            return false ;
+        }
+        String functionId = oaBusdata.get("i_bus_function_id")+ "" ;
+        int funId = Integer.parseInt(functionId) ;
+        Map<String, String> permitData = permit(funId, tableName, userName);
+        String userId = permitData.get("userId");
+        String userUnit = permitData.get("userUnit");
+        String userDepart = permitData.get("userDepart");
+        permitData.remove("userId");
+        permitData.remove("userUnit");
+        permitData.remove("userDepart");
+       /* List<Map<String, Object>> dataList = oaBusdataMapper.getBusdataByMap((pageNo - 1) * pageSize,
+                pageSize, col, tableName, condition, permitData, userId, userUnit, userDepart, orderFlag);
+*/
+        List<Map<String,Object>> list = oaBusdataMapper.getCheckData(tableName,functionId,permitData,userId,userUnit,userDepart);
+        for(Map map : list){
+            String i_id = map.get("i_id") + "";
+            if(id.equals(i_id)){
+                res = true ;
+                break ;
+            }
+        }
+        return res;
+    }
+
 
     /**
      * 查询出对应的下拉框数据
