@@ -178,9 +178,11 @@ public class oaCalendarServiceImpl extends ServiceImpl<oaCalendarMapper, oaCalen
              Map<String, Object> stringObjectMap = list.get(i);
              String i_id = stringObjectMap.get("i_id").toString();
              String url = oaCalendarMapper.selectUrl(Integer.parseInt(i_id));
+             String path = oaCalendarMapper.selectPath(Integer.parseInt(i_id));
             /* Map<String, Object>  map = new HashMap<>();
              map.put("url",url);*/
              list.get(i).put("url",url) ;
+             list.get(i).put("path",path) ;
         }
         return list;
     }

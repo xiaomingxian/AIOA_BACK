@@ -348,5 +348,8 @@
     <select id="selectUrl" resultType="java.lang.String">
         select s_text from oa_busdata_text where s_busdata_table = "oa_busdata30"  and  i_busdata_id =#{id}
     </select>
+    <select id="selectPath" resultType="java.lang.String">
+          select s_file_path from oa_file where s_table = 'oa_busdata30' and  i_table_id = #{id}
+    </select>
 
 </mapper>
