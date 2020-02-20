@@ -666,7 +666,7 @@ public class OaBusdataServiceImpl extends ServiceImpl<OaBusdataMapper, OaBusdata
             unitList.add(sysDepartService.getUnitByDeptId(sysDepart.getId()));
         });
         List<String> unitSet = unitList.stream().map(SysDepart::getId).distinct().collect(Collectors.toList());
-        unitSet.stream().forEach(s -> log.info(s));
+        //unitSet.stream().forEach(s -> log.info(s));
         String[] units = new String[unitSet.size()];
         for (int i = 0; i < unitSet.size(); i++) {
             units[i] = "'" + unitSet.get(i) + "'";
@@ -719,7 +719,7 @@ public class OaBusdataServiceImpl extends ServiceImpl<OaBusdataMapper, OaBusdata
                 result.put("s_create_unitid", unit);
             } else if (is3 || is4) {
                 for (int i = 0; i < deptList.size(); i++) {
-                    deptList.set(i, "'" + deptList.get(i) + ",");
+                    deptList.set(i, "'" + deptList.get(i) + "'");
                 }
                 String str = String.join(",", deptList);
                 result.put("s_create_deptid", str);

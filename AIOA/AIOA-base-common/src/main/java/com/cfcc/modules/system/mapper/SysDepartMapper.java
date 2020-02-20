@@ -3,7 +3,6 @@ package com.cfcc.modules.system.mapper;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.cfcc.modules.system.entity.SysDepart;
 import org.apache.ibatis.annotations.Select;
-import org.omg.CORBA.PUBLIC_MEMBER;
 import org.springframework.data.repository.query.Param;
 
 import java.util.List;
@@ -18,7 +17,9 @@ import java.util.List;
  */
 public interface SysDepartMapper extends BaseMapper<SysDepart> {
 
-	@Select("select depart_name from sys_depart where id = #{depId}")
+	String findUserDepartByDepart(@Param("departId") String departId);
+
+    @Select("select depart_name from sys_depart where id = #{depId}")
 	public String getDepartNameByDepId(@Param("depId") String depId);
 
 
