@@ -104,15 +104,15 @@ public class TaskCommonController {
                 case IWfConstant.TASK_MONITOR:
                     //判断是不是超级管理员 是的话展示所有人
                     List<SysRole> roles = loginInfo.getRoles();
-                    boolean isAdmin=false;
+                    boolean isAdmin = false;
                     for (SysRole role : roles) {
                         String roleName = role.getRoleName();
                         if ("系统管理员".equalsIgnoreCase(roleName)) {
-                            isAdmin=true;
+                            isAdmin = true;
                             break;
                         }
                     }
-                    result = taskCommonService.queryTaskMonitor(taskInfoVO, pageNo, pageSize,isAdmin);
+                    result = taskCommonService.queryTaskMonitor(taskInfoVO, pageNo, pageSize, isAdmin);
                     break;
                 //我的委托
                 case IWfConstant.MY_AGENT:
@@ -316,7 +316,7 @@ public class TaskCommonController {
 
     @ApiOperation("回退/撤回记录查看")
     @GetMapping("backRecordQuery")
-    public Result backRecordQuery(String procInstId, String table, HttpServletRequest request) {
+    public Result backRecordQuery(String procInstId, @RequestParam(required = false) String table, HttpServletRequest request) {
         try {
 
             List<BackRecord> list = taskCommonService.backRecord(procInstId, table);
