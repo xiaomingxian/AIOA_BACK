@@ -66,6 +66,7 @@ public class oaTeamworkInstServiceImpl extends ServiceImpl<oaTeamworkInstMapper,
             oaTeamwork oaTeamwork = oaTeamworkMapper.findById(oaTeamworkInstList.get(i).getITeamworkId());
             if(oaTeamwork != null){
                 oaTeamworkInstList.get(i).setITeamworkName(oaTeamwork.getSTeamworkName());
+                oaTeamworkInstList.get(i).setDCreateTime(oaTeamwork.getDCreateTime());
             }
                 BusModel model = busModelMapper.selectById(oaTeamworkInstList.get(i).getIBusModelId());
                 if(model != null){
@@ -106,6 +107,7 @@ public class oaTeamworkInstServiceImpl extends ServiceImpl<oaTeamworkInstMapper,
             oaTeamwork oaTeamwork = oaTeamworkMapper.findById(oaTeamworkInstList.get(i).getITeamworkId());
             if(oaTeamwork != null){
                 oaTeamworkInstList.get(i).setITeamworkName(oaTeamwork.getSTeamworkName());
+                oaTeamworkInstList.get(i).setDCreateTime(oaTeamwork.getDCreateTime());
             }
             BusModel model = busModelMapper.selectById(oaTeamworkInstList.get(i).getIBusModelId());
             if(model != null){
