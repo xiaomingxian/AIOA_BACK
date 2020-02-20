@@ -67,12 +67,12 @@ public class HomeAnalysis {
         SysUser sysUser = iSysUserService.getById(userId);
         String schema= MycatSchema.getSchema();
         String username = sysUser.getUsername();
-        String schema1 = MycatSchema.getSchema();
+        List<BusFunction> busFunctionlList = iBusFunctionService.findList(schema);
         Map<String,Map<String,Object>> map =new HashMap<String,Map<String,Object>>();
             for (int i = 0; i <userSetList.size() ; i++) {
                 SysUserSet userSet = userSetList.get(i);
                 if(userId.equals(userSet.getSUserId())){
-                    List<BusFunction> busFunctionlList = iBusFunctionService.findList(schema1);
+
                     for (BusFunction busFunction :busFunctionlList) {
                         Integer iBus1Id = userSet.getIBus1Id();
                         Integer iBus2Id = userSet.getIBus2Id();
@@ -97,7 +97,7 @@ public class HomeAnalysis {
                     }
                     break;
                 }else{
-                    List<BusFunction> busFunctionlList = iBusFunctionService.findList(schema);
+
                     for (BusFunction busFunction :busFunctionlList) {
                         Integer iBus1Id = null;
                         Integer iBus2Id = null;

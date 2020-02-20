@@ -345,5 +345,11 @@
     <select id="busFunctionList" resultType="com.cfcc.modules.oaBus.entity.BusFunction">
         SELECT i_id,i_bus_model_id,s_name  FROM oa_bus_function
     </select>
+    <select id="selectUrl" resultType="java.lang.String">
+        select s_text from oa_busdata_text where s_busdata_table = "oa_busdata30"  and  i_busdata_id =#{id}
+    </select>
+    <select id="selectPath" resultType="java.lang.String">
+          select s_file_path from oa_file where s_table = 'oa_busdata30' and  i_table_id = #{id}
+    </select>
 
 </mapper>
