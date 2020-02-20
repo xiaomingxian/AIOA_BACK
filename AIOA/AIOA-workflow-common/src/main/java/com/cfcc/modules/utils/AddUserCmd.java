@@ -26,6 +26,7 @@ public class AddUserCmd implements Command<Void> {
 
     protected String assignee;//办理人
     protected boolean isDept;//办理人
+    protected TaskEntity taskAfter;//办理人
 
     //@Autowired
     private RuntimeService runtimeService;
@@ -45,7 +46,8 @@ public class AddUserCmd implements Command<Void> {
     public AddUserCmd(String executionId, String assignee, String descript,
                       String parentTaskId,
                       RuntimeService runtimeService,
-                      TaskService taskService, boolean isDept) {
+                      TaskService taskService, boolean isDept
+            , TaskEntity taskAfter) {
         this.executionId = executionId;
         this.assignee = assignee;
         this.runtimeService = runtimeService;
@@ -53,6 +55,7 @@ public class AddUserCmd implements Command<Void> {
         this.descript = descript;
         this.parentTaskId = parentTaskId;
         this.isDept = isDept;
+        this.taskAfter = taskAfter;
     }
 
 
@@ -71,7 +74,7 @@ public class AddUserCmd implements Command<Void> {
             ExecutionEntity execution1 = parent2.createExecution();
             //ExecutionEntity execution2 = execution1.createExecution();
             //execution2
-            subType(parent2, execution1,commandContext,execution );
+            subType(parent2, execution1, commandContext, execution);
         } else {
             //非子流程类型
             ExecutionEntity newExecution = parent.createExecution();//创建一个新的ExecutionEntity实例对象
@@ -83,7 +86,7 @@ public class AddUserCmd implements Command<Void> {
         return null;
     }
 
-    private void subType(ExecutionEntity parent2, ExecutionEntity execution1, CommandContext commandContext,Execution sourceExecution) {
+    private void subType(ExecutionEntity parent2, ExecutionEntity execution1, CommandContext commandContext, Execution sourceExecution) {
 
 
         ProcessEngineConfigurationImpl pec = commandContext
@@ -119,12 +122,12 @@ public class AddUserCmd implements Command<Void> {
         taskEntity.setExecution(execution);
         taskEntity.setAssignee(assignee);
         taskEntity.setParentTaskId(parentTaskId);
+
         //保存
         taskEntity.setDescription(descript);
         execution.addTask(taskEntity);
         taskService.saveTask(taskEntity);
-        // 追加三级分支流程--触发任务创建监听器，更新历史actinst表的任务ID
-        //newTask.fireEvent("create");
+        taskAfter.setExecutionId(execution.getId());
 
 
         Integer nrOfInstances = LoopVariableUtils.getLoopVariableDept(parent2, "nrOfInstances");

@@ -161,7 +161,7 @@ public interface SysUserMapper extends BaseMapper<SysUser> {
 
     @Select("<script> " +
             "SELECT " +
-            " u.id id,u.username username ,d.depart_name departName " +
+            " u.id id,u.username username ,d.depart_name departName,d.id departId " +
             "FROM " +
             " sys_depart d " +
             "LEFT JOIN sys_user_depart ud ON d.id = ud.dep_id " +
