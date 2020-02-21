@@ -16,6 +16,4 @@ public interface ButtonPermissionService {
     Map<String, Boolean> currentUserPermission(String key, Map<String, Object> query, LoginInfo currentUser,
                                                String taskDefKey, String proInstanId, String taskId,String isDaiBan);
 
-    boolean haveSavePermission(Object proKey1, HashMap<String, Object> map, LoginInfo loginInfo,
-                               String taskDef,String taskId,String isDaiBan);
 }

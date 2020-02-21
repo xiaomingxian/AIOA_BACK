@@ -317,37 +317,6 @@ public class ButtonPermissionServiceImpl implements ButtonPermissionService {
         return currentUserPermission;
     }
 
-    @Autowired
-    private HistoryService historyService;
 
-    @Override
-    public boolean haveSavePermission(Object proKey1, HashMap<String, Object> map, LoginInfo loginInfo,
-                                      String taskDef, String taskId, String isDaiBan) {
-
-
-        String processInstanceId = null;
-
-        Object iProcButtonId = map.get("iProcButtonId");
-        map.remove("iProcButtonId");
-
-        if (proKey1 != null && taskId != null) {
-            HistoricTaskInstance historicTaskInstance = historyService.createHistoricTaskInstanceQuery().taskId(taskId).singleResult();
-            processInstanceId = historicTaskInstance.getProcessInstanceId();
-        }
-
-
-        Map<String, Boolean> permission = currentUserPermission(proKey1.toString(), map, loginInfo, taskDef,
-                processInstanceId, taskId, isDaiBan);
-
-        List<ButtonPermit> btnList = dynamicTableMapper.querySaveButton(proKey1.toString(), taskDef, iProcButtonId.toString());
-
-
-        if (btnList.size() <= 0) return false;
-        ButtonPermit buttonPermit = btnList.get(0);
-
-        boolean havePermission = havePermission(buttonPermit, permission);
-
-        return havePermission;
-    }
 
 }

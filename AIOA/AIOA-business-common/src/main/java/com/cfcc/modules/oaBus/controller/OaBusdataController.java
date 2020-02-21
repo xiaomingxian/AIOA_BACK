@@ -387,15 +387,6 @@ public class OaBusdataController {
     }
 
 
-    @GetMapping("haveSavePermission")
-    public Result haveSavePermission(String table, String id, HttpServletRequest request) {
-
-        LoginInfo loginInfo = isysUserService.getLoginInfo(request);
-
-        return oaBusdataService.haveSavePermission(table, id, loginInfo);
-
-    }
-
 
     @AutoLog(value = "新建临时任务")
     @ApiOperation(value = "新建临时任务", notes = "新建临时任务")
