@@ -291,6 +291,8 @@ public class TaskCommonController {
         try {
             taskCommonService.jump(jumpMsg, request);
             return Result.ok("跳转节点成功");
+        } catch (AIOAException e) {
+            return Result.error(e.getMessage());
         } catch (Exception e) {
             e.printStackTrace();
             return Result.error("跳转节点失败");
