@@ -116,7 +116,7 @@ public class OaButtonController {
 		if (oaButton!=null && oaButton.getSBtnValue()!=null ){
 			oaButton.setSMethod(oaButton.getSBtnValue());
 		}
-		OaButton oaButtonEntity = oaButtonService.queryById(oaButton.getIId());
+		OaButton oaButtonEntity = oaButtonService.queryById(oaButton.getIId(),null);
 		if(oaButtonEntity==null) {
 			result.error500("未找到对应实体");
 		}else {
@@ -175,19 +175,24 @@ public class OaButtonController {
 	 * @param id
 	 * @return
 	 */
-	@AutoLog(value = "按钮管理-通过id查询")
-	@ApiOperation(value="按钮管理-通过id查询", notes="按钮管理-通过id查询")
+	@AutoLog(value = "按钮管理-通过id查询或名称")
+	@ApiOperation(value="按钮管理-通过id查询或名称", notes="按钮管理-通过id查询或名称")
 	@GetMapping(value = "/queryById")
-	public Result<OaButton> queryById(@RequestParam(name="id",required=true) Integer id) {
-		Result<OaButton> result = new Result<OaButton>();
-		OaButton oaButton = oaButtonService.queryById(id);
-		if(oaButton==null) {
-			result.error500("未找到对应实体");
-		}else {
-			result.setResult(oaButton);
-			result.setSuccess(true);
+	public Result<OaButton> queryById(@RequestParam(name="id",required=false) Integer id,@RequestParam(name="sbtnName",required=false) String sBtnName) {
+		try {
+			Result<OaButton> result = new Result<OaButton>();
+			OaButton oaButton = oaButtonService.queryById(id,sBtnName.trim());
+			if(oaButton==null) {
+                result.error500("未找到对应实体");
+            }else {
+                result.setResult(oaButton);
+                result.setSuccess(true);
+            }
+			return result;
+		} catch (Exception e) {
+			e.printStackTrace();
 		}
-		return result;
+		return null;
 	}
 
 

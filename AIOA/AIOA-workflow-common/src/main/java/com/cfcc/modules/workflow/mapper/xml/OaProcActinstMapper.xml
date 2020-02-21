@@ -73,5 +73,36 @@
 
     </insert>
 
+<!--作者：吕剑  根据流程key和任务名称查询-->
+    <select id="queryByKeyAndName" resultType="com.cfcc.modules.workflow.pojo.OaProcActinst">
+        select
+        i_id iId,
+        proc_def_key procDefKey,
+        act_id actId,
+        act_name actName,
+        candidates candidates,
+        is_mult_assignee isMultAssignee,
+        role_scope roleScope,
+        user_or_role userOrRole,
+        is_can_add isCanAdd,
+        is_dept_finish,
+        is_complete_task isCompleteTask,
+        record_currentuser recordCurrentuser,
+        record_key recordKey,
+        depts depts,
+        is_dept_finish isDeptFinish,
+        create_time createTime,
+        update_time updateTime,
+        user_record_val userRecordVal
+        from oa_proc_actinst
+        where 1=1
+        <if test="pojo.procDefKey!=null and pojo.procDefKey!=''">
+            and PROC_DEF_KEY like concat("%", #{pojo.procDefKey} ,"%")
+        </if>
+        <if test="pojo.actName!=null and pojo.actName!=''">
+            and act_name like concat("%", #{pojo.actName} ,"%")
+        </if>
+    </select>
+
 
 </mapper>
