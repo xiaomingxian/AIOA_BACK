@@ -380,6 +380,7 @@ public class OaFileServiceImpl extends ServiceImpl<OaFileMapper, OaFile> impleme
     public OaFile singleCopyFile(Map<String, Object> map) {
         OaFile file = new OaFile();
         String initFile = map.get("sFilePath") + "";
+
         String fileName = initFile.substring(initFile.lastIndexOf(File.separator) + 1, initFile.length());
         try {
             //获取后台项目路径
@@ -388,7 +389,7 @@ public class OaFileServiceImpl extends ServiceImpl<OaFileMapper, OaFile> impleme
             String path2 = path.substring(0, path.lastIndexOf(File.separator));
             String tempPaths = "";
             if (map.get("sFilePath") != null){
-                if ((map.get("sFilePath")+"") == "2" || (map.get("sFilePath")+"") == "3"){
+                if (map.get("sFileType") != null){
                     tempPaths = path2+File.separator+templateFilePath;
                 }else {
                     tempPaths = path2+File.separator+tempPath;
@@ -412,7 +413,6 @@ public class OaFileServiceImpl extends ServiceImpl<OaFileMapper, OaFile> impleme
         } catch (IOException e) {
             e.printStackTrace();
         }
-
         return file;
     }
 
