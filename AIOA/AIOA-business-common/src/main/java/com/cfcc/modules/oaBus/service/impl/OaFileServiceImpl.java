@@ -390,9 +390,9 @@ public class OaFileServiceImpl extends ServiceImpl<OaFileMapper, OaFile> impleme
             if (map.get("sFilePath") != null){
                 if ((map.get("sFilePath")+"") == "2" || (map.get("sFilePath")+"") == "3"){
                     tempPaths = path2+File.separator+templateFilePath;
+                }else {
+                    tempPaths = path2+File.separator+tempPath;
                 }
-            }else {
-                tempPaths = path2+File.separator+tempPath;
             }
             File temp = new File(tempPaths);
             if (!temp.exists()) {
