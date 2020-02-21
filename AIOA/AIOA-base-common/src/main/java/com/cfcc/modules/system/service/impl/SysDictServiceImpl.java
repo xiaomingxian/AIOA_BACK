@@ -1,31 +1,30 @@
 package com.cfcc.modules.system.service.impl;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
-
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.cfcc.common.constant.CacheConstant;
 import com.cfcc.common.constant.CommonConstant;
 import com.cfcc.common.system.vo.DictModel;
 import com.cfcc.common.util.SqlInjectionUtil;
 import com.cfcc.modules.system.entity.SysDepart;
-import com.cfcc.modules.system.entity.SysUser;
-import com.cfcc.modules.system.service.ISysDepartService;
-import com.cfcc.modules.system.service.ISysDictService;
 import com.cfcc.modules.system.entity.SysDict;
 import com.cfcc.modules.system.entity.SysDictItem;
 import com.cfcc.modules.system.mapper.SysDictItemMapper;
 import com.cfcc.modules.system.mapper.SysDictMapper;
 import com.cfcc.modules.system.model.TreeSelectModel;
+import com.cfcc.modules.system.service.ISysDepartService;
+import com.cfcc.modules.system.service.ISysDictService;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
-
-import lombok.extern.slf4j.Slf4j;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 /**
  * <p>
@@ -269,6 +268,18 @@ public class SysDictServiceImpl extends ServiceImpl<SysDictMapper, SysDict> impl
     @Override
     public List<DictModel> getSqlValue(String description) {
         return sysDictMapper.getSqlValueDao(description);
+    }
+
+    @Override
+    public IPage<SysDict> getDictByAll(SysDict sysDict, Integer pageNo, Integer pageSize) {
+        IPage<SysDict> pageList = new Page<SysDict>();
+        Long total = sysDictMapper.getDictByAllAndPage(sysDict);
+        List<SysDict> sysDictList = sysDictMapper.getDictByAll(sysDict,(pageNo - 1) * pageSize,pageSize);
+        pageList.setRecords(sysDictList);
+        pageList.setTotal(total);
+        pageList.setSize(pageSize);
+        pageList.setCurrent(pageNo);
+        return pageList;
     }
 
 
