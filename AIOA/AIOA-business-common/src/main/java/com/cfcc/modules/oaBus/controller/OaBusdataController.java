@@ -392,7 +392,7 @@ public class OaBusdataController {
         LoginInfo loginInfo = isysUserService.getLoginInfo(request);
         SysDepart depart = loginInfo.getDepart();
         Map<String, Object> result = new HashMap<>();
-        System.out.println(json);
+        //System.out.println(json);
         Map maps = (Map) JSONObject.parse(json);
         String modelId = maps.get("modelId") + "";
         String functionId = maps.get("function_id") + "";

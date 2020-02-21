@@ -1073,6 +1073,7 @@ public class TaskCommonServiceImpl implements TaskCommonService {
             addTaskDescript(task.getProcessInstanceId(), busMsg);
         } else {
             task = taskService.createTaskQuery().taskId(taskId).singleResult();
+            if (task==null)throw new AIOAException("未找到您要办理的任务,请刷新所进入的页面重试)");
         }
 
 

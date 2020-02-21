@@ -67,6 +67,8 @@ public class ButtonPermissionServiceImpl implements ButtonPermissionService {
 
     @Override
     public Map<String, Object> getBtnAndOpt(Map<String, Object> result) {
+
+
         HashMap<String, Object> data = new HashMap<>();
         String schema = MycatSchema.getSchema();
         // 获取Redis中缓存的表数据
@@ -193,7 +195,6 @@ public class ButtonPermissionServiceImpl implements ButtonPermissionService {
             log.error("===================>>>>流程配置信息为空,可能是redis数据错误");
             data.put("opt", new ArrayList<>());
         }
-
 
         return data;
     }
