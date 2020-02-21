@@ -179,37 +179,44 @@ public class TaskInActServiceImpl implements TaskInActService {
                 taskCommonService.updateHisAct(task);
 
             } else {
+                //部门任务
                 List<List<String>> assignee = (List<List<String>>) taskInfoVO.getAssignee();
                 String randomParent = UUID.randomUUID().toString().replaceAll("-", "");
-                commandExecutor.execute(new AddUserCmd(executionId, null, descript, randomParent
-                        , runtimeService, taskService, true, taskAfter));
+                for (List<String> userdept : assignee) {
+                    commandExecutor.execute(new AddUserCmd(executionId, null, descript, randomParent
+                            , runtimeService, taskService, true, taskAfter));
+                }
 
 
                 List<Task> addDeptTask = taskService.createTaskQuery().processInstanceId(processInstanceId).list();
                 TaskWithDepts taskWithDepts = taskInfoVO.getTaskWithDepts();
 
-                if (addDeptTask.size() > 0) {
-                    for (Task taskDept : addDeptTask) {
-                        //部门用户 抢签
-                        taskId = taskDept.getId();
-                        if (randomParent.equalsIgnoreCase(taskDept.getParentTaskId())) {
-                            //TODO 同一类型 多个部门如何区分
-                            for (List<String> list : assignee) {
-                                for (String uid : list) {
-                                    taskService.addCandidateUser(taskId, uid);
-                                }
-                                String taskDefinitionKey = taskDept.getTaskDefinitionKey();
-                                taskWithDepts.setTaskDefKey(taskDefinitionKey);
-                                //存储下个节点的任务id---主办/辐办/传阅等类型都存储起来(会有重复数据)[数量=用户量*种类]
-                                taskWithDepts.setTskId(taskId);
-                                //请求数据库 2-3 次
-                                departWithTaskMapper.save(processInstanceId, taskWithDepts);
+
+                //为追加的部门 添加用户
+                for (int i = 0; i < addDeptTask.size(); i++) {
+                    Task taskdept = addDeptTask.get(i);
+                    String id = taskdept.getId();
+                    String parentTaskIdDept = task.getParentTaskId();
+
+                    if (parentTaskIdDept.equalsIgnoreCase(randomParent)){
+                        int size = assignee.size();
+                        if (size>i){
+                            List<String> list = assignee.get(i);
+                            for (String uid : list) {
+                                taskService.addCandidateUser(id, uid);
                             }
                         }
+                        String taskDefinitionKey = taskdept.getTaskDefinitionKey();
+                        taskWithDepts.setTaskDefKey(taskDefinitionKey);
+                        //存储下个节点的任务id---主办/辐办/传阅等类型都存储起来(会有重复数据)[数量=用户量*种类]
+                        taskWithDepts.setTskId(id);
+                        //请求数据库 2-3 次
+                        departWithTaskMapper.save(processInstanceId, taskWithDepts);
                     }
 
 
                 }
+
                 taskCommonService.updateHisActDept(taskAfter, randomParent);
                 taskCommonService.updateRuActDept(taskAfter, randomParent);
 
