@@ -76,10 +76,11 @@ public class SysDictController {
     public Result<IPage<SysDict>> queryPageList(SysDict sysDict, @RequestParam(name = "pageNo", defaultValue = "1") Integer pageNo,
                                                 @RequestParam(name = "pageSize", defaultValue = "10") Integer pageSize, HttpServletRequest req) {
         Result<IPage<SysDict>> result = new Result<IPage<SysDict>>();
-        QueryWrapper<SysDict> queryWrapper = QueryGenerator.initQueryWrapper(sysDict, req.getParameterMap());
-        Page<SysDict> page = new Page<SysDict>(pageNo, pageSize);
-        IPage<SysDict> pageList = sysDictService.page(page, queryWrapper);
+//        QueryWrapper<SysDict> queryWrapper = QueryGenerator.initQueryWrapper(sysDict, req.getParameterMap());
+//        Page<SysDict> page = new Page<SysDict>(pageNo, pageSize);
+//        IPage<SysDict> pageList = sysDictService.page(page, queryWrapper);
 
+        IPage<SysDict> pageList = sysDictService.getDictByAll(sysDict,pageNo,pageSize);
 
         log.debug("查询当前页：" + pageList.getCurrent());
         log.debug("查询当前页数量：" + pageList.getSize());

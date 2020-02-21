@@ -1,13 +1,14 @@
 package com.cfcc.modules.system.service;
 
-import java.util.List;
-import java.util.Map;
-
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.extension.service.IService;
 import com.cfcc.common.system.vo.DictModel;
 import com.cfcc.modules.system.entity.SysDict;
-import com.baomidou.mybatisplus.extension.service.IService;
 import com.cfcc.modules.system.entity.SysDictItem;
 import com.cfcc.modules.system.model.TreeSelectModel;
+
+import java.util.List;
+import java.util.Map;
 
 /**
  * <p>
@@ -99,4 +100,6 @@ public interface ISysDictService extends IService<SysDict> {
     List<DictModel> getDictByCode(String dictCode) ;
 
 	List<DictModel> getSqlValue(String description);
+
+    IPage<SysDict> getDictByAll(SysDict sysDict, Integer pageNo, Integer pageSize);
 }
