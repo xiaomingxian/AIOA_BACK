@@ -29,6 +29,8 @@ import org.activiti.engine.HistoryService;
 import org.activiti.engine.RepositoryService;
 import org.activiti.engine.TaskService;
 import org.activiti.engine.history.HistoricTaskInstance;
+import org.activiti.engine.impl.persistence.entity.ProcessDefinitionEntity;
+import org.activiti.engine.impl.pvm.process.ActivityImpl;
 import org.activiti.engine.repository.ProcessDefinition;
 import org.activiti.engine.task.Task;
 import org.apache.commons.lang.StringUtils;
@@ -99,6 +101,9 @@ public class OaBusdataServiceImpl extends ServiceImpl<OaBusdataMapper, OaBusdata
 
     @Autowired
     private RepositoryService repositoryService;
+
+    @Autowired
+    private ButtonPermissionService buttonPermissionService;
 
 
     //private Logger logger = LoggerFactory.getLogger(OaBusdataServiceImpl.class);
@@ -435,8 +440,8 @@ public class OaBusdataServiceImpl extends ServiceImpl<OaBusdataMapper, OaBusdata
 
         long l2 = System.currentTimeMillis();
 
-        System.out.println("--->业务详情查询时间::" + (l2 - l1));
-
+        System.out.println("================>>>业务详情查询时间::" + (l2 - l1));
+        //********************************************************************* 流程信息查询
         //读取该流程的第一个环节
         String proKey = busProcSet.getProcDefKey();
         String processInstanceId = null;
@@ -446,45 +451,62 @@ public class OaBusdataServiceImpl extends ServiceImpl<OaBusdataMapper, OaBusdata
         if (StringUtils.isBlank(proKey)) {//没有流程
             result.put("optionTable", null);
         } else {//有流程
-            Task task = null;
-            HistoricTaskInstance historicTaskInstance=null;
-            if (taskId != null) {//从待办已办等进来
-                task=taskService.createTaskQuery().processInstanceBusinessKey(proKey)
-                        .taskId(taskId).singleResult();
-                if (task==null) {
-                    historicTaskInstance =historyService.createHistoricTaskInstanceQuery().taskId(taskId).singleResult();
-                }
+            if (StringUtils.isNotBlank(status) && status.equalsIgnoreCase("newtask")) {
 
-            } else {//从业务页面进来
-                List<Task> list = taskService.createTaskQuery().processDefinitionKey(proKey)
-                        .processInstanceBusinessKey(busdataId).taskCandidateOrAssigned(user.getId())
-                        .list();
-                if (list.size() > 0) {
-                    //最新待办
-                    task = list.get(list.size() - 1);
-                } else {
-                    //最新已办
-                    List<HistoricTaskInstance> hiList = historyService.createHistoricTaskInstanceQuery().processDefinitionKey(proKey)
-                            .processInstanceBusinessKey(busdataId).taskAssignee(user.getId()).list();
-                    if (hiList.size() > 0) {
-                        historicTaskInstance = hiList.get(hiList.size() - 1);
+            } else {
+                Task task = null;
+                HistoricTaskInstance historicTaskInstance = null;
+                if (taskId != null) {//从待办已办等进来
+                    task = taskService.createTaskQuery().processInstanceBusinessKey(proKey)
+                            .taskId(taskId).singleResult();
+                    if (task == null) {
+                        historicTaskInstance = historyService.createHistoricTaskInstanceQuery().taskId(taskId).singleResult();
+                    }
+
+                } else {//从业务页面进来
+                    List<Task> list = taskService.createTaskQuery().processDefinitionKey(proKey)
+                            .processInstanceBusinessKey(busdataId).taskCandidateOrAssigned(user.getId())
+                            .list();
+                    if (list.size() > 0) {
+                        //最新待办
+                        task = list.get(list.size() - 1);
+                    } else {
+                        //最新已办
+                        List<HistoricTaskInstance> hiList = historyService.createHistoricTaskInstanceQuery().processDefinitionKey(proKey)
+                                .processInstanceBusinessKey(busdataId).taskAssignee(user.getId()).list();
+                        if (hiList.size() > 0) {
+                            historicTaskInstance = hiList.get(hiList.size() - 1);
+                        }
                     }
                 }
-            }
-            if (task!=null){
-                taskId = task.getId();
-                processInstanceId = task.getProcessInstanceId();
-                processDefinitionId = task.getProcessDefinitionId();
-                taskDef = task.getTaskDefinitionKey();
-                executionId = task.getExecutionId();
-            }else if (historicTaskInstance!=null){
-                taskId = historicTaskInstance.getId();
-                processInstanceId = historicTaskInstance.getProcessInstanceId();
-                processDefinitionId = historicTaskInstance.getProcessDefinitionId();
-                taskDef = historicTaskInstance.getTaskDefinitionKey();
-                executionId = historicTaskInstance.getExecutionId();
+                if (task != null) {
+                    taskId = task.getId();
+                    processInstanceId = task.getProcessInstanceId();
+                    processDefinitionId = task.getProcessDefinitionId();
+                    taskDef = task.getTaskDefinitionKey();
+                    executionId = task.getExecutionId();
+                } else if (historicTaskInstance != null) {
+                    taskId = historicTaskInstance.getId();
+                    processInstanceId = historicTaskInstance.getProcessInstanceId();
+                    processDefinitionId = historicTaskInstance.getProcessDefinitionId();
+                    taskDef = historicTaskInstance.getTaskDefinitionKey();
+                    executionId = historicTaskInstance.getExecutionId();
+                }
             }
         }
+
+        if (StringUtils.isBlank(taskDef) && StringUtils.isNotBlank(proKey)
+                && StringUtils.isNotBlank(status) && status.equalsIgnoreCase("newtask")) {
+            ProcessDefinition processDefinition = repositoryService.createProcessDefinitionQuery()
+                    .processDefinitionKey(proKey).latestVersion().singleResult();
+            if (processDefinition == null) throw new AIOAException("未找到流程信息请检查流程是否部署");
+            ProcessDefinitionEntity proc = (ProcessDefinitionEntity) repositoryService.getProcessDefinition(processDefinition.getId());
+            List<ActivityImpl> activities = proc.getActivities();
+            if (activities.size() == 0) throw new AIOAException("未找到流程环节,请检查流程图是否合法");
+            taskDef = activities.get(0).getId();
+        }
+        long l3 = System.currentTimeMillis();
+        System.out.println("================>>>流程信息查询时间:" + (l3 - l2));
 
         //******************************************   更新状态为已读
         //只是待办状态时修改
@@ -501,16 +523,9 @@ public class OaBusdataServiceImpl extends ServiceImpl<OaBusdataMapper, OaBusdata
                 taskId = param.get("taskId") + "";
             }
         }
-        if (StringUtils.isBlank(taskDef) && StringUtils.isNotBlank(proKey)
-                && StringUtils.isNotBlank(status) && status.equalsIgnoreCase("newtask")){
-            //ProcessDefinition processDefinition = repositoryService.createProcessDefinitionQuery()
-            //        .processDefinitionKey(proKey).latestVersion().singleResult();
-            taskDef = processManagerService.actsListPic(null, proKey, true).get(0).getId();
-        }
 
+        long lstatus = System.currentTimeMillis();
 
-        long l3 = System.currentTimeMillis();
-        System.out.println("流程信息查询时间:" + (l3 - l2));
 
         String optionTable = tableName + "_opinion";
         Integer busProcSetIId = busProcSet.getIId();
@@ -524,16 +539,26 @@ public class OaBusdataServiceImpl extends ServiceImpl<OaBusdataMapper, OaBusdata
         result.put("table", tableName);
         result.put("executionId", executionId);
         result.put("functionId", functionId);
-        log.info(result.toString());
 
 
         //******************************************   按钮/意见
-        Map<String, Object> btnAndOpt = ButtonPermissionService.getBtnAndOpt(result);
+        long l = System.currentTimeMillis();
+        oaBusdata.put("tableName", tableName);
+        oaBusdata.put("busdataId", busdataId);
+        Map<String, Boolean> currentUserPermission =
+                buttonPermissionService.currentUserPermission(proKey, oaBusdata, loginInfo,
+                        taskDef, proInstanId, taskId, status);
+
+        long lcu = System.currentTimeMillis();
+        System.out.println("================>>>用户权限时间:" + (lcu - lstatus));
+
+        Map<String, Object> btnAndOpt = ButtonPermissionService.getBtnAndOpt(result, currentUserPermission);
         result.put("btnAndOpt", btnAndOpt);
         long l4 = System.currentTimeMillis();
-        System.out.println("按钮+意见 查询时间:" + (l4 - l3));
+        System.out.println("================>>>按钮+意见:" + (l4 - lcu));
 
-        System.out.println("总共查询时间：" + (l4 - l1));
+
+        System.out.println("================>>>总共查询时间：" + (l4 - l1));
 
 
         return result;
@@ -591,9 +616,9 @@ public class OaBusdataServiceImpl extends ServiceImpl<OaBusdataMapper, OaBusdata
 
         Integer iIsDisplay = oaBusdata.get("i_is_display") == null ? null : Integer.parseInt(oaBusdata.get("i_is_display").toString());
         String sCreateBy = oaBusdata.get("s_create_by") == null ? "" : oaBusdata.get("s_create_by").toString();
-        boolean isDaiBan = false;
+        String isDaiBan = null;
         if (iIsDisplay != null && iIsDisplay == 1 && id.equals(sCreateBy)) {
-            isDaiBan = true;
+            isDaiBan = "newtask";
         }
 
 

@@ -201,7 +201,7 @@ public class OaFileServiceImpl extends ServiceImpl<OaFileMapper, OaFile> impleme
             }
             //获取需要存储的file
             List<OaFile> oaFileList = oaFileMapper.getOaFileByIidAndTable(sBusdataTable, oaBusdataListIid);
-            System.out.println("---------oaFileList :----------------" + oaFileList);
+            //System.out.println("---------oaFileList :----------------" + oaFileList);
             //判断文件类型并获取其内容
             String sContent = null;
             List<OaFile> oaFileReMoveList = new ArrayList<>();
@@ -252,7 +252,7 @@ public class OaFileServiceImpl extends ServiceImpl<OaFileMapper, OaFile> impleme
             }
             oaFileLists.addAll(oaFileList);
         }
-        System.out.println("------开始:---------" + oaFileLists.toString());
+        //System.out.println("------开始:---------" + oaFileLists.toString());
         return oaFileLists;
     }
 
@@ -493,7 +493,7 @@ public class OaFileServiceImpl extends ServiceImpl<OaFileMapper, OaFile> impleme
             //根据表名和业务模块id查询数据
             List<Map<String, Object>> oaBusdata = oaBusdataMapper.getBusdataByTable(columnLists, busFunction);
             if (oaBusdata.size() == 0) {  //执行下一循环
-                System.out.println("-----------无数据存入ES库！！！！！-----------");
+                //System.out.println("-----------无数据存入ES库！！！！！-----------");
                 continue;
             }
             Iterator<Map<String, Object>> iterator = oaBusdata.iterator();
@@ -508,7 +508,7 @@ public class OaFileServiceImpl extends ServiceImpl<OaFileMapper, OaFile> impleme
                     Object value = oaBusdatum.get(key);
 //                    System.out.println("key:"+key+",  sBusdataTable:"+sBusdataTable+"， functionId" + functionId);
                     List<String> sDictIdlist = busPageDetailMapper.getSDictIdByKey(functionId, sBusdataTable, key);
-                    System.out.println("................." + sDictIdlist + ".................");
+                    //System.out.println("................." + sDictIdlist + ".................");
                     String aa = null;
                     if (sDictIdlist.size() == 0){
                         continue;
@@ -516,7 +516,7 @@ public class OaFileServiceImpl extends ServiceImpl<OaFileMapper, OaFile> impleme
                     boolean flag = false;
                     for (int i = 0; i < sDictIdlist.size(); i++) {
                         aa = sDictIdlist.get(i);
-                        System.out.println(aa);
+                        //System.out.println(aa);
                         if (aa==null){
                             flag = true;
                             break;
@@ -530,7 +530,7 @@ public class OaFileServiceImpl extends ServiceImpl<OaFileMapper, OaFile> impleme
                             String sysDictId = sysDictMapper.getDictIdByDictCode(sDictIdlist.get(0));
                             String itemValue = sysDictItemMapper.getItemTextById(sysDictId, value);
                             if (itemValue == null) {
-                                System.out.println("key:" + key + ",  value:" + value + "该字段查不到其含义！！！！！");
+                                //System.out.println("key:" + key + ",  value:" + value + "该字段查不到其含义！！！！！");
                             } else {
                                 oaBusdatum.put(key, itemValue);
                             }

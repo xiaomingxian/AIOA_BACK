@@ -96,7 +96,7 @@ public class FileNtkoController {
                 oaBusdataService.updateAllOaData(busdataMap);
 //                dynamicTableMapper.updateData(busdataMap);
             }
-            System.out.println("---------------->>>>>>>>>>>>>>>创建保存成功");
+            //System.out.println("---------------->>>>>>>>>>>>>>>创建保存成功");
             //----开启webSocket，起草底稿后向前端发一个请求，表明已经保存成功。
             sendWebSocketMessage(tableid,message) ;
             result.setSuccess(true);
@@ -154,7 +154,7 @@ public class FileNtkoController {
                 result.setResult(filePath);
             }
 
-            System.out.println("----------------->>>>查看文件路径" + filePath);
+            //System.out.println("----------------->>>>查看文件路径" + filePath);
             return result;
         } catch (Exception e) {
             e.printStackTrace();

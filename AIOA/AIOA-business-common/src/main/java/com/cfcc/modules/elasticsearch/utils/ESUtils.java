@@ -65,7 +65,7 @@ public class ESUtils {
         }else if (typeName.equals("elasticsearch2")){
             createOaFileMappingBuilder(request,typeName);
         }else {
-            System.out.println("不能创建该索引！！！！");
+            //System.out.println("不能创建该索引！！！！");
         }
     }
 
