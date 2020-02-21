@@ -12,10 +12,7 @@ import com.cfcc.modules.system.entity.SysUserAgent;
 import com.cfcc.modules.system.mapper.SysUserAgentMapper;
 import com.cfcc.modules.system.mapper.SysUserMapper;
 import com.cfcc.modules.utils.*;
-import com.cfcc.modules.workflow.mapper.DepartWithTaskMapper;
-import com.cfcc.modules.workflow.mapper.TaskFoldMapper;
-import com.cfcc.modules.workflow.mapper.TaskMapper;
-import com.cfcc.modules.workflow.mapper.TaskTransferMapper;
+import com.cfcc.modules.workflow.mapper.*;
 import com.cfcc.modules.workflow.pojo.*;
 import com.cfcc.modules.workflow.service.*;
 import com.cfcc.modules.workflow.vo.TaskInfoVO;
@@ -64,7 +61,16 @@ public class TaskCommonFoldServiceImpl implements TaskCommonFoldService {
     @Autowired
     private SysUserMapper userMapper;
 
-//流程监控一级折叠
+    @Autowired
+    private OaProcActinstMapper oaProcActinstMapper;
+
+
+    @Override
+    public OaProcActinst queryByKeyAndName(OaProcActinst oaProcActinst) {
+        return oaProcActinstMapper.queryByKeyAndName(oaProcActinst);
+    }
+
+    //流程监控一级折叠
     @Override
     public Result monitorFoldUrgency(String urgencyDegree, TaskInfoVO taskInfoVO,boolean isAdmin) {
         Result<List<SysDictItem>> SysDictResult = new Result<>();

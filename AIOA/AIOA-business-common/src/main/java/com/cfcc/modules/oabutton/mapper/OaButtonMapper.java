@@ -19,7 +19,7 @@ public interface OaButtonMapper extends BaseMapper<OaButton> {
 
     List<OaButton> queryButton(@Param("button")OaButton oaButton, @Param("pageNo")Integer pageNo, @Param("pageSize")Integer pageSize);
 
-    OaButton queryById(@Param("id") Integer id);
+    OaButton queryById(@Param("id") Integer id,@Param("sBtnName") String sBtnName);
 
     void deleteOaButtonByID(@Param("id")String id);
 
