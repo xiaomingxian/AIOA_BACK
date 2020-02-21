@@ -122,6 +122,9 @@
         <if test="buttonId!=null and buttonId !=''">
             and mo.i_button_id=#{buttonId}
         </if>
+        <if test="taskDefKey!=null and taskDefKey !=''">
+            and mo.TASK_DEF_KEY_=#{taskDefKey}
+        </if>
         <!--<where>
             <if test="iProcButtonId != null and iProcButtonId != ''">
                 i_proc_button_id=#{id}
@@ -154,6 +157,9 @@
         inner join oa_proc_button p on p.i_id=b.i_proc_button_id order by b.i_id desc) as a where a.mid=#{id}
         <if test="buttonId!=null and buttonId !=''">
           and  a.i_button_id=#{buttonId}
+        </if>
+        <if test="taskDefKey!=null and taskDefKey !=''">
+            and  a.TASK_DEF_KEY_=#{taskDefKey}
         </if>
 --         order by a.i_id
         limit #{pageNo},#{pageSize}
