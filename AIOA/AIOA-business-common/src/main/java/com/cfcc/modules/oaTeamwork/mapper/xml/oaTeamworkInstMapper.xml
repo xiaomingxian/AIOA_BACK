@@ -55,12 +55,36 @@
                 and c.i_version = #{iVersion}
             </if>
         </where>
+        order by
+        <if test="oaTeamworkInst.tableOrder">
+            <if test="oaTeamworkInst.iTeamworkSetId==1">
+                c.i_teamwork_set_id
+            </if>
+            <if test="oaTeamworkInst.iTeamworkSetId==-1">
+                c.i_teamwork_set_id desc,
+            </if>
+
+            <if test="oaTeamworkInst.iVersion==1">
+                c.i_version,
+            </if>
+            <if test="oaTeamworkInst.iVersion==-1">
+                c.i_version desc,
+            </if>
+            <if test="oaTeamworkInst.iTeamworkId==1">
+                c.i_teamwork_id
+            </if>
+            <if test="oaTeamworkInst.iTeamworkId==-1">
+                c.i_teamwork_id desc,
+            </if>
+
+        </if>
+        1=1
     </select>
 
     <select id="findPage" resultType="com.cfcc.modules.oaTeamwork.entity.oaTeamworkInst">
-        select *  from oa_teamwork_inst c
+        select *  from oa_teamwork_inst
+              c.i_order = 1c
         <where>
-              c.i_order = 1
             <if test="oaTeamworkInst.iTeamworkId != null and oaTeamworkInst.iTeamworkId != '' ">
                c.i_teamwork_id = #{oaTeamworkInst.iTeamworkId}
             </if>
@@ -70,7 +94,31 @@
             <if test="oaTeamworkInst.iVersion != null and oaTeamworkInst.iVersion != '' ">
                 and c.i_version = #{oaTeamworkInst.iVersion}
             </if>
-        </where>  ORDER BY c.i_order asc
+        </where>
+        order by
+        <if test="oaTeamworkInst.tableOrder">
+            <if test="oaTeamworkInst.iTeamworkSetId==1">
+                 c.i_teamwork_set_id
+            </if>
+            <if test="oaTeamworkInst.iTeamworkSetId==-1">
+                c.i_teamwork_set_id desc,
+            </if>
+
+            <if test="oaTeamworkInst.iVersion==1">
+                c.i_version,
+            </if>
+            <if test="oaTeamworkInst.iVersion==-1">
+                c.i_version desc,
+            </if>
+            <if test="oaTeamworkInst.iTeamworkId==1">
+                c.i_teamwork_id
+            </if>
+            <if test="oaTeamworkInst.iTeamworkId==-1">
+                c.i_teamwork_id desc,
+            </if>
+
+        </if>
+        1=1
         limit #{pageNo},#{pageSize}
     </select>
     <select id="findList" resultType="com.cfcc.modules.oaTeamwork.entity.oaTeamworkInst">
@@ -86,7 +134,30 @@
                 and c.i_version = #{oaTeamworkInst.iVersion}
             </if>
         </where>
-        ORDER BY c.i_order asc
+        order by
+        <if test="oaTeamworkInst.tableOrder">
+            <if test="oaTeamworkInst.iTeamworkSetId==1">
+                c.i_teamwork_set_id
+            </if>
+            <if test="oaTeamworkInst.iTeamworkSetId==-1">
+                c.i_teamwork_set_id desc,
+            </if>
+
+            <if test="oaTeamworkInst.iVersion==1">
+                c.i_version,
+            </if>
+            <if test="oaTeamworkInst.iVersion==-1">
+                c.i_version desc,
+            </if>
+            <if test="oaTeamworkInst.iTeamworkId==1">
+                c.i_teamwork_id
+            </if>
+            <if test="oaTeamworkInst.iTeamworkId==-1">
+                c.i_teamwork_id desc,
+            </if>
+
+        </if>
+        1=1
     </select>
     <select id="findOrder" resultType="java.lang.Integer">
       select max(i_order) from oa_teamwork_inst where i_teamwork_id =#{iteamworkId}   GROUP BY i_version

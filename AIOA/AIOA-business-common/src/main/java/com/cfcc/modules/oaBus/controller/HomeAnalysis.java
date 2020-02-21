@@ -72,8 +72,7 @@ public class HomeAnalysis {
             for (int i = 0; i <userSetList.size() ; i++) {
                 SysUserSet userSet = userSetList.get(i);
                 if(userId.equals(userSet.getSUserId())){
-
-                    for (BusFunction busFunction :busFunctionlList) {
+                    busFunctionlList.forEach(busFunction -> {
                         Integer iBus1Id = userSet.getIBus1Id();
                         Integer iBus2Id = userSet.getIBus2Id();
                         Integer iBus3Id = userSet.getIBus3Id();
@@ -94,11 +93,10 @@ public class HomeAnalysis {
                             getIdAndSname(busFunction,map,"model4",username,createTime);
                         }
 
-                    }
+                    });
                     break;
                 }else{
-
-                    for (BusFunction busFunction :busFunctionlList) {
+                    busFunctionlList.forEach(busFunction -> {
                         Integer iBus1Id = null;
                         Integer iBus2Id = null;
                         Integer iBus3Id = null;
@@ -118,13 +116,9 @@ public class HomeAnalysis {
                         {
                             getIdAndSname(busFunction,map,"model4",username,createTime);
                         }
-
-                    }
+                    });
                 }
-
-
         }
-
         return map;
     }
     //获取
