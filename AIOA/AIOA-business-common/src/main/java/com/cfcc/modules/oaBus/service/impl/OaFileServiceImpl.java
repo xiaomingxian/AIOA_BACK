@@ -69,6 +69,10 @@ public class OaFileServiceImpl extends ServiceImpl<OaFileMapper, OaFile> impleme
     @Value(value = "${jeecg.path.tempFilePath}")
     private String tempPath;
 
+    //模板地址
+    @Value(value = "${jeecg.path.templateFilePath}")
+    private String templateFilePath;
+
 
     @Override
     public Boolean savePicText(Integer fileType, String picText) {
@@ -382,7 +386,15 @@ public class OaFileServiceImpl extends ServiceImpl<OaFileMapper, OaFile> impleme
             String projectPath = System.getProperty("user.dir");
             String path = projectPath.substring(0, projectPath.lastIndexOf(File.separator));
             String path2 = path.substring(0, path.lastIndexOf(File.separator));
-            File temp = new File(path2+File.separator+tempPath);
+            String tempPaths = "";
+            if (map.get("sFilePath") != null){
+                if ((map.get("sFilePath")+"") == "2" || (map.get("sFilePath")+"") == "3"){
+                    tempPaths = path2+File.separator+templateFilePath;
+                }
+            }else {
+                tempPaths = path2+File.separator+tempPath;
+            }
+            File temp = new File(tempPaths);
             if (!temp.exists()) {
                 temp.mkdirs();
             }
