@@ -26,8 +26,10 @@ import com.cfcc.modules.workflow.service.ProcessManagerService;
 import com.cfcc.modules.workflow.service.TaskCommonService;
 import lombok.extern.slf4j.Slf4j;
 import org.activiti.engine.HistoryService;
+import org.activiti.engine.RepositoryService;
 import org.activiti.engine.TaskService;
 import org.activiti.engine.history.HistoricTaskInstance;
+import org.activiti.engine.repository.ProcessDefinition;
 import org.activiti.engine.task.Task;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -94,6 +96,9 @@ public class OaBusdataServiceImpl extends ServiceImpl<OaBusdataMapper, OaBusdata
     private IBusPageService iBusPageService;
     @Autowired
     private TaskService taskService;
+
+    @Autowired
+    private RepositoryService repositoryService;
 
 
     //private Logger logger = LoggerFactory.getLogger(OaBusdataServiceImpl.class);
@@ -495,6 +500,12 @@ public class OaBusdataServiceImpl extends ServiceImpl<OaBusdataMapper, OaBusdata
             if (param.get("taskId") != null) {
                 taskId = param.get("taskId") + "";
             }
+        }
+        if (StringUtils.isBlank(taskDef) && StringUtils.isNotBlank(proKey)
+                && StringUtils.isNotBlank(status) && status.equalsIgnoreCase("newtask")){
+            //ProcessDefinition processDefinition = repositoryService.createProcessDefinitionQuery()
+            //        .processDefinitionKey(proKey).latestVersion().singleResult();
+            taskDef = processManagerService.actsListPic(null, proKey, true).get(0).getId();
         }
 
 
