@@ -78,10 +78,10 @@ public class BusPageController {
                                                 @RequestParam(name = "pageSize", defaultValue = "10") Integer pageSize,
                                                 HttpServletRequest req) {
         Result<IPage<BusPage>> result = new Result<IPage<BusPage>>();
-        QueryWrapper<BusPage> queryWrapper = QueryGenerator.initQueryWrapper(busPage, req.getParameterMap());
+        /*QueryWrapper<BusPage> queryWrapper = QueryGenerator.initQueryWrapper(busPage, req.getParameterMap());
         Page<BusPage> page = new Page<BusPage>(pageNo, pageSize);
-        queryWrapper.orderByDesc("i_id");
-        IPage<BusPage> pageList = busPageService.page(page, queryWrapper);
+        queryWrapper.orderByDesc("i_id");*/
+        IPage<BusPage> pageList = busPageService.getPage(pageNo,pageSize, busPage);
         result.setSuccess(true);
         result.setResult(pageList);
         return result;

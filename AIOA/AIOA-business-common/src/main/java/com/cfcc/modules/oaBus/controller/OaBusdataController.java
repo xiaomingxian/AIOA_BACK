@@ -389,7 +389,7 @@ public class OaBusdataController {
 
     /**
      * 查询一个当前用户是否可以查看这条数据
-     * @param table
+     * @param tableName
      * @param id
      * @param request
      * @return
@@ -402,15 +402,6 @@ public class OaBusdataController {
         boolean res =false ;
         res = oaBusdataService.checkBusDataSer(tableName,id,userName) ;
         return res;
-    }
-
-    @GetMapping("haveSavePermission")
-    public Result haveSavePermission(String table, String id, HttpServletRequest request) {
-
-        LoginInfo loginInfo = isysUserService.getLoginInfo(request);
-
-        return oaBusdataService.haveSavePermission(table, id, loginInfo);
-
     }
 
 
