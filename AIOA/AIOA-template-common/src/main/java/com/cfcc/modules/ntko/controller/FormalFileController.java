@@ -92,7 +92,8 @@ public class FormalFileController {
             Integer tmplateId = iDocNumSetService.queryByIdAndSendObj(docNumManage);
             OaTemplate oaTemplate = iOaTemplateService.queryById(tmplateId);
             oaFile = iOaFileService.queryById(oaTemplate.getIFileId());
-            String fileName = oaFile.getSFileName();
+            String mFilePath = oaFile.getSFilePath();
+            String fileName=mFilePath.substring(mFilePath.lastIndexOf("\\")+1);
             //根据业务表名和id查业务数据
             Map<String, Object> map = iOaBusdataService.getBusDataById(stable, Integer.parseInt(tableid));
             //根据业务功能id查业务含义数据

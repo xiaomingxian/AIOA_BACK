@@ -75,6 +75,7 @@ public class OaButtonSetController {
     @GetMapping(value = "/findById")
     public Result<IPage<OaButtonSet>> findById(@RequestParam(name = "id", required = true) Integer id,
                                                @RequestParam(name = "buttonId", required = false) Integer buttonId,
+                                               @RequestParam(name = "taskDefKey", required = false) String taskDefKey,
                                                     @RequestParam(name = "pageNo", defaultValue = "1") Integer pageNo,
                                                     @RequestParam(name = "pageSize", defaultValue = "10") Integer pageSize,
                                                     HttpServletRequest req) {
@@ -82,7 +83,7 @@ public class OaButtonSetController {
 		/*QueryWrapper<OaButtonSet> queryWrapper = QueryGenerator.initQueryWrapper(oaButtonSet, req.getParameterMap());
 		Page<OaButtonSet> page = new Page<OaButtonSet>(pageNo, pageSize);
 		IPage<OaButtonSet> pageList = oaButtonSetService.page(page, queryWrapper);*/
-        IPage<OaButtonSet> pageList = oaButtonSetService.getPage(pageNo, pageSize, id,buttonId);
+        IPage<OaButtonSet> pageList = oaButtonSetService.getPage(pageNo, pageSize, id,buttonId,taskDefKey);
         result.setSuccess(true);
         result.setResult(pageList);
         return result;

@@ -12,6 +12,7 @@ import com.cfcc.common.util.oConvertUtils;
 import com.cfcc.modules.workflow.pojo.OaProcActinst;
 import com.cfcc.modules.workflow.pojo.OaProcActinst;
 import com.cfcc.modules.workflow.service.IoaProcActinstService;
+import com.cfcc.modules.workflow.service.TaskCommonFoldService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
@@ -210,6 +211,33 @@ public class OaProcActinstController {
             result.error500("未找到对应实体");
         } else {
             result.setResult(OaProcActinst);
+            result.setSuccess(true);
+        }
+        return result;
+    }
+
+
+    @Autowired
+    private TaskCommonFoldService taskCommonFoldService;
+    /**
+     * 根据流程key和任务名称查询
+     *作者：lvjian
+     * @param oaProcActinst
+     * @return
+     */
+    @AutoLog(value = "流程节点配置-根据流程key和任务名称查询")
+    @ApiOperation(value = "流程节点配置-根据流程key和任务名称查询", notes = "流程节点配置-根据流程key和任务名称查询")
+    @GetMapping(value = "/queryByKeyAndName")
+    public Result<OaProcActinst> queryByKeyAndName(OaProcActinst oaProcActinst) {
+        Result<OaProcActinst> result = new Result<OaProcActinst>();
+        if (oaProcActinst.getActName()!=null &&oaProcActinst.getActName().trim().length()>0){
+            oaProcActinst.setActName(oaProcActinst.getActName().trim());
+        }
+        OaProcActinst OaProcActinst1 = taskCommonFoldService.queryByKeyAndName(oaProcActinst);
+        if (OaProcActinst1 == null) {
+            result.error500("未找到对应实体");
+        } else {
+            result.setResult(OaProcActinst1);
             result.setSuccess(true);
         }
         return result;

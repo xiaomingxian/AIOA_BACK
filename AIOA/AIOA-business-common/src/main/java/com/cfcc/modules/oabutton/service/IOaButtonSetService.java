@@ -24,7 +24,7 @@ public interface IOaButtonSetService extends IService<OaButtonSet> {
      * @param id
      * @return
      */
-    IPage<OaButtonSet> getPage(Integer pageNo, Integer pageSize, Integer id, Integer buttonId);
+    IPage<OaButtonSet> getPage(Integer pageNo, Integer pageSize, Integer id, Integer buttonId,String taskDefKey);
     //通过id查询
     OaButtonSet queryById(Integer iId);
     //通过任务KEY和按钮ID查询

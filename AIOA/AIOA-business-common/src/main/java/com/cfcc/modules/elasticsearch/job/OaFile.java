@@ -70,7 +70,7 @@ public class OaFile implements Job {
             for (Map<String, Object> map : oaFileList) {
                 String json = JSON.toJSONString(map);
                 RestStatus restStatus = searchService.saveOrUpdate(json, map.get("i_id").toString() + map.get("table").toString(), INDEX_NAME, INDEX_TYPE);
-                System.out.println("----------"+!restStatus.equals("OK")+"----------");
+                //System.out.println("----------"+!restStatus.equals("OK")+"----------");
                 //restStatus.equals("OK")成功时返回false
                 if (!restStatus.equals("OK")){
                     log.info("-----------------oa_busdata添加数据成功-------------------");

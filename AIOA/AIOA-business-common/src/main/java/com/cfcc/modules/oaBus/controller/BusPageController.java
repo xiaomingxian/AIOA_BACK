@@ -327,7 +327,7 @@ public class BusPageController {
                     e.printStackTrace();
                 }
             }
-            System.out.println(filePath);
+            //System.out.println(filePath);
         }
         return result;
     }
@@ -379,7 +379,7 @@ public class BusPageController {
                     e.printStackTrace();
                 }
             }
-            System.out.println(filePath);
+            //System.out.println(filePath);
         }
         return result;
     }

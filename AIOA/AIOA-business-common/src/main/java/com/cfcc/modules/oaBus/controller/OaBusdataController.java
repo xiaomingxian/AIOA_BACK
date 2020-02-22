@@ -76,81 +76,6 @@ public class OaBusdataController {
     private IBusPageDetailService busPageDetailService;
 
 
-    @GetMapping("test")
-    public Result test(String table) {
-
-        String cols = busPageDetailService.getColums(table);
-        if (cols == null) {
-            Result.error("未查询到该表的字段信息");
-        }
-        List<Map> res = oaBusdataService.selectByTable(table, cols);
-
-
-        return Result.ok(res);
-    }
-
-
-    @GetMapping("buttonQuery")
-    public Result buttonQuery(
-            @RequestParam(required = false) String taskDefKey,
-            @RequestParam(required = false) String optionTable,
-            @RequestParam(required = false) String busdataId,
-            @RequestParam(required = false) String oaBusdata,
-            @RequestParam(required = false) String proInstanId,
-            @RequestParam(required = false) String taskId,
-            @RequestParam(required = false) String proSetId,
-            HttpServletRequest request
-    ) {
-        LoginInfo loginInfo = isysUserService.getLoginInfo(request);
-        HashMap<String, Object> queryWrapper = new HashMap<>();
-        queryWrapper.put("taskDefKey", taskDefKey);
-        queryWrapper.put("loginInfo", loginInfo);
-        queryWrapper.put("optionTable", optionTable);
-        queryWrapper.put("busdataId", busdataId);
-        queryWrapper.put("oaBusdata", oaBusdata);
-        queryWrapper.put("proInstanId", proInstanId);
-        queryWrapper.put("taskId", taskId);
-        queryWrapper.put("proSetId", proSetId);
-        try {
-            Map<String, Object> btn = buttonPermissionService.getBtn(queryWrapper);
-
-            return Result.ok(btn);
-        } catch (Exception e) {
-            return Result.error("查询按钮失败");
-        }
-    }
-
-
-    @GetMapping("optQuery")
-    public Result optQuery(
-            @RequestParam(required = false) String taskDefKey,
-            @RequestParam(required = false) String optionTable,
-            @RequestParam(required = false) String busdataId,
-            @RequestParam(required = false) String oaBusdata,
-            @RequestParam(required = false) String proInstanId,
-            @RequestParam(required = false) String taskId,
-            @RequestParam(required = false) String proSetId,
-            HttpServletRequest request
-    ) {
-        LoginInfo loginInfo = isysUserService.getLoginInfo(request);
-        HashMap<String, Object> queryWrapper = new HashMap<>();
-        queryWrapper.put("taskDefKey", taskDefKey);
-        queryWrapper.put("loginInfo", loginInfo);
-        queryWrapper.put("optionTable", optionTable);
-        queryWrapper.put("busdataId", busdataId);
-        queryWrapper.put("oaBusdata", oaBusdata);
-        queryWrapper.put("proInstanId", proInstanId);
-        queryWrapper.put("taskId", taskId);
-        queryWrapper.put("proSetId", proSetId);
-
-        try {
-            Map<String, Object> opt = buttonPermissionService.getOpt(queryWrapper);
-            return Result.ok(opt);
-        } catch (Exception e) {
-            return Result.error("查询意见失败");
-        }
-    }
-
 
     /**
      * 分页列表查询
@@ -392,7 +317,7 @@ public class OaBusdataController {
         LoginInfo loginInfo = isysUserService.getLoginInfo(request);
         SysDepart depart = loginInfo.getDepart();
         Map<String, Object> result = new HashMap<>();
-        System.out.println(json);
+        //System.out.println(json);
         Map maps = (Map) JSONObject.parse(json);
         String modelId = maps.get("modelId") + "";
         String functionId = maps.get("function_id") + "";

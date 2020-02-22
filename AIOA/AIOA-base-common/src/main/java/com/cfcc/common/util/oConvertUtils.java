@@ -74,7 +74,7 @@ public class oConvertUtils {
 		try {
 			byte[] b = strIn.getBytes(sourceCode);
 			for (int i = 0; i < b.length; i++) {
-				System.out.print(b[i] + "  ");
+				//System.out.print(b[i] + "  ");
 			}
 			strOut = new String(b, targetCode);
 		} catch (Exception e) {

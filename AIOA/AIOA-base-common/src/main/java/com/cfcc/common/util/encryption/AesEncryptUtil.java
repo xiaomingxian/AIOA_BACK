@@ -113,10 +113,10 @@ public class AesEncryptUtil {
         String iv = IV;
         // /g2wzfqvMOeazgtsUVbq1kmJawROa6mcRAzwG1/GeJ4=
         data = encrypt(test, key, iv);
-        System.out.println("数据："+test);
-        System.out.println("加密："+data);
+        //System.out.println("数据："+test);
+        //System.out.println("加密："+data);
         String jiemi =desEncrypt(data, key, iv).trim();
-        System.out.println("解密："+jiemi);
+        //System.out.println("解密："+jiemi);
 
 
     }

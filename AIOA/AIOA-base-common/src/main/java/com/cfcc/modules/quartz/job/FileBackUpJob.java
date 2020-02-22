@@ -41,7 +41,7 @@ public class FileBackUpJob implements Job {
         }
         for (int i = 0; i < sourceFileList.length; i++) {
             String sourceName = sourceFileList[i].getName();
-            System.out.println(sourceName);
+            //System.out.println(sourceName);
             String savePath = "";
             if (sourceName.indexOf(".") != -1) {
                 savePath = dataPath + File.separator + dayDataPath + File.separator + sourceName.substring(0, sourceName.lastIndexOf(".")) + ".zip";

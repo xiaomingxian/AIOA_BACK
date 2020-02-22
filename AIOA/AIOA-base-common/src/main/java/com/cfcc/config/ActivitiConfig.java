@@ -16,7 +16,7 @@ public class ActivitiConfig implements ProcessEngineConfigurationConfigurer {
         processEngineConfiguration.setActivityFontName("宋体");
         processEngineConfiguration.setLabelFontName("宋体");
         processEngineConfiguration.setAnnotationFontName("宋体");
-        System.out.println("#############Activiti设置中文#############");
+        //System.out.println("#############Activiti设置中文#############");
 
     }
 }
