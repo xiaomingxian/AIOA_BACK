@@ -369,7 +369,6 @@ public class OaBusdataServiceImpl extends ServiceImpl<OaBusdataMapper, OaBusdata
         String proInstanId = param.get("proInstanId") == null ? null : param.get("proInstanId") + "";
         // 待办、已办...
         String status = param.get("status") == null ? null : param.get("status") + "";
-        String taskDefinitionKey = param.get("taskDefinitionKey") == null ? null : param.get("taskDefinitionKey") + "";
 
 
         Map<String, Object> result = new HashMap<>();

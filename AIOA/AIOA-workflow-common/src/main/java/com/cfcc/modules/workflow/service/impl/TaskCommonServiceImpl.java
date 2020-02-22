@@ -1073,7 +1073,7 @@ public class TaskCommonServiceImpl implements TaskCommonService {
             addTaskDescript(task.getProcessInstanceId(), busMsg);
         } else {
             task = taskService.createTaskQuery().taskId(taskId).singleResult();
-            if (task==null)throw new AIOAException("未找到您要办理的任务,请刷新所进入的页面重试)");
+            if (task == null) throw new AIOAException("未找到您要办理的任务,请刷新所进入的页面重试)");
         }
 
 
@@ -1544,13 +1544,16 @@ public class TaskCommonServiceImpl implements TaskCommonService {
             }
         }
 
-        String processInstanceId = jumpMsg.getProcessInstanceId();
-        taskMapper.deleteHiParent(processInstanceId, sourceTaskId);
-        taskMapper.deleteRuParent(processInstanceId, sourceTaskId);
         //将父节点是它的任务的节点置空
         //update   `act_hi_taskinst` set PARENT_TASK_ID_=null   where PARENT_TASK_ID_='10027' PROC_INST_ID_=2560
         //  update  act_ru_task set PARENT_TASK_ID_=null   where PARENT_TASK_ID_='10027' and PROC_INST_ID_=10022
-        historyService.deleteHistoricTaskInstance(sourceTaskId);
+        if (!deleteReason.contains("back")) {
+            String processInstanceId = jumpMsg.getProcessInstanceId();
+            taskMapper.deleteHiParent(processInstanceId, sourceTaskId);
+            taskMapper.deleteRuParent(processInstanceId, sourceTaskId);
+            historyService.deleteHistoricTaskInstance(sourceTaskId);
+        }
+
 
         return task;
 
