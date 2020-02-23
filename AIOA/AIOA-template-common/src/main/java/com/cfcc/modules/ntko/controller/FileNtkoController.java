@@ -11,6 +11,7 @@ import com.cfcc.modules.oaBus.entity.OaFile;
 import com.cfcc.modules.oaBus.mapper.OaBusDynamicTableMapper;
 import com.cfcc.modules.oaBus.service.IOaBusdataService;
 import com.cfcc.modules.oaBus.service.IOaFileService;
+import com.cfcc.modules.oaBus.service.OaBusDynamicTableService;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -44,7 +45,7 @@ public class FileNtkoController {
     @Value(value = "${jeecg.path.uploadfile}")
     private String uploadfilepath;
 
-    @Value(value = "${jeecg.path.tempFilePath}")
+    @Value(value = "${jeecg.path.templateFilePath}")
     private String tempFilePath;
 
     @Autowired
@@ -53,6 +54,8 @@ public class FileNtkoController {
     private WebSocket webSocket;
     @Autowired
     private IOaBusdataService oaBusdataService;
+    @Autowired
+    private OaBusDynamicTableMapper dynamicTableMapper;
 
     /**
      * 起草底稿后保存上传到服务器
@@ -218,7 +221,9 @@ public class FileNtkoController {
      * @Author
      */
     @PostMapping(value = "/editFile")
-    public Result<String> editEndsource(HttpServletRequest request, @RequestParam(value = "fileId", required = false) String fileId) throws IOException {
+    public Result<String> editEndsource(HttpServletRequest request,
+                                        @RequestParam(value = "fileId", required = false) String fileId,
+                                        @RequestParam(value = "sfileType", required = false) String sfileType) throws IOException {
         OaFile initFile = oaFileService.getById(fileId);
         Result<String> result = new Result<>();
         Calendar calendar = Calendar.getInstance();
@@ -236,31 +241,32 @@ public class FileNtkoController {
         MultipartHttpServletRequest multipartRequest = (MultipartHttpServletRequest) request;
         MultipartFile mf = multipartRequest.getFile("file");// 获取上传文件对象
         FileCopyUtils.copy(mf.getBytes(), savefile);
-//        Map<String, Object> map = FileUtils.Upload(ctxPath, tempPath, request);
-//        String fileName = (String) map.get("fileName");
-//        String savePath = (String) map.get("savePath");
-        OaFile oaFile = new OaFile();
-        oaFile.setIId(Integer.parseInt(fileId));
-        oaFile.setSFileType(initFile.getSFileType());
-        QueryWrapper<OaFile> c = new QueryWrapper<>();
-        c.setEntity(oaFile);
-        Boolean flag = oaFileService.remove(c);
+
         String saveFileName = fileName.replace(fileName.substring(fileName.lastIndexOf('_'), fileName.lastIndexOf('.')), "");
-        if (flag == true) {
-            oaFile.setSTable(initFile.getSTable());
-            oaFile.setITableId(initFile.getITableId());
-            oaFile.setSFileType(initFile.getSFileType());
-            oaFile.setSFileName(saveFileName);
-            oaFile.setSFilePath(savePath);
-            oaFile.setDCreateTime(new Date());
-            oaFileService.save(oaFile);
-            QueryWrapper<OaFile> query = new QueryWrapper<>();
-            query.setEntity(oaFile);
-            OaFile ad = oaFileService.getOne(query);
-            oaFileService.updateIorderById(ad.getIId());
-            result.setMessage("编辑成功");
-        } else {
-            result.setMessage("编辑功能出现问题，请联系管理员");
+
+        Map<String,Object> oaFileMap=new HashMap<>();
+        oaFileMap.put("table","oa_file");
+        oaFileMap.put("i_id",initFile.getITableId());
+        oaFileMap.put("s_table",initFile.getSTable());
+        oaFileMap.put("i_table_id",initFile.getITableId());
+        oaFileMap.put("s_file_type",initFile.getSFileType());
+        oaFileMap.put("s_file_name",saveFileName);
+        oaFileMap.put("s_file_path",savePath);
+        oaFileMap.put("d_create_time",new Date());
+
+        if (sfileType!=null){
+            String projectPath = System.getProperty("user.dir");
+            String path1 = projectPath.substring(0, projectPath.lastIndexOf(File.separator));
+            String path2 = path1.substring(0, path1.lastIndexOf(File.separator));
+            File template = new File(path2+File.separator+tempFilePath+File.separator+fileName);
+            FileCopyUtils.copy(mf.getBytes(), template);
+        }
+
+        int num=dynamicTableMapper.updateData(oaFileMap);
+        if (num!=0){
+            log.info("----------------->编辑更新成功");
+        }else {
+            log.info("----------------->编辑更新失败");
         }
         return result;
     }
