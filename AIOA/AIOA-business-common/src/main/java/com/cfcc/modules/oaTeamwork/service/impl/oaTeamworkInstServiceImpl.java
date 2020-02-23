@@ -35,7 +35,6 @@ public class oaTeamworkInstServiceImpl extends ServiceImpl<oaTeamworkInstMapper,
     private oaTeamworkMapper  oaTeamworkMapper;
     @Autowired
     private BusModelMapper busModelMapper;
-
     @Autowired
     private BusFunctionMapper busFunctionMapper;
 
@@ -64,6 +63,10 @@ public class oaTeamworkInstServiceImpl extends ServiceImpl<oaTeamworkInstMapper,
         List<oaTeamworkInst> oaTeamworkInstList =  oaTeamworkInstMapper.findPage((pageNo-1)*pageSize,pageSize,oaTeamworkInst);
         for(int i=0;i<oaTeamworkInstList.size();i++){
             oaTeamwork oaTeamwork = oaTeamworkMapper.findById(oaTeamworkInstList.get(i).getITeamworkId());
+            Integer sumorder = oaTeamworkInstMapper.SumOrder((oaTeamworkInstList.get(i).getITeamworkId()));
+            Integer lastOrder = oaTeamworkInstMapper.LastOrder(oaTeamworkInstList.get(i).getITeamworkId());
+            oaTeamworkInstList.get(i).setOrders(sumorder.toString());//总步骤
+            oaTeamworkInstList.get(i).setLastOrder(lastOrder.toString());//当前步骤
             if(oaTeamwork != null){
                 oaTeamworkInstList.get(i).setITeamworkName(oaTeamwork.getSTeamworkName());
                 oaTeamworkInstList.get(i).setDCreateTime(oaTeamwork.getDCreateTime());
@@ -105,6 +108,10 @@ public class oaTeamworkInstServiceImpl extends ServiceImpl<oaTeamworkInstMapper,
         List<oaTeamworkInst> oaTeamworkInstList = oaTeamworkInstMapper.findList(oaTeamworkInst);
         for(int i=0;i<oaTeamworkInstList.size();i++){
             oaTeamwork oaTeamwork = oaTeamworkMapper.findById(oaTeamworkInstList.get(i).getITeamworkId());
+            Integer sumorder = oaTeamworkInstMapper.SumOrder((oaTeamworkInstList.get(i).getITeamworkId()));
+            Integer lastOrder = oaTeamworkInstMapper.LastOrder(oaTeamworkInstList.get(i).getITeamworkId());
+            oaTeamworkInstList.get(i).setOrders(sumorder.toString());//总步骤
+            oaTeamworkInstList.get(i).setLastOrder(lastOrder.toString());//当前步骤
             if(oaTeamwork != null){
                 oaTeamworkInstList.get(i).setITeamworkName(oaTeamwork.getSTeamworkName());
                 oaTeamworkInstList.get(i).setDCreateTime(oaTeamwork.getDCreateTime());

@@ -29,6 +29,10 @@ public interface oaTeamworkInstMapper extends BaseMapper<oaTeamworkInst> {
 
     Integer findMax(Integer iteamworkId);
 
+    Integer SumOrder(Integer iteamworkId);
+
+    Integer LastOrder(Integer iteamworkId);
+
     List<oaTeamworkInst> findList( @Param("oaTeamworkInst")oaTeamworkInst oaTeamworkInst);
 
     List<Integer> findOrder(Integer iteamworkId);
