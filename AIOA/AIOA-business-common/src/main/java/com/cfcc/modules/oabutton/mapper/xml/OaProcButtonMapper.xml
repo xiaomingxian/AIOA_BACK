@@ -33,7 +33,7 @@
                 and (PROC_DEF_KEY='' or PROC_DEF_KEY is null)
             </if>
             <if test="sButtonSetName !=null and sButtonSetName !=''">
-                and s_button_set_name=#{sButtonSetName}
+                and s_button_set_name like concat("%",#{sButtonSetName},"%")
             </if>
         </where>
     </select>
@@ -51,7 +51,7 @@
                 and (PROC_DEF_KEY='' or PROC_DEF_KEY is null)
             </if>
             <if test="procbutton.sButtonSetName !=null and procbutton.sButtonSetName!=''">
-                 and s_button_set_name=#{procbutton.sButtonSetName}
+                 and s_button_set_name like concat("%",#{procbutton.sButtonSetName},"%")
             </if>
         </where>
         limit #{pageNo},#{pageSize}

@@ -76,7 +76,7 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser> impl
         List<Map<String,Object>> sysUserList = sysUserMapper.getSysUserAllByAll(user,orderBydepart, (pageNo - 1) * pageSize,pageSize);
         for (Map<String, Object> sysUser : sysUserList) {
             String parentId = sysUser.get("parentId")+"";
-            System.out.println(parentId);
+            //System.out.println(parentId);
             if (parentId == null || parentId == "" || parentId.equals("1")){
                 sysUser.put("parentName","" );
                 continue;

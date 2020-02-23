@@ -32,9 +32,9 @@ public class OaButtonSetServiceImpl extends ServiceImpl<OaButtonSetMapper, OaBut
     private OaButtonSetMapper oaButtonSetMapper;
 
     @Override
-    public IPage<OaButtonSet> getPage(Integer pageNo, Integer pageSize, Integer id,Integer buttonId) {
-        int total = oaButtonSetMapper.queryButtonCount(id,buttonId);
-        List<OaButtonSet> buttonSetList = oaButtonSetMapper.queryButton(id,buttonId,(pageNo-1)*pageSize,pageSize);
+    public IPage<OaButtonSet> getPage(Integer pageNo, Integer pageSize, Integer id,Integer buttonId,String taskDefKey) {
+        int total = oaButtonSetMapper.queryButtonCount(id,buttonId,taskDefKey);
+        List<OaButtonSet> buttonSetList = oaButtonSetMapper.queryButton(id,buttonId,taskDefKey,(pageNo-1)*pageSize,pageSize);
         IPage<OaButtonSet> pageList = new Page<>();
         pageList.setRecords(buttonSetList);
         pageList.setTotal(total);

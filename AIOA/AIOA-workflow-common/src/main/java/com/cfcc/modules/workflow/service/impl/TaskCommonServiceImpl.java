@@ -848,12 +848,12 @@ public class TaskCommonServiceImpl implements TaskCommonService {
             List<HistoricTaskInstance> list = historyService.createHistoricTaskInstanceQuery().processInstanceId(procInstId).list();
             for (HistoricTaskInstance historicTaskInstance : list) {
                 if (StringUtils.isNotBlank(historicTaskInstance.getDescription())) {
-                    if (historicTaskInstance.getDescription()!=null){
+                    if (historicTaskInstance.getDescription() != null) {
                         TaskCommon taskCommon = new TaskCommon();
                         taskCommon.setBusMsg(historicTaskInstance.getDescription());
                         table = taskCommon.getTable();
-                        if (StringUtils.isBlank(table))continue;
-                        table=table+"_opinion";
+                        if (StringUtils.isBlank(table)) continue;
+                        table = table + "_opinion";
                     }
 
                     break;
@@ -861,7 +861,7 @@ public class TaskCommonServiceImpl implements TaskCommonService {
 
             }
         }
-        if (StringUtils.isBlank(table))throw  new AIOAException("未找到业务信息");
+        if (StringUtils.isBlank(table)) throw new AIOAException("未找到业务信息");
 
         return taskMapper.backRecord(procInstId, table);
     }
@@ -1073,6 +1073,7 @@ public class TaskCommonServiceImpl implements TaskCommonService {
             addTaskDescript(task.getProcessInstanceId(), busMsg);
         } else {
             task = taskService.createTaskQuery().taskId(taskId).singleResult();
+            if (task == null) throw new AIOAException("未找到您要办理的任务,请刷新所进入的页面重试)");
         }
 
 
@@ -1290,7 +1291,7 @@ public class TaskCommonServiceImpl implements TaskCommonService {
         Map<String, Object> vars = taskInfoVO.getVars();
 
         String processDefinitionId = task.getProcessDefinitionId();
-
+        //下几个环节中找到所选择的下一环节
         List<Activity> nextActs = searchNextActs(taskId, processDefinitionId, null);
 
         //找出选择的下一个环节
@@ -1307,45 +1308,50 @@ public class TaskCommonServiceImpl implements TaskCommonService {
 
         String processInstanceId = task.getProcessInstanceId();
         String userId = taskInfoVO.getUserId();
+        String currentTaskKey = task.getTaskDefinitionKey();
 
+
+        //当前环节是否需要记录用户
+        OaProcActinst currentTaskOaProcActinst = taskMapper.isRecordCurrentUser(currentTaskKey, processDefinitionId);
+        if (currentTaskOaProcActinst.getRecordCurrentuser()) {
+            String recordKey = currentTaskOaProcActinst.getRecordKey();
+            if (null != recordKey) {
+                List<String> keys = new ArrayList<>();
+                if (recordKey.contains(",")) {
+                    String[] split = recordKey.split(",");
+                    keys = Arrays.asList(split);
+                } else {
+                    keys.add(recordKey);
+                    taskMapper.deleteOld(processInstanceId, keys);
+                    taskMapper.recordUser(processInstanceId, keys, userId);
+
+                }
+                taskMapper.deleteOld(processInstanceId, keys);
+                taskMapper.recordUser(processInstanceId, keys, userId);
+            }
+
+        }
+
+        //下一环节
         String taskDefKeyNext = nextAct.getId();
 
-        OaProcActinst oaProcActinst = taskMapper.isRecordCurrentUser(taskDefKeyNext, processDefinitionId);
-
+        //获取下一环节的办理人表达式
         String assignee = nextAct.getAssignee();
         if (assignee == null) return;
 
 
         boolean multi = nextAct.isMulti();
-        if (multi) return;
-        //下一环节是否记录用户
-        Boolean recordCurrentuser = oaProcActinst.getRecordCurrentuser();
-        if (recordCurrentuser != null && recordCurrentuser) {
-            String recordKey = oaProcActinst.getRecordKey();
-            if (StringUtils.isNotBlank(recordKey)) {
-                String[] keys = recordKey.contains(",") ? recordKey.split(",") : recordKey.split("");
-                if (keys.length > 0) {
-                    //记录是选择的人
-                    Object o = vars.get(assignee);
-                    if (o != null) {
-                        //查询哪些有只值哪些没值
-                        //先删除
-                        taskMapper.deleteOld(processInstanceId, Arrays.asList(keys));
-                        taskMapper.recordUser(processInstanceId, Arrays.asList(keys), userId);
-                    }
-                }
-            }
-        }
+        if (multi) return;//选择记录用户的节点不允许多实例
 
         //下一环节是否使用已经记录的用户
-        Boolean userRecordVal = oaProcActinst.getUserRecordVal();
-        if (userRecordVal != null && userRecordVal) {
-            //使用记录的用户
-            if (vars.get(assignee) == null) {
-                String valByEl = taskMapper.getValByEl(processDefinitionId, taskDefKeyNext + "-" + assignee);
-                if (StringUtils.isNotBlank(valByEl)) vars.put(assignee, valByEl);
-            }
+        //Boolean userRecordVal = oaProcActinst.getUserRecordVal();
+        //if (userRecordVal != null && userRecordVal) {//是否使用记录的用户
+        //使用记录的用户(如果本身有用户的话就使用自己选择的用户)
+        if (vars.get(assignee) == null) {
+            String valByEl = taskMapper.getValByEl(processInstanceId, taskDefKeyNext + "-" + assignee);
+            if (StringUtils.isNotBlank(valByEl)) vars.put(assignee, valByEl);
         }
+        //}
     }
 
     /**
@@ -1538,13 +1544,16 @@ public class TaskCommonServiceImpl implements TaskCommonService {
             }
         }
 
-        String processInstanceId = jumpMsg.getProcessInstanceId();
-        taskMapper.deleteHiParent(processInstanceId, sourceTaskId);
-        taskMapper.deleteRuParent(processInstanceId, sourceTaskId);
         //将父节点是它的任务的节点置空
         //update   `act_hi_taskinst` set PARENT_TASK_ID_=null   where PARENT_TASK_ID_='10027' PROC_INST_ID_=2560
         //  update  act_ru_task set PARENT_TASK_ID_=null   where PARENT_TASK_ID_='10027' and PROC_INST_ID_=10022
-        historyService.deleteHistoricTaskInstance(sourceTaskId);
+        if (!deleteReason.contains("back")) {
+            String processInstanceId = jumpMsg.getProcessInstanceId();
+            taskMapper.deleteHiParent(processInstanceId, sourceTaskId);
+            taskMapper.deleteRuParent(processInstanceId, sourceTaskId);
+            historyService.deleteHistoricTaskInstance(sourceTaskId);
+        }
+
 
         return task;
 

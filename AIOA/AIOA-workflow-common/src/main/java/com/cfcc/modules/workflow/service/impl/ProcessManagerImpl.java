@@ -347,7 +347,8 @@ public class ProcessManagerImpl implements ProcessManagerService {
     public List<Activity> actsListPic(String processDefinitionId, String proKey, boolean b) {
 
         if (null == processDefinitionId) {
-            ProcessDefinition processDefinition = repositoryService.createProcessDefinitionQuery().processDefinitionKey(proKey).latestVersion().singleResult();
+            ProcessDefinition processDefinition = repositoryService.createProcessDefinitionQuery()
+                    .processDefinitionKey(proKey).latestVersion().singleResult();
             if (processDefinition == null) throw new AIOAException("未找到对应流程,请检查流程是否部署");//未找到对应流程
             processDefinitionId = processDefinition.getId();
         }

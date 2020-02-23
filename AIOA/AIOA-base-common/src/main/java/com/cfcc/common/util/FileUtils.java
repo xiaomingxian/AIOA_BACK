@@ -30,14 +30,9 @@ public class FileUtils {
     /**
      * 文件上传
      */
-    public static Map<String,Object> Upload(String Path1,String Path2, HttpServletRequest request){
+    public static Map<String,Object> Upload(String Path1, HttpServletRequest request){
         Map<String,Object> map = new HashMap<>();
         try {
-//            String Path = Path1;//服务器路径
-//            String fileName = null;
-//			String bizPath = "files";
-//            File filePath=new File("FileUtils.java");
-//            String apath=filePath.getAbsolutePath();
 //            String apath=System.getProperty("user.dir");
 //            String bpath=apath.substring(0,apath.lastIndexOf("\\"));
 //            String cpath=bpath.substring(0,bpath.lastIndexOf("\\"));
@@ -60,14 +55,6 @@ public class FileUtils {
             String savePath = file.getPath() + File.separator + fileName;
             File savefile = new File(savePath);
             FileCopyUtils.copy(mf.getBytes(), savefile);
-            /*String tempPath=path2;//临时文件路径
-            File tempfile = new File(tempPath);
-            String tempFile=tempfile.getPath()+File.separator+ fileName;
-            File file1 = new File(tempFile);
-//            if (!file1.exists()) {
-//                file1.mkdirs();// 创建临时文件目录
-//            }
-            FileCopyUtils.copy(mf.getBytes(),file1 );*/
             map.put("fileName",fileName);
             map.put("savePath",savePath);
         } catch (IOException e) {

@@ -435,6 +435,29 @@
         LEFT JOIN oa_bus_model m ON m.i_id = f.i_bus_model_id
         WHERE f.i_id =#{functionId}
     </select>
+    <select id="getCheckData" resultType="java.util.Map">
+        select i_id from ${tableName} b where
+        b.i_is_display = 0 and i_bus_function_id = #{functionId}
+        and ( s_create_by = #{userId}
+        <if test="permitData.size>0">
+            or
+            <foreach collection="permitData" item="value" index="key" separator=" and " open="(" close=")">
+                ${key} in (${value})
+            </foreach>
+        </if>
+        or (
+        exists(
+        SELECT * FROM ${tableName}_permit p
+        WHERE b.i_id=p.i_busdata_id
+        AND (
+        p.s_user_id=#{userId}
+        OR (p.s_user_id IS NULL AND p.s_userdept_id in (${userDepart}) )
+        OR (p.s_user_id IS NULL AND p.s_userdept_id IS NULL AND p.s_userunit_id in (${userUnit}))
+        )
+        )
+        )
+        )
 
+    </select>
 
 </mapper>

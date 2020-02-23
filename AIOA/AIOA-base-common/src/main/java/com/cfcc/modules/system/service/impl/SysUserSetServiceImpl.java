@@ -92,7 +92,7 @@ public class SysUserSetServiceImpl extends ServiceImpl<SysUserSetMapper, SysUser
     @Override
     public SysUserSet findByUserId(String userId) {
         SysUserSet sysUserSet= sysUserSetMapper.findByUserId(userId);
-        System.out.println(sysUserSet+"]]]]]]");
+        //System.out.println(sysUserSet+"]]]]]]");
         if(sysUserSet == null){
             return null;
         }

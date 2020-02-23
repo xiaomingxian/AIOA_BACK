@@ -24,7 +24,7 @@ public class CASServiceUtil {
 		String ticket = "ST-5-1g-9cNES6KXNRwq-GuRET103sm0-DESKTOP-VKLS8B3";
 		String res = getSTValidate(serviceUrl,ticket, service);
 		
-		System.out.println("---------res-----"+res);
+		//System.out.println("---------res-----"+res);
 	}
 	
 	

@@ -204,7 +204,7 @@ public class FileUtils {
             } catch (IOException e) {
                 e.printStackTrace();
 //                LOGGER.debug("读取word文件失败");
-                System.out.println("读取word文件失败");
+//                System.out.println("读取word文件失败");
             }
         }
         System.out.println(contextList);

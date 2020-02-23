@@ -302,7 +302,7 @@ public class OaTemplateController {
      * @return
      */
     @PostMapping(value = "/upload")
-    public Result<?> upload(HttpServletRequest request, HttpServletResponse response) {
+    public Result<?> upload(HttpServletRequest request, HttpServletResponse response,@RequestParam(value = "fileType",required = false) String type) {
         Result<OaFile> result = new Result<>();
         try {
             //获取用户名称
@@ -329,14 +329,14 @@ public class OaTemplateController {
             File savefile = new File(savePath);
             FileCopyUtils.copy(mf.getBytes(), savefile);
 
-            //获取后台项目路径
+            /*//获取后台项目路径
             String projectPath = System.getProperty("user.dir");
             String path1 = projectPath.substring(0, projectPath.lastIndexOf(File.separator));
             String path2 = path1.substring(0, path1.lastIndexOf(File.separator));
             File template = new File(path2+File.separator+templatePath+File.separator+orgName);
-            FileCopyUtils.copy(mf.getBytes(), template);
+            FileCopyUtils.copy(mf.getBytes(), template);*/
             OaFile oaFile = new OaFile();
-            oaFile.setSFileType("7");        // 附件类型为 4 附件
+            oaFile.setSFileType(type);        // 附件类型为 4 附件
             oaFile.setSFileName(orgName);        //设置附件名字
             oaFile.setSFilePath(savePath);        //设置文件路径
             oaFile.setSCreateBy(username);
@@ -345,6 +345,12 @@ public class OaTemplateController {
 //            QueryWrapper<OaFile> c = new QueryWrapper<>();
 //            c.setEntity(oaFile);
 //            OaFile ad = oaFileService.getOne(c);        //查询刚刚插入的那条数据的id
+
+            Map<String,Object> map=new HashMap<>();
+            map.put("sFilePath",savePath);
+            map.put("sFileType",type);
+            oaFileService.singleCopyFile(map);
+
             result.setResult(oaFile);
             result.setMessage(savePath);
             result.setSuccess(true);

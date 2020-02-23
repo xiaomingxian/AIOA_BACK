@@ -26,8 +26,12 @@ import com.cfcc.modules.workflow.service.ProcessManagerService;
 import com.cfcc.modules.workflow.service.TaskCommonService;
 import lombok.extern.slf4j.Slf4j;
 import org.activiti.engine.HistoryService;
+import org.activiti.engine.RepositoryService;
 import org.activiti.engine.TaskService;
 import org.activiti.engine.history.HistoricTaskInstance;
+import org.activiti.engine.impl.persistence.entity.ProcessDefinitionEntity;
+import org.activiti.engine.impl.pvm.process.ActivityImpl;
+import org.activiti.engine.repository.ProcessDefinition;
 import org.activiti.engine.task.Task;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -70,8 +74,6 @@ public class OaBusdataServiceImpl extends ServiceImpl<OaBusdataMapper, OaBusdata
     @Autowired
     private IBusProcSetService iBusProcSetService;
     @Autowired
-    private TaskCommonService taskCommonService;
-    @Autowired
     private OaBusDynamicTableService dynamicTableService;
     @Autowired
     private ISysDictService sysDictService;
@@ -94,6 +96,12 @@ public class OaBusdataServiceImpl extends ServiceImpl<OaBusdataMapper, OaBusdata
     private IBusPageService iBusPageService;
     @Autowired
     private TaskService taskService;
+
+    @Autowired
+    private RepositoryService repositoryService;
+
+    @Autowired
+    private ButtonPermissionService buttonPermissionService;
 
 
     //private Logger logger = LoggerFactory.getLogger(OaBusdataServiceImpl.class);
@@ -165,11 +173,11 @@ public class OaBusdataServiceImpl extends ServiceImpl<OaBusdataMapper, OaBusdata
     @Override
     public void updateIsES(List<Map<String, Object>> oaFileList) {
         for (Map<String, Object> map : oaFileList) {
-            System.out.println("****************");
+            //System.out.println("****************");
             String id = map.get("i_id").toString();
             Object table_name = map.get("table_name");
-            System.out.println(table_name);
-            System.out.println(map);
+            //System.out.println(table_name);
+            //System.out.println(map);
             String tableName = map.get("table_name").toString();
 
             Integer count = oaBusdataMapper.updateIsESByid(tableName, id);
@@ -230,7 +238,7 @@ public class OaBusdataServiceImpl extends ServiceImpl<OaBusdataMapper, OaBusdata
             }
             functionId = optional.get();
             condition.put("function_id", functionId + "");
-            System.out.println("fuctionId:" + functionId);
+            //System.out.println("fuctionId:" + functionId);
         } else {
             result.setMessage("查询条件中必须包含 function_id！！");
             return result;
@@ -284,7 +292,7 @@ public class OaBusdataServiceImpl extends ServiceImpl<OaBusdataMapper, OaBusdata
             List<Map<String, Object>> dataList = oaBusdataMapper.getBusdataByMap((pageNo - 1) * pageSize,
                     pageSize, col, tableName, condition, permitData, userId, userUnit, userDepart, orderFlag);
             int total = oaBusdataMapper.getBusdataByMapTotal(tableName, condition, permitData, userId, userUnit, userDepart);
-            System.out.println(dataList);
+            //System.out.println(dataList);
             page.setRecords(dataList);
             page.setTotal(total);
             result.setResult(page);
@@ -292,7 +300,7 @@ public class OaBusdataServiceImpl extends ServiceImpl<OaBusdataMapper, OaBusdata
 
 
         String tableHead = JSON.toJSON(listColumns).toString();
-        System.out.println("tableHead:" + tableHead);
+        //System.out.println("tableHead:" + tableHead);
         Map<String, Object> mapHead = new HashMap<>();
         mapHead.put("tableHead", tableHead);
         result.setMessage(tableHead);
@@ -344,6 +352,7 @@ public class OaBusdataServiceImpl extends ServiceImpl<OaBusdataMapper, OaBusdata
     @Override
     public Map<String, Object> getBusDataAndDetailById(Map<String, Object> param, LoginInfo loginInfo) {
 
+        long l1 = System.currentTimeMillis();
         // 业务数据表名
         String tableName = param.get("tableName") == null ? null : param.get("tableName") + "";
         if (tableName == null) {
@@ -360,7 +369,6 @@ public class OaBusdataServiceImpl extends ServiceImpl<OaBusdataMapper, OaBusdata
         String proInstanId = param.get("proInstanId") == null ? null : param.get("proInstanId") + "";
         // 待办、已办...
         String status = param.get("status") == null ? null : param.get("status") + "";
-        String taskDefinitionKey = param.get("taskDefinitionKey") == null ? null : param.get("taskDefinitionKey") + "";
 
 
         Map<String, Object> result = new HashMap<>();
@@ -415,73 +423,95 @@ public class OaBusdataServiceImpl extends ServiceImpl<OaBusdataMapper, OaBusdata
         result.put("busTextData", busText);
 
         SysUser user = loginInfo;
-        int modelId = (int) oaBusdata.get("i_bus_model_id");
-        Object i_fun_version = oaBusdata.get("i_fun_version");
-        BusProcSet busProcSet = iBusProcSetService.getProcSet(modelId, functionId, i_fun_version);
-        if (busProcSet == null) {
+
+
+        if (busProcSet1 == null) {
             throw new AIOAException("数据版本与设置版本不一致请检查版本");
         }
 
-        Map<String, Object> procSet = iBusProcSetService.getProcSetNewTask(modelId + "", functionId, i_fun_version.toString());
+
+        long l2 = System.currentTimeMillis();
+
+        System.out.println("================>>>业务详情查询时间::" + (l2 - l1));
+        //********************************************************************* 流程信息查询
         //读取该流程的第一个环节
+        String proKey = busProcSet1.getProcDefKey();
         String processInstanceId = null;
         String processDefinitionId = null;
-        String proKey = null;
         String taskDef = null;
         String executionId = null;
-        Object proKey1 = procSet.get("proKey");
-        if (proKey1 == null || (proKey1 != null && "".equals(proKey1))) {//没有流程
-            taskDef = null;//新建任务
+        if (StringUtils.isBlank(proKey)) {//没有流程
             result.put("optionTable", null);
         } else {//有流程
-            //先查是不是已经开启了
-            //当前用户对应的最新节点(展示按钮用)
-            taskDef = taskCommonService.queryTaskDefId(busProcSet.getProcDefKey(), user.getId(), busdataId);
-            if (StringUtils.isBlank(taskDef)) {
-                proKey = proKey1 + "";
-                taskDef = processManagerService.actsListPic(null, proKey, true).get(0).getId();
-            } else {
-                taskId = taskId == null ? taskDef.split("~")[0] : taskId;
-                taskDef = taskDef.split("~")[1];
-            }
-        }
+            if (StringUtils.isNotBlank(status) && status.equalsIgnoreCase("newtask")) {//新建
+                ProcessDefinition processDefinition = repositoryService.createProcessDefinitionQuery()
+                        .processDefinitionKey(proKey).latestVersion().singleResult();
+                if (processDefinition == null) throw new AIOAException("未找到流程信息请检查流程是否部署");
+                ProcessDefinitionEntity proc = (ProcessDefinitionEntity) repositoryService.getProcessDefinition(processDefinition.getId());
+                List<ActivityImpl> activities = proc.getActivities();
+                if (activities.size() == 0) throw new AIOAException("未找到流程环节,请检查流程图是否合法");
+                taskDef = activities.get(0).getId();
+            } else {//已经产生流程
+                Task task = null;
+                HistoricTaskInstance historicTaskInstance = null;
+                if (taskId != null) {//从待办已办等进来
+                    task = taskService.createTaskQuery().processInstanceBusinessKey(proKey)
+                            .taskId(taskId).singleResult();
+                    if (task != null && StringUtils.isBlank(status)) status = "todo";
+                    if (task == null) {
+                        historicTaskInstance = historyService.createHistoricTaskInstanceQuery().taskId(taskId).singleResult();
+                        if (historicTaskInstance != null && StringUtils.isBlank(status)) status = "done";
+                    }
 
-        //******************************************   更新状态为已读
-        //只是待办状态时修改
-        if (status != null && "todo".equalsIgnoreCase(status)) {
-            iBusFunctionPermitService.updateReade(tableName + "_permit", loginInfo.getId(), functionId, busdataId);
-            //可能会有多个环节 以用户选择的为准
-            taskDef = StringUtils.isNotBlank(taskDefinitionKey) ? taskDefinitionKey : taskDef;
-        }
-        if (status != null && "done".equalsIgnoreCase(status)) {
-            if (param.get("taskDefinitionKey") != null) {
-                taskDef = param.get("taskDefinitionKey") + "";
-            }
-            if (param.get("taskId") != null) {
-                taskId = param.get("taskId") + "";
-            }
-        }
+                } else {//从业务页面进来
+                    List<Task> list = taskService.createTaskQuery().processDefinitionKey(proKey)
+                            .processInstanceBusinessKey(busdataId).taskCandidateOrAssigned(user.getId())
+                            .list();
+                    if (list.size() > 0) {
+                        //最新待办
+                        task = list.get(list.size() - 1);
+                        if (task != null && StringUtils.isBlank(status)) status = "todo";
 
-        if (taskId != null) {
-            HistoricTaskInstance historicTaskInstance = historyService.createHistoricTaskInstanceQuery().taskId(taskId).singleResult();
-            if (historicTaskInstance == null) throw new AIOAException("当前任务不存在,可能已经被和删除,请重新进入页面");
-            processDefinitionId = historicTaskInstance.getProcessDefinitionId();
-            processInstanceId = historicTaskInstance.getProcessInstanceId();
-            executionId = historicTaskInstance.getExecutionId();
-            if (processDefinitionId == null || processInstanceId == null) {
-                Task task = taskService.createTaskQuery().taskId(taskId).singleResult();
+                    } else {
+                        //最新已办
+                        List<HistoricTaskInstance> hiList = historyService.createHistoricTaskInstanceQuery().processDefinitionKey(proKey)
+                                .processInstanceBusinessKey(busdataId).taskAssignee(user.getId()).list();
+                        if (hiList.size() > 0) {
+                            historicTaskInstance = hiList.get(hiList.size() - 1);
+                            if (historicTaskInstance != null && StringUtils.isBlank(status)) status = "done";
+                        }
+                    }
+                }
                 if (task != null) {
-                    processDefinitionId = task.getProcessDefinitionId();
+                    taskId = task.getId();
                     processInstanceId = task.getProcessInstanceId();
+                    processDefinitionId = task.getProcessDefinitionId();
+                    taskDef = task.getTaskDefinitionKey();
                     executionId = task.getExecutionId();
-                } else {
-                    throw new AIOAException("该流程存在追加的任务【" + historicTaskInstance.getName() + "】,信息有误");
+                } else if (historicTaskInstance != null) {
+                    taskId = historicTaskInstance.getId();
+                    processInstanceId = historicTaskInstance.getProcessInstanceId();
+                    processDefinitionId = historicTaskInstance.getProcessDefinitionId();
+                    taskDef = historicTaskInstance.getTaskDefinitionKey();
+                    executionId = historicTaskInstance.getExecutionId();
                 }
             }
         }
 
+        long l3 = System.currentTimeMillis();
+        System.out.println("================>>>流程信息查询时间:" + (l3 - l2));
+
+        //******************************************   更新状态为已读
+        //只是待办状态时修改
+        if (StringUtils.isNotBlank(status) && "todo".equalsIgnoreCase(status)) {
+            iBusFunctionPermitService.updateReade(tableName + "_permit", loginInfo.getId(), functionId, busdataId);
+        }
+        long lstatus = System.currentTimeMillis();
+        System.out.println("================>>>修改状态时间:" + (lstatus - l3));
+
+
         String optionTable = tableName + "_opinion";
-        Integer busProcSetIId = busProcSet.getIId();
+        Integer busProcSetIId = busProcSet1.getIId();
         result.put("proSetId", busProcSetIId);
         result.put("taskDefKey", taskDef);
         result.put("optionTable", optionTable);
@@ -492,76 +522,30 @@ public class OaBusdataServiceImpl extends ServiceImpl<OaBusdataMapper, OaBusdata
         result.put("table", tableName);
         result.put("executionId", executionId);
         result.put("functionId", functionId);
-        log.info(result.toString());
+
 
         //******************************************   按钮/意见
-        Map<String, Object> btnAndOpt = ButtonPermissionService.getBtnAndOpt(result);
+        oaBusdata.put("tableName", tableName);
+        oaBusdata.put("busdataId", busdataId);
+        Map<String, Boolean> currentUserPermission =
+                buttonPermissionService.currentUserPermission(proKey, oaBusdata, loginInfo,
+                        taskDef, proInstanId, taskId, status);
+
+        long lcu = System.currentTimeMillis();
+        System.out.println("================>>>用户权限时间:" + (lcu - lstatus));
+
+        Map<String, Object> btnAndOpt = ButtonPermissionService.getBtnAndOpt(result, currentUserPermission);
         result.put("btnAndOpt", btnAndOpt);
+        long l4 = System.currentTimeMillis();
+        System.out.println("================>>>按钮+意见:" + (l4 - lcu));
+
+
+        System.out.println("================>>>总共查询时间：" + (l4 - l1));
+
+
         return result;
     }
 
-
-    @Override
-    public Result haveSavePermission(String table, String id, LoginInfo loginInfo) {
-
-        Map<String, Object> result = new HashMap<>();
-
-        Map<String, Object> oaBusdata = oaBusdataMapper.getBusdataMapByIdDao(table, id);
-
-        if (null == oaBusdata) {
-            return Result.error("数据不存在可能已被删除");
-        }
-
-
-        String functionId = oaBusdata.get("i_bus_function_id") + "";
-        Object i_fun_version = oaBusdata.get("i_fun_version");
-
-        int modelId = (int) oaBusdata.get("i_bus_model_id");
-
-        BusProcSet busProcSet = iBusProcSetService.getProcSet(modelId, functionId, i_fun_version);
-        if (busProcSet == null) {
-            return Result.error("数据版本与设置版本不一致请检查版本");
-        }
-        Map<String, Object> procSet = iBusProcSetService.getProcSetNewTask(modelId + "", functionId, i_fun_version.toString());
-        //读取该流程的第一个环节
-        String proKey = null;
-        String taskId = null;
-        String taskDef = null;
-        Object proKey1 = procSet.get("proKey");
-        if (proKey1 == null || (proKey1 != null && "".equals(proKey1))) {//没有流程
-            result.put("taskDefKey", null);//新建任务
-            result.put("optionTable", null);
-        } else {//有流程
-            //先查是不是已经开启了
-            //当前用户对应的最新节点(展示按钮用)
-            taskDef = taskCommonService.queryTaskDefId(busProcSet.getProcDefKey(), loginInfo.getId(), id);
-            if (StringUtils.isBlank(taskDef)) {
-                proKey = proKey1 + "";
-                taskDef = processManagerService.actsListPic(null, proKey, true).get(0).getId();
-            } else {
-                taskId = taskDef.split("~")[0];
-                taskDef = taskDef.split("~")[1];
-            }
-        }
-        Integer iProcButtonId = busProcSet.getIProcButtonId();
-
-        HashMap<String, Object> map = new HashMap<>();
-        map.put("table", table);
-        map.put("i_id", id);
-        map.put("iProcButtonId", iProcButtonId);
-
-        Integer iIsDisplay = oaBusdata.get("i_is_display") == null ? null : Integer.parseInt(oaBusdata.get("i_is_display").toString());
-        String sCreateBy = oaBusdata.get("s_create_by") == null ? "" : oaBusdata.get("s_create_by").toString();
-        boolean isDaiBan = false;
-        if (iIsDisplay != null && iIsDisplay == 1 && id.equals(sCreateBy)) {
-            isDaiBan = true;
-        }
-
-
-        boolean b = ButtonPermissionService.haveSavePermission(proKey1, map, loginInfo, taskDef, taskId, isDaiBan);
-
-        return Result.ok(b);
-    }
 
     @Override
     public Map<String, Object> getFuncitonDataById(String functionId) {
@@ -573,6 +557,53 @@ public class OaBusdataServiceImpl extends ServiceImpl<OaBusdataMapper, OaBusdata
     public Map<String, Object> queryStateById(String stable, Integer tableid) {
         Map<String, Object> map = oaBusdataMapper.getBusdataById(stable, tableid);
         return map;
+    }
+
+    /**
+     * 查询当前用户是否有查看数据的权限
+     * @param tableName
+     * @param id
+     * @param userName
+     * @return
+     */
+    @Override
+    public boolean checkBusDataSer(String tableName, String id, String userName) {
+        boolean res = false ;
+        if (tableName == null || "".equals(tableName)) {
+            log.info("查询失败：表名为空");
+            return false ;
+        }
+        if (id == null || "".equals(id)) {
+            log.info("查询失败：id为空");
+            return false ;
+        }
+        Map<String, Object> oaBusdata = oaBusdataMapper.getBusdataMapByIdDao(tableName, id);
+        if (null == oaBusdata) {
+            // 数据不存在
+            log.info("数据不存在可能已被删除");
+            return false ;
+        }
+        String functionId = oaBusdata.get("i_bus_function_id")+ "" ;
+        int funId = Integer.parseInt(functionId) ;
+        Map<String, String> permitData = permit(funId, tableName, userName);
+        String userId = permitData.get("userId");
+        String userUnit = permitData.get("userUnit");
+        String userDepart = permitData.get("userDepart");
+        permitData.remove("userId");
+        permitData.remove("userUnit");
+        permitData.remove("userDepart");
+       /* List<Map<String, Object>> dataList = oaBusdataMapper.getBusdataByMap((pageNo - 1) * pageSize,
+                pageSize, col, tableName, condition, permitData, userId, userUnit, userDepart, orderFlag);
+*/
+        List<Map<String,Object>> list = oaBusdataMapper.getCheckData(tableName,functionId,permitData,userId,userUnit,userDepart);
+        for(Map map : list){
+            String i_id = map.get("i_id") + "";
+            if(id.equals(i_id)){
+                res = true ;
+                break ;
+            }
+        }
+        return res;
     }
 
 
@@ -735,7 +766,7 @@ public class OaBusdataServiceImpl extends ServiceImpl<OaBusdataMapper, OaBusdata
                 result.put("i_id",dataIdList) ;
             }*/
         }
-        System.out.println(result);
+        //System.out.println(result);
         return result;
     }
 

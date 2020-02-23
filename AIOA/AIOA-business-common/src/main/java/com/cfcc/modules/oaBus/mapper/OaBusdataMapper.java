@@ -160,4 +160,11 @@ public interface OaBusdataMapper extends BaseMapper<OaBusdata> {
     int listCountBytableName(Map<String, Object> map);
 
     Map<String,Object> queryFuncitonDataById(@Param("functionId")String functionId);
+
+    List<Map<String, Object>> getCheckData(@Param("tableName") String tableName,
+                              @Param("functionId")String functionId,
+                              @Param("permitData")Map<String, String> permitData,
+                              @Param("userId")String userId,
+                              @Param("userUnit")String userUnit,
+                              @Param("userDepart")String userDepart);
 }

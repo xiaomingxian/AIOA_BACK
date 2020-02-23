@@ -197,6 +197,6 @@ public class JwtUtil {
 	
 	public static void main(String[] args) {
 		 String token = "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJleHAiOjE1NjUzMzY1MTMsInVzZXJuYW1lIjoiYWRtaW4ifQ.xjhud_tWCNYBOg_aRlMgOdlZoWFFKB_givNElHNw3X0";
-		 System.out.println(JwtUtil.getUsername(token));
+		 //System.out.println(JwtUtil.getUsername(token));
 	}
 }

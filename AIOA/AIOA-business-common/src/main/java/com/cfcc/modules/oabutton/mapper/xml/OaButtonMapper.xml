@@ -39,7 +39,7 @@
                 s_btn_id=#{sBtnId}
             </if>
             <if test="sBtnName !=null and sBtnName!=''">
-                and s_btn_name=#{sBtnName}
+                and s_btn_name like concat("%",#{sBtnName},"%")
             </if>
             <if test="sBtnValue !=null and sBtnValue!=''">
                 and s_btn_value=#{sBtnValue}
@@ -62,7 +62,7 @@
                 <!--s_btn_id=#{button.sBtnId}-->
             <!--</if>-->
             <if test="button.sBtnName !=null and button.sBtnName!=''">
-                and s_btn_name=#{button.sBtnName}
+                and s_btn_name like concat("%",#{button.sBtnName},"%")
             </if>
             <!--<if test="button.sBtnValue !=null and button.sBtnValue!=''">-->
                 <!--and s_btn_value=#{button.sBtnValue}-->
@@ -79,10 +79,19 @@
     </select>
     <!--根据id查询-->
     <select id="queryById" resultType="com.cfcc.modules.oabutton.entity.OaButton">
-        select s_btn_id, s_btn_name, s_btn_value, s_excbutton_id, s_excfield, i_is_refresh, i_is_checkbus, i_is_defend, i_is_ntko,
+        select i_id,s_btn_id, s_btn_name, s_btn_value, s_excbutton_id, s_excfield, i_is_refresh, i_is_checkbus, i_is_defend, i_is_ntko,
         i_is_print,i_is_printpreview,i_is_saveas,i_is_save,i_is_new,i_is_close,i_is_open,i_is_edit,i_is_copy,i_is_saverevision,i_is_showrevision,
         i_is_addread,i_is_base
-        from oa_button where i_id = #{id}
+        from oa_button
+         <where>
+             <if test="id !=null and id!=''">
+                and i_id = #{id}
+             </if>
+             <if test="sBtnName !=null and sBtnName!=''">
+                 and s_btn_name like concat("%",#{sBtnName} ,"%")
+             </if>
+         </where>
+
     </select>
     <!--按钮配置-->
     <select id="buttonList" resultType="com.cfcc.modules.oabutton.entity.OaButton">

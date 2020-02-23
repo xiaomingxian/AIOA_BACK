@@ -15,6 +15,7 @@ import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.FileCopyUtils;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -60,6 +61,7 @@ public class FileNtkoController {
      * @Author
      */
     @PostMapping(value = "/upload")
+    @Transactional
     public Result<String> upload(HttpServletRequest request,
                                  @RequestParam(value = "stable", required = true) String stable,
                                  @RequestParam(value = "tableid", required = true) String tableid,
@@ -67,8 +69,8 @@ public class FileNtkoController {
         Result<String> result = new Result<>();
         try {
             String ctxPath = uploadpath;
-            String tempPath = uploadfilepath;
-            Map<String, Object> map = FileUtils.Upload(ctxPath,uploadfilepath, request);
+//            String tempPath = uploadfilepath;
+            Map<String, Object> map = FileUtils.Upload(ctxPath, request);
             String fileName = (String) map.get("fileName");
             String savePath = (String) map.get("savePath");
             OaFile oaFile = new OaFile();
@@ -79,7 +81,7 @@ public class FileNtkoController {
             oaFile.setSFilePath(savePath);
             oaFile.setDCreateTime(new Date());
             Boolean flag = oaFileService.save(oaFile);
-            String message = "kongjian" ;
+            String message = "kongjian";
             if (flag) {
                 Map<String,Object> busdataMap=new HashMap<>();
                 busdataMap.put("tableName",stable);
@@ -96,7 +98,7 @@ public class FileNtkoController {
                 oaBusdataService.updateAllOaData(busdataMap);
 //                dynamicTableMapper.updateData(busdataMap);
             }
-            System.out.println("---------------->>>>>>>>>>>>>>>创建保存成功");
+            //System.out.println("---------------->>>>>>>>>>>>>>>创建保存成功");
             //----开启webSocket，起草底稿后向前端发一个请求，表明已经保存成功。
             sendWebSocketMessage(tableid,message) ;
             result.setSuccess(true);
@@ -154,7 +156,7 @@ public class FileNtkoController {
                 result.setResult(filePath);
             }
 
-            System.out.println("----------------->>>>查看文件路径" + filePath);
+            //System.out.println("----------------->>>>查看文件路径" + filePath);
             return result;
         } catch (Exception e) {
             e.printStackTrace();
@@ -179,9 +181,7 @@ public class FileNtkoController {
         Result<String> result = new Result<>();
 
         String ctxPath = uploadpath;
-        String tempPath = uploadfilepath;
-
-        Map<String, Object> map = FileUtils.Upload(ctxPath, tempPath,request);
+        Map<String, Object> map = FileUtils.Upload(ctxPath,request);
 
         String fileName = (String) map.get("fileName");
         String savePath = (String) map.get("savePath");
@@ -299,8 +299,8 @@ public class FileNtkoController {
         Result<String> result = new Result<>();
         try {
             String ctxPath = uploadpath;
-            String tempPath = uploadfilepath;
-            Map<String, Object> map = FileUtils.Upload(ctxPath,tempPath, request);
+//            String tempPath = uploadfilepath;
+            Map<String, Object> map = FileUtils.Upload(ctxPath, request);
             String fileName = (String) map.get("fileName");
             String savePath = (String) map.get("savePath");
             OaFile oaFile = new OaFile();

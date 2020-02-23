@@ -67,12 +67,6 @@ public interface IOaBusdataService  extends  IService<OaBusdata>{
 
     List<Map<String, Object>> getSelFun(String modelId);
 
-    /**
-     * 根据functionId 和busdataID 查询出对应的列名和数据，以及对应的一个busdata数据
-     * @param functionId
-     * @param busdataId
-     * @return
-     */
 
 
     Map<String, Object> getBusDataAndDetailById(Map<String, Object> map, LoginInfo loginInfo);
@@ -116,9 +110,10 @@ public interface IOaBusdataService  extends  IService<OaBusdata>{
     List<BusFunction> getFunListByFunUnit(List<BusFunction> busFunctionList, SysDepart depart);
 
 
-    Result haveSavePermission(String table, String id, LoginInfo loginInfo);
 
     Map<String,Object> getFuncitonDataById(String functionId);
 
     Map<String, Object> queryStateById(String stable, Integer tableid);
+
+    boolean checkBusDataSer(String tableName, String id, String userName);
 }

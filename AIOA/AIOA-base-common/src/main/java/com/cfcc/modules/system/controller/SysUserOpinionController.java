@@ -220,7 +220,7 @@ public class SysUserOpinionController {
             sysUserOpinion.setSUserId(id) ;
             //queryWrapper = QueryGenerator.initQueryWrapper(sysUserOpinion, request.getParameterMap());
             queryWrapper.setEntity(sysUserOpinion) ;
-            System.out.println(queryWrapper+"]]]]]");
+            //System.out.println(queryWrapper+"]]]]]");
         } catch (UnsupportedEncodingException e) {
             e.printStackTrace();
         }

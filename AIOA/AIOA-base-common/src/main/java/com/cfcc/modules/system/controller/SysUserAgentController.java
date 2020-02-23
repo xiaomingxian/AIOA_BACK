@@ -105,11 +105,17 @@ public class SysUserAgentController {
      * @return
      */
     @PostMapping(value = "/add")
-    public Result<SysUserAgent> add(@RequestBody SysUserAgent sysUserAgent, HttpServletRequest request) {
+    public Result add(@RequestBody SysUserAgent sysUserAgent, HttpServletRequest request) {
         Result<SysUserAgent> result = new Result<SysUserAgent>();
         try {
             SysUser currentUser = userService.getCurrentUser(request);
             String username = currentUser.getUsername();
+            QueryWrapper<SysUserAgent> sysUserAgentQueryWrapper = new QueryWrapper<>();
+            sysUserAgentQueryWrapper.lambda().eq(SysUserAgent::getUserName,currentUser.getUsername());
+            List<SysUserAgent> list = sysUserAgentService.list(sysUserAgentQueryWrapper);
+            if (list.size()>0){
+                return Result.error("一个用户只能设置一个代理人");
+            }
             Map<String, Object> allUserMsgAgent = userService.getAllUserMsg(sysUserAgent.getAgentUserName());
 
             sysUserAgent.setUserName(username);

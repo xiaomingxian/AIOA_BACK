@@ -52,7 +52,7 @@
                 and c.i_order = #{busModel.iOrder}
             </if>
             <if test="busModel.sName != null and busModel.sName != '' ">
-                and c.s_name = #{busModel.sName}
+                and c.s_name like CONCAT(CONCAT('%', #{busModel.sName}), '%')
             </if>
             <if test="busModel.sBusdataTable != null and busModel.sBusdataTable != '' ">
                 and c.s_busdata_table = #{busModel.sBusdataTable}

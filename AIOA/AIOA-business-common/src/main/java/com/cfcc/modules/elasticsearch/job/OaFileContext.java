@@ -61,7 +61,7 @@ public class OaFileContext implements Job {
     public void execute(JobExecutionContext context) throws JobExecutionException {
         List<Map<String,Object>> oaFileList = iOaFileService.getOaFile();
         for (Map<String, Object> map : oaFileList) {
-            System.out.println(map);
+            //System.out.println(map);
         }
         System.out.println("***************222"+oaFileList.size());
         if (oaFileList.size() != 0){
@@ -87,7 +87,7 @@ public class OaFileContext implements Job {
                 for (Map<String, Object> map : oaFileList) {
                     String json = JSON.toJSONString(map);
                     RestStatus restStatus = searchService.saveOrUpdate(json, map.get("table_name").toString() + map.get("i_id").toString() , INDEX_NAME1, INDEX_TYPE1);
-                    System.out.println("----是否添加成功----"+restStatus);
+                    //System.out.println("----是否添加成功----"+restStatus);
                     if (restStatus.equals("OK")){
                         log.info("-----------------oa_busdata添加数据成功-------------------");
                     }else {
@@ -108,7 +108,7 @@ public class OaFileContext implements Job {
 
         List<OaFile> oaFileContextList = iOaFileService.getOaFileContext();
         for (OaFile oaFile : oaFileContextList) {
-            System.out.println(oaFile);
+            //System.out.println(oaFile);
         }
         System.out.println("***************333"+oaFileContextList.size());
         if (oaFileContextList.size() != 0){

@@ -15,9 +15,9 @@ import java.util.Map;
  */
 public interface OaButtonSetMapper extends BaseMapper<OaButtonSet> {
 
-    int queryButtonCount(@Param("id") Integer id,@Param("buttonId") Integer buttonId);
+    int queryButtonCount(@Param("id") Integer id,@Param("buttonId") Integer buttonId,@Param("taskDefKey") String taskDefKey);
 
-    List<OaButtonSet> queryButton(@Param("id") Integer id,@Param("buttonId") Integer buttonId, @Param("pageNo") Integer pageNo, @Param("pageSize") Integer pageSize);
+    List<OaButtonSet> queryButton(@Param("id") Integer id,@Param("buttonId") Integer buttonId,@Param("taskDefKey") String taskDefKey, @Param("pageNo") Integer pageNo, @Param("pageSize") Integer pageSize);
 
     OaButtonSet queryById(@Param("id") Integer id);
 
