@@ -223,7 +223,7 @@ public class FileNtkoController {
     @PostMapping(value = "/editFile")
     public Result<String> editEndsource(HttpServletRequest request,
                                         @RequestParam(value = "fileId", required = false) String fileId,
-                                        @RequestParam(value = "sfileType", required = false) String sfileType) throws IOException {
+                                        @RequestParam(value = "fileType", required = false) String fileType) throws IOException {
         OaFile initFile = oaFileService.getById(fileId);
         Result<String> result = new Result<>();
         Calendar calendar = Calendar.getInstance();
@@ -253,16 +253,14 @@ public class FileNtkoController {
         oaFileMap.put("s_file_name",saveFileName);
         oaFileMap.put("s_file_path",savePath);
         oaFileMap.put("d_create_time",new Date());
-
-        if (sfileType!=null){
+        int num=dynamicTableMapper.updateData(oaFileMap);
+        if (fileType!=null){
             String projectPath = System.getProperty("user.dir");
             String path1 = projectPath.substring(0, projectPath.lastIndexOf(File.separator));
             String path2 = path1.substring(0, path1.lastIndexOf(File.separator));
             File template = new File(path2+File.separator+tempFilePath+File.separator+fileName);
             FileCopyUtils.copy(mf.getBytes(), template);
         }
-
-        int num=dynamicTableMapper.updateData(oaFileMap);
         if (num!=0){
             log.info("----------------->编辑更新成功");
         }else {
