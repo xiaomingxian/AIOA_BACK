@@ -172,20 +172,17 @@ public class TaskInActServiceImpl implements TaskInActService {
             if (taskInfoVO.getIsDept() != null && !taskInfoVO.getIsDept()) {
                 List<String> assignee = (List<String>) taskInfoVO.getAssignee();
 
-                for (String userId : assignee) {
-                    commandExecutor.execute(new AddUserCmd(executionId, userId, descript, parentTaskId
-                            , runtimeService, taskService, false, taskAfter));
-                }
+                commandExecutor.execute(new AddUserCmd(executionId, assignee, null, descript, parentTaskId
+                        , runtimeService, taskService, false, taskAfter));
                 taskCommonService.updateHisAct(task);
 
             } else {
                 //部门任务
                 List<List<String>> assignee = (List<List<String>>) taskInfoVO.getAssignee();
                 String randomParent = UUID.randomUUID().toString().replaceAll("-", "");
-                for (List<String> userdept : assignee) {
-                    commandExecutor.execute(new AddUserCmd(executionId, null, descript, randomParent
-                            , runtimeService, taskService, true, taskAfter));
-                }
+
+                commandExecutor.execute(new AddUserCmd(executionId, null, assignee, descript, randomParent
+                        , runtimeService, taskService, true, taskAfter));
 
 
                 List<Task> addDeptTask = taskService.createTaskQuery().processInstanceId(processInstanceId).list();
@@ -198,14 +195,7 @@ public class TaskInActServiceImpl implements TaskInActService {
                     String id = taskdept.getId();
                     String parentTaskIdDept = task.getParentTaskId();
 
-                    if (parentTaskIdDept.equalsIgnoreCase(randomParent)){
-                        int size = assignee.size();
-                        if (size>i){
-                            List<String> list = assignee.get(i);
-                            for (String uid : list) {
-                                taskService.addCandidateUser(id, uid);
-                            }
-                        }
+                    if (parentTaskIdDept.equalsIgnoreCase(randomParent)) {
                         String taskDefinitionKey = taskdept.getTaskDefinitionKey();
                         taskWithDepts.setTaskDefKey(taskDefinitionKey);
                         //存储下个节点的任务id---主办/辐办/传阅等类型都存储起来(会有重复数据)[数量=用户量*种类]
@@ -213,7 +203,6 @@ public class TaskInActServiceImpl implements TaskInActService {
                         //请求数据库 2-3 次
                         departWithTaskMapper.save(processInstanceId, taskWithDepts);
                     }
-
 
                 }
 
