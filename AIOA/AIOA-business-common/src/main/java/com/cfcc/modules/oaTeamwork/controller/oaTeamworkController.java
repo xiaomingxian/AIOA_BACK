@@ -12,6 +12,7 @@ import javax.servlet.http.HttpServletResponse;
 import com.cfcc.common.api.vo.Result;
 import com.cfcc.common.aspect.annotation.AutoLog;
 import com.cfcc.common.system.query.QueryGenerator;
+import com.cfcc.common.system.util.JwtUtil;
 import com.cfcc.common.util.oConvertUtils;
 import java.util.Date;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
@@ -21,6 +22,7 @@ import com.cfcc.modules.oaBus.entity.BusModel;
 import com.cfcc.modules.oaTeamwork.entity.oaTeamwork;
 import com.cfcc.modules.oaTeamwork.entity.oaTeamworkSet;
 import com.cfcc.modules.oaTeamwork.service.IoaTeamworkService;
+import com.cfcc.modules.shiro.vo.DefContants;
 import com.cfcc.modules.system.entity.LoginInfo;
 import com.cfcc.modules.system.entity.SysDepart;
 import com.cfcc.modules.system.entity.SysUser;
@@ -209,10 +211,13 @@ public class oaTeamworkController {
 	 @AutoLog(value = "个人协同办公业务配置分类-下拉列表")
 	 @ApiOperation(value = "个人协同办公业务配置分类-下拉列表", notes = "个人协同办公业务配置分类-下拉列表")
 	 @GetMapping(value = "/findTeamworkName")
-	 public Result<List<oaTeamwork>> findTeamworkName() {
+	 public Result<List<oaTeamwork>> findTeamworkName(HttpServletRequest request) {
 		 Result<List<oaTeamwork>> result = new Result<>();
 		 try {
-			 List<oaTeamwork> teamworkName = oaTeamworkService.findTeamworkName();
+			 //查询当前用户，作为assignee
+			 String token = request.getHeader(DefContants.X_ACCESS_TOKEN);
+			 String username = JwtUtil.getUsername(token);
+			 List<oaTeamwork> teamworkName = oaTeamworkService.findTeamworkName(username);
 			 result.setSuccess(true);
 			 result.setResult(teamworkName);
 		 } catch (Exception e) {

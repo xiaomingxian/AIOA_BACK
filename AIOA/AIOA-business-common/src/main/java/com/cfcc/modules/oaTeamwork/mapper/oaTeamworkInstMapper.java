@@ -15,7 +15,7 @@ import com.baomidou.mybatisplus.core.mapper.BaseMapper;
  */
 public interface oaTeamworkInstMapper extends BaseMapper<oaTeamworkInst> {
 
-    int count(oaTeamworkInst oaTeamworkInst);
+    int count(@Param("oaTeamworkInst")oaTeamworkInst oaTeamworkInst);
 
     oaTeamworkInst findById(Integer iId);
 

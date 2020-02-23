@@ -26,7 +26,7 @@ public interface oaTeamworkMapper extends BaseMapper<oaTeamwork> {
 
     int Insert(oaTeamwork oaTeamwork);
 
-    List<oaTeamwork> findTeamworkName();
+    List<oaTeamwork> findTeamworkName(String username);
 
     oaTeamwork selectByName(String teamworkName);
 

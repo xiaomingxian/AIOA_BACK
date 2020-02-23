@@ -25,6 +25,6 @@ public interface IoaTeamworkService extends IService<oaTeamwork> {
 
     int Insert(oaTeamwork oaTeamwork);
 
-    List<oaTeamwork> findTeamworkName();
+    List<oaTeamwork> findTeamworkName(String username);
 
 }
