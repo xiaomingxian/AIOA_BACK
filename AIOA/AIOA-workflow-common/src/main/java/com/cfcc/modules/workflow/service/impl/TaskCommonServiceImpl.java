@@ -623,8 +623,11 @@ public class TaskCommonServiceImpl implements TaskCommonService {
             addTaskDescript(task.getProcessInstanceId(), busMsg);
         } else {
             task = taskService.createTaskQuery().taskId(taskId).singleResult();
+            if (task == null) throw new AIOAException("未找到您要办理的任务,请刷新所进入的页面重试)");
         }
 
+
+        taskInfoVOs.get(0).setProcessId(task.getProcessInstanceId());
         String assignee = task.getAssignee();
         if (assignee == null) {//如果是候选人-先签收
             taskService.claim(taskId, taskInfoVO.getUserId());
@@ -1075,6 +1078,9 @@ public class TaskCommonServiceImpl implements TaskCommonService {
             task = taskService.createTaskQuery().taskId(taskId).singleResult();
             if (task == null) throw new AIOAException("未找到您要办理的任务,请刷新所进入的页面重试)");
         }
+
+        //回显流程实例id进业务表
+        taskInfoVO.setProcessId(task.getProcessInstanceId());
 
 
         //判断节点类型：抢签或者普通

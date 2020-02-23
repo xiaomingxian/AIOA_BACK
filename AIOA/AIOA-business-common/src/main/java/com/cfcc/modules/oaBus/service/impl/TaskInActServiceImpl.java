@@ -65,13 +65,15 @@ public class TaskInActServiceImpl implements TaskInActService {
         //1 流程办理
         String nextTaskMsg = taskCommonService.doTask(taskInfoVO);
         //2 业务相关
+        Map<String, Object> busData = taskInfoVO.getBusData();
         if (nextTaskMsg.endsWith("  ")) {
-            Map<String, Object> busData = taskInfoVO.getBusData();
             LoginInfo loginInfo = sysUserService.getLoginInfo(request);
             busData.put("s_signer", loginInfo.getUsername());
 
             busData.put("d_date1", new Date());//new SimpleDateFormat("yyyy-MM-dd").format(new Date()));//
         }
+        busData.put("s_varchar10",taskInfoVO.getProcessId());
+
         busAbout(taskInfoVO, nextTaskMsg);
     }
 
@@ -103,13 +105,14 @@ public class TaskInActServiceImpl implements TaskInActService {
 
 
         String nextTaskMsg = taskCommonService.doTasksMore(taskInfoVOs);
+        Map<String, Object> busData = taskInfoVOs.get(0).getBusData();
         if (nextTaskMsg.endsWith("  ")) {
-            Map<String, Object> busData = taskInfoVOs.get(0).getBusData();
             LoginInfo loginInfo = sysUserService.getLoginInfo(request);
             busData.put("s_signer", loginInfo.getUsername());
 
             busData.put("d_date1", new Date());//new SimpleDateFormat("yyyy-MM-dd").format(new Date()));//
         }
+        busData.put("s_varchar10",taskInfoVOs.get(0).getProcessId());
         busAboutMore(taskInfoVOs, nextTaskMsg);
 
     }
