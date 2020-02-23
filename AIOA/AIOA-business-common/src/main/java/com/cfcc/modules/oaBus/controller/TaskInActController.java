@@ -22,6 +22,8 @@ import com.cfcc.modules.workflow.vo.TaskInfoVO;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
+import net.bytebuddy.asm.Advice;
+import org.activiti.engine.impl.cfg.IdGenerator;
 import org.activiti.engine.impl.pvm.process.ActivityImpl;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -57,6 +59,9 @@ public class TaskInActController {
 
     @Autowired
     private TaskInActService taskInActService;
+
+//    @Autowired
+//    private IdGenerator idGenerator;
 
     @ApiOperation("查询追加用户")
     @GetMapping("addUsersQuery")
@@ -194,8 +199,8 @@ public class TaskInActController {
                             iterator.remove();
                             continue;
                         }
-                        }
                     }
+                }
 
 
             }
@@ -497,7 +502,7 @@ public class TaskInActController {
 
 
             if (taskInfoVOS != null && taskInfoVOS.size() > 0) {
-                taskInActService.doTaskMore(taskInfoVOS,request);
+                taskInActService.doTaskMore(taskInfoVOS, request);
             } else {
                 return Result.error("信息不完善,拒绝办理");
             }

@@ -36,6 +36,7 @@ public class TaskInfoVO implements Serializable {
     private String operstatus; //任务状态(代办/已办)
     private String iImport; //行领导关注
 
+
     //流程需要的变量
     private Map<String, Object> vars;
     //业务数据

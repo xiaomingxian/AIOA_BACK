@@ -1,8 +1,8 @@
 package com.cfcc.modules.utils;
 
-import com.cfcc.modules.workflow.service.TaskCommonService;
 import org.activiti.engine.RuntimeService;
 import org.activiti.engine.TaskService;
+import org.activiti.engine.impl.cfg.IdGenerator;
 import org.activiti.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.activiti.engine.impl.interceptor.Command;
 import org.activiti.engine.impl.interceptor.CommandContext;
@@ -17,6 +17,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Date;
 import java.util.List;
+import java.util.UUID;
 
 @Service
 @Transactional
@@ -24,32 +25,35 @@ public class AddUserCmd implements Command<Void> {
 
     protected String executionId;//执行实例id
 
-    protected String assignee;//办理人
-    protected boolean isDept;//办理人
-    protected TaskEntity taskAfter;//办理人
+    protected List<String> assignees;
+    protected List<List<String>> candidateUsers;
+    protected boolean isDept;
+    protected TaskEntity taskAfter;
 
-    //@Autowired
     private RuntimeService runtimeService;
 
-    //@Autowired
     private TaskService taskService;
 
 
     private String descript;
     private String parentTaskId;
 
-    //@Autowired
-    //private IdGenerator idGenerator;
     public AddUserCmd() {
     }
 
-    public AddUserCmd(String executionId, String assignee, String descript,
+    public AddUserCmd(String executionId,
+                      List<String> assignees,
+                      List<List<String>> candidateUsers,
+                      String descript,
                       String parentTaskId,
                       RuntimeService runtimeService,
-                      TaskService taskService, boolean isDept
+                      TaskService taskService,
+
+                      boolean isDept
             , TaskEntity taskAfter) {
         this.executionId = executionId;
-        this.assignee = assignee;
+        this.assignees = assignees;
+        this.candidateUsers = candidateUsers;
         this.runtimeService = runtimeService;
         this.taskService = taskService;
         this.descript = descript;
@@ -110,31 +114,36 @@ public class AddUserCmd implements Command<Void> {
 
         //创建新taskEntity 填充属性
         Task newTask = taskService.createTaskQuery().executionId(executionId).singleResult();
-        TaskEntity t = (TaskEntity) newTask;
-        TaskEntity taskEntity = new TaskEntity();
-        taskEntity.setCreateTime(new Date());
-        taskEntity.setTaskDefinitionKey(t.getTaskDefinitionKey());
-        taskEntity.setProcessDefinitionId(t.getProcessDefinitionId());
-        taskEntity.setTaskDefinition(t.getTaskDefinition());
-        taskEntity.setProcessInstanceId(t.getProcessInstanceId());
-        taskEntity.setExecutionId(execution.getId());
-        taskEntity.setName(t.getName());
-        taskEntity.setExecution(execution);
-        taskEntity.setAssignee(assignee);
-        taskEntity.setParentTaskId(parentTaskId);
+        for (List<String> candidateUser : candidateUsers) {
 
-        //保存
-        taskEntity.setDescription(descript);
-        execution.addTask(taskEntity);
-        taskService.saveTask(taskEntity);
+            TaskEntity t = (TaskEntity) newTask;
+            TaskEntity taskEntity = new TaskEntity();
+            taskEntity.setId(UUID.randomUUID().toString().replaceAll("-",""));
+            taskEntity.setCreateTime(new Date());
+            taskEntity.setTaskDefinitionKey(t.getTaskDefinitionKey());
+            taskEntity.setProcessDefinitionId(t.getProcessDefinitionId());
+            taskEntity.setTaskDefinition(t.getTaskDefinition());
+            taskEntity.setProcessInstanceId(t.getProcessInstanceId());
+            taskEntity.setExecutionId(execution.getId());
+            taskEntity.setName(t.getName());
+            taskEntity.setExecution(execution);
+            taskEntity.addCandidateUsers(candidateUser);
+            taskEntity.setParentTaskId(parentTaskId);
+
+            //保存
+            taskEntity.setDescription(descript);
+            execution.addTask(taskEntity);
+            taskService.saveTask(taskEntity);
+
+        }
         taskAfter.setExecutionId(execution.getId());
 
 
         Integer nrOfInstances = LoopVariableUtils.getLoopVariableDept(parent2, "nrOfInstances");
         Integer nrOfActiveInstances = LoopVariableUtils.getLoopVariableDept(parent2, "nrOfActiveInstances");
 
-        LoopVariableUtils.setLoopVariableDept(parent2, "nrOfInstances", nrOfInstances + 1);
-        LoopVariableUtils.setLoopVariableDept(parent2, "nrOfActiveInstances", nrOfActiveInstances + 1);
+        LoopVariableUtils.setLoopVariableDept(parent2, "nrOfInstances", nrOfInstances + candidateUsers.size());
+        LoopVariableUtils.setLoopVariableDept(parent2, "nrOfActiveInstances", nrOfActiveInstances + candidateUsers.size());
     }
 
     private void notSub(ExecutionEntity newExecution) {
@@ -145,26 +154,31 @@ public class AddUserCmd implements Command<Void> {
         //创建新taskEntity 填充属性
         Task newTask = taskService.createTaskQuery().executionId(executionId).singleResult();
         TaskEntity t = (TaskEntity) newTask;
-        TaskEntity taskEntity = new TaskEntity();
-        taskEntity.setCreateTime(new Date());
-        taskEntity.setTaskDefinitionKey(t.getTaskDefinitionKey());
-        taskEntity.setProcessDefinitionId(t.getProcessDefinitionId());
-        taskEntity.setTaskDefinition(t.getTaskDefinition());
-        taskEntity.setProcessInstanceId(t.getProcessInstanceId());
-        taskEntity.setExecutionId(newExecution.getId());
-        taskEntity.setName(t.getName());
-        taskEntity.setExecution(newExecution);
-        taskEntity.setAssignee(assignee);
-        taskEntity.setParentTaskId(parentTaskId);
-        //保存
-        taskEntity.setDescription(descript);
-        taskService.saveTask(taskEntity);
+
+        for (String assignee : assignees) {
+            TaskEntity taskEntity = new TaskEntity();
+            taskEntity.setId(UUID.randomUUID().toString().replaceAll("-",""));
+            taskEntity.setCreateTime(new Date());
+            taskEntity.setTaskDefinitionKey(t.getTaskDefinitionKey());
+            taskEntity.setProcessDefinitionId(t.getProcessDefinitionId());
+            taskEntity.setTaskDefinition(t.getTaskDefinition());
+            taskEntity.setProcessInstanceId(t.getProcessInstanceId());
+            taskEntity.setExecutionId(newExecution.getId());
+            taskEntity.setName(t.getName());
+            taskEntity.setExecution(newExecution);
+            taskEntity.setAssignee(assignee);
+            taskEntity.setParentTaskId(parentTaskId);
+            //保存
+            taskEntity.setDescription(descript);
+            taskService.saveTask(taskEntity);
+        }
+
 
 
         Integer nrOfInstances = LoopVariableUtils.getLoopVariable(newExecution, "nrOfInstances");
         Integer nrOfActiveInstances = LoopVariableUtils.getLoopVariable(newExecution, "nrOfActiveInstances");
 
-        LoopVariableUtils.setLoopVariable(newExecution, "nrOfInstances", nrOfInstances + 1);
-        LoopVariableUtils.setLoopVariable(newExecution, "nrOfActiveInstances", nrOfActiveInstances + 1);
+        LoopVariableUtils.setLoopVariable(newExecution, "nrOfInstances", nrOfInstances + assignees.size());
+        LoopVariableUtils.setLoopVariable(newExecution, "nrOfActiveInstances", nrOfActiveInstances + assignees.size());
     }
 }
