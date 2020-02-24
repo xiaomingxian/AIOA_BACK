@@ -214,10 +214,9 @@ public class oaTeamworkController {
 	 public Result<List<oaTeamwork>> findTeamworkName(HttpServletRequest request) {
 		 Result<List<oaTeamwork>> result = new Result<>();
 		 try {
-			 //查询当前用户，作为assignee
-			 String token = request.getHeader(DefContants.X_ACCESS_TOKEN);
-			 String username = JwtUtil.getUsername(token);
-			 List<oaTeamwork> teamworkName = oaTeamworkService.findTeamworkName(username);
+			 SysUser currentUser = iSysUserService.getCurrentUser(request);
+			 String id = currentUser.getId();
+			 List<oaTeamwork> teamworkName = oaTeamworkService.findTeamworkName(id);
 			 result.setSuccess(true);
 			 result.setResult(teamworkName);
 		 } catch (Exception e) {

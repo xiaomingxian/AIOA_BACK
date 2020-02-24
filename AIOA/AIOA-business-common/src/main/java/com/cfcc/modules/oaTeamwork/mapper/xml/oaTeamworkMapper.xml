@@ -6,7 +6,7 @@
         (i_id,
          s_teamwork_name,
          description,
-         s_create_by,
+           s_create_by,
          s_create_deptid,
          s_create_unitid,
          d_create_time,
@@ -19,6 +19,7 @@
         #{sCreateBy},
         #{sCreateDeptid},
         #{sCreateUnitid},
+
         #{dCreateTime},
         #{dUpdateTime},
         #{iVersion}
@@ -83,7 +84,7 @@
         limit #{pageNo},#{pageSize}
     </select>
     <select id="findTeamworkName" resultType="com.cfcc.modules.oaTeamwork.entity.oaTeamwork">
-        select * from oa_teamwork
+        select * from oa_teamwork  where s_create_by = #{id}
     </select>
     <select id="selectByName" resultType="com.cfcc.modules.oaTeamwork.entity.oaTeamwork">
         select * from oa_teamwork where  s_teamwork_name=#{teamworkName}
