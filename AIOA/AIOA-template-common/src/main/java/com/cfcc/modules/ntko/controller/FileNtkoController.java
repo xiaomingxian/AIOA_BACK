@@ -246,7 +246,7 @@ public class FileNtkoController {
 
         Map<String,Object> oaFileMap=new HashMap<>();
         oaFileMap.put("table","oa_file");
-        oaFileMap.put("i_id",initFile.getITableId());
+        oaFileMap.put("i_id",initFile.getIId());
         oaFileMap.put("s_table",initFile.getSTable());
         oaFileMap.put("i_table_id",initFile.getITableId());
         oaFileMap.put("s_file_type",initFile.getSFileType());
