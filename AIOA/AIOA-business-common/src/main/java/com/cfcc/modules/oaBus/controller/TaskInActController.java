@@ -22,8 +22,10 @@ import com.cfcc.modules.workflow.vo.TaskInfoVO;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
-import net.bytebuddy.asm.Advice;
-import org.activiti.engine.impl.cfg.IdGenerator;
+import org.activiti.engine.HistoryService;
+import org.activiti.engine.RepositoryService;
+import org.activiti.engine.history.HistoricTaskInstance;
+import org.activiti.engine.impl.persistence.entity.ProcessDefinitionEntity;
 import org.activiti.engine.impl.pvm.process.ActivityImpl;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -60,159 +62,231 @@ public class TaskInActController {
     @Autowired
     private TaskInActService taskInActService;
 
-//    @Autowired
-//    private IdGenerator idGenerator;
+    @Autowired
+    private HistoryService historyService;
+
+    @Autowired
+    private RepositoryService repositoryService;
+
+
+    //TODO 过滤行领导 *****************************************************
+
+    @ApiOperation("查询追加用户")
+    @GetMapping("departChuanYueUser")
+    public Result departChuanYueUser(String drafterId, String procInstId, String procKey, HttpServletRequest request) {
+        try {
+            //查询 流程 办理没办理信息(根据用户信息+procId)
+            if (StringUtils.isBlank(procInstId)) {
+                List<Map<String, Object>> list = nexUserQuery(procKey, procInstId, drafterId, null, request);
+                //走普通的下一任务查询
+                return Result.ok(list);
+            } else {
+                //追加视图--查询第一个环节
+                List<HistoricTaskInstance> list = historyService.createHistoricTaskInstanceQuery().processInstanceId(procInstId).list();
+                if (list.size() == 0) return Result.error("未找到产生的任务信息");
+                String processDefinitionId = list.get(0).getProcessDefinitionId();
+                ProcessDefinitionEntity proc = (ProcessDefinitionEntity) repositoryService.getProcessDefinition(processDefinitionId);
+                List<ActivityImpl> activities = proc.getActivities();
+                if (activities.size() == 0) throw new AIOAException("未找到流程环节,请检查流程图是否合法");
+                String taskDefKey = activities.get(0).getId();//第一个环节的key
+                String hiTaskId = null;
+                for (HistoricTaskInstance historicTaskInstance : list) {
+                    String taskDefinitionKey = historicTaskInstance.getTaskDefinitionKey();
+                    if (taskDefinitionKey.equalsIgnoreCase(taskDefKey)) {
+                        hiTaskId = historicTaskInstance.getId();
+                        break;
+                    }
+                }
+                return canAddUsers(hiTaskId, true, request);
+
+
+            }
+        } catch (AIOAException e) {
+            return Result.error(e.getMessage());
+        } catch (Exception e) {
+            return Result.error("查询用户失败");
+        }
+    }
+
+    //办理(追加走追加,办理走办理)[在前端区分]
+
 
     @ApiOperation("查询追加用户")
     @GetMapping("addUsersQuery")
     public Result addUsersQuery(String taskId, HttpServletRequest request) {
 
         try {
-            //查找是自己发出的任务
-            List<TaskInfoJsonAble> taskJsonAbles = taskCommonService.sendByMe(taskId);
-            if (taskJsonAbles == null || (taskJsonAbles != null && taskJsonAbles.size() <= 0)) {
-                return Result.error("没有可追加环节");
-            }
-
-            ArrayList<String> taskIds = new ArrayList<>();
-            //记录taskId去查询已选择的用户
-            Map<String, String> idAndKey = new HashMap<>();
-            Map<String, String> idAndExecutionId = new HashMap<>();
-            //已经选择过的用户
-            Map<String, List<String>> choiceIds = new HashMap<>();
-
-            taskJsonAbles.stream().forEach(task -> {
-                String id = task.getId();
-                String executionId = task.getExecutionId();
-                String taskDefinitionKey = task.getTaskDefinitionKey();
-                taskIds.add(id);
-                idAndKey.put(taskDefinitionKey, id);
-                idAndExecutionId.put(taskDefinitionKey, executionId);
-                choiceIds.put(id, task.getUsersHaveChoice());
-            });
-
-
-            TaskInfoJsonAble taskInfoJsonAble = taskJsonAbles.get(0);
-            String drafterId = taskInfoJsonAble.getDrafterId();
-            String key = taskInfoJsonAble.getProDefName();
-            String processDefinitionId = taskInfoJsonAble.getProcessDefinitionId();
-
-            Result result = nextUserQuery(key, processDefinitionId, drafterId, taskId, request);
-            //查找已经选择的用户 标记出来
-            if (result.isSuccess()) {
-                List<Map<String, Object>> actMsgs = (List<Map<String, Object>>) result.getResult();
-                ListIterator<Map<String, Object>> iterator = actMsgs.listIterator();
-
-                //下n个节点遍历
-                while (iterator.hasNext()) {
-                    Map<String, Object> actMsg = iterator.next();
-
-                    Activity activity = (Activity) actMsg.get("actMsg");
-                    List<Map<String, Object>> nextUsers = (List<Map<String, Object>>) actMsg.get("nextUsers");
-                    String taskDefKey = activity.getId();
-                    boolean allowMulti = activity.isAllowMulti();
-                    OaProcActinst oaProcActinst = (OaProcActinst) actMsg.get("oaProcActinst");
-
-                    boolean isDept = false;
-                    String userOrRole = oaProcActinst.getUserOrRole();
-                    if ("dept".equalsIgnoreCase(userOrRole)) {
-                        isDept = true;
-                    }
-
-                    boolean multAssignee = oaProcActinst.isMultAssignee();
-                    if ((!allowMulti) || (!multAssignee) && !isDept) {
-                        iterator.remove();
-                        continue;
-                    }
-
-                    //部门与非部门的处理方式不同
-                    if (isDept) {
-                        String firstSonKey = activity.getFirstSonKey();
-                        //去部门记录任务记录表里查询相关信息
-                        //查看是否有主办
-                        String taskIdRecord = idAndKey.get(firstSonKey);
-                        if (taskIdRecord == null) {
-                            iterator.remove();
-                            continue;
-                        }
-
-                        int count = taskCommonService.haveMainDept(taskIdRecord);//主办数量大于就排除主办
-                        if (count > 0) {
-                            String depts = oaProcActinst.getDepts();
-                            if (depts != null && depts.contains(",")) {
-                                String[] split = depts.split(",");
-                                ArrayList<String> list = new ArrayList<>();
-                                for (String s : split) {
-                                    if (!s.contains("主办")) {
-                                        list.add(s);
-                                    }
-                                }
-                                oaProcActinst.setDepts(list.toString());
-                            }
-                        }
-                        //查出所有用户,排除他们所在部门
-                        List<String> deptUsers = taskCommonService.deptUsers(taskIdRecord);
-                        if (deptUsers.size() > 0) {
-
-                            List<String> deptIds = sysUserService.selectDeptsBysUsers(deptUsers);
-                            Iterator<Map<String, Object>> deptsIterator = nextUsers.iterator();
-                            while (deptsIterator.hasNext()) {
-                                Map<String, Object> next = deptsIterator.next();
-                                Object id = next.get("id");
-                                next.put("taskId", idAndKey.get(firstSonKey));
-                                next.put("executionId", idAndExecutionId.get(firstSonKey));
-                                if (deptIds.contains(id)) {
-                                    deptsIterator.remove();
-                                }
-                            }
-
-                        }
-
-
-                    } else {
-                        //区分已选和未选
-                        //定义是否需要追加用户的标志
-                        //根据任务定义key获取记录的流程id(不是部门类型)
-                        String taskIdRecord = idAndKey.get(taskDefKey);
-                        if (taskIdRecord == null && !isDept) {
-                            iterator.remove();
-                            continue;
-                        }
-
-                        //已经选择的用户id
-                        List<String> uids = choiceIds.get(taskIdRecord);
-
-
-                        boolean donotAddUser = true;
-                        for (Map<String, Object> user : nextUsers) {
-                            String uid = (String) user.get("uid");
-                            if (uids.contains(uid)) {
-                                user.put("status", "处理人");
-                            } else {
-                                user.put("status", "可追加");
-                                donotAddUser = false;
-                            }
-                            user.put("taskId", idAndKey.get(taskDefKey));
-                            user.put("executionId", idAndExecutionId.get(taskDefKey));
-                        }
-                        if (donotAddUser) {
-                            iterator.remove();
-                            continue;
-                        }
-                    }
-                }
-
-
-            }
-            List<Map<String, Object>> actMsgs = (List<Map<String, Object>>) result.getResult();
-            if (actMsgs.size() == 0) return Result.error("没有可追加环节");
-            return result;
+            return canAddUsers(taskId, false, request);
         } catch (AIOAException e) {
             return Result.error(e.getMessage());
         } catch (Exception e) {
             return Result.error("查询可追加用户失败");
         }
     }
+
+    private Result canAddUsers(String taskId, boolean isChuanyue, HttpServletRequest request) {
+        //查找是自己发出的任务
+        List<TaskInfoJsonAble> taskJsonAbles = taskCommonService.sendByMe(taskId);
+        if (taskJsonAbles == null || (taskJsonAbles != null && taskJsonAbles.size() <= 0)) {
+            return Result.error("没有可追加环节");
+        }
+
+        ArrayList<String> taskIds = new ArrayList<>();
+        //记录taskId去查询已选择的用户
+        Map<String, String> idAndKey = new HashMap<>();
+        Map<String, String> idAndExecutionId = new HashMap<>();
+        //已经选择过的用户
+        Map<String, List<String>> choiceIds = new HashMap<>();
+
+        taskJsonAbles.stream().forEach(task -> {
+            String id = task.getId();
+            String executionId = task.getExecutionId();
+            String taskDefinitionKey = task.getTaskDefinitionKey();
+            taskIds.add(id);
+            idAndKey.put(taskDefinitionKey, id);
+            idAndExecutionId.put(taskDefinitionKey, executionId);
+            choiceIds.put(id, task.getUsersHaveChoice());
+        });
+
+
+        TaskInfoJsonAble taskInfoJsonAble = taskJsonAbles.get(0);
+        String drafterId = taskInfoJsonAble.getDrafterId();
+        String key = taskInfoJsonAble.getProDefName();
+        String processDefinitionId = taskInfoJsonAble.getProcessDefinitionId();
+
+        Result result = nextUserQuery(key, processDefinitionId, drafterId, taskId, request);
+        //查找已经选择的用户 标记出来
+        if (result.isSuccess()) {
+            List<Map<String, Object>> actMsgs = (List<Map<String, Object>>) result.getResult();
+            ListIterator<Map<String, Object>> iterator = actMsgs.listIterator();
+
+            //下n个节点遍历
+            while (iterator.hasNext()) {
+                Map<String, Object> actMsg = iterator.next();
+
+                Activity activity = (Activity) actMsg.get("actMsg");
+                List<Map<String, Object>> nextUsers = (List<Map<String, Object>>) actMsg.get("nextUsers");
+                String taskDefKey = activity.getId();
+                boolean allowMulti = activity.isAllowMulti();
+                OaProcActinst oaProcActinst = (OaProcActinst) actMsg.get("oaProcActinst");
+
+                boolean isDept = false;
+                String userOrRole = oaProcActinst.getUserOrRole();
+                if ("dept".equalsIgnoreCase(userOrRole)) {
+                    isDept = true;
+                }
+
+                boolean multAssignee = oaProcActinst.isMultAssignee();
+                if ((!allowMulti) || (!multAssignee) && !isDept) {
+                    iterator.remove();
+                    continue;
+                }
+
+                //部门与非部门的处理方式不同
+                if (isDept) {
+                    String firstSonKey = activity.getFirstSonKey();
+                    //去部门记录任务记录表里查询相关信息
+                    //查看是否有主办
+                    String taskIdRecord = idAndKey.get(firstSonKey);
+                    if (taskIdRecord == null) {
+                        iterator.remove();
+                        continue;
+                    }
+
+                    int count = taskCommonService.haveMainDept(taskIdRecord);//主办数量大于就排除主办
+                    if (count > 0) {
+                        String depts = oaProcActinst.getDepts();
+                        if (depts != null && depts.contains(",")) {
+                            String[] split = depts.split(",");
+                            ArrayList<String> list = new ArrayList<>();
+                            for (String s : split) {
+                                if (!s.contains("主办")) {
+                                    list.add(s);
+                                }
+                            }
+                            oaProcActinst.setDepts(list.toString());
+                        }
+                    }
+                    //查出所有用户,排除他们所在部门
+                    List<String> deptUsers = taskCommonService.deptUsers(taskIdRecord);
+                    if (deptUsers.size() > 0) {
+
+                        List<String> deptIds = sysUserService.selectDeptsBysUsers(deptUsers);
+                        List<Map<String, Object>> deptHaveChoice = new ArrayList<>();//已经选择过的部门
+                        Iterator<Map<String, Object>> deptsIterator = nextUsers.iterator();
+
+                        while (deptsIterator.hasNext()) {
+                            Map<String, Object> next = deptsIterator.next();
+                            Object id = next.get("id");
+                            next.put("taskId", idAndKey.get(firstSonKey));
+                            next.put("executionId", idAndExecutionId.get(firstSonKey));
+                            if (deptIds.contains(id)) {
+                                deptHaveChoice.add(next);
+                                deptsIterator.remove();
+                            }
+                        }
+
+                        actMsg.put("deptHaveChoice", deptHaveChoice);
+                        if (nextUsers.size() == 0) {
+                            actMsg.put("canAdd", false);
+                            if (!isChuanyue) {
+                                iterator.remove();
+                            }
+                            continue;
+                        }
+
+                    }
+
+
+                } else {
+                    //区分已选和未选
+                    //定义是否需要追加用户的标志
+                    //根据任务定义key获取记录的流程id(不是部门类型)
+                    String taskIdRecord = idAndKey.get(taskDefKey);
+                    if (taskIdRecord == null && !isDept) {
+                        iterator.remove();
+                        continue;
+                    }
+
+                    //已经选择的用户id
+                    List<String> uids = choiceIds.get(taskIdRecord);
+
+
+                    boolean donotAddUser = true;
+                    List<Map<String, Object>> userHaveChoice = new ArrayList<>();
+                    Iterator<Map<String, Object>> iterator1 = nextUsers.iterator();
+                    while (iterator1.hasNext()) {
+                        Map<String, Object> user = iterator1.next();
+                        String uid = (String) user.get("uid");
+                        if (uids.contains(uid)) {
+                            userHaveChoice.add(user);
+                            iterator1.remove();
+                        } else {
+                            user.put("status", "可追加");
+                            donotAddUser = false;
+                        }
+                        user.put("taskId", idAndKey.get(taskDefKey));
+                        user.put("executionId", idAndExecutionId.get(taskDefKey));
+
+                    }
+                    actMsg.put("userHaveChoice", userHaveChoice);
+                    if (donotAddUser) {
+                        actMsg.put("canAdd", false);
+                        if (!isChuanyue) iterator.remove();
+                        continue;
+                    }
+                }
+            }
+
+
+        }
+        List<Map<String, Object>> actMsgs = (List<Map<String, Object>>) result.getResult();
+        if (actMsgs.size() == 0) return Result.error("没有可追加环节");
+        return result;
+    }
+
+
+
 
 
     @PostMapping("doAddUsers")

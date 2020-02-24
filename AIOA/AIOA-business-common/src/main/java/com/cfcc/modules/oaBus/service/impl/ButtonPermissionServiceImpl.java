@@ -263,13 +263,13 @@ public class ButtonPermissionServiceImpl implements ButtonPermissionService {
                                                       String status) {
 
         String userId = currentUser.getId();
-        String busdataId = (String) busData.get("busdataId");
+        String busdataId = busData.get("i_id").toString();
         //当前用户权限
         HashMap<String, Boolean> currentUserPermission = new HashMap<>();
         String createBy = busData.get("s_create_by") == null ? "" : busData.get("s_create_by") + "";
         //创建者
         currentUserPermission.put("isCreate", createBy.equals(currentUser.getId()));
-        List<String> reader = dynamicTableMapper.isReader(busdataId, busData.get("tableName") + "_permit");
+        List<String> reader = dynamicTableMapper.isReader(busdataId, busData.get("table") + "_permit");
         //参与者
         currentUserPermission.put("isReader", reader.contains(userId));
         //已办用户(有流程)
@@ -317,6 +317,21 @@ public class ButtonPermissionServiceImpl implements ButtonPermissionService {
         return currentUserPermission;
     }
 
+    @Override
+    public List<Map<String, Object>> reloadOpinionList(Map<String, Object> map) {
+        String proSetId = map.get("proSetId")+"";
+        String taskDefKey = map.get("taskDefKey")+"";
+        String opinionTable = map.get("opinionTable")+"";
+        String busdataId = map.get("busdataId")+"";
+        Map<String,Object> procsetParam = new HashMap<>();
+        procsetParam.put("table","oa_bus_proc_set");
+        procsetParam.put("i_id",proSetId);
+        Map<String, Object> procsetData = dynamicTableMapper.queryDataById(procsetParam);
+        String procDefKey = procsetData.get("PROC_DEF_KEY_")+"";
+        String opt = procsetData.get("i_proc_opinion_id")+"";
+        List<Map<String, Object>> maps = dynamicTableMapper.queryOptions(opt, proSetId, procDefKey, taskDefKey, opinionTable, busdataId);
+        return maps;
+    }
 
 
 }

@@ -48,20 +48,31 @@ public class oaCalendar {
 	@Excel(name = "日程发生地点", width = 15)
     @ApiModelProperty(value = "日程发生地点")
 	private java.lang.String sAddress;
+	//导出表格数字转化成汉字
+	@Excel(name = "是否领导", width = 15)
+	@TableField(exist = false)
+	private java.lang.String leader;
+	@Excel(name = "是否顶置", width = 15)
+	@TableField(exist = false)
+	private java.lang.String top;
+	@Excel(name = "公开类型", width = 15)
+	@TableField(exist = false)
+	private java.lang.String open;
+	@Excel(name = "消息提示", width = 15)
+	@TableField(exist = false)
+	private java.lang.String message;
+
+
 	/**是否置顶*/
-	@Excel(name = "是否置顶", width = 15)
     @ApiModelProperty(value = "是否置顶")
 	private java.lang.Integer iIsTop;
 	/**是否领导日程*/
-	@Excel(name = "是否领导日程", width = 15)
     @ApiModelProperty(value = "是否领导日程")
 	private java.lang.Integer iIsLeader;
 	/**即时消息提醒类型:1.10分钟前 2.30分钟前;3.1小时前;4.2小时前;*/
-	@Excel(name = "即时消息提醒类型", width = 15)
     @ApiModelProperty(value = "即时消息提醒类型:1.10分钟前 2.30分钟前;3.1小时前;4.2小时前;")
 	private java.lang.Integer iRemindType;
 	/**公开类型:1.全行 2.分管;3.部门内;*/
-	@Excel(name = "公开类型", width = 15)
     @ApiModelProperty(value = "公开类型:1.全行 2.分管;3.部门内;")
 	private java.lang.Integer iOpenType;
 	/**开始时间*/
@@ -119,5 +130,10 @@ public class oaCalendar {
 
 	@TableField(exist = false)
 	private java.lang.Integer more;
+
+
+
+
+
 
 }

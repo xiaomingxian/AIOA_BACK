@@ -4,7 +4,7 @@
 
     <!-- 通过字典code获取字典数据 -->
     <select id="queryDictItemsByCode" parameterType="String" resultType="com.cfcc.common.system.vo.DictModel">
-		   select s.item_value as "value",s.item_text as "text", s.description as "ip" from sys_dict_item s
+		   select s.item_value as "value",s.item_text as "text" from sys_dict_item s
 		   where dict_id = (select id from sys_dict where dict_code = #{code})
 		   order by s.sort_order asc
 	</select>
@@ -82,7 +82,15 @@
 		(select id from sys_dict c where c.dict_code = #{dictCode})
 	</select>
     <select id="getDictIdByDictCode" resultType="java.lang.String">
-		SELECT id from sys_dict
+		SELECT id from
+		<choose>
+			<when test="DBvalue != null and DBvalue != ''">
+				#{DBvalue}.sys_dict
+			</when>
+			<otherwise>
+				sys_dict
+			</otherwise>
+		</choose>
 		<where>
 			1 = 1
 			<if test="dictCode != null and dictCode != ''">
@@ -92,7 +100,13 @@
 
 	</select>
 	<select id="getDictByAllAndPage" resultType="java.lang.Long">
-		SELECT count(id) from sys_dict
+		SELECT count(id) from
+		<if test="DBvalue != null">
+			#{DBvalue}.sys_dict
+		</if>
+		<if test="DBvalue == null">
+			sys_dict
+		</if>
 		<where>
 			1 = 1
 			<if test="sysDict.dictName != null and sysDict.dictName != ''">
@@ -121,6 +135,9 @@
 			</if>
 		</where>
 	</select>
-
+	<select id="getEsIpAndHost" resultType="com.cfcc.modules.system.entity.SysDictItem">
+		select * from sys_dict_item s
+		   where dict_id = (select id from sys_dict where dict_code = #{orgCode})
+	</select>
 
 </mapper>

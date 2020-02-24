@@ -282,5 +282,11 @@ public class SysDictServiceImpl extends ServiceImpl<SysDictMapper, SysDict> impl
         return pageList;
     }
 
+    @Override
+    public List<SysDictItem> getEsIpAndHost(String orgCode) {
+        List<SysDictItem> dictItemList = sysDictMapper.getEsIpAndHost(orgCode);
+        return dictItemList;
+    }
+
 
 }

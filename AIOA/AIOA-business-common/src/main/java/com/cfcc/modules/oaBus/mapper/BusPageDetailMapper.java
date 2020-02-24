@@ -16,7 +16,7 @@ import java.util.Map;
  */
 public interface BusPageDetailMapper extends BaseMapper<BusPageDetail> {
 
-    List<String> getSDictIdByKey(@Param("functionId") Integer i_bus_function_id, @Param("sBusdataTable") String sBusdataTable, @Param("key") String key);
+    List<String> getSDictIdByKey(@Param("functionId") Integer i_bus_function_id, @Param("sBusdataTable") String sBusdataTable, @Param("key") String key,@Param("DBvalue") String DBvalue);
 
     int queryBusPageDetailCount(BusPageDetail busPageDetail);
 
@@ -35,7 +35,7 @@ public interface BusPageDetailMapper extends BaseMapper<BusPageDetail> {
 
     List<BusPageDetail> findList();
 
-    List<String> getCloumnNameByTableAndEsquery(@Param("sBusdataTable") String sBusdataTable,@Param("iId") Integer iId);
+    List<String> getCloumnNameByTableAndEsquery(@Param("sBusdataTable") String sBusdataTable,@Param("iId") Integer iId, @Param("DBvalue") String DBvalue);
 
     List<BusPageDetail> queryConditionByIdDao(int iBusFunctionId);
 

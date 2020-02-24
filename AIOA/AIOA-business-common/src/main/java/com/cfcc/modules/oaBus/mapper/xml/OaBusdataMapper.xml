@@ -12,7 +12,16 @@
     </select>
 
     <update id="updateIsESByid">
-        update ${tableName} set i_is_es = 2 where i_id = #{id}
+        update
+        <choose>
+            <when test="DBvalue != null and DBvalue != ''">
+                #{DBvalue}.${tableName}
+            </when>
+            <otherwise>
+                ${tableName}
+            </otherwise>
+        </choose>
+          set i_is_es = 2 where i_id = #{id}
     </update>
 
     <select id="queryBusdataCount" resultType="java.lang.Integer">
@@ -27,11 +36,19 @@
     </select>
 
     <select id="getBusdataByTable" resultType="java.util.Map">
-        select i_id ,i_bus_function_id
+        select i_id ,i_bus_function_id,i_is_file
         <if test="columnLists != null and columnLists != ''">
             ,${columnLists}
         </if>
-          from ${busFunction.sBusdataTable}
+        from
+        <choose>
+            <when test="DBvalue != null and DBvalue != ''">
+                #{DBvalue}.${busFunction.sBusdataTable}
+            </when>
+            <otherwise>
+                ${busFunction.sBusdataTable}
+            </otherwise>
+        </choose>
         <where>
             <if test="busFunction.iId != null">
                 i_bus_model_id = #{busFunction.iBusModelId}
@@ -415,6 +432,19 @@
 
     <select id="queryValue" resultType="java.lang.String">
         select ${sTableColumn} from ${tableName} where i_id=#{tableid}
+    </select>
+
+    <select id="getBusdataByIdAndTableName" resultType="java.lang.String">
+        select s_title from
+        <choose>
+            <when test="DBvalue != null and DBvalue != ''">
+                #{DBvalue}.${sBusdataTable}
+            </when>
+            <otherwise>
+                ${sBusdataTable}
+            </otherwise>
+        </choose>
+        where i_id = #{id}
     </select>
 
     <select id="listCountBytableName" resultType="java.lang.Integer">

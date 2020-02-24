@@ -106,8 +106,8 @@ public class oaCalendarController implements Job {
 												   @RequestParam(name="pageSize", defaultValue="10") Integer pageSize,
 												   HttpServletRequest request) {
 		Result<IPage<oaCalendar>> result = new Result<IPage<oaCalendar>>();
-		String token = request.getHeader(DefContants.X_ACCESS_TOKEN);
-		String username = JwtUtil.getUsername(token);
+		SysUser currentUser = sysUserService.getCurrentUser(request);
+		String username = currentUser.getUsername();
 		oaCalendar.setSCreateBy(username);
 		IPage<oaCalendar> pageList = oaCalendarService.findPage(pageNo,pageSize,oaCalendar);
 		result.setSuccess(true);
@@ -425,6 +425,38 @@ public class oaCalendarController implements Job {
       //Step.2 AutoPoi 导出Excel
       ModelAndView mv = new ModelAndView(new JeecgEntityExcelView());
       List<oaCalendar> pageList = oaCalendarService.list(queryWrapper);
+      for (int i=0;i<pageList.size();i++){
+		  Integer iIsLeader = pageList.get(i).getIIsLeader();//是否是领导
+		  if(iIsLeader == 1){  //是
+            pageList.get(i).setLeader("是");
+		  }else{
+			  pageList.get(i).setLeader("否");
+		  }
+		  Integer iIsTop = pageList.get(i).getIIsTop();//是否置顶
+		  if(iIsTop == 1){  //是
+			  pageList.get(i).setTop("是");
+		  }else{
+			  pageList.get(i).setTop("否");
+		  }
+		  Integer iOpenType = pageList.get(i).getIOpenType();//公开类型
+		  if(iOpenType == 1){  //全行
+			  pageList.get(i).setOpen("全行");
+		  }else if(iOpenType == 2){//分管
+			  pageList.get(i).setOpen("分管");
+		  }else if(iOpenType == 3){//部门内
+			  pageList.get(i).setOpen("部门内");
+		  }
+		  Integer remindType = pageList.get(i).getIRemindType();//消息提示类型
+		  if(remindType == 1){  //全行:1.10分钟前 2.30分钟前;3.1小时前;4.2小时前
+			  pageList.get(i).setMessage("10分钟前");
+		  }else if(remindType == 2){//分管
+			  pageList.get(i).setMessage("30分钟前");
+		  }else if(remindType == 3){//部门内
+			  pageList.get(i).setMessage("1小时前");
+		  }else if(remindType == 4){
+			  pageList.get(i).setMessage("2小时前");
+		  }
+	  }
       //导出文件名称
       mv.addObject(NormalExcelConstants.FILE_NAME, "日程管理表列表");
       mv.addObject(NormalExcelConstants.CLASS,oaCalendar.class);

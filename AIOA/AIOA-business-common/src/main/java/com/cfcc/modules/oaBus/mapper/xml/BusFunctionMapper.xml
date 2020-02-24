@@ -11,7 +11,14 @@
     </delete>
 
     <select id="getFunByIsEs" resultType="com.cfcc.modules.oaBus.entity.BusFunction">
-        select distinct i_bus_model_id, i_id, s_name  from oa_bus_function c where c.i_is_es = 1
+        select distinct i_bus_model_id, i_id, s_name  from
+         <if test="DBvalue != null">
+             #{DBvalue}.oa_bus_function c
+         </if>
+        <if test="DBvalue == null">
+            oa_bus_function c
+        </if>
+         where c.i_is_es = 1
     </select>
 
     <select id="queryBusFunctionCount" resultType="java.lang.Integer">
@@ -63,5 +70,18 @@
     </select>
     <select id="queryByModelIdDao" resultType="com.cfcc.modules.oaBus.entity.BusFunction">
         select * from oa_bus_function c where c.i_bus_model_id = #{modelId} order by IF(ISNULL(s_level), 1, 0),(s_level + 0) ;
+    </select>
+    <select id="getBusFunctionListByDepartId" resultType="com.cfcc.modules.oaBus.entity.BusFunction">
+        SELECT * FROM oa_bus_function WHERE i_is_es = 1 AND i_id IN
+          (SELECT i_bus_function_id FROM
+            <choose>
+                <when test="DBvalue != null and DBvalue != ''">
+                    #{DBvalue}.oa_bus_function_unit
+                </when>
+                <otherwise>
+                    oa_bus_function_unit
+                </otherwise>
+            </choose>
+          WHERE s_unit_id = #{departId})
     </select>
 </mapper>

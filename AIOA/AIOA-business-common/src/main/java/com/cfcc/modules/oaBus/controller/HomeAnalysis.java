@@ -73,12 +73,11 @@ public class HomeAnalysis {
         List<BusFunction> busFunctionlList = iBusFunctionService.findList(schema);
         Map<String,Map<String,Object>> map =new HashMap<String,Map<String,Object>>();
         if(sysUserSet!=null){
+            Integer iBus1Id = sysUserSet.getIBus1Id();
+            Integer iBus2Id = sysUserSet.getIBus2Id();
+            Integer iBus3Id = sysUserSet.getIBus3Id();
+            Integer iBus4Id = sysUserSet.getIBus4Id();
             for (BusFunction busFunction:busFunctionlList) {
-                Integer iBus1Id = sysUserSet.getIBus1Id();
-                Integer iBus2Id = sysUserSet.getIBus2Id();
-                Integer iBus3Id = sysUserSet.getIBus3Id();
-                Integer iBus4Id = sysUserSet.getIBus4Id();
-
                 if( iBus1Id == null ?(modellist.length >0 && StringUtils.equals(busFunction.getIId().toString(),modellist[0])) : busFunction.getIId() == iBus1Id )
                 {
                     getIdAndSname(busFunction,map,"model1",username,createTime);
@@ -95,12 +94,11 @@ public class HomeAnalysis {
                 }
             }
         }else{
-          for (BusFunction busFunction:busFunctionlList) {
             Integer iBus1Id = null;
             Integer iBus2Id = null;
             Integer iBus3Id = null;
             Integer iBus4Id = null;
-
+          for (BusFunction busFunction:busFunctionlList) {
             if( iBus1Id == null ?(modellist.length >0 && StringUtils.equals(busFunction.getIId().toString(),modellist[0])) : busFunction.getIId() == iBus1Id )
             {
                 getIdAndSname(busFunction,map,"model1",username,createTime);

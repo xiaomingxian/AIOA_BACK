@@ -52,4 +52,6 @@ public interface IBusFunctionService extends IService<BusFunction> {
     Map<String, Object> queryRoleAndDepartSer();
 
     List<BusFunction> queryByModelId(String modelId);
+
+    List<BusFunction> getBusFunctionListByDepartId(String departId,String DBvalue);
 }

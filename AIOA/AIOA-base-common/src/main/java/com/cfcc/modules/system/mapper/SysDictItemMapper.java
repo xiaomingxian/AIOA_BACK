@@ -1,13 +1,11 @@
 package com.cfcc.modules.system.mapper;
 
-import com.cfcc.modules.system.entity.SysDict;
+import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.cfcc.modules.system.entity.SysDictItem;
 import org.apache.ibatis.annotations.Delete;
 import org.apache.ibatis.annotations.Insert;
 import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Select;
-import com.baomidou.mybatisplus.core.mapper.BaseMapper;
-import org.springframework.web.bind.annotation.DeleteMapping;
 
 import java.util.List;
 import java.util.Map;
@@ -16,7 +14,7 @@ public interface SysDictItemMapper extends BaseMapper<SysDictItem> {
     @Select("SELECT * FROM SYS_DICT_ITEM WHERE DICT_ID = #{mainId}")
     public List<SysDictItem> selectItemsByMainId(String mainId);
 
-    String getItemTextById(@Param("sDictId") String sDictId,@Param("value") Object value);
+    String getItemTextById(@Param("sDictId") String sDictId,@Param("value") Object value, @Param("DBvalue") String DBvalue);
 
     @Insert("<script>" +
             "insert  into  sys_dict_unit  (s_dict_id,s_unit_id) values " +

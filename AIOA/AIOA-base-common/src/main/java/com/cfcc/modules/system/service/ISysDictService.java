@@ -102,4 +102,6 @@ public interface ISysDictService extends IService<SysDict> {
 	List<DictModel> getSqlValue(String description);
 
     IPage<SysDict> getDictByAll(SysDict sysDict, Integer pageNo, Integer pageSize);
+
+    List<SysDictItem> getEsIpAndHost(String orgCode);
 }

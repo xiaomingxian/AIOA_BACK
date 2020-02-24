@@ -6,6 +6,7 @@ import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Select;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * @Description: 附件表
@@ -70,6 +71,8 @@ public interface OaFileMapper extends BaseMapper<OaFile> {
     void updateFileOrder2(@Param("id") Integer id);
 
     Integer updatePicText(@Param("fileType") Integer fileType,@Param("picText") String picText);
+
+    List<Map<String, Object>> getOaFileByTableAndTableId(@Param("id") String id,@Param("sBusdataTable") String sBusdataTable,@Param("DBvalue") String DBvalue);
 }
 
 

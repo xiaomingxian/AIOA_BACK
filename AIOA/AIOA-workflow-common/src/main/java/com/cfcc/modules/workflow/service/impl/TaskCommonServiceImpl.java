@@ -934,8 +934,7 @@ public class TaskCommonServiceImpl implements TaskCommonService {
 
         HistoricTaskInstance historicTaskInstance = historyService.createHistoricTaskInstanceQuery().taskId(taskId).singleResult();
         ProcessDefinition processDefinition = repositoryService.createProcessDefinitionQuery()
-                .processDefinitionId(historicTaskInstance
-                        .getProcessDefinitionId())
+                .processDefinitionId(historicTaskInstance.getProcessDefinitionId())
                 .singleResult();
         if (historicTaskInstance == null) throw new AIOAException("taskId:" + taskId + " 对应的任务不存在");
         String processInstanceId = historicTaskInstance.getProcessInstanceId();

@@ -300,6 +300,20 @@ public class BusFunctionServiceImpl extends ServiceImpl<BusFunctionMapper, BusFu
         return busFunctionMapper.queryByModelIdDao(modelId);
     }
 
+    @Override
+    public List<BusFunction> getBusFunctionListByDepartId(String departId,String DBvalue) {
+        List<BusFunction> busFunctionList = busFunctionMapper.getBusFunctionListByDepartId(departId, DBvalue);
+        List<BusModel> busModels = new ArrayList<>();
+        for (BusFunction busFunction : busFunctionList) {
+            BusModel busModel = busModelMapper.getBusModelById(busFunction.getIBusModelId(),DBvalue);
+            if (busModel.getIId() == busFunction.getIBusModelId()) {
+                busFunction.setSBusdataTable(busModel.getSBusdataTable());
+                continue;
+            }
+        }
+        return busFunctionList;
+    }
+
     /**
      * 获得编辑数据时的其它绑定数据
      *

@@ -30,7 +30,7 @@ public interface IOaBusdataService  extends  IService<OaBusdata>{
 
     IPage<TableCol> getTableColList(int iPageId, int modelId, int functionId);
 
-    void updateIsES(List<Map<String, Object>> oaFileList);
+    void updateIsES(List<Map<String, Object>> oaFileList,String DBvalue);
 
     List<Map> selectByTable(String table, String cols);
 
@@ -114,6 +114,8 @@ public interface IOaBusdataService  extends  IService<OaBusdata>{
     Map<String,Object> getFuncitonDataById(String functionId);
 
     Map<String, Object> queryStateById(String stable, Integer tableid);
+
+    List<Map<String, Object>> getOaBusdataList(String columnLists, BusFunction busFunction,String DBvalue);
 
     boolean checkBusDataSer(String tableName, String id, String userName);
 }
