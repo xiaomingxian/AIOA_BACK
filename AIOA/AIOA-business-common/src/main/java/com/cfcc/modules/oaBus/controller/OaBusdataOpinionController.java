@@ -2,17 +2,18 @@ package com.cfcc.modules.oaBus.controller;
 
 import com.cfcc.common.api.vo.Result;
 import com.cfcc.common.aspect.annotation.AutoLog;
+import com.cfcc.common.exception.AIOAException;
 import com.cfcc.modules.oaBus.entity.OaBusdataOpinion;
+import com.cfcc.modules.oaBus.service.ButtonPermissionService;
 import com.cfcc.modules.oaBus.service.IOaBusdataOpinionService;
+import com.cfcc.modules.system.entity.LoginInfo;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.http.HttpServletRequest;
 import java.util.*;
 
 /**
@@ -29,6 +30,8 @@ public class OaBusdataOpinionController {
     @Autowired
     private IOaBusdataOpinionService oaBusdataOpinionService;
 
+    @Autowired
+    private ButtonPermissionService buttonPermissionService;
 
     @AutoLog(value = "业务按钮-查询意见列表")
     @ApiOperation(value = "业务按钮-查询意见列表", notes = "业务按钮-查询意见列表")
@@ -101,4 +104,23 @@ public class OaBusdataOpinionController {
         return result;
     }
 
+    @AutoLog(value = "业务详情-意见刷新")
+    @ApiOperation(value = "意见刷新", notes = "意见刷新")
+    @PostMapping(value = "/reloadOpinionList")
+    @ResponseBody
+    public Result reloadOpinionList(@RequestBody Map<String, Object> map) {
+        Result result = new Result();
+        try {
+            List<Map<String, Object>> showOpinion = buttonPermissionService.reloadOpinionList(map);
+            result.setResult(showOpinion);
+            return result;
+        } catch (AIOAException e) {
+            return Result.error(e.getMessage());
+        } catch (Exception e) {
+            log.error(e.toString());
+            e.printStackTrace();
+            return Result.error("查询业务详情失败");
+        }
+
+    }
 }

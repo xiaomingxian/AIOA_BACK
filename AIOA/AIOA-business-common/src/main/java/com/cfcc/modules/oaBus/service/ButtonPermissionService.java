@@ -5,6 +5,7 @@ import com.cfcc.modules.system.entity.LoginInfo;
 import com.cfcc.modules.system.entity.SysUser;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public interface ButtonPermissionService {
@@ -16,4 +17,5 @@ public interface ButtonPermissionService {
     Map<String, Boolean> currentUserPermission(String key, Map<String, Object> query, LoginInfo currentUser,
                                                String taskDefKey, String proInstanId, String taskId,String isDaiBan);
 
+    List<Map<String, Object>> reloadOpinionList(Map<String,Object> map);
 }
