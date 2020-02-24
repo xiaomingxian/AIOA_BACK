@@ -65,6 +65,8 @@ public class oaTeamworkInstServiceImpl extends ServiceImpl<oaTeamworkInstMapper,
             oaTeamwork oaTeamwork = oaTeamworkMapper.findById(oaTeamworkInstList.get(i).getITeamworkId());
             Integer sumorder = oaTeamworkInstMapper.SumOrder((oaTeamworkInstList.get(i).getITeamworkId()));
             Integer lastOrder = oaTeamworkInstMapper.LastOrder(oaTeamworkInstList.get(i).getITeamworkId());
+            String modelName  = oaTeamworkMapper.getfirstModel(oaTeamworkInstList.get(i).getITeamworkId());
+            oaTeamworkInstList.get(i).setBusModelName(modelName);
             oaTeamworkInstList.get(i).setOrders(sumorder.toString());//总步骤
             oaTeamworkInstList.get(i).setLastOrder(lastOrder.toString());//当前步骤
             if(oaTeamwork != null){

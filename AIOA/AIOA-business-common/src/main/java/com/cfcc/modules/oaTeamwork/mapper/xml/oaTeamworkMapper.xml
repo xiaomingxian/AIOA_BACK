@@ -89,5 +89,8 @@
     <select id="selectByName" resultType="com.cfcc.modules.oaTeamwork.entity.oaTeamwork">
         select * from oa_teamwork where  s_teamwork_name=#{teamworkName}
     </select>
+    <select id="getfirstModel" resultType="java.lang.String">
+     select s_name from  oa_bus_model where i_id =  (select i_bus_model_id from oa_teamwork_set where i_teamwork_id = #{iTeamworkId} limit 0,1)
+    </select>
 
 </mapper>
