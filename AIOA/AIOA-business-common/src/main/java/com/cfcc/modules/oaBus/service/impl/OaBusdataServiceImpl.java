@@ -525,8 +525,6 @@ public class OaBusdataServiceImpl extends ServiceImpl<OaBusdataMapper, OaBusdata
 
 
         //******************************************   按钮/意见
-        oaBusdata.put("tableName", tableName);
-        oaBusdata.put("busdataId", busdataId);
         Map<String, Boolean> currentUserPermission =
                 buttonPermissionService.currentUserPermission(proKey, oaBusdata, loginInfo,
                         taskDef, proInstanId, taskId, status);

@@ -263,13 +263,13 @@ public class ButtonPermissionServiceImpl implements ButtonPermissionService {
                                                       String status) {
 
         String userId = currentUser.getId();
-        String busdataId = (String) busData.get("busdataId");
+        String busdataId = busData.get("i_id").toString();
         //当前用户权限
         HashMap<String, Boolean> currentUserPermission = new HashMap<>();
         String createBy = busData.get("s_create_by") == null ? "" : busData.get("s_create_by") + "";
         //创建者
         currentUserPermission.put("isCreate", createBy.equals(currentUser.getId()));
-        List<String> reader = dynamicTableMapper.isReader(busdataId, busData.get("tableName") + "_permit");
+        List<String> reader = dynamicTableMapper.isReader(busdataId, busData.get("table") + "_permit");
         //参与者
         currentUserPermission.put("isReader", reader.contains(userId));
         //已办用户(有流程)
