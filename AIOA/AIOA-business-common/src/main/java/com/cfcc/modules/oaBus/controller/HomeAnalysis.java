@@ -72,51 +72,51 @@ public class HomeAnalysis {
         SysUserSet sysUserSet = sysUserSetService.findByUserId(sysUser.getId());
         List<BusFunction> busFunctionlList = iBusFunctionService.findList(schema);
         Map<String,Map<String,Object>> map =new HashMap<String,Map<String,Object>>();
-                   if(userId.equals(sysUserSet.getSUserId())){
-                        for (BusFunction busFunction:busFunctionlList) {
-                            Integer iBus1Id = sysUserSet.getIBus1Id();
-                            Integer iBus2Id = sysUserSet.getIBus2Id();
-                            Integer iBus3Id = sysUserSet.getIBus3Id();
-                            Integer iBus4Id = sysUserSet.getIBus4Id();
+        if(sysUserSet!=null){
+            for (BusFunction busFunction:busFunctionlList) {
+                Integer iBus1Id = sysUserSet.getIBus1Id();
+                Integer iBus2Id = sysUserSet.getIBus2Id();
+                Integer iBus3Id = sysUserSet.getIBus3Id();
+                Integer iBus4Id = sysUserSet.getIBus4Id();
 
-                            if( iBus1Id == null ?(modellist.length >0 && StringUtils.equals(busFunction.getIId().toString(),modellist[0])) : busFunction.getIId() == iBus1Id )
-                            {
-                                getIdAndSname(busFunction,map,"model1",username,createTime);
-                            }
-                            if( iBus2Id == null ?(modellist.length >1 && StringUtils.equals(busFunction.getIId().toString(),modellist[1])) : busFunction.getIId() == iBus2Id)
-                            {
-                                getIdAndSname(busFunction,map,"model2",username,createTime);
-                            }if( iBus3Id == null ?(modellist.length >2 && StringUtils.equals(busFunction.getIId().toString(),modellist[2])) : busFunction.getIId() == iBus3Id)
-                            {
-                                getIdAndSname(busFunction,map,"model3",username,createTime);
-                            }if( iBus4Id == null ?(modellist.length >3 && StringUtils.equals(busFunction.getIId().toString(),modellist[3])) : busFunction.getIId() == iBus4Id)
-                            {
-                                getIdAndSname(busFunction,map,"model4",username,createTime);
-                            }
-                        }
-                }else{
-                    for (BusFunction busFunction:busFunctionlList) {
-                        Integer iBus1Id = null;
-                        Integer iBus2Id = null;
-                        Integer iBus3Id = null;
-                        Integer iBus4Id = null;
-
-                        if( iBus1Id == null ?(modellist.length >0 && StringUtils.equals(busFunction.getIId().toString(),modellist[0])) : busFunction.getIId() == iBus1Id )
-                        {
-                            getIdAndSname(busFunction,map,"model1",username,createTime);
-                        }
-                        if( iBus2Id == null ?(modellist.length >1 && StringUtils.equals(busFunction.getIId().toString(),modellist[1])) : busFunction.getIId() == iBus2Id)
-                        {
-                            getIdAndSname(busFunction,map,"model2",username,createTime);
-                        }if( iBus3Id == null ?(modellist.length >2 && StringUtils.equals(busFunction.getIId().toString(),modellist[2])) : busFunction.getIId() == iBus3Id)
-                        {
-                            getIdAndSname(busFunction,map,"model3",username,createTime);
-                        }if( iBus4Id == null ?(modellist.length >3 && StringUtils.equals(busFunction.getIId().toString(),modellist[3])) : busFunction.getIId() == iBus4Id)
-                        {
-                            getIdAndSname(busFunction,map,"model4",username,createTime);
-                        }
-                    }
+                if( iBus1Id == null ?(modellist.length >0 && StringUtils.equals(busFunction.getIId().toString(),modellist[0])) : busFunction.getIId() == iBus1Id )
+                {
+                    getIdAndSname(busFunction,map,"model1",username,createTime);
                 }
+                if( iBus2Id == null ?(modellist.length >1 && StringUtils.equals(busFunction.getIId().toString(),modellist[1])) : busFunction.getIId() == iBus2Id)
+                {
+                    getIdAndSname(busFunction,map,"model2",username,createTime);
+                }if( iBus3Id == null ?(modellist.length >2 && StringUtils.equals(busFunction.getIId().toString(),modellist[2])) : busFunction.getIId() == iBus3Id)
+                {
+                    getIdAndSname(busFunction,map,"model3",username,createTime);
+                }if( iBus4Id == null ?(modellist.length >3 && StringUtils.equals(busFunction.getIId().toString(),modellist[3])) : busFunction.getIId() == iBus4Id)
+                {
+                    getIdAndSname(busFunction,map,"model4",username,createTime);
+                }
+            }
+        }else{
+          for (BusFunction busFunction:busFunctionlList) {
+            Integer iBus1Id = null;
+            Integer iBus2Id = null;
+            Integer iBus3Id = null;
+            Integer iBus4Id = null;
+
+            if( iBus1Id == null ?(modellist.length >0 && StringUtils.equals(busFunction.getIId().toString(),modellist[0])) : busFunction.getIId() == iBus1Id )
+            {
+                getIdAndSname(busFunction,map,"model1",username,createTime);
+            }
+            if( iBus2Id == null ?(modellist.length >1 && StringUtils.equals(busFunction.getIId().toString(),modellist[1])) : busFunction.getIId() == iBus2Id)
+            {
+                getIdAndSname(busFunction,map,"model2",username,createTime);
+            }if( iBus3Id == null ?(modellist.length >2 && StringUtils.equals(busFunction.getIId().toString(),modellist[2])) : busFunction.getIId() == iBus3Id)
+            {
+                getIdAndSname(busFunction,map,"model3",username,createTime);
+            }if( iBus4Id == null ?(modellist.length >3 && StringUtils.equals(busFunction.getIId().toString(),modellist[3])) : busFunction.getIId() == iBus4Id)
+            {
+                getIdAndSname(busFunction,map,"model4",username,createTime);
+            }
+        }
+    }
 
         return map;
     }
