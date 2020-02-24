@@ -151,14 +151,14 @@ public class BusFunctionServiceImpl extends ServiceImpl<BusFunctionMapper, BusFu
         busFunction.setDCreateTime(new Date());
         //1。插入到function表中
         busFunctionMapper.insert(busFunction);
-        QueryWrapper<BusFunction> queryWrapper = new QueryWrapper<>();
+        /*QueryWrapper<BusFunction> queryWrapper = new QueryWrapper<>();
         queryWrapper.setEntity(busFunction);
         BusFunction queryBusFunction = this.getOne(queryWrapper);        //查询刚刚插入的那条数据的id
+*/
 
+        busProcSet.setIBusFunctionId(busFunction.getIId());
 
-        busProcSet.setIBusFunctionId(queryBusFunction.getIId());
-
-        busProcSet.setIBusModelId(queryBusFunction.getIBusModelId());
+        busProcSet.setIBusModelId(busFunction.getIBusModelId());
         //2.插入到procset表中
         busProcSet.setIVersion(1);      //将版本设为0
         busProcSet.setIPageId(busFunction.getIPageId()) ;
@@ -167,17 +167,17 @@ public class BusFunctionServiceImpl extends ServiceImpl<BusFunctionMapper, BusFu
         queryWrapperProc.setEntity(busProcSet);
         BusProcSet queryBusProcSet = iBusProcSetService.getOne(queryWrapperProc);      //查询出刚刚插入关联表的id值
         //3.更新procsetId到busFunction表中
-        queryBusFunction.setIProcSetId(queryBusProcSet.getIId());
-        this.updateBudFunctionById(queryBusFunction);
+        busFunction.setIProcSetId(queryBusProcSet.getIId());
+        this.updateBudFunctionById(busFunction);
 
         //4.批量保存busFunctionView表中
         busFunctionView.forEach(entry -> {
-            entry.setIBusFunctionId(queryBusFunction.getIId());
+            entry.setIBusFunctionId(busFunction.getIId());
         });
         iBusFunctionViewService.saveBatch(busFunctionView);
         //5.批量保存到busFunctionUnit
         busFunctionUnit.forEach(entry -> {
-            entry.setIBusFunctionId(queryBusFunction.getIId());
+            entry.setIBusFunctionId(busFunction.getIId());
         });
         iBusFunctionUnitService.saveBatch(busFunctionUnit);
 
