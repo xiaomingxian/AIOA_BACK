@@ -233,7 +233,10 @@ public class NewTaskController {
         String username = JwtUtil.getUsername(token);
         String schema = MycatSchema.getSchema();
         List<BusModelPermit> ModelPermitList = iBusModelPermitService.findList(schema);
-
+        SysUser user = sysUserService.getUserByName(username);
+        String sysUserId = user.getId();//查出当前用户的id
+        String departId = ioaCalendarService.getDepartId(user.getId()); //查出当前登陆用户的部门id
+        List<String> roleIds = iBusFunctionPermitService.getroleId(sysUserId);
         if (ModelPermitList == null) {
             result.error500("未找到对应实体");
 
@@ -250,10 +253,10 @@ public class NewTaskController {
                     continue;
                 }
                 if (sDisplay.equals("0")) {//不可见
-                    queryall(modelpermit, list2, username);
+                    queryall(modelpermit, list2, sysUserId,departId,roleIds);
                 }
                 if (sDisplay.equals("1")) {//可见
-                    queryall(modelpermit, list1, username);
+                    queryall(modelpermit, list1, sysUserId,departId,roleIds);
                 }
             }
             //过滤掉不可见的
@@ -292,11 +295,11 @@ public class NewTaskController {
     }
 
     //
-    private void queryall(BusModelPermit model, List<String> list, String username) {
-        SysUser user = sysUserService.getUserByName(username);
+    private void queryall(BusModelPermit model, List<String> list, String sysUserId, String departId,List<String> roleIds) {
+       /* SysUser user = sysUserService.getUserByName(username);
         String sysUserId = user.getId();//查出当前用户的id
         String departId = ioaCalendarService.getDepartId(user.getId()); //查出当前登陆用户的部门id
-        List<String> roleIds = iBusFunctionPermitService.getroleId(sysUserId);
+        List<String> roleIds = iBusFunctionPermitService.getroleId(sysUserId);*/
         String sPermitType = model.getSPermitType();
         if (sPermitType.equals("0")) { //是所有人\
             String modelid = model.getIBusModelId() + "";
@@ -331,11 +334,8 @@ public class NewTaskController {
         }
     }
 
-    private void queryFunctionall(BusFunctionPermit functionPermit, List<String> list, String username) {
-        SysUser user = sysUserService.getUserByName(username);
-        String sysUserId = user.getId();//查出当前用户的id
-        String departId = ioaCalendarService.getDepartId(user.getId()); //查出当前登陆用户的部门id
-        List<String> roleIds = iBusFunctionPermitService.getroleId(sysUserId);
+    private void queryFunctionall(BusFunctionPermit functionPermit, List<String> list, String sysUserId, String departId,List<String> roleIds) {
+
         String sPermitType = functionPermit.getSPermitType();
 
         if (sPermitType.equals("0")) { //是所有人\
@@ -389,28 +389,28 @@ public class NewTaskController {
         String schema = MycatSchema.getSchema();
         String username = JwtUtil.getUsername(token);
         List<BusFunctionPermit> functionPermitList = iBusFunctionPermitService.findList(schema);
-
+        SysUser user = sysUserService.getUserByName(username);
+        String sysUserId = user.getId();//查出当前用户的id
+        String departId = ioaCalendarService.getDepartId(user.getId()); //查出当前登陆用户的部门id
+        List<String> roleIds = iBusFunctionPermitService.getroleId(sysUserId);
         if (functionPermitList == null) {
             result.error500("未找到对应实体");
 
         } else {
             for (BusFunctionPermit functionPermit : functionPermitList) {
-
                 String sPermitType = functionPermit.getSPermitType();
-
                 if (StringUtils.isBlank(sPermitType)) {
                     continue;
                 }
-
                 String sDisplay = functionPermit.getSDisplay();
                 if (StringUtils.isBlank(sDisplay)) {
                     continue;
                 }
                 if (sDisplay.equals("0")) {//不可见
-                    queryFunctionall(functionPermit, list2, username);
+                    queryFunctionall(functionPermit, list2,sysUserId,departId,roleIds);
                 }
                 if (sDisplay.equals("1")) {//可见
-                    queryFunctionall(functionPermit, list1, username);
+                    queryFunctionall(functionPermit, list1,sysUserId,departId,roleIds);
                 }
             }
             //过滤掉不可见的
