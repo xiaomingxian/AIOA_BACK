@@ -94,8 +94,8 @@ public class oaTeamworkServiceImpl extends ServiceImpl<oaTeamworkMapper, oaTeamw
     }
 
     @Override
-    public List<oaTeamwork> findTeamworkName() {
-        return oaTeamworkMapper.findTeamworkName();
+    public List<oaTeamwork> findTeamworkName(String id) {
+        return oaTeamworkMapper.findTeamworkName(id);
     }
 
 

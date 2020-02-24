@@ -34,4 +34,8 @@ public interface SysDepartMapper extends BaseMapper<SysDepart> {
 
 	@Select("select * from sys_depart c where c.org_code = #{orgCode}")
 	SysDepart queryUserDepartByOrgCodeDao(@Param("orgCode")String orgCode);
+
+    List<String> findSysDepartByParentIdAndOrgType(@Param("ip") String ip,@Param("DBtext") String DBtext);
+
+	List<String> findSysDepartByParentIdAndOrgType0(@Param("DBvalue") String DBvalue);
 }

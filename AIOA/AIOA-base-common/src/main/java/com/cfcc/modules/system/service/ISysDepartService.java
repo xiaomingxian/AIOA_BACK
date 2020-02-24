@@ -89,4 +89,9 @@ public interface ISysDepartService extends IService<SysDepart>{
      * @return
      */
     SysDepart getMaxUnitByDeptId(String id) ;
+
+    List<String> findSysDepartByParentIdAndOrgType(String DBvalue);
+
+
+//    List<String> getEsIpAndHost();
 }

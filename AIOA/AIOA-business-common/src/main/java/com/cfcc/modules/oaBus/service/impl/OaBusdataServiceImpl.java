@@ -74,6 +74,8 @@ public class OaBusdataServiceImpl extends ServiceImpl<OaBusdataMapper, OaBusdata
     @Autowired
     private IBusProcSetService iBusProcSetService;
     @Autowired
+    private TaskCommonService taskCommonService;
+    @Autowired
     private OaBusDynamicTableService dynamicTableService;
     @Autowired
     private ISysDictService sysDictService;
@@ -171,7 +173,7 @@ public class OaBusdataServiceImpl extends ServiceImpl<OaBusdataMapper, OaBusdata
 
 
     @Override
-    public void updateIsES(List<Map<String, Object>> oaFileList) {
+    public void updateIsES(List<Map<String, Object>> oaFileList,String DBvalue) {
         for (Map<String, Object> map : oaFileList) {
             //System.out.println("****************");
             String id = map.get("i_id").toString();
@@ -180,7 +182,7 @@ public class OaBusdataServiceImpl extends ServiceImpl<OaBusdataMapper, OaBusdata
             //System.out.println(map);
             String tableName = map.get("table_name").toString();
 
-            Integer count = oaBusdataMapper.updateIsESByid(tableName, id);
+            Integer count = oaBusdataMapper.updateIsESByid(tableName, id,DBvalue);
             if (count != 1) {
                 //修改失败
             }
@@ -602,6 +604,11 @@ public class OaBusdataServiceImpl extends ServiceImpl<OaBusdataMapper, OaBusdata
             }
         }
         return res;
+    }
+
+    @Override
+    public List<Map<String, Object>> getOaBusdataList(String columnLists, BusFunction busFunction,String DBvalue) {
+        return oaBusdataMapper.getBusdataByTable(columnLists, busFunction, DBvalue);
     }
 
 

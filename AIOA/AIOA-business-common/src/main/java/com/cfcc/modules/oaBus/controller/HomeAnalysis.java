@@ -3,11 +3,13 @@ package com.cfcc.modules.oaBus.controller;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.cfcc.common.api.vo.Result;
 import com.cfcc.common.mycat.MycatSchema;
+import com.cfcc.common.system.util.JwtUtil;
 import com.cfcc.modules.oaBus.entity.BusFunction;
 import com.cfcc.modules.oaBus.service.IBusFunctionPermitService;
 import com.cfcc.modules.oaBus.service.IBusFunctionService;
 import com.cfcc.modules.oaBus.service.IBusModelService;
 import com.cfcc.modules.oaBus.service.IOaBusdataService;
+import com.cfcc.modules.shiro.vo.DefContants;
 import com.cfcc.modules.system.entity.SysUser;
 import com.cfcc.modules.system.entity.SysUserSet;
 import com.cfcc.modules.system.service.ISysUserService;
@@ -23,6 +25,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import javax.servlet.http.HttpServletRequest;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -61,64 +64,58 @@ public class HomeAnalysis {
      */
     @ApiOperation("dasdasdads")
     @GetMapping(value = "/HomeList")
-    public Map<String, Map<String,Object>> HomeList(@RequestParam(name="userId",required=false)String userId,@RequestParam(name="createTime",required=false)String createTime) {
+    public Map<String, Map<String,Object>> HomeList(HttpServletRequest request, @RequestParam(name="userId",required=false)String userId, @RequestParam(name="createTime",required=false)String createTime) {
         String[] modellist = busFunction.split(",");  //切割配置文件里面的id
-        List<SysUserSet> userSetList= sysUserSetService.findList();
         SysUser sysUser = iSysUserService.getById(userId);
         String schema= MycatSchema.getSchema();
         String username = sysUser.getUsername();
+        SysUserSet sysUserSet = sysUserSetService.findByUserId(sysUser.getId());
         List<BusFunction> busFunctionlList = iBusFunctionService.findList(schema);
         Map<String,Map<String,Object>> map =new HashMap<String,Map<String,Object>>();
-            for (int i = 0; i <userSetList.size() ; i++) {
-                SysUserSet userSet = userSetList.get(i);
-                if(userId.equals(userSet.getSUserId())){
-                    busFunctionlList.forEach(busFunction -> {
-                        Integer iBus1Id = userSet.getIBus1Id();
-                        Integer iBus2Id = userSet.getIBus2Id();
-                        Integer iBus3Id = userSet.getIBus3Id();
-                        Integer iBus4Id = userSet.getIBus4Id();
-
-                        if( iBus1Id == null ?(modellist.length >0 && StringUtils.equals(busFunction.getIId().toString(),modellist[0])) : busFunction.getIId() == iBus1Id )
-                        {
-                            getIdAndSname(busFunction,map,"model1",username,createTime);
-                        }
-                        if( iBus2Id == null ?(modellist.length >1 && StringUtils.equals(busFunction.getIId().toString(),modellist[1])) : busFunction.getIId() == iBus2Id)
-                        {
-                            getIdAndSname(busFunction,map,"model2",username,createTime);
-                        }if( iBus3Id == null ?(modellist.length >2 && StringUtils.equals(busFunction.getIId().toString(),modellist[2])) : busFunction.getIId() == iBus3Id)
-                        {
-                            getIdAndSname(busFunction,map,"model3",username,createTime);
-                        }if( iBus4Id == null ?(modellist.length >3 && StringUtils.equals(busFunction.getIId().toString(),modellist[3])) : busFunction.getIId() == iBus4Id)
-                        {
-                            getIdAndSname(busFunction,map,"model4",username,createTime);
-                        }
-
-                    });
-                    break;
-                }else{
-                    busFunctionlList.forEach(busFunction -> {
-                        Integer iBus1Id = null;
-                        Integer iBus2Id = null;
-                        Integer iBus3Id = null;
-                        Integer iBus4Id = null;
-
-                        if( iBus1Id == null ?(modellist.length >0 && StringUtils.equals(busFunction.getIId().toString(),modellist[0])) : busFunction.getIId() == iBus1Id )
-                        {
-                            getIdAndSname(busFunction,map,"model1",username,createTime);
-                        }
-                        if( iBus2Id == null ?(modellist.length >1 && StringUtils.equals(busFunction.getIId().toString(),modellist[1])) : busFunction.getIId() == iBus2Id)
-                        {
-                            getIdAndSname(busFunction,map,"model2",username,createTime);
-                        }if( iBus3Id == null ?(modellist.length >2 && StringUtils.equals(busFunction.getIId().toString(),modellist[2])) : busFunction.getIId() == iBus3Id)
-                        {
-                            getIdAndSname(busFunction,map,"model3",username,createTime);
-                        }if( iBus4Id == null ?(modellist.length >3 && StringUtils.equals(busFunction.getIId().toString(),modellist[3])) : busFunction.getIId() == iBus4Id)
-                        {
-                            getIdAndSname(busFunction,map,"model4",username,createTime);
-                        }
-                    });
+        if(sysUserSet!=null){
+            Integer iBus1Id = sysUserSet.getIBus1Id();
+            Integer iBus2Id = sysUserSet.getIBus2Id();
+            Integer iBus3Id = sysUserSet.getIBus3Id();
+            Integer iBus4Id = sysUserSet.getIBus4Id();
+            for (BusFunction busFunction:busFunctionlList) {
+                if( iBus1Id == null ?(modellist.length >0 && StringUtils.equals(busFunction.getIId().toString(),modellist[0])) : busFunction.getIId() == iBus1Id )
+                {
+                    getIdAndSname(busFunction,map,"model1",username,createTime);
                 }
+                if( iBus2Id == null ?(modellist.length >1 && StringUtils.equals(busFunction.getIId().toString(),modellist[1])) : busFunction.getIId() == iBus2Id)
+                {
+                    getIdAndSname(busFunction,map,"model2",username,createTime);
+                }if( iBus3Id == null ?(modellist.length >2 && StringUtils.equals(busFunction.getIId().toString(),modellist[2])) : busFunction.getIId() == iBus3Id)
+                {
+                    getIdAndSname(busFunction,map,"model3",username,createTime);
+                }if( iBus4Id == null ?(modellist.length >3 && StringUtils.equals(busFunction.getIId().toString(),modellist[3])) : busFunction.getIId() == iBus4Id)
+                {
+                    getIdAndSname(busFunction,map,"model4",username,createTime);
+                }
+            }
+        }else{
+            Integer iBus1Id = null;
+            Integer iBus2Id = null;
+            Integer iBus3Id = null;
+            Integer iBus4Id = null;
+          for (BusFunction busFunction:busFunctionlList) {
+            if( iBus1Id == null ?(modellist.length >0 && StringUtils.equals(busFunction.getIId().toString(),modellist[0])) : busFunction.getIId() == iBus1Id )
+            {
+                getIdAndSname(busFunction,map,"model1",username,createTime);
+            }
+            if( iBus2Id == null ?(modellist.length >1 && StringUtils.equals(busFunction.getIId().toString(),modellist[1])) : busFunction.getIId() == iBus2Id)
+            {
+                getIdAndSname(busFunction,map,"model2",username,createTime);
+            }if( iBus3Id == null ?(modellist.length >2 && StringUtils.equals(busFunction.getIId().toString(),modellist[2])) : busFunction.getIId() == iBus3Id)
+            {
+                getIdAndSname(busFunction,map,"model3",username,createTime);
+            }if( iBus4Id == null ?(modellist.length >3 && StringUtils.equals(busFunction.getIId().toString(),modellist[3])) : busFunction.getIId() == iBus4Id)
+            {
+                getIdAndSname(busFunction,map,"model4",username,createTime);
+            }
         }
+    }
+
         return map;
     }
     //获取

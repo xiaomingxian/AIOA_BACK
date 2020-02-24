@@ -317,6 +317,21 @@ public class ButtonPermissionServiceImpl implements ButtonPermissionService {
         return currentUserPermission;
     }
 
+    @Override
+    public List<Map<String, Object>> reloadOpinionList(Map<String, Object> map) {
+        String proSetId = map.get("proSetId")+"";
+        String taskDefKey = map.get("taskDefKey")+"";
+        String opinionTable = map.get("opinionTable")+"";
+        String busdataId = map.get("busdataId")+"";
+        Map<String,Object> procsetParam = new HashMap<>();
+        procsetParam.put("table","oa_bus_proc_set");
+        procsetParam.put("i_id",proSetId);
+        Map<String, Object> procsetData = dynamicTableMapper.queryDataById(procsetParam);
+        String procDefKey = procsetData.get("PROC_DEF_KEY_")+"";
+        String opt = procsetData.get("i_proc_opinion_id")+"";
+        List<Map<String, Object>> maps = dynamicTableMapper.queryOptions(opt, proSetId, procDefKey, taskDefKey, opinionTable, busdataId);
+        return maps;
+    }
 
 
 }

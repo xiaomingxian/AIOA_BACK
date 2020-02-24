@@ -21,11 +21,11 @@ public interface OaBusdataMapper extends BaseMapper<OaBusdata> {
 
     List<Integer> getBusdataIidByTable(@Param("sBusdataTable")String sBusdataTable, @Param("iId") Integer iId);
 
-    Integer updateIsESByid(@Param("tableName") String tableName, @Param("id") String id);
+    Integer updateIsESByid(@Param("tableName") String tableName, @Param("id") String id,@Param("DBvalue")String DBvalue);
 
     int queryBusdataCount(OaBusdata oaBusdata);
 
-    List<Map<String,Object>> getBusdataByTable(@Param("columnLists") String columnLists,@Param("busFunction") BusFunction busFunction);
+    List<Map<String,Object>> getBusdataByTable(@Param("columnLists") String columnLists,@Param("busFunction") BusFunction busFunction, @Param("DBvalue") String DBvalue);
 
     List<OaBusdata> queryBusdata(@Param("pageNo") int pageNo, @Param("pageSize") Integer pageSize, @Param("oaBusdata")OaBusdata oaBusdata);
 
@@ -160,6 +160,9 @@ public interface OaBusdataMapper extends BaseMapper<OaBusdata> {
     int listCountBytableName(Map<String, Object> map);
 
     Map<String,Object> queryFuncitonDataById(@Param("functionId")String functionId);
+
+    String getBusdataByIdAndTableName(@Param("id") String id,@Param("sBusdataTable") String sBusdataTable,@Param("DBvalue") String DBvalue);
+
 
     List<Map<String, Object>> getCheckData(@Param("tableName") String tableName,
                               @Param("functionId")String functionId,

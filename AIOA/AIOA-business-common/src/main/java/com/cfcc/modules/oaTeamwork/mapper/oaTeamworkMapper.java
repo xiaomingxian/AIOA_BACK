@@ -26,8 +26,9 @@ public interface oaTeamworkMapper extends BaseMapper<oaTeamwork> {
 
     int Insert(oaTeamwork oaTeamwork);
 
-    List<oaTeamwork> findTeamworkName();
+    List<oaTeamwork> findTeamworkName(String id);
 
     oaTeamwork selectByName(String teamworkName);
 
+    String getfirstModel(Integer iTeamworkId);
 }

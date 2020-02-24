@@ -130,6 +130,27 @@
     <select id="findPicText" resultType="java.lang.String">
         SELECT s_table FROM oa_file WHERE s_file_type = #{fileType}
     </select>
+    <select id="getOaFileByTableAndTableId" resultType="java.util.Map">
+        SELECT s_table AS tableName, i_table_id AS tableId, s_file_name, s_file_path, s_create_by
+          from
+        <choose>
+            <when test="DBvalue != null and DBvalue != ''">
+                #{DBvalue}.oa_file
+            </when>
+            <otherwise>
+                oa_file
+            </otherwise>
+        </choose>
+          <where>
+              1 = 1
+              <if test="id != null and id != ''">
+                  and i_table_id = #{id}
+              </if>
+              <if test="sBusdataTable != null and sBusdataTable != null">
+                  and  s_table = #{sBusdataTable}
+              </if>
+          </where>
+    </select>
 
     <!--修改附件名称-->
     <update id="updateDocNameById">

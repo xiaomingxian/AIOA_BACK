@@ -49,17 +49,17 @@
         select count(1) from oa_teamwork_inst c
         <where>
             c.i_order =1
-            <if test="iId != null  ">
-              and  c.i_id = #{iId}
+            <if test="oaTeamworkInst.iId != null  ">
+              and  c.i_id = #{oaTeamworkInst.iId}
             </if>
-            <if test="iTeamworkId!= null  ">
-                and c.i_teamwork_id = #{iTeamworkId}
+            <if test="oaTeamworkInst.iTeamworkId!= null  ">
+                and c.i_teamwork_id = #{oaTeamworkInst.iTeamworkId}
             </if>
-            <if test="iTeamworkSetId != null  ">
-                and c.i_teamwork_set_id = #{iTeamworkSetId}
+            <if test="oaTeamworkInst.iTeamworkSetId != null  ">
+                and c.i_teamwork_set_id = #{oaTeamworkInst.iTeamworkSetId}
             </if>
-            <if test="iVersion != null  ">
-                and c.i_version = #{iVersion}
+            <if test="oaTeamworkInst.iVersion != null  ">
+                and c.i_version = #{oaTeamworkInst.iVersion}
             </if>
         </where>
         order by
@@ -77,7 +77,7 @@
             <if test="oaTeamworkInst.iVersion==-1">
                 c.i_version desc,
             </if>
-            <if test="oaTeamworkInst.iTeamworkId==1">
+            <if test="iTeamworkId==1">
                 c.i_teamwork_id
             </if>
             <if test="oaTeamworkInst.iTeamworkId==-1">
@@ -89,11 +89,11 @@
     </select>
 
     <select id="findPage" resultType="com.cfcc.modules.oaTeamwork.entity.oaTeamworkInst">
-        select *  from oa_teamwork_inst
-              c.i_order = 1c
+        select *  from oa_teamwork_inst c
         <where>
+            c.i_order = 1
             <if test="oaTeamworkInst.iTeamworkId != null and oaTeamworkInst.iTeamworkId != '' ">
-               c.i_teamwork_id = #{oaTeamworkInst.iTeamworkId}
+                and  c.i_teamwork_id = #{oaTeamworkInst.iTeamworkId}
             </if>
             <if test="oaTeamworkInst.iTeamworkSetId != null and oaTeamworkInst.iTeamworkSetId != '' ">
                 and c.i_teamwork_set_id = #{oaTeamworkInst.iTeamworkSetId}
