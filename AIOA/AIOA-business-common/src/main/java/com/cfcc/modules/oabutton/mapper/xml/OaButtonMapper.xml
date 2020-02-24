@@ -83,15 +83,13 @@
         i_is_print,i_is_printpreview,i_is_saveas,i_is_save,i_is_new,i_is_close,i_is_open,i_is_edit,i_is_copy,i_is_saverevision,i_is_showrevision,
         i_is_addread,i_is_base
         from oa_button
-         <where>
+         where 1=1
              <if test="id !=null and id!=''">
                 and i_id = #{id}
              </if>
              <if test="sBtnName !=null and sBtnName!=''">
                  and s_btn_name like concat("%",#{sBtnName} ,"%")
              </if>
-         </where>
-
     </select>
     <!--按钮配置-->
     <select id="buttonList" resultType="com.cfcc.modules.oabutton.entity.OaButton">
