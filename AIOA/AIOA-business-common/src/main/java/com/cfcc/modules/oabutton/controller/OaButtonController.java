@@ -181,7 +181,7 @@ public class OaButtonController {
 	public Result<OaButton> queryById(@RequestParam(name="id",required=false) Integer id,@RequestParam(name="sbtnName",required=false) String sBtnName) {
 		try {
 			Result<OaButton> result = new Result<OaButton>();
-			OaButton oaButton = oaButtonService.queryById(id,sBtnName.trim());
+			OaButton oaButton = oaButtonService.queryById(id,sBtnName);
 			if(oaButton==null) {
                 result.error500("未找到对应实体");
             }else {
