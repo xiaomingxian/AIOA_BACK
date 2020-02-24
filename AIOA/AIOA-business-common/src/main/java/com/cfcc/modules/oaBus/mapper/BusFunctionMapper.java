@@ -18,7 +18,7 @@ import java.util.Map;
  */
 public interface BusFunctionMapper extends BaseMapper<BusFunction> {
 
-    List<BusFunction> getFunByIsEs();
+    List<BusFunction> getFunByIsEs(@Param("DBvalue")String DBvalue);
 
     int queryBusFunctionCount(BusFunction busFunction);
 
@@ -48,6 +48,8 @@ public interface BusFunctionMapper extends BaseMapper<BusFunction> {
     Map<String,Object> getEdtorText(@Param("table")String s_busdata_table, @Param("id")String i_id);
 
     List<BusFunction> queryByModelIdDao(@Param("modelId")String modelId);
+
+    List<BusFunction> getBusFunctionListByDepartId(@Param("departId") String departId,@Param("DBvalue") String DBvalue );
 }
 
 

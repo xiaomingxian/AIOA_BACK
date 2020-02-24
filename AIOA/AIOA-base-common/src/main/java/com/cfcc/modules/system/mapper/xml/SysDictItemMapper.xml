@@ -3,7 +3,16 @@
 <mapper namespace="com.cfcc.modules.system.mapper.SysDictItemMapper">
 
     <select id="getItemTextById" resultType="java.lang.String">
-        select item_text from sys_dict_item
+        select item_text from
+        <choose>
+            <when test="DBvalue != null and DBvalue != ''">
+                #{DBvalue}.sys_dict_item
+            </when>
+            <otherwise>
+                sys_dict_item
+            </otherwise>
+        </choose>
+
         <where>
             <if test="sDictId != null and sDictId != ''">
                 dict_id = #{sDictId}

@@ -229,6 +229,24 @@ public class SysDepartServiceImpl extends ServiceImpl<SysDepartMapper, SysDepart
 		return sysDepart;
 	}
 
+	@Override
+	public List<String> findSysDepartByParentIdAndOrgType(String DBvalue) {
+		List<String> departList = null;
+//		if (DBtext == null){
+			departList = sysDepartMapper.findSysDepartByParentIdAndOrgType0(DBvalue);
+//		}else {
+//		}
+//		departList = sysDepartMapper.findSysDepartByParentIdAndOrgType(ip,DBtext);
+
+		return departList;
+	}
+
+//	@Override
+//	public List<String> getEsIpAndHost() {
+//		sysDepartMapper.getEsIpAndHost();
+//		return null;
+//	}
+
 	/**
 	 * 查询一个部门的所有父机构id
 	 * @param id

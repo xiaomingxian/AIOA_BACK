@@ -183,14 +183,63 @@ public class OaFileServiceImpl extends ServiceImpl<OaFileMapper, OaFile> impleme
         return pageList;
     }
 
+    @Override
+    public List<Map<String, Object>> getOaFileByTableAndTableId(String id, String sBusdataTable,String DBvalue) {
+        List<Map<String,Object>> oaFileList = oaFileMapper.getOaFileByTableAndTableId(id,sBusdataTable,DBvalue);
+        Iterator<Map<String, Object>> iterator = oaFileList.iterator();
+        while (iterator.hasNext()){
+            Map<String, Object> map = iterator.next();
+            String sFileName = map.get("s_file_name")+"";
+            String str = sFileName.substring(sFileName.lastIndexOf(".") + 1);
+            if (!str.equalsIgnoreCase("doc") && !str.equalsIgnoreCase("docx")
+                    && !str.equalsIgnoreCase("txt") && !str.equalsIgnoreCase("pdf")
+                    && !str.equalsIgnoreCase("pdf") && !str.equalsIgnoreCase("xls")
+                    && !str.equalsIgnoreCase("xlsx")){
+                iterator.remove();
+                continue;
+            }
+            String sFilePath = map.get("s_file_path") + "";
+            File file = new File(sFilePath);
+            String sContent = null;
+            if (file.exists()) { //文件存在返回true
+                switch (str) {
+                    case "doc":
+                        sContent = FileUtils.readDocFile(sFilePath);
+                        break;
+                    case "docx":
+                        sContent = FileUtils.readDocxFile(sFilePath);
+                        break;
+                    case "txt":
+                        sContent = FileUtils.ReadTxtFile(sFilePath);
+                        break;
+                    case "pdf":
+                        sContent = FileUtils.readPdfFile(sFilePath);
+                        break;
+                    case "xls":
+                        sContent = FileUtils.readXLSFile(sFilePath);
+                        break;
+                    case "xlsx":
+                        sContent = FileUtils.readxlsxFile(sFilePath);
+                        break;
+                    default:
+                        break;
+                }
+                String sTitle = oaBusdataMapper.getBusdataByIdAndTableName(id,sBusdataTable,DBvalue);
+                map.put("s_file_path", sContent);
+                map.put("sTitle", sTitle);
+            }
+        }
+        return null;
+    }
+
     /**
      * 附件检索
      *
      * @return
      */
     @Override
-    public List<OaFile> getOaFileContext() {
-        List<BusModel> busModels = findBusModels();
+    public List<OaFile> getOaFileContext(String DBvalue) {
+        List<BusModel> busModels = findBusModels(DBvalue);
         List<OaFile> oaFileLists = new ArrayList<>();
         for (BusModel busModel : busModels) {
             String sBusdataTable = busModel.getSBusdataTable();
@@ -449,8 +498,8 @@ public class OaFileServiceImpl extends ServiceImpl<OaFileMapper, OaFile> impleme
     }
 
     @Override
-    public String getColumList(String sBusdataTable, Integer iId) {
-        List<String> isEsColumnLists = busPageDetailMapper.getCloumnNameByTableAndEsquery(sBusdataTable, iId);
+    public String getColumList(String sBusdataTable, Integer iId, String DBvalue) {
+        List<String> isEsColumnLists = busPageDetailMapper.getCloumnNameByTableAndEsquery(sBusdataTable, iId, DBvalue);
         String columnLists = "";
         if (isEsColumnLists != null){
             String columnList = isEsColumnLists.toString().replace("[", "");
@@ -472,6 +521,63 @@ public class OaFileServiceImpl extends ServiceImpl<OaFileMapper, OaFile> impleme
         return clumnNameLists;
     }
 
+    @Override
+    public List<Map<String, Object>> getOaBusdata(String sBusdataTable, List<Map<String, Object>> oaBusdata,BusFunction busFunction,String DBvalue) {
+        Iterator<Map<String, Object>> iterator = oaBusdata.iterator();
+        while (iterator.hasNext()){
+            Map<String, Object> oaBusdatum = iterator.next();
+            Integer functionId = null;
+            if (oaBusdatum.get("i_bus_function_id") == null && oaBusdatum.get("i_bus_function_id") != ""){
+                continue;
+            }else {
+                functionId = Integer.parseInt(oaBusdatum.get("i_bus_function_id")+"");
+            }
+            if (functionId == null) {
+                continue;
+            }
+            Set<String> set = oaBusdatum.keySet();
+            for (String key : set) {
+                Object value = oaBusdatum.get(key);
+                List<String> sDictIdlist = busPageDetailMapper.getSDictIdByKey(functionId, sBusdataTable, key, DBvalue);
+                System.out.println("................." + sDictIdlist + ".................");
+                String aa = null;
+                if (sDictIdlist.size() == 0){
+                    continue;
+                }
+                boolean flag = false;
+                for (int i = 0; i < sDictIdlist.size(); i++) {
+                    aa = sDictIdlist.get(i);
+                    System.out.println(aa);
+                    if (aa==null){
+                        flag = true;
+                        break;
+                    }
+                }
+                if (flag){
+                    continue;
+                }
+                if ( sDictIdlist.size() == 1) {  //如果有返回值，则对其赋值
+                    if (sDictIdlist.get(0) != null && sDictIdlist.get(0).trim().length() >0){
+                        String sysDictId = sysDictMapper.getDictIdByDictCode(sDictIdlist.get(0),DBvalue);
+                        String itemValue = sysDictItemMapper.getItemTextById(sysDictId, value, DBvalue);
+                        if (itemValue == null) {
+                            System.out.println("key:" + key + ",  value:" + value + "该字段查不到其含义！！！！！");
+                        } else {
+                            oaBusdatum.put(key, itemValue);
+                        }
+                    }
+                }
+                if(key.equals("s_title")){
+                    oaBusdatum.put("【"+busFunction.getSName()+"】" + key,value);
+                }
+            }
+            oaBusdatum.put("table_name", sBusdataTable);
+        }
+
+
+        return oaBusdata;
+    }
+
     /**
      * 根据i_is_es判断是否纳入全文检索
      * 当i_is_es为1时为纳入全文检索
@@ -479,19 +585,19 @@ public class OaFileServiceImpl extends ServiceImpl<OaFileMapper, OaFile> impleme
      * @return
      */
     @Override
-    public List<Map<String, Object>> getOaFile() {
-        List<BusFunction> busFunctionList = findBusFunction();
+    public List<Map<String, Object>> getOaFile(String DBvalue) {
+        List<BusFunction> busFunctionList = findBusFunction(DBvalue);
         List<Map<String, Object>> oaBusdataList = new ArrayList<>();
         for (BusFunction busFunction : busFunctionList) {
             //表名
             String sBusdataTable = busFunction.getSBusdataTable();
             //要检索字段变为字符串格式
-            String columnLists = getColumList(sBusdataTable, busFunction.getIId());
+            String columnLists = getColumList(sBusdataTable, busFunction.getIId(), DBvalue);
             if (columnLists.equals("")){
                 continue;
             }
             //根据表名和业务模块id查询数据
-            List<Map<String, Object>> oaBusdata = oaBusdataMapper.getBusdataByTable(columnLists, busFunction);
+            List<Map<String, Object>> oaBusdata = oaBusdataMapper.getBusdataByTable(columnLists, busFunction, DBvalue);
             if (oaBusdata.size() == 0) {  //执行下一循环
                 //System.out.println("-----------无数据存入ES库！！！！！-----------");
                 continue;
@@ -507,7 +613,7 @@ public class OaFileServiceImpl extends ServiceImpl<OaFileMapper, OaFile> impleme
                 for (String key : set) {
                     Object value = oaBusdatum.get(key);
 //                    System.out.println("key:"+key+",  sBusdataTable:"+sBusdataTable+"， functionId" + functionId);
-                    List<String> sDictIdlist = busPageDetailMapper.getSDictIdByKey(functionId, sBusdataTable, key);
+                    List<String> sDictIdlist = busPageDetailMapper.getSDictIdByKey(functionId, sBusdataTable, key, DBvalue);
                     //System.out.println("................." + sDictIdlist + ".................");
                     String aa = null;
                     if (sDictIdlist.size() == 0){
@@ -527,8 +633,8 @@ public class OaFileServiceImpl extends ServiceImpl<OaFileMapper, OaFile> impleme
                     }
                     if ( sDictIdlist.size() == 1) {  //如果有返回值，则对其赋值
                         if (sDictIdlist.get(0) != null && sDictIdlist.get(0).trim().length() >0){
-                            String sysDictId = sysDictMapper.getDictIdByDictCode(sDictIdlist.get(0));
-                            String itemValue = sysDictItemMapper.getItemTextById(sysDictId, value);
+                            String sysDictId = sysDictMapper.getDictIdByDictCode(sDictIdlist.get(0), DBvalue);
+                            String itemValue = sysDictItemMapper.getItemTextById(sysDictId, value,DBvalue);
                             if (itemValue == null) {
                                 //System.out.println("key:" + key + ",  value:" + value + "该字段查不到其含义！！！！！");
                             } else {
@@ -550,11 +656,11 @@ public class OaFileServiceImpl extends ServiceImpl<OaFileMapper, OaFile> impleme
         return oaBusdataList;
     }
 
-    public List<BusFunction> findBusFunction() {
-        List<BusFunction> busFunctionList = busFunctionMapper.getFunByIsEs();
+    public List<BusFunction> findBusFunction(String DBvalue) {
+        List<BusFunction> busFunctionList = busFunctionMapper.getFunByIsEs(DBvalue);
         List<BusModel> busModels = new ArrayList<>();
         for (BusFunction busFunction : busFunctionList) {
-            BusModel busModel = busModelMapper.getBusModelById(busFunction.getIBusModelId());
+            BusModel busModel = busModelMapper.getBusModelById(busFunction.getIBusModelId(),DBvalue);
             if (busModel.getIId() == busFunction.getIBusModelId()) {
                 busFunction.setSBusdataTable(busModel.getSBusdataTable());
                 continue;
@@ -630,16 +736,15 @@ public class OaFileServiceImpl extends ServiceImpl<OaFileMapper, OaFile> impleme
         return oaBusdataList;
     }
 */
-    public List<BusModel> findBusModels() {
-        List<BusFunction> busFunctionList = busFunctionMapper.getFunByIsEs();
+    public List<BusModel> findBusModels(String DBvalue) {
+        List<BusFunction> busFunctionList = busFunctionMapper.getFunByIsEs(DBvalue);
         List<BusModel> busModelList = new ArrayList<>();
         for (BusFunction busFunction : busFunctionList) {
-            BusModel busModel = busModelMapper.getBusModelById(busFunction.getIBusModelId());
+            BusModel busModel = busModelMapper.getBusModelById(busFunction.getIBusModelId(),DBvalue);
             busModelList.add(busModel);
         }
         return busModelList;
     }
-
 
     @Override
     public List<OaFile> batchUploads(MultipartFile file, String sTable, Integer iTableId, String sFileType, HttpServletRequest request, HttpServletResponse response) {
@@ -686,4 +791,6 @@ public class OaFileServiceImpl extends ServiceImpl<OaFileMapper, OaFile> impleme
         }
         return fileIds;
     }
+
+
 }

@@ -59,7 +59,31 @@ public class OaFileContext implements Job {
 
     @Override
     public void execute(JobExecutionContext context) throws JobExecutionException {
-        List<Map<String,Object>> oaFileList = iOaFileService.getOaFile();
+        /*
+        * 一、首先去主库的数据库字典表根据dict_code查询item_text
+        * sysDictService.queryDictItemsByCode(dictCode);
+        * 二、根据查询的出来的item_text字段值（数据库名）遍历查询各个数据库的数据，分别根据各中支获取数据，
+        * 根据查到的   item_text字段值（数据库名）+ 去
+        *   1、在sys_depart表中根据parent_id = 0 和 1 和org_type = 1 条件查询id
+        *   全文检索：
+        *   1、根据oa_bus_function表中确定的添加到es库的数据查询
+        *   2、找到到oa_busdate数据表时也要根据s_create_unitid(创建者机构id)查找
+        *   3、当查找数据中特殊意义的数据
+        *           参考位置private Map<String, Object> selOptionByDtailList
+        *   对附件检索：
+        *       第一种方法：
+        *       1、直接检索oa_file表，查询所有数据List，再取其中的s_file_name字段值，进行字段截取，判断是否是能检索的文件4
+        *
+        *       第二种方法：
+        *       1、直接根据全文检索得到的oa_busdata的数据根据里面的i_is_file判断是否有附件
+        *           如果有则去oa_file表中查询数据（判断文件是否为可检索文件）
+        *       2、对得到的数据中s_file_path字段获取其内容，存放到该字段s_file_path中
+        *   。。。。。
+        * 三、
+        * */
+        String DBvalue = null;
+
+        List<Map<String,Object>> oaFileList = iOaFileService.getOaFile(DBvalue);
         for (Map<String, Object> map : oaFileList) {
             //System.out.println(map);
         }
@@ -98,15 +122,15 @@ public class OaFileContext implements Job {
                         log.info("-----------------oa_busdata添加数据成功-------------------");
                     }
                     //将数据库中修改为已添加ES库成功
-                    iOaBusdataService.updateIsES(oaFileList);
                 }
+                 iOaBusdataService.updateIsES(oaFileList,DBvalue);
             } catch (Exception e) {
                 e.printStackTrace();
             }
         }
         //=============================
 
-        List<OaFile> oaFileContextList = iOaFileService.getOaFileContext();
+        List<OaFile> oaFileContextList = iOaFileService.getOaFileContext(DBvalue);
         for (OaFile oaFile : oaFileContextList) {
             //System.out.println(oaFile);
         }

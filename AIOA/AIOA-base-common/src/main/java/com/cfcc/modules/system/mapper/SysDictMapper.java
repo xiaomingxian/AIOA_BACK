@@ -6,7 +6,6 @@ import com.cfcc.modules.system.entity.SysDict;
 import com.cfcc.modules.system.entity.SysDictItem;
 import com.cfcc.modules.system.model.DuplicateCheckVo;
 import com.cfcc.modules.system.model.TreeSelectModel;
-import io.swagger.models.auth.In;
 import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Select;
 
@@ -122,9 +121,11 @@ public interface SysDictMapper extends BaseMapper<SysDict> {
             " order by i.sort_order")
     List<Map<String, Object>> getDictForSelDao(@Param("dictKey") String dictKey);
 
-    String getDictIdByDictCode(@Param("dictCode") String dictId);
+    String getDictIdByDictCode(@Param("dictCode") String dictId, @Param("DBvalue") String DBvalue);
 
     Long getDictByAllAndPage(@Param("sysDict") SysDict sysDict);
 
     List<SysDict> getDictByAll(@Param("sysDict") SysDict sysDict,@Param("start") Integer start,@Param("pageSize") Integer pageSize);
+
+    List<SysDictItem> getEsIpAndHost(@Param("orgCode") String orgCode);
 }

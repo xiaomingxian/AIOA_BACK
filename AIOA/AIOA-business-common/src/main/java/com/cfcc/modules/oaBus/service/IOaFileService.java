@@ -2,6 +2,7 @@ package com.cfcc.modules.oaBus.service;
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.service.IService;
+import com.cfcc.modules.oaBus.entity.BusFunction;
 import com.cfcc.modules.oaBus.entity.OaFile;
 import com.cfcc.modules.oabutton.entity.OaButton;
 import org.springframework.web.multipart.MultipartFile;
@@ -44,17 +45,17 @@ public interface IOaFileService extends IService<OaFile> {
     //根据文件类型删除登录图片信息
     void deleteOneFileByType(Integer id);
 
-    List<OaFile> getOaFileContext();
+    List<OaFile> getOaFileContext(String DBvalue);
 
     IPage<OaFile> getPage(Integer pageNo, Integer pageSize, OaFile oaFile);
 
     OaFile queryById(Integer oaFileId);
 
-    List<Map<String,Object>> getOaFile();
+    List<Map<String,Object>> getOaFile(String DBvalue);
 
     boolean updateDocNameById(Map<String,Object> map);
 
-    public String getColumList(String sBusdataTable,Integer iId);
+    public String getColumList(String sBusdataTable,Integer iId, String DBvalue);
 
     List<OaFile> getOaFileListSer(String tableName, String busDataId);
 
@@ -86,4 +87,7 @@ public interface IOaFileService extends IService<OaFile> {
      */
     List<OaFile> batchUploads(MultipartFile files, String sTable, Integer iTableId, String sFileType, HttpServletRequest request, HttpServletResponse response);
 
+    List<Map<String, Object>> getOaBusdata(String sBusdataTable, List<Map<String, Object>> oaBusdata, BusFunction busFunction, String DBvalue);
+
+    List<Map<String, Object>> getOaFileByTableAndTableId(String id, String sBusdataTable,String DBvalue);
 }

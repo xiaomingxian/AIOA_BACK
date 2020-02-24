@@ -1,12 +1,11 @@
 package com.cfcc.common.system.vo;
 
-import java.io.Serializable;
-
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.experimental.Accessors;
+
+import java.io.Serializable;
 
 @Data
 @EqualsAndHashCode(callSuper = false)
@@ -17,12 +16,12 @@ public class DictModel implements Serializable{
 
 	public DictModel() {
 	}
-	
+
 	public DictModel(String value, String text) {
 		this.value = value;
 		this.text = text;
+
 	}
-	
 	/**
 	 * 字典value
 	 */

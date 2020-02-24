@@ -14,7 +14,16 @@
 
     <select id="getBusModelById" resultType="com.cfcc.modules.oaBus.entity.BusModel"
             parameterType="integer">
-        select * from oa_bus_model c where c.i_id = #{iId}
+        select * from
+        <choose>
+            <when test="DBvalue != null and DBvalue != ''">
+                #{DBvalue}.oa_bus_model c
+            </when>
+            <otherwise>
+                oa_bus_model c
+            </otherwise>
+        </choose>
+          where c.i_id = #{iId}
     </select>
 
     <select id="
