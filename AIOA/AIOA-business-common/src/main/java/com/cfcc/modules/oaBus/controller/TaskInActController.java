@@ -228,12 +228,12 @@ public class TaskInActController {
 
                         actMsg.put("deptHaveChoice", deptHaveChoice);
                         if (nextUsers.size() == 0) {
-                            if (!isChuanyue) {
-                                iterator.remove();
-                            }
+//                            if (!isChuanyue) {
+                            iterator.remove();
+//                            }
                             continue;
-                        }else {
-                            activity.setCanAdd( true);
+                        } else {
+                            activity.setCanAdd(true);
                         }
 
                     }
@@ -272,10 +272,11 @@ public class TaskInActController {
                     }
                     actMsg.put("userHaveChoice", userHaveChoice);
                     if (donotAddUser) {
-                        if (!isChuanyue) iterator.remove();
+//                        if (!isChuanyue)
+                        iterator.remove();
                         continue;
-                    }else {
-                        activity.setCanAdd( true);
+                    } else {
+                        activity.setCanAdd(true);
 
                     }
                 }
@@ -289,11 +290,8 @@ public class TaskInActController {
     }
 
 
-
-
-
     @PostMapping("doAddUsers")
-    @ApiOperation("任务办理并行/包容网关")
+    @ApiOperation("追加办理人")
     public Result doAddUser(@RequestBody Map<String, Object> map, HttpServletRequest request) {
         try {
             LoginInfo loginInfo = sysUserService.getLoginInfo(request);
@@ -303,7 +301,19 @@ public class TaskInActController {
 
                 TaskInfoVO taskInfoVO1 = mapToObject(taskInfoVO);
                 taskInfoVO1.setUserId(loginInfo.getId());
-                taskInfoVOS.add(taskInfoVO1);
+
+                Map<String, Object> vars = taskInfoVO1.getVars();
+                Collection<Object> values = vars.values();
+                boolean flag=false;
+                for (Object value : values) {
+                    if (value instanceof  String && value!=null && value.toString().contains("no-")){
+                        flag=true;
+                        break;
+                    }
+                }
+                if (!flag){
+                    taskInfoVOS.add(taskInfoVO1);
+                }
             }
 
 
