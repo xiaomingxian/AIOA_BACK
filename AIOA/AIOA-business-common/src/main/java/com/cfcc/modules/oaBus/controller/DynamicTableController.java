@@ -440,4 +440,17 @@ public class DynamicTableController {
         return result;
     }
 
+    @ApiOperation(value = "新增对外传输数据日志")
+    @PostMapping("insertOaOutLog")
+    public Result insertOaOutLog(@RequestBody Map<String,Object> map,HttpServletRequest request) {
+        Result result = new Result<>();
+        try {
+             dynamicTableService.insertOaOutLog(map,request);
+             result.setSuccess(true);
+        } catch (Exception e) {
+            e.printStackTrace();
+            result.error500("新增传输日志失败");
+        }
+        return result;
+    }
 }

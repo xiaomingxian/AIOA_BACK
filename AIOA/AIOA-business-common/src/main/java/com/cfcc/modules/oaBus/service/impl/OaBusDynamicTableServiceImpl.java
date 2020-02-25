@@ -86,6 +86,8 @@ public class OaBusDynamicTableServiceImpl implements OaBusDynamicTableService {
     @Lazy
     private OaBusDynamicTableService dynamicTableService;
 
+    @Autowired
+    private ISysUserService isysUserService;
 
     @Override
     public Map<String, Object> getBusProcSet(Integer iprocSetId) {
@@ -787,6 +789,14 @@ public class OaBusDynamicTableServiceImpl implements OaBusDynamicTableService {
         log.info("========省会向地市传阅服务结束============");
         resultStatus.setResult(200);
         return resultStatus;
+    }
+
+    @Override
+    public void insertOaOutLog(Map<String, Object> map,HttpServletRequest request) {
+        LoginInfo loginInfo = isysUserService.getLoginInfo(request);
+        map.put("s_send_by",loginInfo.getId()); //创建用户
+        map.put("d_create_time",new Date());  //发送时间
+        dynamicTableMapper.insertData(map);
     }
 
     @Override

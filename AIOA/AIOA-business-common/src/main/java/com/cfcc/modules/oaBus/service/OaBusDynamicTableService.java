@@ -65,4 +65,6 @@ public interface OaBusDynamicTableService {
     boolean deleteBusdata(Map<String, Object> map);
 
     Result provinceToCityInsideClient(HttpServletRequest request);
+
+    void insertOaOutLog(Map<String, Object> map,HttpServletRequest request);
 }
