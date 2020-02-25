@@ -11,13 +11,18 @@ import com.cfcc.modules.elasticsearch.entity.EsSearch;
 import com.cfcc.modules.elasticsearch.service.EsSearchService;
 import com.cfcc.modules.elasticsearch.service.SearchService;
 import com.cfcc.modules.oaBus.service.IOaFileService;
+import com.cfcc.modules.system.entity.SysUser;
+import com.cfcc.modules.system.service.ISysUserService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
+import javax.servlet.http.HttpServletRequest;
 import java.util.List;
 import java.util.Map;
 
@@ -43,10 +48,14 @@ public class OaElasticsearchController {
     private SearchService searchService;
 
     @Autowired
+    private ISysUserService sysUserService;
+
+    @Autowired
     private EsSearchService esSearchService;
 
     @Autowired
     private IOaFileService iOaFileService;
+
 
     @AutoLog(value = "全文检索-统计搜索数据")
     @ApiOperation(value="业务配置表【全文检索】-搜索数据添加", notes="业务配置表【全文检索】-搜索数据添加")
@@ -61,8 +70,26 @@ public class OaElasticsearchController {
     @AutoLog(value = "全文检索-搜索数据查询")
     @ApiOperation(value="业务配置表【全文检索】-搜索数据查询", notes="业务配置表【全文检索】-搜索数据查询")
     @RequestMapping(value = "/getsearch")
-    public Result<List<EsSearch>> getEsSearchList(@RequestBody String keyWord){
+    public Result<List<EsSearch>> getEsSearchList(@RequestBody String keyWord, HttpServletRequest request){
         Result<List<EsSearch>> result = new Result<List<EsSearch>>();
+        /*String Driver = "com.mysql.jdbc.Driver";
+        Connection conn = null;
+        try {
+            Class.forName(Driver);
+//            conn = DriverManager.getConnection()
+            DatabaseMetaData metaData = conn.getMetaData();
+
+            //获取数据库的url
+            String url = metaData.getURL();
+            //
+        } catch (ClassNotFoundException e) {
+            e.printStackTrace();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }*/
+
+
+
         Map map = (Map) JSONObject.parse(keyWord);
         String keyWord1 =  map.get("keyWord").toString().trim();
 
@@ -83,11 +110,18 @@ public class OaElasticsearchController {
     @AutoLog(value = "全文检索-分页列表查询")
     @ApiOperation(value="业务配置表[全文检索]-分页列表查询", notes="业务配置表[全文检索]-分页列表查询")
     @RequestMapping(value = "/list")
-    public Result<IPage<Map<String, Object>>> queryOaBusDataList(@RequestBody String keyWord
+    public Result<IPage<Map<String, Object>>> queryOaBusDataList(@RequestBody String keyWord,HttpServletRequest request
 //                                                    @RequestParam(name="pageNo", defaultValue="1") Integer pageNo,
 //                                                    @RequestParam(name="pageSize", defaultValue="10") Integer pageSize
     ) {
         Result<IPage<Map<String, Object>>> result = new Result<IPage<Map<String, Object>>>();
+        SysUser currentUser = sysUserService.getCurrentUser(request);
+        String username = currentUser.getUsername();
+        //获取用户所属支行id
+        String departId = sysUserService.getdeptIdByUser(username);
+
+
+
         IPage<Map<String, Object>> sourceList = null;
         Map map = (Map) JSONObject.parse(keyWord);
         String keyWord1 =  map.get("keyWord").toString().trim();

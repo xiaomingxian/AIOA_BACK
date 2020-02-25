@@ -184,5 +184,17 @@
     <select id="getUserIdByUserName" resultType="java.lang.String">
         SELECT id FROM sys_user WHERE username = #{username}
     </select>
+    <select id="getdeptIdByUser" resultType="java.util.Map">
+        SELECT
+            su.id AS userId,
+            sud.dep_id AS deptId,
+            sd.org_type AS orgType
+        FROM
+            sys_user su
+            LEFT JOIN sys_user_depart sud ON su.id = sud.user_id
+            LEFT JOIN sys_depart sd ON sud.dep_id = sd.id
+        WHERE
+            username = #{username}
+    </select>
 
 </mapper>

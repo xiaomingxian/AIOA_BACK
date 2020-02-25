@@ -76,7 +76,7 @@
           (SELECT i_bus_function_id FROM
             <choose>
                 <when test="DBvalue != null and DBvalue != ''">
-                    #{DBvalue}.oa_bus_function_unit
+                    ${DBvalue}.oa_bus_function_unit
                 </when>
                 <otherwise>
                     oa_bus_function_unit

@@ -66,7 +66,7 @@ public class SearchServiceImpl implements SearchService {
             ESUtils.buildSettings(request);
             ESUtils.buildMappings(request,indexType);
             CreateIndexResponse response = restHighLevelClient.indices().create(request,RequestOptions.DEFAULT);
-            System.out.println(response.isAcknowledged());
+//            System.out.println(response.isAcknowledged());
 
         }else{
             logger.info(indexName+"所有已经存在，不能再次创建！！");

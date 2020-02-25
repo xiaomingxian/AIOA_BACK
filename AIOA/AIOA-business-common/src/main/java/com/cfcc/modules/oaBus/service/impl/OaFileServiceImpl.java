@@ -14,6 +14,7 @@ import com.cfcc.modules.oaBus.entity.OaFile;
 import com.cfcc.modules.oaBus.mapper.*;
 import com.cfcc.modules.oaBus.service.IOaFileService;
 import com.cfcc.modules.oabutton.entity.OaButton;
+import com.cfcc.modules.system.mapper.SysDepartMapper;
 import com.cfcc.modules.system.mapper.SysDictItemMapper;
 import com.cfcc.modules.system.mapper.SysDictMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -56,6 +57,9 @@ public class OaFileServiceImpl extends ServiceImpl<OaFileMapper, OaFile> impleme
 
     @Autowired
     private SysDictMapper sysDictMapper;
+
+    @Autowired
+    private SysDepartMapper sysDepartMapper;
 
     @Autowired
     @Lazy
@@ -229,7 +233,7 @@ public class OaFileServiceImpl extends ServiceImpl<OaFileMapper, OaFile> impleme
                 map.put("sTitle", sTitle);
             }
         }
-        return null;
+        return oaFileList;
     }
 
     /**

@@ -15,7 +15,7 @@
         update
         <choose>
             <when test="DBvalue != null and DBvalue != ''">
-                #{DBvalue}.${tableName}
+                ${DBvalue}.${tableName}
             </when>
             <otherwise>
                 ${tableName}
@@ -43,7 +43,7 @@
         from
         <choose>
             <when test="DBvalue != null and DBvalue != ''">
-                #{DBvalue}.${busFunction.sBusdataTable}
+                ${DBvalue}.${busFunction.sBusdataTable}
             </when>
             <otherwise>
                 ${busFunction.sBusdataTable}
@@ -438,7 +438,7 @@
         select s_title from
         <choose>
             <when test="DBvalue != null and DBvalue != ''">
-                #{DBvalue}.${sBusdataTable}
+                ${DBvalue}.${sBusdataTable}
             </when>
             <otherwise>
                 ${sBusdataTable}

@@ -183,8 +183,8 @@ public class OaBusdataServiceImpl extends ServiceImpl<OaBusdataMapper, OaBusdata
             String tableName = map.get("table_name").toString();
 
             Integer count = oaBusdataMapper.updateIsESByid(tableName, id,DBvalue);
-            if (count != 1) {
-                //修改失败
+            while (count != 1){
+                count = oaBusdataMapper.updateIsESByid(tableName, id,DBvalue);
             }
         }
     }
