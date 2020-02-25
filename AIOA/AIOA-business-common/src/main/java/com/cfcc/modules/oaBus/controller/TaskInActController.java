@@ -228,11 +228,12 @@ public class TaskInActController {
 
                         actMsg.put("deptHaveChoice", deptHaveChoice);
                         if (nextUsers.size() == 0) {
-                            actMsg.put("canAdd", false);
                             if (!isChuanyue) {
                                 iterator.remove();
                             }
                             continue;
+                        }else {
+                            activity.setCanAdd( true);
                         }
 
                     }
@@ -271,9 +272,11 @@ public class TaskInActController {
                     }
                     actMsg.put("userHaveChoice", userHaveChoice);
                     if (donotAddUser) {
-                        actMsg.put("canAdd", false);
                         if (!isChuanyue) iterator.remove();
                         continue;
+                    }else {
+                        activity.setCanAdd( true);
+
                     }
                 }
             }

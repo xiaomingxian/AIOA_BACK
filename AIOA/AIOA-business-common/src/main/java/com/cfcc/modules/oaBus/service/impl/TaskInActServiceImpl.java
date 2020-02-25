@@ -19,6 +19,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.activiti.engine.RuntimeService;
 import org.activiti.engine.TaskService;
 import org.activiti.engine.impl.TaskServiceImpl;
+import org.activiti.engine.impl.cfg.IdGenerator;
 import org.activiti.engine.impl.interceptor.CommandExecutor;
 import org.activiti.engine.impl.persistence.entity.TaskEntity;
 import org.activiti.engine.runtime.Execution;
@@ -34,7 +35,7 @@ import java.text.SimpleDateFormat;
 import java.util.*;
 
 @Service
-@Transactional
+@Transactional(readOnly = false)
 @Slf4j
 public class TaskInActServiceImpl implements TaskInActService {
 
@@ -52,8 +53,6 @@ public class TaskInActServiceImpl implements TaskInActService {
     @Autowired
     private DepartWithTaskMapper departWithTaskMapper;
 
-    @Autowired
-    private RuntimeService runtimeService;
 
     @Autowired
     private TaskService taskService;
@@ -72,7 +71,7 @@ public class TaskInActServiceImpl implements TaskInActService {
 
             busData.put("d_date1", new Date());//new SimpleDateFormat("yyyy-MM-dd").format(new Date()));//
         }
-        busData.put("s_varchar10",taskInfoVO.getProcessId());
+        busData.put("s_varchar10", taskInfoVO.getProcessId());
 
         busAbout(taskInfoVO, nextTaskMsg);
     }
@@ -112,7 +111,7 @@ public class TaskInActServiceImpl implements TaskInActService {
 
             busData.put("d_date1", new Date());//new SimpleDateFormat("yyyy-MM-dd").format(new Date()));//
         }
-        busData.put("s_varchar10",taskInfoVOs.get(0).getProcessId());
+        busData.put("s_varchar10", taskInfoVOs.get(0).getProcessId());
         busAboutMore(taskInfoVOs, nextTaskMsg);
 
     }
@@ -153,6 +152,10 @@ public class TaskInActServiceImpl implements TaskInActService {
 
 
         String descript = null;
+        String randomParent = UUID.randomUUID().toString().replaceAll("-", "");
+        List<Task> tasks = new ArrayList<>();
+
+
         for (TaskInfoVO taskInfoVO : taskInfoVOS) {
 
             String taskId = taskInfoVO.getTaskId();
@@ -166,7 +169,6 @@ public class TaskInActServiceImpl implements TaskInActService {
             taskAfter.setParentTaskId(task.getParentTaskId());
 
             String processInstanceId = task.getProcessInstanceId();
-            String parentTaskId = task.getParentTaskId();
             if (descript == null) {
                 descript = task.getDescription();
             }
@@ -175,17 +177,16 @@ public class TaskInActServiceImpl implements TaskInActService {
             if (taskInfoVO.getIsDept() != null && !taskInfoVO.getIsDept()) {
                 List<String> assignee = (List<String>) taskInfoVO.getAssignee();
 
-                commandExecutor.execute(new AddUserCmd(executionId, assignee, null, descript, parentTaskId
-                        , runtimeService, taskService, false, taskAfter));
-                taskCommonService.updateHisAct(task);
+                commandExecutor.execute(new AddUserCmd(executionId, assignee, null, descript, randomParent
+                        , false, taskAfter, tasks));
+//                taskCommonService.updateHisAct(task);
 
             } else {
                 //部门任务
                 List<List<String>> assignee = (List<List<String>>) taskInfoVO.getAssignee();
-                String randomParent = UUID.randomUUID().toString().replaceAll("-", "");
 
                 commandExecutor.execute(new AddUserCmd(executionId, null, assignee, descript, randomParent
-                        , runtimeService, taskService, true, taskAfter));
+                        , true, taskAfter, tasks));
 
 
                 List<Task> addDeptTask = taskService.createTaskQuery().processInstanceId(processInstanceId).list();
@@ -209,10 +210,13 @@ public class TaskInActServiceImpl implements TaskInActService {
 
                 }
 
-                taskCommonService.updateHisActDept(taskAfter, randomParent);
-                taskCommonService.updateRuActDept(taskAfter, randomParent);
+
+            }
 
 
+            for (Task task1 : tasks) {
+                taskCommonService.updateHisActDept(task1, null);
+                taskCommonService.updateRuActDept(task1, null);
             }
             //********************* 写入参与人 *********************
             Map<String, Object> busData = taskInfoVO.getBusData();

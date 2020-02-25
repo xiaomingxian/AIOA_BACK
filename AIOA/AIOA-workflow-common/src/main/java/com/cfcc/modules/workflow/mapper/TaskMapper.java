@@ -218,11 +218,27 @@ public interface TaskMapper {
             " EXECUTION_ID_=#{executionId} where PARENT_TASK_ID_=#{parentTaskId}")
     void updateHisAct( Task task);
 
-    @Update("UPDATE act_hi_taskinst set PROC_DEF_ID_=#{t.processDefinitionId} ,PROC_INST_ID_=#{t.processInstanceId}," +
-            " EXECUTION_ID_=#{t.executionId},PARENT_TASK_ID_=#{t.parentTaskId} where PARENT_TASK_ID_=#{pid}")
+//    @Update("<foreach collection='list' item='t' index='index' open='' close=''  separator=';'> " +
+//            "            UPDATE act_hi_taskinst " +
+//            "            <set> " +
+//            "               PROC_DEF_ID_=#{t.processDefinitionId} ,PROC_INST_ID_=#{t.processInstanceId}," +
+//            " EXECUTION_ID_=#{t.executionId},PARENT_TASK_ID_=#{t.parentTaskId} " +
+//            "            </set>" +
+//            "            <where>" +
+//            "                 PARENT_TASK_ID_=#{pid}" +
+//            "            </where>" +
+//            "        </foreach>" )
     void updateHisActDept(@Param("t") Task task,@Param("pid") String randomParent);
 
-    @Update("UPDATE act_ru_task set PROC_DEF_ID_=#{t.processDefinitionId} ,PROC_INST_ID_=#{t.processInstanceId}," +
-            " EXECUTION_ID_=#{t.executionId},PARENT_TASK_ID_=#{t.parentTaskId} where PARENT_TASK_ID_=#{pid}")
+//    @Update("<foreach collection='list' item='t' index='index'  open='' close='' separator=';'>  " +
+//            "            UPDATE act_ru_task " +
+//            "            <set> " +
+//            "             PROC_DEF_ID_=#{t.processDefinitionId} ,PROC_INST_ID_=#{t.processInstanceId}," +
+//            " EXECUTION_ID_=#{t.executionId},PARENT_TASK_ID_=#{t.parentTaskId}" +
+//            "            </set>" +
+//            "            <where>" +
+//            "               PARENT_TASK_ID_=#{pid} " +
+//            "            </where> " +
+//            "        </foreach> " )
     void updateRuActDept(@Param("t") Task task,@Param("pid") String randomParent);
 }
