@@ -17,7 +17,7 @@
         select * from
         <choose>
             <when test="DBvalue != null and DBvalue != ''">
-                #{DBvalue}.oa_bus_model c
+                ${DBvalue}.oa_bus_model c
             </when>
             <otherwise>
                 oa_bus_model c

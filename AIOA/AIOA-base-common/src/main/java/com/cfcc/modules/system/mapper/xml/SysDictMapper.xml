@@ -85,7 +85,7 @@
 		SELECT id from
 		<choose>
 			<when test="DBvalue != null and DBvalue != ''">
-				#{DBvalue}.sys_dict
+				${DBvalue}.sys_dict
 			</when>
 			<otherwise>
 				sys_dict
@@ -101,12 +101,8 @@
 	</select>
 	<select id="getDictByAllAndPage" resultType="java.lang.Long">
 		SELECT count(id) from
-		<if test="DBvalue != null">
-			#{DBvalue}.sys_dict
-		</if>
-		<if test="DBvalue == null">
 			sys_dict
-		</if>
+
 		<where>
 			1 = 1
 			<if test="sysDict.dictName != null and sysDict.dictName != ''">

@@ -89,8 +89,8 @@ public class OaFile implements Job {
                 String sBusdataTable = null;
                 for (BusFunction busFunction : busFunctionList) {
                     sBusdataTable = busFunction.getSBusdataTable();
-                    String columnLists = oaFileService.getColumList("oa_busdata30", 64, DBvalue);
-//                    String columnLists = oaFileService.getColumList(sBusdataTable, busFunction.getIId());
+//                    String columnLists = oaFileService.getColumList("oa_busdata30", 64, DBvalue);
+                    String columnLists = oaFileService.getColumList(sBusdataTable, busFunction.getIId(),DBvalue);
                     if (columnLists.equals("")){
                         continue;
                     }

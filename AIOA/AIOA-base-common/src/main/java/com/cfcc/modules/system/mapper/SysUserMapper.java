@@ -261,4 +261,6 @@ public interface SysUserMapper extends BaseMapper<SysUser> {
             "        </foreach>" +
             "</script>")
     List<String> selectDeptsBysUsers(@Param("ids") List<String> deptUsers);
+
+    Map<String,Object> getdeptIdByUser(@Param("username") String username);
 }

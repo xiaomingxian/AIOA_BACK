@@ -168,4 +168,6 @@ public interface ISysUserService extends IService<SysUser> {
 	SysUser selectById(String sysUserId);
 
     List<String> selectDeptsBysUsers(List<String> deptUsers);
+
+    String getdeptIdByUser(String username);
 }

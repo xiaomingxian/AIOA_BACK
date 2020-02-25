@@ -6,7 +6,7 @@
         select item_text from
         <choose>
             <when test="DBvalue != null and DBvalue != ''">
-                #{DBvalue}.sys_dict_item
+                ${DBvalue}.sys_dict_item
             </when>
             <otherwise>
                 sys_dict_item
