@@ -290,14 +290,14 @@ public class TaskCommonFoldServiceImpl implements TaskCommonFoldService {
 
         List<HisTaskJsonAble> list = taskFoldMapper.queryTaskDoneFold(urgencyDegree,taskInfoVO, (pageNo - 1) * pageSize, pageSize);
         //数据后续组装*************
-        ArrayList<String> ids = new ArrayList<>();
-        for (HisTaskJsonAble hisTaskJsonAble : list) {
-            if (hisTaskJsonAble.getIsDone() == null) {
-                hisTaskJsonAble.setTaskDefinitionKey("end");
-                hisTaskJsonAble.setTaskDefinitionKeyName("已结束");
-            }
-            ids.add(hisTaskJsonAble.getProcessInstanceId());
-        }
+//        ArrayList<String> ids = new ArrayList<>();
+//        for (HisTaskJsonAble hisTaskJsonAble : list) {
+//            if (hisTaskJsonAble.getIsDone() == null) {
+//                hisTaskJsonAble.setTaskDefinitionKey("end");
+//                hisTaskJsonAble.setTaskDefinitionKeyName("已结束");
+//            }
+//            ids.add(hisTaskJsonAble.getProcessInstanceId());
+//        }
         //分页
 
 
