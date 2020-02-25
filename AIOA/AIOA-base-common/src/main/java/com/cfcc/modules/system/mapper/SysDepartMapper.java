@@ -6,6 +6,7 @@ import org.apache.ibatis.annotations.Select;
 import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * <p>
@@ -36,4 +37,6 @@ public interface SysDepartMapper extends BaseMapper<SysDepart> {
 	SysDepart queryUserDepartByOrgCodeDao(@Param("orgCode")String orgCode);
 
 	List<String> findSysDepartByParentIdAndOrgType0(@Param("DBvalue")String DBvalue);
+
+	Map<String, Object> getDepartIdById(@Param("parentId") String parentId);
 }

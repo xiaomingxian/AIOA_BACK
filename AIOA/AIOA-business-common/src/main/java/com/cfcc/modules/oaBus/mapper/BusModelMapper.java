@@ -16,7 +16,7 @@ import java.util.List;
 public interface BusModelMapper extends BaseMapper<BusModel> {
 
 
-    BusModel getBusModelById(Integer iId,String DBvalue);
+    BusModel getBusModelById(@Param("iId") Integer iId,@Param("DBvalue") String DBvalue);
 //  BusModel getBusModelById(Integer iId);
 
     int updateBusModelByIdDao(BusModel busModel);

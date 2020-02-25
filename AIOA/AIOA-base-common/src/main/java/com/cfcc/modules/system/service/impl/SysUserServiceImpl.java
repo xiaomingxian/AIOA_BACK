@@ -458,7 +458,10 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser> impl
         Map<String, Object> map = sysUserMapper.getdeptIdByUser(username);
         Map<String,Object> mapDepart = new HashMap<>();
         if (!(map.get("orgType")+"").equals("1")){
-//            mapDepart = sysDepartMapper.getDepartIdById();
+            mapDepart = sysDepartMapper.getDepartIdById(map.get("parentId")+"");
+            while (!(mapDepart.get("orgType")+"").equals("1")){
+                mapDepart = sysDepartMapper.getDepartIdById(map.get("parentId")+"");
+            }
         }else {
             return map.get("deptId")+"";
         }

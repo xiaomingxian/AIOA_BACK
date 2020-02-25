@@ -188,7 +188,8 @@
         SELECT
             su.id AS userId,
             sud.dep_id AS deptId,
-            sd.org_type AS orgType
+            sd.org_type AS orgType,
+            sd.parent_id AS parentId
         FROM
             sys_user su
             LEFT JOIN sys_user_depart sud ON su.id = sud.user_id
