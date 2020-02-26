@@ -279,7 +279,7 @@
 
 
         SELECT
-        GROUP_CONCAT(DISTINCT t.ID_) hiTaskId,
+        GROUP_CONCAT( t.ID_) hiTaskId,
         t.PROC_DEF_ID_ processDefinitionId,
         GROUP_CONCAT( t.task_def_key_) taskDefinitionKey,
         t.proc_inst_id_ processInstanceId,
@@ -537,7 +537,7 @@
 
         select
 
-        GROUP_CONCAT(DISTINCT l.id) id,
+        GROUP_CONCAT( l.id) id,
         GROUP_CONCAT(DISTINCT l.NAME) name,
         GROUP_CONCAT( l.NAME) allNames,
         l.executionId,
@@ -1356,7 +1356,7 @@
     <select id="deptTaskHaveDone" resultType="com.cfcc.modules.workflow.pojo.TaskInfoJsonAble">
 
         SELECT
-        GROUP_CONCAT(DISTINCT t.ID_) hiTaskId,
+        GROUP_CONCAT( t.ID_) hiTaskId,
         t.PROC_DEF_ID_ processDefinitionId,
         GROUP_CONCAT( t.task_def_key_) taskDefinitionKey,
         t.proc_inst_id_ processInstanceId,
@@ -1583,7 +1583,7 @@
 
         select
 
-        GROUP_CONCAT(DISTINCT l.id) id,
+        GROUP_CONCAT( l.id) id,
         GROUP_CONCAT(DISTINCT l.NAME) name,
         GROUP_CONCAT( l.NAME) allNames,
         l.executionId,
