@@ -24,4 +24,7 @@
 		</choose>
 		  WHERE org_type = '1' AND parent_id IN ('','1')
 	</select>
+    <select id="getDepartIdById" resultType="java.util.Map">
+		SELECT id AS deptId, parent_id AS parentId, org_type AS orgType FROM sys_depart WHERE id = #{parentId}
+	</select>
 </mapper>

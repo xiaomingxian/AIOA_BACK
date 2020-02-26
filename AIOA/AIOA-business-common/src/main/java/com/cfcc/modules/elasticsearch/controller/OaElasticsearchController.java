@@ -17,7 +17,6 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -32,17 +31,17 @@ import java.util.Map;
 @RequestMapping("/oaEs/oaelasticsearch")
 public class OaElasticsearchController {
 
-    @Value("${spring.data.elasticsearch.indexName1}")
-    private String INDEX_NAME1;  //elasticsearch1
+//    @Value("${spring.data.elasticsearch.indexName1}")
+//    private String INDEX_NAME1;  //elasticsearch1
 
-    @Value("${spring.data.elasticsearch.typeName1}")
-    private String INDEX_TYPE1;  //oa_busdata
+//    @Value("${spring.data.elasticsearch.typeName1}")
+//    private String INDEX_TYPE1;  //oa_busdata
 
-    @Value("${spring.data.elasticsearch.indexName2}")
-    private String INDEX_NAME2;  //elasticsearch2
+//    @Value("${spring.data.elasticsearch.indexName2}")
+//    private String INDEX_NAME2;  //elasticsearch2
 
-    @Value("${spring.data.elasticsearch.typeName2}")
-    private String INDEX_TYPE2;  //oa_file
+//    @Value("${spring.data.elasticsearch.typeName2}")
+//    private String INDEX_TYPE2;  //oa_file
 
     @Autowired
     private SearchService searchService;
@@ -115,24 +114,29 @@ public class OaElasticsearchController {
 //                                                    @RequestParam(name="pageSize", defaultValue="10") Integer pageSize
     ) {
         Result<IPage<Map<String, Object>>> result = new Result<IPage<Map<String, Object>>>();
+        IPage<Map<String, Object>> sourceList = null;
+        Map map = (Map) JSONObject.parse(keyWord);
+        String keyWord1 =  map.get("keyWord").toString().trim();
+        Integer pageNo = Integer.parseInt(map.get("pageNo").toString());
+
         SysUser currentUser = sysUserService.getCurrentUser(request);
         String username = currentUser.getUsername();
         //获取用户所属支行id
         String departId = sysUserService.getdeptIdByUser(username);
 
-
-
-        IPage<Map<String, Object>> sourceList = null;
-        Map map = (Map) JSONObject.parse(keyWord);
-        String keyWord1 =  map.get("keyWord").toString().trim();
-        Integer pageNo = Integer.parseInt(map.get("pageNo").toString());
         Integer pageSize = 10;
-        INDEX_NAME1 = "elasticsearch1";
+        String DBvalue =  "";
+        String indexName = "";
+        if (map.get("DBvalue") != null){
+            DBvalue = map.get("DBvalue")+"";
+        }
+        indexName = DBvalue+departId+1+"";
+        String indexType = "oaBusdate";
         try {
             if (!keyWord.equals("")){   //输入查询的数据为空时，则为全查
 //                sourceList = searchService.queryAll(INDEX_NAME1,pageNo,pageSize);
 //            }else {
-                sourceList = searchService.query(keyWord1,pageNo,pageSize,INDEX_NAME1,INDEX_TYPE1);
+                sourceList = searchService.query(keyWord1,pageNo,pageSize,indexName,indexType);
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -151,7 +155,7 @@ public class OaElasticsearchController {
     @AutoLog(value = "全文检索-分页列表查询")
     @ApiOperation(value="业务配置表[全文检索]-分页列表查询", notes="业务配置表[全文检索]-分页列表查询")
     @RequestMapping(value = "/oafile")
-    public Result<IPage<Map<String, Object>>> queryOaFileList(@RequestBody String keyWord
+    public Result<IPage<Map<String, Object>>> queryOaFileList(@RequestBody String keyWord,HttpServletRequest request
 //                                                           @RequestParam(name="pageNo", defaultValue="1") Integer pageNo,
 //                                                           @RequestParam(name="pageSize", defaultValue="10") Integer pageSize
     ) {
@@ -161,13 +165,24 @@ public class OaElasticsearchController {
         Integer pageNo = Integer.parseInt(map.get("pageNo").toString());
         Integer pageSize = 10;
         IPage<Map<String, Object>> sourceList = null;
+
+        SysUser currentUser = sysUserService.getCurrentUser(request);
+        String username = currentUser.getUsername();
+        //获取用户所属支行id
+        String departId = sysUserService.getdeptIdByUser(username);
+        String DBvalue =  "";
+        String indexName = "";
+        if (map.get("DBvalue") != null){
+            DBvalue = map.get("DBvalue")+"";
+        }
+        indexName = DBvalue+departId+2+"";
+        String indexType = "oaFile";
         System.out.println("---oafile------"+keyWord);
-        INDEX_NAME2 = "elasticsearch2";
         try {
             if (!keyWord.equals("")){  //输入查询的数据为空时，则为不查
 //                sourceList = searchService.queryAll(INDEX_NAME2,(pageNo-1)*pageSize,pageSize);
 //            }else {
-                sourceList = searchService.query(keyWord1,pageNo,pageSize,INDEX_NAME2,INDEX_TYPE2);
+                sourceList = searchService.query(keyWord1,pageNo,pageSize,indexName,indexType);
             }
         } catch (Exception e) {
             e.printStackTrace();
