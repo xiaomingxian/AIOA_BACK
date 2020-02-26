@@ -354,6 +354,7 @@ public class OaBusdataServiceImpl extends ServiceImpl<OaBusdataMapper, OaBusdata
     @Override
     public Map<String, Object> getBusDataAndDetailById(Map<String, Object> param, LoginInfo loginInfo) {
 
+        System.out.println("===================>>>>查详情开始<<<<==========================");
         long l1 = System.currentTimeMillis();
         // 业务数据表名
         String tableName = param.get("tableName") == null ? null : param.get("tableName") + "";
@@ -433,6 +434,13 @@ public class OaBusdataServiceImpl extends ServiceImpl<OaBusdataMapper, OaBusdata
 
 
         long l2 = System.currentTimeMillis();
+        String userId=user.getId();
+//        if (status!=null && "agent".equalsIgnoreCase(status)){//代理人情况
+//            SysUser agentUser = ((LoginInfo) user).getAgentUser();
+//            if (agentUser!=null){
+//                userId=agentUser.getId();
+//            }
+//        }
 
         System.out.println("================>>>业务详情查询时间::" + (l2 - l1));
         //********************************************************************* 流程信息查询
@@ -467,7 +475,7 @@ public class OaBusdataServiceImpl extends ServiceImpl<OaBusdataMapper, OaBusdata
 
                 } else {//从业务页面进来
                     List<Task> list = taskService.createTaskQuery().processDefinitionKey(proKey)
-                            .processInstanceBusinessKey(busdataId).taskCandidateOrAssigned(user.getId())
+                            .processInstanceBusinessKey(busdataId).taskCandidateOrAssigned(userId)
                             .list();
                     if (list.size() > 0) {
                         //最新待办
@@ -477,7 +485,7 @@ public class OaBusdataServiceImpl extends ServiceImpl<OaBusdataMapper, OaBusdata
                     } else {
                         //最新已办
                         List<HistoricTaskInstance> hiList = historyService.createHistoricTaskInstanceQuery().processDefinitionKey(proKey)
-                                .processInstanceBusinessKey(busdataId).taskAssignee(user.getId()).list();
+                                .processInstanceBusinessKey(busdataId).taskAssignee(userId).list();
                         if (hiList.size() > 0) {
                             historicTaskInstance = hiList.get(hiList.size() - 1);
                             if (historicTaskInstance != null && StringUtils.isBlank(status)) status = "done";

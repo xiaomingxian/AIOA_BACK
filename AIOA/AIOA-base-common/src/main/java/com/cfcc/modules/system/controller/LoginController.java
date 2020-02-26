@@ -11,10 +11,8 @@ import com.cfcc.common.system.vo.LoginUser;
 import com.cfcc.common.util.*;
 import com.cfcc.common.util.encryption.EncryptedString;
 import com.cfcc.modules.shiro.vo.DefContants;
-import com.cfcc.modules.system.entity.LoginInfo;
-import com.cfcc.modules.system.entity.SysDepart;
-import com.cfcc.modules.system.entity.SysRole;
-import com.cfcc.modules.system.entity.SysUser;
+import com.cfcc.modules.system.entity.*;
+import com.cfcc.modules.system.mapper.SysUserAgentMapper;
 import com.cfcc.modules.system.model.SysLoginModel;
 import com.cfcc.modules.system.service.IOaIpService;
 import com.cfcc.modules.system.service.ISysDepartService;
@@ -23,6 +21,7 @@ import com.cfcc.modules.system.service.ISysUserService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
+import net.bytebuddy.asm.Advice;
 import org.apache.shiro.SecurityUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -56,12 +55,15 @@ public class LoginController {
     @Autowired
     private IOaIpService iOaIpService;
 
+    @Autowired
+    private SysUserAgentMapper sysUserAgentMapper;
+
     @RequestMapping(value = "/message")
-    public Result<Object> message(@RequestBody Map<String,Object> map,HttpServletRequest request)  {
+    public Result<Object> message(@RequestBody Map<String, Object> map, HttpServletRequest request) {
         Result<Object> result = new Result<Object>();
         String ip = request.getHeader("X-Forwarded-For");
-        if (map.size() == 0){
-            if (map.get("username") == null){
+        if (map.size() == 0) {
+            if (map.get("username") == null) {
                 result.setSuccess(false);
                 return result;
             }
@@ -69,11 +71,11 @@ public class LoginController {
             return result;
         }
 //        String cIp = iSysLogService.get(map.get("username").toString());
-        String cIp = iOaIpService.getIpByUserName(map.get("username").toString(),ip);
+        String cIp = iOaIpService.getIpByUserName(map.get("username").toString(), ip);
 //        if (cIp == null){
 //            result.setResult("");
 //        }else {
-            result.setResult(cIp);
+        result.setResult(cIp);
 //        }
         result.setSuccess(true);
         return result;
@@ -82,7 +84,7 @@ public class LoginController {
 
     @RequestMapping(value = "/login", method = RequestMethod.POST)
     @ApiOperation("登录接口")
-    public Result<JSONObject> login(@RequestBody SysLoginModel sysLoginModel,HttpServletRequest request) throws Exception {
+    public Result<JSONObject> login(@RequestBody SysLoginModel sysLoginModel, HttpServletRequest request) throws Exception {
         Result<JSONObject> result = new Result<JSONObject>();
         String orgSchema = sysLoginModel.getOrgSchema();
         String username = sysLoginModel.getUsername();
@@ -90,10 +92,10 @@ public class LoginController {
         String ip = request.getHeader("X-Forwarded-For");
         request.setAttribute("orgSchema", orgSchema);
         SysUser sysUser = sysUserService.getUserByName(username);
-        if (sysUser != null){
-            if (sysUser.getAvatar() != null){
-                if (!sysUser.getAvatar().equals("")){
-                    if (!sysUser.getAvatar().equalsIgnoreCase(ip)){
+        if (sysUser != null) {
+            if (sysUser.getAvatar() != null) {
+                if (!sysUser.getAvatar().equals("")) {
+                    if (!sysUser.getAvatar().equalsIgnoreCase(ip)) {
                         result.setSuccess(false);
                         result.error500("请在指定IP地址上登录！");
                         return result;
@@ -398,6 +400,9 @@ public class LoginController {
         //角色
         List<SysRole> roles = sysUserService.getCurrentUserRoles(sysUser.getId());
         loginInfo.setRoles(roles);
+        //查询代理人信息
+        SysUser agentUser = sysUserAgentMapper.myAgentUserMsg(loginInfo.getUsername());
+        loginInfo.setAgentUser(agentUser);
         //存进redis
         redisUtil.set(CommonConstant.LOGIN_INFO + token, loginInfo);
 

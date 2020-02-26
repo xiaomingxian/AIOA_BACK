@@ -23,6 +23,8 @@ public class LoginInfo extends SysUser implements Serializable {
 
     private List<String> roleIds;
 
+    private SysUser agentUser;
+
 
     public List<String> getRoleIds() {
         ArrayList<String> rs = new ArrayList<>();
