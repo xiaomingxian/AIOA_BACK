@@ -350,6 +350,7 @@ public class OaBusdataController {
         for (int i = 0; i <= res; i++) {
             list.add((Integer.parseInt(runDate) + i) + "");
         }
+        list.sort(Comparator.reverseOrder());
         result.put("d_create_time", list);
         result.put("tableName", tableName);
         return result;
