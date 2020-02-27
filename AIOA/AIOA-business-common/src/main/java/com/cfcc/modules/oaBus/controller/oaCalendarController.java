@@ -249,8 +249,19 @@ public class oaCalendarController implements Job {
 	 @AutoLog(value = "日程管理表-分页列表查询")
 	 @ApiOperation(value="日程管理表-分页列表查询", notes="日程管理表-分页列表查询")
 	 @PostMapping(value = "/MostUserLink")
-	 public List<Map<String,Object>> MostUserLink(HttpServletRequest request) {
-		 List<Map<String,Object>> linklist = oaCalendarService.MostUserLink();
+	 public Map<String,Object> MostUserLink(HttpServletResponse response,String  Id) throws IOException {
+		 Map<String,Object> linklist = oaCalendarService.MostUserLink(response,Id);
+		 return linklist;
+	 }
+	 /***
+	  * 查出常用链接
+	  *
+	  */
+	 @AutoLog(value = "日程管理表-分页列表查询")
+	 @ApiOperation(value="日程管理表-分页列表查询", notes="日程管理表-分页列表查询")
+	 @PostMapping(value = "LinkList")
+	 public List<String> LinkList(HttpServletRequest request) {
+		 List<String> linklist = oaCalendarService.LinkList();
 		 return linklist;
 	 }
 
