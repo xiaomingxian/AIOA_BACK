@@ -87,7 +87,7 @@ public class FileNtkoController {
             String message = "kongjian";
             if (flag) {
                 Map<String,Object> busdataMap=new HashMap<>();
-                busdataMap.put("tableName",stable);
+                busdataMap.put("table",stable);
                 busdataMap.put("i_id",Integer.parseInt(tableid));
                 if ("1".equals(fileType)) {
                     busdataMap.put("i_is_draft",1);
@@ -98,8 +98,8 @@ public class FileNtkoController {
                 if ("3".equals(fileType)) {
                     busdataMap.put("i_is_approve",1);
                 }
-                oaBusdataService.updateAllOaData(busdataMap);
-//                dynamicTableMapper.updateData(busdataMap);
+                dynamicTableMapper.updateData(busdataMap);
+//                oaBusdataService.updateFileStatus(busdataMap);
             }
             //System.out.println("---------------->>>>>>>>>>>>>>>创建保存成功");
             //----开启webSocket，起草底稿后向前端发一个请求，表明已经保存成功。

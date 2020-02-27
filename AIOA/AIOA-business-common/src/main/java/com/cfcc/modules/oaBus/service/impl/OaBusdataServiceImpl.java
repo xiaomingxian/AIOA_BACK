@@ -414,9 +414,12 @@ public class OaBusdataServiceImpl extends ServiceImpl<OaBusdataMapper, OaBusdata
         Map<String, String> map = new HashMap<>();
         Map<String, Object> optionMap = new HashMap<>();
         //存放校验规则,字典数据，detail数据
+        long aaa = System.currentTimeMillis();
         optionMap = selOptionByDtailList(optionMap, map, busPageDetailList, loginInfo.getDepart().getId());
         result.put("optionMap", optionMap);
         log.info(map.toString());
+        long bbb = System.currentTimeMillis();
+        System.out.println("查询配置用时：" + (bbb -aaa));
         result.put("detailList", map);
         // 业务function信息
         BusFunction busFunction = busFunctionService.getOneByFunId(functionId);
@@ -634,6 +637,7 @@ public class OaBusdataServiceImpl extends ServiceImpl<OaBusdataMapper, OaBusdata
                                                      List<BusPageDetail> busPageDetailList, String departId) {
         List<BusPageDetail> checkList = new ArrayList<>();
         //查询出对应的下拉列表数据
+        long aaa = System.currentTimeMillis();
         busPageDetailList.forEach(entry -> {
             map.put(entry.getSTableColumn(), entry.getSColumnName());
             if (entry.getICheckIsNull() != null && entry.getICheckIsNull() == 1) {
@@ -653,8 +657,10 @@ public class OaBusdataServiceImpl extends ServiceImpl<OaBusdataMapper, OaBusdata
                 }
             }
         });
-
-        //查询秘密等级
+        long bbb = System.currentTimeMillis();
+        System.out.println("AAAA查询配置用时：" + (bbb -aaa));
+        aaa = System.currentTimeMillis();
+       /* //查询秘密等级
         List<DictModel> secretDegreeList = sysDictService.getDictByCode("secretDegree");
         List<DictModel> regulars = sysDictService.getDescribeDictCode("regular_expressions");
         //查询对应的信息公开，字典数据
@@ -668,9 +674,10 @@ public class OaBusdataServiceImpl extends ServiceImpl<OaBusdataMapper, OaBusdata
         optionMap.put("xxgk", xxgk);
         optionMap.put("urgencyList", urgencyList);
         optionMap.put("bgkly", bgkly);
-        optionMap.put("regulars", regulars);
+        optionMap.put("regulars", regulars);*/
         optionMap.put("checkList", checkList);
-
+        bbb = System.currentTimeMillis();
+        System.out.println("AAAA查询其他配置用时：" + (bbb -aaa));
         return optionMap;
     }
 

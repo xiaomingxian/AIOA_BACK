@@ -9,6 +9,7 @@ import com.cfcc.common.aspect.annotation.AutoLog;
 import com.cfcc.common.exception.AIOAException;
 import com.cfcc.common.system.query.QueryGenerator;
 import com.cfcc.common.system.util.JwtUtil;
+import com.cfcc.common.system.vo.DictModel;
 import com.cfcc.common.util.oConvertUtils;
 import com.cfcc.modules.oaBus.entity.BusFunction;
 import com.cfcc.modules.oaBus.entity.OaBusdata;
@@ -18,6 +19,7 @@ import com.cfcc.modules.shiro.vo.DefContants;
 import com.cfcc.modules.system.entity.LoginInfo;
 import com.cfcc.modules.system.entity.SysDepart;
 import com.cfcc.modules.system.entity.SysUser;
+import com.cfcc.modules.system.service.ISysDictService;
 import com.cfcc.modules.system.service.ISysUserService;
 import com.cfcc.modules.workflow.vo.OaBusdataPermitRead;
 import io.swagger.annotations.Api;
@@ -61,6 +63,8 @@ public class OaBusdataController {
     private IBusModelService ibusModelService;
     @Autowired
     private ISysUserService isysUserService;
+    @Autowired
+    private ISysDictService sysDictService;
     @Autowired
     private IOaBusdataPermitService oaBusdataPermitService;
     @Autowired
@@ -356,6 +360,59 @@ public class OaBusdataController {
         return result;
     }
 
+
+
+    /**
+     * 查询业务详情配置
+     *
+     * @param
+     * @return
+     */
+    @AutoLog(value = "查询详情-查询对应的数据字典数据")
+    @ApiOperation(value = "查询详情-查询对应的数据字典数据", notes = "查询详情-查询对应的数据字典数据")
+    @PostMapping(value = "/querySysDictData")
+    @ResponseBody
+    public Result querySysDictData(@RequestBody String params, HttpServletRequest request) {
+        try {
+            // 查询当前用户，作为assignee
+            LoginInfo loginInfo = isysUserService.getLoginInfo(request);
+            String departId = loginInfo.getDepart().getId() ;
+            Map<String, Object> optionMap = new HashMap<>() ;
+            Map map = (Map) JSONObject.parse(params);
+            //String modelId =  map.get("modelId") + "";
+            int param = Integer.parseInt(map.get("param")+"") ;
+            if(param == 1 ){
+                //查询秘密等级
+                List<DictModel> secretDegreeList = sysDictService.getDictByCode("secretDegree");
+                //查询缓急
+                List<Map<String, Object>> urgencyList = sysDictService.getDictByKeySer("urgencyDegree", departId);
+                optionMap.put("secretDegree", secretDegreeList);
+                optionMap.put("urgencyList", urgencyList);
+            }else if(param == 2 ){
+
+                List<DictModel> regulars = sysDictService.getDescribeDictCode("regular_expressions");
+                optionMap.put("regulars", regulars);
+            }else if(param == 3 ){
+                //查询对应的信息公开，字典数据
+                List<Map<String, Object>> xxgk = sysDictService.getDictByKeySer("xxgk", departId);
+                //查询对应的不公开理由，字典数据
+                List<Map<String, Object>> bgkly = sysDictService.getDictByKeySer("bgkly", departId);
+                //将数据校验规则取出
+                optionMap.put("xxgk", xxgk);
+                optionMap.put("bgkly", bgkly);
+            }
+            return Result.ok(optionMap);
+        } catch (AIOAException e) {
+            return Result.error(e.getMessage());
+        } catch (Exception e) {
+            log.error(e.toString());
+            e.printStackTrace();
+            return Result.error("查询业务详情失败");
+        }
+
+    }
+
+
     /**
      * 查询出具体的业务数据
      *
@@ -390,15 +447,15 @@ public class OaBusdataController {
 
     /**
      * 查询一个当前用户是否可以查看这条数据
-     * @param tableName
-     * @param id
      * @param request
-     * @return
+     * @returnString tableName, String id
      */
     @ApiOperation(value = "查询一个当前用户是否可以查看这条数据", notes = "查询一个当前用户是否可以查看这条数据")
     @PostMapping("/checkBusData")
-    public boolean checkBusData(String tableName, String id, HttpServletRequest request) {
+    public boolean checkBusData(@RequestBody Map<String,Object> map, HttpServletRequest request) {
         LoginInfo loginInfo = isysUserService.getLoginInfo(request);
+        String tableName = map.get("tableName") + "";
+        String id = map.get("id") + "";
         String userName = loginInfo.getUsername();
         boolean res =false ;
         res = oaBusdataService.checkBusDataSer(tableName,id,userName) ;

@@ -340,7 +340,7 @@
        select dep_id from sys_user_depart where user_id=#{userNameId}
     </select>
     <select id="findMostUser" resultType="java.util.Map">
-        select * from oa_busdata30 where i_bus_function_id = 107  and  s_title  is  not null  and s_title &lt;&gt; ""
+        select * from oa_busdata30 where i_bus_function_id = 107  and  s_title  is  not null  and s_title &lt;&gt; "" and i_id = #{id}
     </select>
     <select id="busFunctionList" resultType="com.cfcc.modules.oaBus.entity.BusFunction">
         SELECT i_id,i_bus_model_id,s_name  FROM oa_bus_function
@@ -354,5 +354,8 @@
     <select id="LinkList" resultType="java.lang.String">
           select i_id from oa_busdata30 where i_bus_function_id = 107 and i_is_display = 0
      </select>
+    <select id="findMostUser1" resultType="java.util.Map">
+         select * from oa_busdata30 where i_bus_function_id = 107  and  s_title  is  not null  and s_title &lt;&gt; ""
+    </select>
 
 </mapper>
