@@ -208,9 +208,14 @@ public class ButtonPermissionServiceImpl implements ButtonPermissionService {
         if (StringUtils.isBlank(sExcfield)) {
             return true;
         }
-        String[] strs = sExcfield.split("=");
-        if (strs.length > 1 && strs[1].equals(String.valueOf(oaBusdata.get(strs[0])))) {
-            return true;
+        String[] excfields = sExcfield.split(";");
+        if(excfields.length > 0){
+            for (int i = 0; i < excfields.length; i++){
+                String[] strs = excfields[i].split("=");
+                if (strs.length > 1 && strs[1].equals(String.valueOf(oaBusdata.get(strs[0])))) {
+                    return true;
+                }
+            }
         }
         return false;
     }
