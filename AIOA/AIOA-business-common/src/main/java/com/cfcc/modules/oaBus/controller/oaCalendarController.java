@@ -208,12 +208,14 @@ public class oaCalendarController implements Job {
 				 if(managedeptsId!=null&&managedeptsId.equals(manageId)){
 					 oaCalendarList.add(share);
 				 }
-			 }else{ //公开类型是部门
+			 }else if(iOpenType ==3){ //公开类型是部门
 				 for(int i=0;i<departIdList.size();i++)
 					 if (departId!=null&&departIdList.get(i).equals(departId)) {
 						 oaCalendarList.add(share);
 					 }
 
+			 }else{
+			 	oaCalendarList.add(share);
 			 }
 		 }}
 		 pageList.setRecords(oaCalendarList) ;
@@ -291,9 +293,9 @@ public class oaCalendarController implements Job {
 			if(oaCalendar.getIIsLeader() == null){
 				oaCalendar.setIIsLeader(0);
 			}if(oaCalendar.getIOpenType() == null){
-			    oaCalendar.setIOpenType(1);
+			    oaCalendar.setIOpenType(0);
             }if(oaCalendar.getIRemindType() == null){
-                oaCalendar.setIOpenType(1);
+                oaCalendar.setIOpenType(0);
             }
 			oaCalendar.setIFunDataId(1);
 			oaCalendarService.saveCalendar(oaCalendar);

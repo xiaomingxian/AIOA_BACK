@@ -52,20 +52,21 @@ public class oaTeamworkInstServiceImpl extends ServiceImpl<oaTeamworkInstMapper,
     public IPage<oaTeamworkInst> findPage(Integer pageNo, Integer pageSize, oaTeamworkInst oaTeamworkInst) {
         int total = oaTeamworkInstMapper.count(oaTeamworkInst);
         String teamworkName = oaTeamworkInst.getTeamworkName();
-        Integer teamworkIId= null;
+       /*// Integer teamworkIId= null;
         if(teamworkName != null){
             oaTeamwork oaTeamwork=oaTeamworkMapper.selectByName(teamworkName);
             if(oaTeamwork != null){
                teamworkIId = oaTeamwork.getIId();
             }
-        }
-        oaTeamworkInst.setITeamworkId(teamworkIId);
+        }*/
+        //oaTeamworkInst.setITeamworkId(oaTeamworkInst.);
         List<oaTeamworkInst> oaTeamworkInstList =  oaTeamworkInstMapper.findPage((pageNo-1)*pageSize,pageSize,oaTeamworkInst);
         for(int i=0;i<oaTeamworkInstList.size();i++){
             oaTeamwork oaTeamwork = oaTeamworkMapper.findById(oaTeamworkInstList.get(i).getITeamworkId());
             Integer sumorder = oaTeamworkInstMapper.SumOrder((oaTeamworkInstList.get(i).getITeamworkId()));
             Integer lastOrder = oaTeamworkInstMapper.LastOrder(oaTeamworkInstList.get(i).getITeamworkId());
             String modelName  = oaTeamworkMapper.getfirstModel(oaTeamworkInstList.get(i).getITeamworkId());
+
             oaTeamworkInstList.get(i).setBusModelName(modelName);
             oaTeamworkInstList.get(i).setOrders(sumorder.toString());//总步骤
             oaTeamworkInstList.get(i).setLastOrder(lastOrder.toString());//当前步骤
