@@ -29,6 +29,7 @@ import org.activiti.engine.impl.persistence.entity.ProcessDefinitionEntity;
 import org.activiti.engine.impl.pvm.process.ActivityImpl;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
@@ -369,6 +370,7 @@ public class TaskInActController {
         List<Map<String, Object>> list = new ArrayList();
         Map<String, String> conditionContext = new HashMap<>();
 
+
         //遍历节点 查询相关业务信息(避免循环中查询(但是此数据较少))
         for (Activity i : acts) {
             if (i.getConditionContext() != null) {
@@ -660,6 +662,10 @@ public class TaskInActController {
     }
 
 
+    @Value("${dontChoiceDepts}")
+    private String dontChoiceDepts;
+
+
     private void nexUsersQuery(String drafterId, String id, OaProcActinst oaProcActinst,
                                List<Map<String, Object>> nextUsers, LoginInfo user, boolean excludeMySelf) {
         String roleScope = oaProcActinst.getRoleScope();
@@ -667,10 +673,26 @@ public class TaskInActController {
         String candidates = oaProcActinst.getCandidates();
         //排除掉自己？？？？
         if ("dept".equals(userOrRole)) {
+            //排除掉行领导
+
             //case RoleScope.ALLDEPT:
             //返回所有部门信息(不跨部门)
             String parentId = user.getDepart().getParentId();
-            nextUsers.addAll(sysUserService.selectAllDept(parentId));
+            List<Map<String, Object>> depts = sysUserService.selectAllDept(parentId);
+
+            Iterator<Map<String, Object>> iterator = depts.iterator();
+            while (iterator.hasNext()){
+                Map<String, Object> next = iterator.next();
+                Object departName = next.get("departName");
+                if (departName!=null){
+                    String s = departName.toString();
+                    if (dontChoiceDepts.contains(s)){
+                        iterator.remove();
+                    }
+                }
+            }
+
+            nextUsers.addAll(depts);
             //break;
         } else {
             List<Map<String, Object>> draftMsg = null;
