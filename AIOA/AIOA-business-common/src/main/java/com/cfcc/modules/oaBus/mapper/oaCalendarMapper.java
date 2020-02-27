@@ -61,9 +61,11 @@ public interface oaCalendarMapper extends BaseMapper<oaCalendar> {
 
     List<BusFunction> busFunctionList();
 
-    List<Map<String, Object>> findMostUser();
+    Map<String, Object> findMostUser(String id);
 
     String selectUrl(Integer  id);
 
     String selectPath(int id);
+
+    List<String> LinkList();
 }
