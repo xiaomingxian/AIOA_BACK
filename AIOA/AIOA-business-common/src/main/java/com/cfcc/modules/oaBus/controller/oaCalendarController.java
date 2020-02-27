@@ -214,8 +214,6 @@ public class oaCalendarController implements Job {
 						 oaCalendarList.add(share);
 					 }
 
-			 }else{
-			 	oaCalendarList.add(share);
 			 }
 		 }}
 		 pageList.setRecords(oaCalendarList) ;
@@ -248,9 +246,9 @@ public class oaCalendarController implements Job {
 	  */
 	 @AutoLog(value = "日程管理表-分页列表查询")
 	 @ApiOperation(value="日程管理表-分页列表查询", notes="日程管理表-分页列表查询")
-	 @PostMapping(value = "/MostUserLink")
-	 public Map<String,Object> MostUserLink(HttpServletResponse response,String  Id) throws IOException {
-		 Map<String,Object> linklist = oaCalendarService.MostUserLink(response,Id);
+	 @GetMapping(value = "/MostUserLink")
+	 public Map<String,Object> MostUserLink(HttpServletResponse response,@RequestParam(name="id",required=false)String  id) throws IOException {
+		 Map<String,Object> linklist = oaCalendarService.MostUserLink(response,id);
 		 return linklist;
 	 }
 	 /***
