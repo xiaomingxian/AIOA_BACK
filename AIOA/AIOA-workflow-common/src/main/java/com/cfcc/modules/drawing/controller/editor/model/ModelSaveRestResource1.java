@@ -15,28 +15,31 @@ package com.cfcc.modules.drawing.controller.editor.model;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.activiti.bpmn.converter.BpmnXMLConverter;
-import org.activiti.bpmn.model.BpmnModel;
+import org.activiti.bpmn.model.*;
 import org.activiti.bpmn.model.Process;
 import org.activiti.editor.constants.ModelDataJsonConstants;
 import org.activiti.editor.language.json.converter.BpmnJsonConverter;
 import org.activiti.engine.ActivitiException;
 import org.activiti.engine.RepositoryService;
+import org.activiti.engine.impl.bpmn.behavior.ExclusiveGatewayActivityBehavior;
 import org.activiti.engine.repository.Deployment;
 import org.activiti.engine.repository.Model;
 import org.apache.batik.transcoder.TranscoderInput;
 import org.apache.batik.transcoder.TranscoderOutput;
 import org.apache.batik.transcoder.image.PNGTranscoder;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.tomcat.jni.Proc;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.InputStream;
+import java.io.*;
 import java.nio.charset.Charset;
+import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * @author Tijs Rademakers
@@ -93,12 +96,35 @@ public class ModelSaveRestResource1 implements ModelDataJsonConstants {
             BpmnModel model2 = new BpmnJsonConverter().convertToBpmnModel(modelNode);
             List<Process> processes = model2.getProcesses();
             Process process = processes.get(0);
+            Collection<FlowElement> flowElements = process.getFlowElements();
+           //解决排他网关没有默认出口现象
+            Map<String, ExclusiveGateway> exclusiveGatewayMap = new HashMap<>();
+            Map<String, SequenceFlow> sequenceFlowHashMap = new HashMap<>();
+            for (FlowElement flowElement : flowElements) {
+                if (flowElement instanceof ExclusiveGateway){
+                    ExclusiveGateway exclusiveGateway = (ExclusiveGateway) flowElement;
+                    exclusiveGatewayMap.put(exclusiveGateway.getId(),exclusiveGateway);
+
+                }
+                if (flowElement instanceof  SequenceFlow){
+                    SequenceFlow sequenceFlow= (SequenceFlow) flowElement;
+                    String sourceRef = sequenceFlow.getSourceRef();
+                    sequenceFlowHashMap.put(sourceRef,sequenceFlow);
+                }
+            }
+            for (String key : exclusiveGatewayMap.keySet()) {
+                ExclusiveGateway exclusiveGateway = exclusiveGatewayMap.get(key);
+                SequenceFlow sequenceFlow = sequenceFlowHashMap.get(key);
+                exclusiveGateway.setDefaultFlow(sequenceFlow.getId());
+            }
+
             if (StringUtils.isBlank(process.getName())) process.setName(model.getName());
             if (StringUtils.isBlank(process.getId())) process.setName(model.getKey());
             if (process.getId()!=null && process.getId().equals("process")) process.setId(model.getKey());
 
 
             bpmnBytes = new BpmnXMLConverter().convertToXML(model2);
+
 
             String processName = modelData.getName() + ".bpmn";
 
