@@ -100,22 +100,13 @@ public class ModelSaveRestResource1 implements ModelDataJsonConstants {
            //解决排他网关没有默认出口现象
             Map<String, ExclusiveGateway> exclusiveGatewayMap = new HashMap<>();
             Map<String, SequenceFlow> sequenceFlowHashMap = new HashMap<>();
-            for (FlowElement flowElement : flowElements) {
-                if (flowElement instanceof ExclusiveGateway){
-                    ExclusiveGateway exclusiveGateway = (ExclusiveGateway) flowElement;
-                    exclusiveGatewayMap.put(exclusiveGateway.getId(),exclusiveGateway);
-
-                }
-                if (flowElement instanceof  SequenceFlow){
-                    SequenceFlow sequenceFlow= (SequenceFlow) flowElement;
-                    String sourceRef = sequenceFlow.getSourceRef();
-                    sequenceFlowHashMap.put(sourceRef,sequenceFlow);
-                }
-            }
+            noDefaultLineCheck(flowElements, exclusiveGatewayMap, sequenceFlowHashMap);
             for (String key : exclusiveGatewayMap.keySet()) {
                 ExclusiveGateway exclusiveGateway = exclusiveGatewayMap.get(key);
                 SequenceFlow sequenceFlow = sequenceFlowHashMap.get(key);
-                exclusiveGateway.setDefaultFlow(sequenceFlow.getId());
+                if (sequenceFlow!=null && exclusiveGateway!=null){
+                    exclusiveGateway.setDefaultFlow(sequenceFlow.getId());
+                }
             }
 
             if (StringUtils.isBlank(process.getName())) process.setName(model.getName());
@@ -143,5 +134,31 @@ public class ModelSaveRestResource1 implements ModelDataJsonConstants {
             throw new ActivitiException("Error saving model", e);
         }
 
+    }
+
+    //递归查找没有默认网关的情况
+    private void noDefaultLineCheck(Collection<FlowElement> flowElements, Map<String, ExclusiveGateway> exclusiveGatewayMap, Map<String, SequenceFlow> sequenceFlowHashMap) {
+        for (FlowElement flowElement : flowElements) {
+
+            if (flowElement instanceof  SubProcess){
+                SubProcess subProcess = (SubProcess) flowElement;
+                Collection<FlowElement> flowElements1 = subProcess.getFlowElements();
+                noDefaultLineCheck(flowElements1,exclusiveGatewayMap,sequenceFlowHashMap);
+            }
+
+            if (flowElement instanceof ExclusiveGateway){
+                ExclusiveGateway exclusiveGateway = (ExclusiveGateway) flowElement;
+                exclusiveGatewayMap.put(exclusiveGateway.getId(),exclusiveGateway);
+
+            }
+            if (flowElement instanceof  SequenceFlow){
+                SequenceFlow sequenceFlow= (SequenceFlow) flowElement;
+                String conditionExpression = sequenceFlow.getConditionExpression();
+                if (StringUtils.isBlank(conditionExpression)){//排他网关的默认出口连线不能有条件
+                    String sourceRef = sequenceFlow.getSourceRef();
+                    sequenceFlowHashMap.put(sourceRef,sequenceFlow);
+                }
+            }
+        }
     }
 }
