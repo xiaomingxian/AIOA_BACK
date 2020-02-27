@@ -8,6 +8,7 @@ import com.cfcc.common.api.vo.Result;
 import com.cfcc.common.constant.workflow.TaskActType;
 import com.cfcc.common.exception.AIOAException;
 import com.cfcc.common.system.service.CommonDynamicTableService;
+import com.cfcc.common.util.StringUtil;
 import com.cfcc.common.util.workflow.VarsWithBus;
 import com.cfcc.modules.system.entity.LoginInfo;
 import com.cfcc.modules.system.entity.SysDepart;
@@ -344,12 +345,15 @@ public class TaskCommonServiceImpl implements TaskCommonService {
                 if (idens.size() > 0 && idens.get(taskId) != null) {
                     List<String> ids = Arrays.asList(idens.get(taskId).get("userIds").split(","));
 
+
                     String taskDefName = next.get("taskDefName") + "";
                     iterator.remove();
 
                     for (String id : ids) {
-                        if ("".equals(id)) continue;
+                        if (StringUtils.isBlank(id)) continue;
                         SysUser sysUser = users.get(id);
+                        if(sysUser==null)continue;
+
                         HashMap<String, Object> map = new HashMap<>();
                         map.put("userName", sysUser.getUsername());
                         String deptName = sysUser.getDeptName();
@@ -471,6 +475,7 @@ public class TaskCommonServiceImpl implements TaskCommonService {
 
         }
         if (identitylinks.size() > 0) idens = taskMapper.identitylinksUsers(identitylinks);
+
         //查询部门的相关(主办/辐办/传阅)
         Map<String, Map<String, Object>> deptMsg = null;
         if (deptTaskIds.size() > 0) {
