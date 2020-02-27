@@ -393,12 +393,14 @@ public class OaBusdataController {
      * @param tableName
      * @param id
      * @param request
-     * @return
+     * @returnString tableName, String id
      */
     @ApiOperation(value = "查询一个当前用户是否可以查看这条数据", notes = "查询一个当前用户是否可以查看这条数据")
     @PostMapping("/checkBusData")
-    public boolean checkBusData(String tableName, String id, HttpServletRequest request) {
+    public boolean checkBusData(@RequestBody Map<String,Object> map, HttpServletRequest request) {
         LoginInfo loginInfo = isysUserService.getLoginInfo(request);
+        String tableName = map.get("tableName") + "";
+        String id = map.get("id") + "";
         String userName = loginInfo.getUsername();
         boolean res =false ;
         res = oaBusdataService.checkBusDataSer(tableName,id,userName) ;

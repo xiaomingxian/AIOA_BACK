@@ -647,7 +647,7 @@ public class OaFileServiceImpl extends ServiceImpl<OaFileMapper, OaFile> impleme
                         }
                     }
                     if(key.equals("s_title")){
-                        oaBusdatum.put("【"+busFunction.getSName()+"】" + key,value);
+                        oaBusdatum.put( key,"【"+busFunction.getSName()+"】" +value);
                     }
                 }
                 oaBusdatum.put("table_name", sBusdataTable);
