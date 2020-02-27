@@ -20,6 +20,11 @@ import org.springframework.stereotype.Service;
 
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 
+import javax.servlet.http.HttpServletResponse;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.util.*;
 
 /**
@@ -172,17 +177,25 @@ public class oaCalendarServiceImpl extends ServiceImpl<oaCalendarMapper, oaCalen
     }
 
     @Override
-    public List<Map<String, Object>> MostUserLink() {
+    public List<Map<String, Object>> MostUserLink(HttpServletResponse response) throws IOException {
         List<Map<String, Object>> list = oaCalendarMapper.findMostUser();
+
          for (int i = 0; i <list.size() ; i++) {
              Map<String, Object> stringObjectMap = list.get(i);
              String i_id = stringObjectMap.get("i_id").toString();
              String url = oaCalendarMapper.selectUrl(Integer.parseInt(i_id));
              String path = oaCalendarMapper.selectPath(Integer.parseInt(i_id));
+
+             File file = new File(path);
+             FileInputStream stream = new FileInputStream(file);
+             byte[] b = new byte[1024];
+             int len = -1;
+             while ((len = stream.read(b, 0, 1024)) != -1) {
+                 response.getOutputStream().write(b, 0, len);
+             }
             /* Map<String, Object>  map = new HashMap<>();
              map.put("url",url);*/
              list.get(i).put("url",url) ;
-             list.get(i).put("path",path) ;
         }
         return list;
     }
