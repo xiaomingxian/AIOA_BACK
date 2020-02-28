@@ -69,6 +69,9 @@ public class OaFile implements Job {
     @Autowired
     private IOaBusdataService iOaBusdataService;
 
+    public static String ANNOTATION = "/*!mycat:schema=";
+    public static String ANNOTATION_END = "*/ ";
+
     @Override
     public void execute(JobExecutionContext context) throws JobExecutionException {
         /*
@@ -100,15 +103,6 @@ public class OaFile implements Job {
                 if (columnLists.equals("")){
                     continue;
                 }
-
-//            String sBusdataTable = "oa_busdata30";
-//                String columnLists = oaFileService.getColumList("oa_busdata30", 64, DBvalue);
-//                BusFunction busFunction = new BusFunction();
-//                busFunction.setIId(64);
-//                busFunction.setIBusModelId(49);
-//                busFunction.setSBusdataTable("oa_busdata30");
-//                busFunction.setSName("电子公告");
-
                 //根据表名和业务模块id查询数据
                 List<Map<String, Object>> oaBusdata = oaBusdataService.getOaBusdataList(columnLists,busFunction,DBvalue);
                 if (oaBusdata.size() == 0) {  //执行下一循环
@@ -209,11 +203,13 @@ public class OaFile implements Job {
         }
     }
 
-    public void isNotNull(List<DictModel> dictModels){
+    public void isNotNull(List<DictModel> dictModels ){
         for (DictModel dictModel : dictModels) {
             String DBtext = dictModel.getText();
             String DBvalue = dictModel.getValue();
-//            if ()
+
+            DBvalue = ANNOTATION+DBvalue+ANNOTATION_END;
+
             List<String> departIdList = sysDepartService.findSysDepartByParentIdAndOrgType(DBvalue);
             for (String departId : departIdList) {
                 List<BusFunction> busFunctionList = busFunctionService.getBusFunctionListByDepartId(departId,DBvalue);

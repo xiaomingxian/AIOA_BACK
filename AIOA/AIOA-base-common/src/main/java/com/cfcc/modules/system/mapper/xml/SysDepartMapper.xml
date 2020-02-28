@@ -13,15 +13,10 @@
 		SELECT org_type from sys_depart WHERE id = #{departId}
 	</select>
 	<select id="findSysDepartByParentIdAndOrgType0" resultType="java.lang.String">
-		SELECT id from
-		<choose>
-			<when test="DBvalue != null and DBvalue != '' ">
-				${DBvalue}.sys_depart
-			</when>
-			<otherwise>
-				sys_depart
-			</otherwise>
-		</choose>
+		<if test="DBvalue != null and DBvalue != ''">
+			${DBvalue}
+		</if>
+		SELECT id from sys_depart
 		  WHERE org_type = '1' AND parent_id IN ('','1')
 	</select>
     <select id="getDepartIdById" resultType="java.util.Map">

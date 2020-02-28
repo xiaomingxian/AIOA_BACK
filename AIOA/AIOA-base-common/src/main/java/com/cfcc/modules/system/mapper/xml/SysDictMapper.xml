@@ -82,15 +82,10 @@
 		(select id from sys_dict c where c.dict_code = #{dictCode})
 	</select>
     <select id="getDictIdByDictCode" resultType="java.lang.String">
-		SELECT id from
-		<choose>
-			<when test="DBvalue != null and DBvalue != ''">
-				${DBvalue}.sys_dict
-			</when>
-			<otherwise>
-				sys_dict
-			</otherwise>
-		</choose>
+		<if test="DBvalue != null and DBvalue != ''">
+			${DBvalue}
+		</if>
+		SELECT id from sys_dict
 		<where>
 			1 = 1
 			<if test="dictCode != null and dictCode != ''">
