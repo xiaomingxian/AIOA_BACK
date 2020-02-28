@@ -155,7 +155,8 @@ public class oaCalendarServiceImpl extends ServiceImpl<oaCalendarMapper, oaCalen
     }
 
     @Override
-    public String getUserId(String id) {
+    public List<String> getUserId(String id) {
+
         return oaCalendarMapper.getByUserId(id);
     }
 

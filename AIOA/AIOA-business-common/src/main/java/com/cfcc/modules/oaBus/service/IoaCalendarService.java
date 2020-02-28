@@ -43,7 +43,7 @@ public interface IoaCalendarService extends IService<oaCalendar> {
 
     IPage<oaCalendar> findWait(Integer pageNo, Integer pageSize, oaCalendar oaCalendar);
 
-    String getUserId(String id);
+    List<String> getUserId(String departId);
 
     String getDepartId(String id);
 

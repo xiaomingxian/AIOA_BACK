@@ -53,7 +53,7 @@ public interface oaCalendarMapper extends BaseMapper<oaCalendar> {
 
     List<oaCalendar> findWait(@Param(value = "pageNo") int pageNo, @Param(value = "pageSize")Integer pageSize, @Param(value = "oaCalendar")  oaCalendar oaCalendar);
 
-    String getByUserId(@Param(value = "id")String id);
+    List<String> getByUserId(@Param(value = "id")String id);
 
     String getDepartId(@Param(value = "id")String id);
 

@@ -134,11 +134,10 @@ public class oaCalendarController implements Job {
 		 List<oaCalendar> oaCalendarList = new ArrayList<>();
 		 //查询当前用户，作为assignee
 		 String token = request.getHeader(DefContants.X_ACCESS_TOKEN);
-		 String username = JwtUtil.getUsername(token);
-         SysUser user = sysUserService.getUserByName(username);
-         String id = user.getId();//查出当前用户的id
-         String departId = oaCalendarService.getDepartId(user.getId()); //查出当前登陆用户的部门id
-         String managedeptsId = oaCalendarService.getUserId(id);//查出当前登陆用户分管的id
+		 SysUser currentUser = sysUserService.getCurrentUser(request);
+		 String id = currentUser.getId();
+		 Integer departId = currentUser.getDepartId();
+		 List<String> manageIdList = oaCalendarService.getUserId(id);
 		 IPage<oaCalendar> byLeader = oaCalendarService.findByLeader(pageNo,pageSize,oaCalendar);  //查出领导的所有日程
 		 List<oaCalendar> oaCalendars = byLeader.getRecords();
 	     if(oaCalendars == null){
@@ -148,13 +147,18 @@ public class oaCalendarController implements Job {
 				 Integer iOpenType = Leader.getIOpenType();//公开类型
 				 String userName = Leader.getSCreateBy();//创建人的名字
 				 String userNameId = sysUserService.getUserByName(userName).getId();//查出创建人的id
-				 String manageId = oaCalendarService.getUserId(userNameId);//查出创建人的分管id
 				 List<String> departIdList=oaCalendarService.getDepartIdList(userNameId);//查出创建人的部门
+				 List<String> manageIdList2 = oaCalendarService.getUserId(userNameId);
+
 				 if(iOpenType == 1){ //公开类型是全行
 					 oaCalendarList.add(Leader);
 				 }else if (iOpenType == 2){ //公开类型是分管
-					 if(managedeptsId!=null&&managedeptsId.equals(manageId)){
-						 oaCalendarList.add(Leader);
+					 for(int i=0;i<manageIdList.size();i++){
+					 	for(int j=0;j<manageIdList2.size();j++){
+					 		if(manageIdList.get(i).equals(manageIdList2.get(j))){
+								oaCalendarList.add(Leader);
+							}
+						}
 					 }
 				 }else{ //公开类型是部门
 					 for(int i=0;i<departIdList.size();i++)
@@ -193,7 +197,7 @@ public class oaCalendarController implements Job {
 		 SysUser user = sysUserService.getUserByName(username);
 		 String id = user.getId();//查出当前用户的id
 		 String departId = oaCalendarService.getDepartId(user.getId()); //查出当前登陆用户的部门id
-		 String managedeptsId = oaCalendarService.getUserId(id);//查出当前登陆用户分管的id
+		 List<String> manageIdList = oaCalendarService.getUserId(id);
 		 List<oaCalendar> oaCalendars = queryPageList.getRecords();
 		 if(oaCalendars == null){
 			 result.error500("未找到对应实体");
@@ -202,13 +206,19 @@ public class oaCalendarController implements Job {
 			 Integer iOpenType = share.getIOpenType();//公开类型
 			 String userName = share.getSCreateBy();//创建人的名字
 			 String userNameId = sysUserService.getUserByName(userName).getId();//查出创建人的id
-			 String manageId = oaCalendarService.getUserId(userNameId);//查出创建人的分管id
 			 List<String> departIdList=oaCalendarService.getDepartIdList(userNameId);//查出创建人的部门
+			 List<String> manageIdList2 = oaCalendarService.getUserId(id);
+
+
 			 if(iOpenType == 1){ //公开类型是全行
 				 oaCalendarList.add(share);
 			 }else if (iOpenType == 2){ //公开类型是分管
-				 if(managedeptsId!=null&&managedeptsId.equals(manageId)){
-					 oaCalendarList.add(share);
+				 for(int i=0;i<manageIdList.size();i++){
+					 for(int j=0;j<manageIdList2.size();j++){
+						 if(manageIdList.get(i).equals(manageIdList2.get(j))){
+							 oaCalendarList.add(share);
+						 }
+					 }
 				 }
 			 }else if(iOpenType ==3){ //公开类型是部门
 				 for(int i=0;i<departIdList.size();i++)
