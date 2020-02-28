@@ -131,16 +131,11 @@
         SELECT s_table FROM oa_file WHERE s_file_type = #{fileType}
     </select>
     <select id="getOaFileByTableAndTableId" resultType="java.util.Map">
+        <if test="DBvalue != null and DBvalue != ''">
+            ${DBvalue}
+        </if>
         SELECT s_table AS tableName, i_table_id AS tableId, s_file_name, s_file_path, s_create_by
-          from
-        <choose>
-            <when test="DBvalue != null and DBvalue != ''">
-                ${DBvalue}.oa_file
-            </when>
-            <otherwise>
-                oa_file
-            </otherwise>
-        </choose>
+          from oa_file
           <where>
               1 = 1
               <if test="id != null and id != ''">
