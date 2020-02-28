@@ -22,8 +22,10 @@ import com.cfcc.modules.oaBus.service.IBusFunctionService;
 import com.cfcc.modules.oaBus.service.IBusModelService;
 import com.cfcc.modules.oaBus.service.IBusProcSetService;
 import com.cfcc.modules.oaBus.service.IOaBusdataService;
+import com.cfcc.modules.oabutton.entity.OaButton;
 import com.cfcc.modules.oabutton.entity.OaButtonSet;
 import com.cfcc.modules.oabutton.service.IOaButtonSetService;
+import com.cfcc.modules.workflow.pojo.OaProcActinst;
 import lombok.extern.slf4j.Slf4j;
 
 import org.jeecgframework.poi.excel.ExcelImportUtil;
@@ -83,7 +85,32 @@ public class OaButtonSetController {
 		/*QueryWrapper<OaButtonSet> queryWrapper = QueryGenerator.initQueryWrapper(oaButtonSet, req.getParameterMap());
 		Page<OaButtonSet> page = new Page<OaButtonSet>(pageNo, pageSize);
 		IPage<OaButtonSet> pageList = oaButtonSetService.page(page, queryWrapper);*/
-        IPage<OaButtonSet> pageList = oaButtonSetService.getPage(pageNo, pageSize, id,buttonId,taskDefKey);
+        IPage<OaButtonSet> pageList = oaButtonSetService.getPage(pageNo, pageSize, id,null,null);
+        result.setSuccess(true);
+        result.setResult(pageList);
+        return result;
+    }
+
+    /**
+     * 分页列表查询--点击查询按钮查询
+     *
+     * @param
+     * @return
+     */
+    @AutoLog(value = "发布类按钮描述-分页列表查询")
+    @ApiOperation(value = "发布类按钮描述-分页列表查询", notes = "发布类按钮描述-分页列表查询")
+    @PostMapping(value = "/findByIf")
+    public Result<IPage<OaButtonSet>> findByIf(@RequestBody Map<String,Object> map) {
+        Result<IPage<OaButtonSet>> result = new Result<>();
+        List<OaButton>  buttonList=null;
+        if (map.get("buttonId")!=null){
+            buttonList=(List<OaButton>)map.get("buttonId");
+        }
+        List<OaProcActinst>  taskDefKeyList=null;
+        if (map.get("taskDefKey")!=null){
+            taskDefKeyList=(List<OaProcActinst>)map.get("taskDefKey");
+        }
+        IPage<OaButtonSet> pageList = oaButtonSetService.getPage((Integer) map.get("pageNo"),(Integer)map.get("pageSize"),(Integer)map.get("id"),buttonList,taskDefKeyList);
         result.setSuccess(true);
         result.setResult(pageList);
         return result;

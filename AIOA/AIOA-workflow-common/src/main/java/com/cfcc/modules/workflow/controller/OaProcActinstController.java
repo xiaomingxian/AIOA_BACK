@@ -228,13 +228,13 @@ public class OaProcActinstController {
     @AutoLog(value = "流程节点配置-根据流程key和任务名称查询")
     @ApiOperation(value = "流程节点配置-根据流程key和任务名称查询", notes = "流程节点配置-根据流程key和任务名称查询")
     @GetMapping(value = "/queryByKeyAndName")
-    public Result<OaProcActinst> queryByKeyAndName(OaProcActinst oaProcActinst) {
-        Result<OaProcActinst> result = new Result<OaProcActinst>();
+    public Result<List<OaProcActinst>> queryByKeyAndName(OaProcActinst oaProcActinst) {
+        Result<List<OaProcActinst>> result = new Result<>();
         if (oaProcActinst.getActName()!=null &&oaProcActinst.getActName().trim().length()>0){
             oaProcActinst.setActName(oaProcActinst.getActName().trim());
         }
-        OaProcActinst OaProcActinst1 = taskCommonFoldService.queryByKeyAndName(oaProcActinst);
-        if (OaProcActinst1 == null) {
+        List<OaProcActinst> OaProcActinst1 = taskCommonFoldService.queryByKeyAndName(oaProcActinst);
+        if (OaProcActinst1 == null ||OaProcActinst1.size()<1) {
             result.error500("未找到对应实体");
         } else {
             result.setResult(OaProcActinst1);

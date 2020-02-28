@@ -1,7 +1,9 @@
 package com.cfcc.modules.oabutton.mapper;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+import com.cfcc.modules.oabutton.entity.OaButton;
 import com.cfcc.modules.oabutton.entity.OaButtonSet;
+import com.cfcc.modules.workflow.pojo.OaProcActinst;
 import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
@@ -15,9 +17,9 @@ import java.util.Map;
  */
 public interface OaButtonSetMapper extends BaseMapper<OaButtonSet> {
 
-    int queryButtonCount(@Param("id") Integer id,@Param("buttonId") Integer buttonId,@Param("taskDefKey") String taskDefKey);
+    int queryButtonCount(@Param("id") Integer id,@Param("buttonId") List<OaButton> buttonId,@Param("taskDefKey") List<OaProcActinst> taskDefKey);
 
-    List<OaButtonSet> queryButton(@Param("id") Integer id,@Param("buttonId") Integer buttonId,@Param("taskDefKey") String taskDefKey, @Param("pageNo") Integer pageNo, @Param("pageSize") Integer pageSize);
+    List<OaButtonSet> queryButton(@Param("id") Integer id,@Param("buttonId") List<OaButton> buttonId,@Param("taskDefKey") List<OaProcActinst> taskDefKey, @Param("pageNo") Integer pageNo, @Param("pageSize") Integer pageSize);
 
     OaButtonSet queryById(@Param("id") Integer id);
 

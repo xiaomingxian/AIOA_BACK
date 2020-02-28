@@ -23,8 +23,8 @@ public interface IOaButtonService extends IService<OaButton> {
      * @return
      */
     IPage<OaButton> getPage(Integer pageNo, Integer pageSize, OaButton oaButton);
-    //通过id查询
-    OaButton queryById(Integer id,String sBtnName);
+    //通过id查询或按钮名称查询
+    List<OaButton> queryById(Integer id,String sBtnName);
     //通过id删除
     void deleteOaButtonByID(String id);
 
