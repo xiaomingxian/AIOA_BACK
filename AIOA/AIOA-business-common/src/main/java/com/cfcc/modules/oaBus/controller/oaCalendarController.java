@@ -18,6 +18,7 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.cfcc.modules.oaBus.entity.BusFunction;
 import com.cfcc.modules.oaBus.entity.BusModelPermit;
+import com.cfcc.modules.oaBus.entity.OaFile;
 import com.cfcc.modules.oaBus.entity.oaCalendar;
 import com.cfcc.modules.oaBus.service.IoaCalendarService;
 import com.cfcc.modules.oaBus.service.OaBusDynamicTableService;
@@ -29,6 +30,7 @@ import com.cfcc.modules.workflow.pojo.TaskInfoJsonAble;
 import com.cfcc.modules.workflow.service.TaskCommonService;
 import lombok.extern.slf4j.Slf4j;
 
+import org.apache.tools.ant.taskdefs.LoadFile;
 import org.jeecgframework.poi.excel.ExcelImportUtil;
 import org.jeecgframework.poi.excel.def.NormalExcelConstants;
 import org.jeecgframework.poi.excel.entity.ExportParams;
@@ -244,24 +246,18 @@ public class oaCalendarController implements Job {
 	  * 查出常用链接
 	  *
 	  */
-	 @AutoLog(value = "日程管理表-分页列表查询")
-	 @ApiOperation(value="日程管理表-分页列表查询", notes="日程管理表-分页列表查询")
+	 @ApiOperation("查询图片数据")
 	 @GetMapping(value = "/MostUserLink")
-	 public Map<String,Object> MostUserLink(HttpServletResponse response,@RequestParam(name="id",required=false)String  id) throws IOException {
-		 Map<String,Object> linklist = oaCalendarService.MostUserLink(response,id);
-		 return linklist;
+	 public boolean readPicture( HttpServletResponse response,@RequestParam(name="id",required=false) String id,
+								@RequestParam("resourceType") String resourceType) {
+
+		 try {
+			 oaCalendarService.MostUserLink(response,id, resourceType);
+		 } catch (Exception e) {
+			 return false;
+		 }
+		 return true ;
 	 }
-	/* *//***
-	  * 查出常用链接
-	  *
-	  *//*
-	 @AutoLog(value = "日程管理表-分页列表查询")
-	 @ApiOperation(value="日程管理表-分页列表查询", notes="日程管理表-分页列表查询")
-	 @GetMapping(value = "/MostUserLink2")
-	 public List<Map<String,Object>> MostUserLink2(HttpServletResponse response) throws IOException {
-		 List<Map<String,Object>> linklist = oaCalendarService.MostUserLink1(response);
-		 return linklist;
-	 }*/
 	 /***
 	  * 查出常用链接
 	  *
@@ -269,8 +265,8 @@ public class oaCalendarController implements Job {
 	 @AutoLog(value = "日程管理表-分页列表查询")
 	 @ApiOperation(value="日程管理表-分页列表查询", notes="日程管理表-分页列表查询")
 	 @PostMapping(value = "LinkList")
-	 public List<String> LinkList(HttpServletRequest request) {
-		 List<String> linklist = oaCalendarService.LinkList();
+	 public List<Map<String, Object>>  LinkList() {
+		 List<Map<String, Object>>  linklist = oaCalendarService.LinkList();
 		 return linklist;
 	 }
 

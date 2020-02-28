@@ -5,10 +5,7 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.cfcc.common.api.vo.Result;
 import com.cfcc.common.system.util.JwtUtil;
 import com.cfcc.common.util.DateUtils;
-import com.cfcc.modules.oaBus.entity.BusFunction;
-import com.cfcc.modules.oaBus.entity.OaBusdata;
-import com.cfcc.modules.oaBus.entity.OaFile;
-import com.cfcc.modules.oaBus.entity.oaCalendar;
+import com.cfcc.modules.oaBus.entity.*;
 import com.cfcc.modules.oaBus.mapper.oaCalendarMapper;
 import com.cfcc.modules.oaBus.service.IOaBusdataService;
 import com.cfcc.modules.oaBus.service.IoaCalendarService;
@@ -178,61 +175,35 @@ public class oaCalendarServiceImpl extends ServiceImpl<oaCalendarMapper, oaCalen
     }
 
     @Override
-        public Map<String, Object> MostUserLink(HttpServletResponse response,String id) throws IOException {
-             Map<String, Object> busdata = oaCalendarMapper.findMostUser(id);
-             String url = oaCalendarMapper.selectUrl(Integer.parseInt(id));
-             String path = oaCalendarMapper.selectPath(Integer.parseInt(id));
-             File file = new File(path);
-             FileInputStream stream = new FileInputStream(file);
-             byte[] b = new byte[1024];
-             int len = -1;
-             while ((len = stream.read(b, 0, 1024)) != -1) {
-                 response.getOutputStream().write(b, 0, len);
-             }
-              busdata.put("url",url) ;
+        public void MostUserLink(HttpServletResponse response,String id,String resourceType)  {
 
-            /*  List<Map<String, Object>> list = oaCalendarMapper.findMostUser();
-             for(int i=0;i< list.size();i++){
-                 String url = oaCalendarMapper.selectUrl(Integer.parseInt(list.get(i).id);
-                 String path = oaCalendarMapper.selectPath(Integer.parseInt(list.get(i).id));
-                 File file = new File(path);
-                 FileInputStream stream = new FileInputStream(file);
-                 byte[] b = new byte[1024];
-                 int len = -1;
-                 while ((len = stream.read(b, 0, 1024)) != -1) {
-                     response.getOutputStream().write(b, 0, len);
-                 }
-                 list.get(i).put("url",url);
-             }*/
+        try {
+            String path = oaCalendarMapper.selectPath(Integer.parseInt(id));
+            File file = new File(path);
+            FileInputStream stream = new FileInputStream(file);
+            byte[] b = new byte[1024];
+            int len = -1;
+            while ((len = stream.read(b, 0, 1024)) != -1) {
+                response.getOutputStream().write(b, 0, len);
+            }
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
 
-        return busdata;
-    }
-/*
-    @Override
-    public List<Map<String, Object>> MostUserLink1(HttpServletResponse response)throws IOException {
-            List<Map<String, Object>> list = oaCalendarMapper.findMostUser1();
-             for(int i=0;i< list.size();i++){
-                 String url = oaCalendarMapper.selectUrl(Integer.parseInt(list.get(i).get("i_id").toString()));
-                 String path = oaCalendarMapper.selectPath(Integer.parseInt(list.get(i).get("i_id").toString()));
-                 File file = new File(path);
-                 FileInputStream stream = new FileInputStream(file);
-                 byte[] b = new byte[1024];
-                 int len = -1;
-                 while ((len = stream.read(b, 0, 1024)) != -1) {
-                     response.getOutputStream().write(b, 0, len);
-                 }
-                 list.get(i).put("url",url);
-             }
-
-        return null;
-    }*/
-
-    @Override
-    public List<String> LinkList() {
-
-        return oaCalendarMapper.LinkList();
     }
 
+    @Override
+    public List<Map<String, Object>>  LinkList()  {
+        List<Map<String, Object>> list = oaCalendarMapper.LinkList();
+        for(int i=0;i< list.size();i++){
+            String id = list.get(i).get("i_id").toString();
+            String url = oaCalendarMapper.selectUrl(Integer.parseInt(id));
+            list.get(i).put("url",url);
+        }
+        return list;
+    }
 
 
 

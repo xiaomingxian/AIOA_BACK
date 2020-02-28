@@ -3,6 +3,7 @@ package com.cfcc.modules.oaBus.service;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.cfcc.modules.oaBus.entity.BusFunction;
+import com.cfcc.modules.oaBus.entity.OaFile;
 import com.cfcc.modules.oaBus.entity.oaCalendar;
 import com.cfcc.modules.system.entity.SysUser;
 
@@ -51,9 +52,9 @@ public interface IoaCalendarService extends IService<oaCalendar> {
 
     List<BusFunction> busFunctionList();
 
-    Map<String, Object> MostUserLink(HttpServletResponse response,String id) throws IOException;
+    void MostUserLink(HttpServletResponse response,String id,String resourceType) throws IOException;
 
-    List<String> LinkList();
+    List<Map<String, Object>>  LinkList() ;
 
-  /*  List<Map<String, Object>> MostUserLink1(HttpServletResponse response) throws IOException;*/
+
 }
