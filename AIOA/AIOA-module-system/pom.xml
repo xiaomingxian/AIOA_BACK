@@ -6,8 +6,8 @@
     <groupId>org.cfcc.framework.boot</groupId>
     <artifactId>AIOA-module-system</artifactId>
     <version>1.0.0</version>
-    <!-- 打war包添加
-    <packaging>war</packaging> -->
+     <!--打war包添加-->
+    <!--<packaging>war</packaging>-->
 
     <parent>
         <groupId>org.cfcc.framework.boot</groupId>
@@ -15,21 +15,27 @@
         <version>1.0.0</version>
     </parent>
 
-    <dependencies>
-        <dependency>
-            <groupId>org.cfcc.framework.boot</groupId>
-            <artifactId>AIOA-template-common</artifactId>
-            <version>1.0.0</version>
-        </dependency>
-    </dependencies>
+    <!--打包时放开-->
+    <!--<dependencies>-->
+        <!--<dependency>-->
+            <!--<groupId>org.cfcc.framework.boot</groupId>-->
+            <!--<artifactId>AIOA-template-common</artifactId>-->
+            <!--<version>1.0.0</version>-->
+        <!--</dependency>-->
+        <!--<dependency>-->
+            <!--<groupId>org.cfcc.framework.boot</groupId>-->
+            <!--<artifactId>AIOA-workflow-common</artifactId>-->
+            <!--<version>1.0.0</version>-->
+        <!--</dependency>-->
+    <!--</dependencies>-->
 
     <!-- 打war包时删除该配置 -->
-    <build>
-        <plugins>
-            <plugin>
-                <groupId>org.springframework.boot</groupId>
-                <artifactId>spring-boot-maven-plugin</artifactId>
-            </plugin>
-        </plugins>
-    </build>
+    <!--<build>-->
+        <!--<plugins>-->
+            <!--<plugin>-->
+                <!--<groupId>org.springframework.boot</groupId>-->
+                <!--<artifactId>spring-boot-maven-plugin</artifactId>-->
+            <!--</plugin>-->
+        <!--</plugins>-->
+    <!--</build>-->
 </project>
