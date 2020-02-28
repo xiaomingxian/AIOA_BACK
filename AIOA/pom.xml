@@ -220,11 +220,11 @@
         </dependency>
         <!-- 代码生成器 -->
         <!-- 如果下载失败，看这个链接http://jeecg-boot.mydoc.io/?t=345672 -->
-        <dependency>
-            <groupId>org.jeecgframework.boot</groupId>
-            <artifactId>codegenerate</artifactId>
-            <version>1.0.5</version>
-        </dependency>
+        <!--<dependency>-->
+            <!--<groupId>org.jeecgframework.boot</groupId>-->
+            <!--<artifactId>codegenerate</artifactId>-->
+            <!--<version>1.0.5</version>-->
+        <!--</dependency>-->
         <!-- AutoPoi Excel工具类-->
         <dependency>
             <groupId>org.jeecgframework</groupId>
