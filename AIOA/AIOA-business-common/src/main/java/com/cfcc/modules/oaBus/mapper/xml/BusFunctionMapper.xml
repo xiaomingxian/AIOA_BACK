@@ -72,16 +72,11 @@
         select * from oa_bus_function c where c.i_bus_model_id = #{modelId} order by IF(ISNULL(s_level), 1, 0),(s_level + 0) ;
     </select>
     <select id="getBusFunctionListByDepartId" resultType="com.cfcc.modules.oaBus.entity.BusFunction">
+        <if test="DBvalue != null and DBvalue != ''">
+            ${DBvalue}
+        </if>
         SELECT * FROM oa_bus_function WHERE i_is_es = 1 AND i_id IN
-          (SELECT i_bus_function_id FROM
-            <choose>
-                <when test="DBvalue != null and DBvalue != ''">
-                    ${DBvalue}.oa_bus_function_unit
-                </when>
-                <otherwise>
-                    oa_bus_function_unit
-                </otherwise>
-            </choose>
+          (SELECT i_bus_function_id FROM oa_bus_function_unit
           WHERE s_unit_id = #{departId})
     </select>
 </mapper>

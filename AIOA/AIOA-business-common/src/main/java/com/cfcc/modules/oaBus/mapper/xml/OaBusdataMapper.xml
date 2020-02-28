@@ -12,15 +12,10 @@
     </select>
 
     <update id="updateIsESByid">
-        update
-        <choose>
-            <when test="DBvalue != null and DBvalue != ''">
-                ${DBvalue}.${tableName}
-            </when>
-            <otherwise>
-                ${tableName}
-            </otherwise>
-        </choose>
+        <if test="DBvalue != null and DBvalue != ''">
+            ${DBvalue}
+        </if>
+        update ${tableName}
           set i_is_es = 2 where i_id = #{id}
     </update>
 
@@ -36,19 +31,15 @@
     </select>
 
     <select id="getBusdataByTable" resultType="java.util.Map">
+        <if test="DBvalue != null and DBvalue != ''">
+            ${DBvalue}
+        </if>
         select i_id ,i_bus_function_id,i_is_file
         <if test="columnLists != null and columnLists != ''">
             ,${columnLists}
         </if>
-        from
-        <choose>
-            <when test="DBvalue != null and DBvalue != ''">
-                ${DBvalue}.${busFunction.sBusdataTable}
-            </when>
-            <otherwise>
-                ${busFunction.sBusdataTable}
-            </otherwise>
-        </choose>
+        from ${busFunction.sBusdataTable}
+
         <where>
             <if test="busFunction.iId != null">
                 i_bus_model_id = #{busFunction.iBusModelId}
@@ -435,15 +426,10 @@
     </select>
 
     <select id="getBusdataByIdAndTableName" resultType="java.lang.String">
-        select s_title from
-        <choose>
-            <when test="DBvalue != null and DBvalue != ''">
-                ${DBvalue}.${sBusdataTable}
-            </when>
-            <otherwise>
-                ${sBusdataTable}
-            </otherwise>
-        </choose>
+        <if test="DBvalue != null and DBvalue != ''">
+            ${DBvalue}
+        </if>
+        select s_title from ${sBusdataTable}
         where i_id = #{id}
     </select>
 
