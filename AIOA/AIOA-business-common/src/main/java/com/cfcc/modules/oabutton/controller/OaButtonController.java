@@ -116,8 +116,8 @@ public class OaButtonController {
 		if (oaButton!=null && oaButton.getSBtnValue()!=null ){
 			oaButton.setSMethod(oaButton.getSBtnValue());
 		}
-		OaButton oaButtonEntity = oaButtonService.queryById(oaButton.getIId(),null);
-		if(oaButtonEntity==null) {
+		List<OaButton> oaButtonEntity = oaButtonService.queryById(oaButton.getIId(),null);
+		if(oaButtonEntity==null ||oaButtonEntity.size()!=1) {
 			result.error500("未找到对应实体");
 		}else {
 			boolean ok = oaButtonService.updateOaButtonById(oaButton);
@@ -180,12 +180,12 @@ public class OaButtonController {
 	@GetMapping(value = "/queryById")
 	public Result<OaButton> queryById(@RequestParam(name="id",required=false) Integer id,@RequestParam(name="sbtnName",required=false) String sBtnName) {
 		try {
-			Result<OaButton> result = new Result<OaButton>();
-			OaButton oaButton = oaButtonService.queryById(id,sBtnName);
-			if(oaButton==null) {
+			Result<OaButton> result = new Result<>();
+			List<OaButton> oaButton = oaButtonService.queryById(id,sBtnName);
+			if(oaButton==null||oaButton.size()<1) {
                 result.error500("未找到对应实体");
             }else {
-                result.setResult(oaButton);
+                result.setResult(oaButton.get(0));
                 result.setSuccess(true);
             }
 			return result;
@@ -194,6 +194,31 @@ public class OaButtonController {
 		}
 		return null;
 	}
+
+	 /**
+	  * 通过按钮名称查询查询
+	  * @param sBtnName
+	  * @return
+	  */
+	 @AutoLog(value = "按钮管理-通过id查询或名称")
+	 @ApiOperation(value="按钮管理-通过id查询或名称", notes="按钮管理-通过id查询或名称")
+	 @GetMapping(value = "/queryBySbtnName")
+	 public Result<List<OaButton>> queryBySbtnName(@RequestParam(name="sbtnName",required=false) String sBtnName) {
+		 try {
+			 Result<List<OaButton>> result = new Result<>();
+			 List<OaButton> oaButton = oaButtonService.queryById(null,sBtnName.trim());
+			 if(oaButton==null||oaButton.size()==0) {
+				 result.error500("未找到对应实体");
+			 }else {
+				 result.setResult(oaButton);
+				 result.setSuccess(true);
+			 }
+			 return result;
+		 } catch (Exception e) {
+			 e.printStackTrace();
+		 }
+		 return null;
+	 }
 
 
 

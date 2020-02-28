@@ -14,7 +14,7 @@ import java.util.Map;
 
 public interface TaskCommonFoldService {
 //    根据流程key和任务名称查询-lvjian
-    OaProcActinst queryByKeyAndName(OaProcActinst oaProcActinst);
+   List<OaProcActinst> queryByKeyAndName(OaProcActinst oaProcActinst);
 //流程监控一级折叠
     Result monitorFoldUrgency(String urgencyDegree, TaskInfoVO taskInfoVO,boolean isAdmin);
 

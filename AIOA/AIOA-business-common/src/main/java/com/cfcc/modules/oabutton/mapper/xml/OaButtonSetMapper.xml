@@ -119,12 +119,23 @@
         b.i_permit_type,b.i_is_creater,b.i_is_reader,b.i_is_lastsender,b.i_is_transactors,b.i_is_default,
         b.i_TASK_DEF_KEY_,b.s_manager_role_id,p.i_id as mid from oa_button_set b
         inner join oa_proc_button p on p.i_id=b.i_proc_button_id) as mo where mo.mid=#{id}
-        <if test="buttonId!=null and buttonId !=''">
-            and mo.i_button_id=#{buttonId}
+        <if test="buttonId!=null and buttonId.size()>0">
+            and mo.i_button_id IN
+            <foreach collection="buttonId" item="item" open="(" close=")" separator=",">
+                <if test="item.iid!=null and item.iid!=''">
+                     #{item.iid}
+                </if>
+            </foreach>
         </if>
-        <if test="taskDefKey!=null and taskDefKey !=''">
-            and mo.TASK_DEF_KEY_=#{taskDefKey}
+        <if test="taskDefKey!=null and taskDefKey.size()>0">
+            and mo.TASK_DEF_KEY_ IN
+            <foreach collection="taskDefKey" item="item" open="(" close=")" separator=",">
+                <if test="item.actId!=null and item.actId!=''">
+                    #{item.actId}
+                </if>
+            </foreach>
         </if>
+
         <!--<where>
             <if test="iProcButtonId != null and iProcButtonId != ''">
                 i_proc_button_id=#{id}
@@ -155,11 +166,21 @@
         b.i_permit_type,b.i_is_creater,b.i_is_reader,b.i_is_lastsender,b.i_is_transactors,b.i_is_default,
         b.i_TASK_DEF_KEY_,b.s_manager_role_id,p.i_id as mid from  oa_button_set b
         inner join oa_proc_button p on p.i_id=b.i_proc_button_id order by b.i_id desc) as a where a.mid=#{id}
-        <if test="buttonId!=null and buttonId !=''">
-          and  a.i_button_id=#{buttonId}
+        <if test="buttonId!=null and buttonId.size()>0">
+            and a.i_button_id IN
+            <foreach collection="buttonId"  item="item" open="(" close=")" separator=",">
+                <if test="item.iid!=null and item.iid!=''">
+                      #{item.iid}
+                </if>
+            </foreach>
         </if>
-        <if test="taskDefKey!=null and taskDefKey !=''">
-            and  a.TASK_DEF_KEY_=#{taskDefKey}
+        <if test="taskDefKey!=null and taskDefKey.size()>0">
+            and a.TASK_DEF_KEY_ IN
+            <foreach collection="taskDefKey" item="item" open="(" close=")" separator=",">
+                <if test="item.actId!=null and item.actId!=''">
+                      #{item.actId}
+                </if>
+            </foreach>
         </if>
 --         order by a.i_id
         limit #{pageNo},#{pageSize}

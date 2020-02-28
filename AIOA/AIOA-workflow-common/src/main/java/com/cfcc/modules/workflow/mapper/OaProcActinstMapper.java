@@ -17,7 +17,7 @@ import java.util.Map;
  */
 public interface OaProcActinstMapper extends BaseMapper<OaProcActinst> {
 //    根据流程key和任务名称查询-lvjian
-    OaProcActinst queryByKeyAndName(@Param("pojo") OaProcActinst oaProcActinst);
+List<OaProcActinst> queryByKeyAndName(@Param("pojo") OaProcActinst oaProcActinst);
 
     @MapKey("actId")
     Map<String, Map<String, Object>> queryActs(@Param("key") String key, @Param("taskIds") List<String> taskIds);
