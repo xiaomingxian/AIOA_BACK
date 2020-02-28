@@ -69,7 +69,7 @@
                 and s_address = #{sAddress}
             </if>
             <if test="sTitle != '' and sTitle != null">
-                and s_title = #{sTitle}
+                and s_title like CONCAT(CONCAT('%', #{sTitle}), '%')
             </if>
             <if test="iOpenType != '' and iOpenType != null">
                 and i_open_type = #{iOpenType}
@@ -97,7 +97,7 @@
             </if>
 
             <if test="sTitle != '' and sTitle != null">
-                and s_title = #{sTitle}
+                and s_title like CONCAT(CONCAT('%', #{sTitle}), '%')
             </if>
             <if test="iOpenType != '' and iOpenType != null">
                 and i_open_type = #{iOpenType}
@@ -125,7 +125,7 @@
                 and s_address = #{sAddress}
             </if>
             <if test="sTitle != '' and sTitle != null">
-                and s_title = #{sTitle}
+                and s_title like CONCAT(CONCAT('%', #{sTitle}), '%')
             </if>
             <if test="iOpenType != '' and iOpenType != null">
                 and i_open_type = #{iOpenType}
@@ -156,7 +156,7 @@
                 and s_address = #{oaCalendar.sAddress}
             </if>
             <if test="oaCalendar.sTitle != '' and oaCalendar.sTitle != null">
-                and s_title = #{oaCalendar.sTitle}
+                and s_title like CONCAT(CONCAT('%', #{oaCalendar.sTitle}), '%')
             </if>
             <if test="oaCalendar.iOpenType != '' and oaCalendar.iOpenType != null">
                 and i_open_type = #{oaCalendar.iOpenType}
@@ -191,8 +191,8 @@
                 and s_address = #{sAddress}
             </if>
             <if test="sTitle != '' and sTitle != null">
-                and s_title = #{sTitle}
-            </if>
+                and s_title like CONCAT(CONCAT('%', #{oaCalendar.sTitle}), '%')
+             </if>
             <if test="iOpenType != '' and iOpenType != null">
                 and i_open_type = #{iOpenType}
             </if>
@@ -224,8 +224,7 @@
                 and s_create_by = #{oaCalendar.sCreateBy}
             </if>
             <if test="oaCalendar.sTitle != '' and oaCalendar.sTitle != null">
-                and s_title = #{oaCalendar.sTitle}
-            </if>
+                and s_title like CONCAT(CONCAT('%', #{oaCalendar.sTitle}), '%')            </if>
             <if test="oaCalendar.iOpenType != '' and oaCalendar.iOpenType != null">
                 and i_open_type = #{oaCalendar.iOpenType}
             </if>
@@ -260,7 +259,7 @@
                 and s_address = #{oaCalendar.sAddress}
             </if>
             <if test="oaCalendar.sTitle != '' and oaCalendar.sTitle != null">
-                and s_title = #{oaCalendar.sTitle}
+                and s_title like CONCAT(CONCAT('%', #{oaCalendar.sTitle}), '%')
             </if>
             <if test="oaCalendar.iOpenType != '' and oaCalendar.iOpenType != null">
                 and i_open_type = #{oaCalendar.iOpenType}
@@ -328,7 +327,7 @@
     <select id="getByShowOrder" resultType="com.cfcc.modules.system.entity.SysUser">
          select * from sys_user where show_order = #{showOrder}
     </select>
-    <!--根据用户id查处是不是分管部门的人-->
+    <!--根据部门id查处是不是分管部门的人-->
     <select id="getByUserId" resultType="java.lang.String">
         select i_id from sys_user_managedepts where s_user_id =#{id}
     </select>

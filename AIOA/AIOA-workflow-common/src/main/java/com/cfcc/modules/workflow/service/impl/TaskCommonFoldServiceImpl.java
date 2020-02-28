@@ -66,7 +66,7 @@ public class TaskCommonFoldServiceImpl implements TaskCommonFoldService {
 
 
     @Override
-    public OaProcActinst queryByKeyAndName(OaProcActinst oaProcActinst) {
+    public List<OaProcActinst> queryByKeyAndName(OaProcActinst oaProcActinst) {
         return oaProcActinstMapper.queryByKeyAndName(oaProcActinst);
     }
 

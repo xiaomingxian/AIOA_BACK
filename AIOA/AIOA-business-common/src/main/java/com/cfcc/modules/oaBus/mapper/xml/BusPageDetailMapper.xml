@@ -93,15 +93,10 @@
 	</insert>
 
 	<select id="getSDictIdByKey" resultType="java.lang.String">
-		select s_dict_id from
-		<choose>
-			<when test="DBvalue != null">
-				${DBvalue}.oa_bus_page_detail c
-			</when>
-			<otherwise>
-				oa_bus_page_detail c
-			</otherwise>
-		</choose>
+		<if test="DBvalue != null and DBvalue != ''">
+			${DBvalue}
+		</if>
+		select s_dict_id from oa_bus_page_detail c
 		<where>
 			1 = 1
 			<if test="functionId != null ">
@@ -174,16 +169,11 @@
 		</where>
 	</select>
 	<select id="getCloumnNameByTableAndEsquery" resultType="java.lang.String">
+		<if test="DBvalue != null and DBvalue != ''">
+			${DBvalue}
+		</if>
 		select s_table_column
-			from
-		<choose>
-			<when test="DBvalue != null and DBvalue != ''">
-				${DBvalue}.oa_bus_page_detail
-			</when>
-			<otherwise>
-				oa_bus_page_detail
-			</otherwise>
-		</choose>
+			from oa_bus_page_detail
 		<where>
 			1 = 1
 			<if test="sBusdataTable != null and sBusdataTable != ''">

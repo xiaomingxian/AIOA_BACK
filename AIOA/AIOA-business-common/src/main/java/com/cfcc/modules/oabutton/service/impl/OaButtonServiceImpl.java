@@ -44,7 +44,7 @@ public class OaButtonServiceImpl extends ServiceImpl<OaButtonMapper, OaButton> i
     }
 
     @Override
-    public OaButton queryById(Integer id,String sBtnName) {
+    public List<OaButton> queryById(Integer id,String sBtnName) {
         return oaButtonMapper.queryById(id,sBtnName);
     }
 

@@ -5,9 +5,11 @@ import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.cfcc.common.constant.CacheConstant;
+import com.cfcc.modules.oabutton.entity.OaButton;
 import com.cfcc.modules.oabutton.entity.OaButtonSet;
 import com.cfcc.modules.oabutton.mapper.OaButtonSetMapper;
 import com.cfcc.modules.oabutton.service.IOaButtonSetService;
+import com.cfcc.modules.workflow.pojo.OaProcActinst;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
@@ -32,7 +34,7 @@ public class OaButtonSetServiceImpl extends ServiceImpl<OaButtonSetMapper, OaBut
     private OaButtonSetMapper oaButtonSetMapper;
 
     @Override
-    public IPage<OaButtonSet> getPage(Integer pageNo, Integer pageSize, Integer id,Integer buttonId,String taskDefKey) {
+    public IPage<OaButtonSet> getPage(Integer pageNo, Integer pageSize, Integer id, List<OaButton> buttonId, List<OaProcActinst> taskDefKey) {
         int total = oaButtonSetMapper.queryButtonCount(id,buttonId,taskDefKey);
         List<OaButtonSet> buttonSetList = oaButtonSetMapper.queryButton(id,buttonId,taskDefKey,(pageNo-1)*pageSize,pageSize);
         IPage<OaButtonSet> pageList = new Page<>();

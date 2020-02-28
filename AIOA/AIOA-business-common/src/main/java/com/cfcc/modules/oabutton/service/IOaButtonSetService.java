@@ -2,7 +2,9 @@ package com.cfcc.modules.oabutton.service;
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.service.IService;
+import com.cfcc.modules.oabutton.entity.OaButton;
 import com.cfcc.modules.oabutton.entity.OaButtonSet;
+import com.cfcc.modules.workflow.pojo.OaProcActinst;
 import io.swagger.models.auth.In;
 import org.apache.ibatis.annotations.Param;
 
@@ -24,7 +26,7 @@ public interface IOaButtonSetService extends IService<OaButtonSet> {
      * @param id
      * @return
      */
-    IPage<OaButtonSet> getPage(Integer pageNo, Integer pageSize, Integer id, Integer buttonId,String taskDefKey);
+    IPage<OaButtonSet> getPage(Integer pageNo, Integer pageSize, Integer id, List<OaButton> buttonId, List<OaProcActinst> taskDefKey);
     //通过id查询
     OaButtonSet queryById(Integer iId);
     //通过任务KEY和按钮ID查询

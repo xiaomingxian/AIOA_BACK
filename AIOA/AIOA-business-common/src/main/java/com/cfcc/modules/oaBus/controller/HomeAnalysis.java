@@ -99,20 +99,20 @@ public class HomeAnalysis {
             Integer iBus3Id = null;
             Integer iBus4Id = null;
           for (BusFunction busFunction:busFunctionlList) {
-            if( iBus1Id == null ?(modellist.length >0 && StringUtils.equals(busFunction.getIId().toString(),modellist[0])) : busFunction.getIId() == iBus1Id )
-            {
-                getIdAndSname(busFunction,map,"model1",username,createTime);
-            }
-            if( iBus2Id == null ?(modellist.length >1 && StringUtils.equals(busFunction.getIId().toString(),modellist[1])) : busFunction.getIId() == iBus2Id)
-            {
-                getIdAndSname(busFunction,map,"model2",username,createTime);
-            }if( iBus3Id == null ?(modellist.length >2 && StringUtils.equals(busFunction.getIId().toString(),modellist[2])) : busFunction.getIId() == iBus3Id)
-            {
-                getIdAndSname(busFunction,map,"model3",username,createTime);
-            }if( iBus4Id == null ?(modellist.length >3 && StringUtils.equals(busFunction.getIId().toString(),modellist[3])) : busFunction.getIId() == iBus4Id)
-            {
-                getIdAndSname(busFunction,map,"model4",username,createTime);
-            }
+              if( iBus1Id == null ?(modellist.length >0 && StringUtils.equals(busFunction.getIId().toString(),modellist[0])) : busFunction.getIId().equals( iBus1Id ))
+              {
+                  getIdAndSname(busFunction,map,"model1",username,createTime);
+              }
+              if( iBus2Id == null ?(modellist.length >1 && StringUtils.equals(busFunction.getIId().toString(),modellist[1])) : busFunction.getIId().equals(iBus2Id))
+              {
+                  getIdAndSname(busFunction,map,"model2",username,createTime);
+              }if( iBus3Id == null ?(modellist.length >2 && StringUtils.equals(busFunction.getIId().toString(),modellist[2])) : busFunction.getIId().equals( iBus3Id))
+              {
+                  getIdAndSname(busFunction,map,"model3",username,createTime);
+              }if( iBus4Id == null ?(modellist.length >3 && StringUtils.equals(busFunction.getIId().toString(),modellist[3])) : busFunction.getIId().equals(iBus4Id))
+              {
+                  getIdAndSname(busFunction,map,"model4",username,createTime);
+              }
         }
     }
 
@@ -139,8 +139,10 @@ public class HomeAnalysis {
             strBuf.append("}} ") ;
             Result<IPage<Map<String, Object>>> byModelId = oaBusdataService.getByModelId(strBuf.toString(), username, username);
             log.info(byModelId.toString());
+            if (byModelId!=null && byModelId.getResult()!=null) {
             List<Map<String, Object>> oaList1 = byModelId.getResult().getRecords() ;
             oaList.addAll(oaList1 ) ;
+             }
             String TableName= iBusFunctionPermitService.findTabelName(function.getIBusModelId());
             String sName = busFunction.getSName();
             if(function.getIBusModelId()==1){ //发文管理
