@@ -812,11 +812,11 @@ public class OaBusDynamicTableServiceImpl implements OaBusDynamicTableService {
         Map<String, Object> docManageParam = new HashMap<>();
         docManageParam.put("table", "oa_docnum_manage");
         docManageParam.put("i_busdata_id", map.get("i_id") + "");
-        //已删除业务关联文号状态改为-1
+        //已删除业务关联文号状态改为1
         try {
             Map<String, Object> docManage = dynamicTableMapper.queryDataById(docManageParam);
             if (docManage != null) {
-                docManageParam.put("i_busdata_id", -1);
+                docManageParam.put("i_busdata_id", 1);
                 docManageParam.put("i_id", docManage.get("i_id")+"");
                 dynamicTableMapper.updateData(docManageParam);
             }
