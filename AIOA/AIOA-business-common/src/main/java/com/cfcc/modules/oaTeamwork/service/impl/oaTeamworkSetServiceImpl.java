@@ -10,6 +10,7 @@ import com.cfcc.modules.oaBus.mapper.BusFunctionMapper;
 import com.cfcc.modules.oaBus.mapper.BusFunctionPermitMapper;
 import com.cfcc.modules.oaBus.mapper.BusModelMapper;
 import com.cfcc.modules.oaTeamwork.entity.oaTeamwork;
+import com.cfcc.modules.oaTeamwork.entity.oaTeamworkInst;
 import com.cfcc.modules.oaTeamwork.entity.oaTeamworkSet;
 import com.cfcc.modules.oaTeamwork.mapper.oaTeamworkInstMapper;
 import com.cfcc.modules.oaTeamwork.mapper.oaTeamworkMapper;
@@ -101,6 +102,11 @@ public class oaTeamworkSetServiceImpl extends ServiceImpl<oaTeamworkSetMapper, o
     }
 
     @Override
+    public Integer findMaxId() {
+        return oaTeamworkSetMapper.findMaxId();
+    }
+
+    @Override
     public boolean deleteById(String id) {
         return oaTeamworkSetMapper.deleteByIid(id);
     }
@@ -111,7 +117,20 @@ public class oaTeamworkSetServiceImpl extends ServiceImpl<oaTeamworkSetMapper, o
     public IPage<oaTeamworkSet> findPage(Integer pageNo, Integer pageSize, oaTeamworkSet oaTeamworkSet) {
         int total = oaTeamworkSetMapper.count(oaTeamworkSet);
         List<oaTeamworkSet> OpinionList =  oaTeamworkSetMapper.findPage((pageNo-1)*pageSize,pageSize,oaTeamworkSet);
+
         for(int i=0;i<OpinionList.size();i++){
+
+            Integer max = oaTeamworkInstMapper.findMax(OpinionList.get(i).getITeamworkId());
+            if(max.equals(0)){
+                if(OpinionList.get(i).getIOrder()<max){
+                    String busdata =  oaTeamworkMapper.getBusData(OpinionList.get(i).getITeamworkId(),OpinionList.get(i).getIOrder());
+                    String  Stitle= oaTeamworkMapper.getTitle(busdata,OpinionList.get(i).getIOrder());
+                    OpinionList.get(i).setSTitle(Stitle);
+                }else{
+                    OpinionList.get(i).setSTitle("");
+                }
+            }
+
             BusModel model = busModelMapper.selectById(OpinionList.get(i).getIBusModelId());
             if(model != null){
                 OpinionList.get(i).setBusModelName(model.getSName());

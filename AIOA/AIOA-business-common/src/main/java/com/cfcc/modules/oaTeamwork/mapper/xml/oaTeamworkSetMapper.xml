@@ -119,5 +119,8 @@
     <select id="select" resultType="com.cfcc.modules.oaTeamwork.entity.oaTeamworkSet">
        select * from oa_teamwork_set where i_teamwork_id = #{iTeamworkId} and i_order = #{iOrder}
     </select>
+    <select id="findMaxId" resultType="java.lang.Integer">
+         select max(i_id) from oa_teamwork_set
+    </select>
 
 </mapper>

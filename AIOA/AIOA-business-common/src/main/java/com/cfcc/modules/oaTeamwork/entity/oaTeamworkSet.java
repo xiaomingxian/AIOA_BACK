@@ -95,5 +95,7 @@ public class oaTeamworkSet {
 	private java.lang.String OrderModelId; //步骤名字
 	@TableField(exist = false)
 	private java.lang.String tableName; //表
+	@TableField(exist = false)
+	private java.lang.String sTitle;
 
 }
