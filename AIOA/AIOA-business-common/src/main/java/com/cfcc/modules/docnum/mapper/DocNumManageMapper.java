@@ -51,4 +51,10 @@ public interface DocNumManageMapper extends BaseMapper<DocNumManage> {
     DocNumManage queryMaxDocNum(DocNumManage docNumManage);
 
     int updateMaxNum(DocNumManage docNumManage);
+
+    List<DocNumManage> checkDocNum(DocNumManage docNumManage);
+
+    List<DocNumManage> getBusdataDocNum(DocNumManage docNumManage);
+
+
 }

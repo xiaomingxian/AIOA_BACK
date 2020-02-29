@@ -41,6 +41,21 @@
         </where>
     </select>
 
+    <!-- 查询文号是否使用-->
+    <select id="checkDocNum" resultType="com.cfcc.modules.docnum.entity.DocNumManage">
+        SELECT i_id,i_docnum_id,s_year,i_doc_num,s_busdata_table,i_busdata_id from oa_docnum_manage WHERE i_docnum_id=#{iDocnumId} AND s_year=#{sYear} AND i_doc_num = #{iDocNum}
+    </select>
+
+    <select id="getBusdataDocNum" resultType="com.cfcc.modules.docnum.entity.DocNumManage">
+        SELECT i_id,i_docnum_id,s_year,i_doc_num,s_busdata_table,i_busdata_id
+        FROM oa_docnum_manage
+        WHERE
+        i_docnum_id = #{iDocnumId} AND s_year = #{sYear} AND i_busdata_id =#{iBusdataId}
+        <if test="sBusdataTable != null and sBusdataTable != ''">
+            and s_busdata_table=#{sBusdataTable}
+        </if>
+    </select>
+
     <!--登记文号-->
     <insert id="addDocNum">
         INSERT INTO oa_docnum_manage
