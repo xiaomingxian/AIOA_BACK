@@ -11,6 +11,7 @@ import com.cfcc.common.exception.AIOAException;
 import com.cfcc.common.mycat.MycatSchema;
 import com.cfcc.common.system.vo.DictModel;
 import com.cfcc.common.util.RedisUtil;
+import com.cfcc.common.util.StringUtil;
 import com.cfcc.modules.oaBus.entity.*;
 import com.cfcc.modules.oaBus.mapper.BusFunctionMapper;
 import com.cfcc.modules.oaBus.mapper.OaBusdataMapper;
@@ -21,7 +22,9 @@ import com.cfcc.modules.system.service.ISysDepartService;
 import com.cfcc.modules.system.service.ISysDictService;
 import com.cfcc.modules.system.service.ISysUserRoleService;
 import com.cfcc.modules.system.service.ISysUserService;
+import com.cfcc.modules.workflow.mapper.DepartWithTaskMapper;
 import com.cfcc.modules.workflow.pojo.Activity;
+import com.cfcc.modules.workflow.pojo.TaskWithDepts;
 import com.cfcc.modules.workflow.service.ProcessManagerService;
 import com.cfcc.modules.workflow.service.TaskCommonService;
 import lombok.extern.slf4j.Slf4j;
@@ -105,6 +108,9 @@ public class OaBusdataServiceImpl extends ServiceImpl<OaBusdataMapper, OaBusdata
     @Autowired
     private ButtonPermissionService buttonPermissionService;
 
+
+    @Autowired
+    private DepartWithTaskMapper departWithTaskMapper;
 
     //private Logger logger = LoggerFactory.getLogger(OaBusdataServiceImpl.class);
     @Override
@@ -547,6 +553,21 @@ public class OaBusdataServiceImpl extends ServiceImpl<OaBusdataMapper, OaBusdata
 
         Map<String, Object> btnAndOpt = ButtonPermissionService.getBtnAndOpt(result, currentUserPermission);
         result.put("btnAndOpt", btnAndOpt);
+
+
+        ArrayList<Integer> deptOptTypes = new ArrayList<>();
+        if(StringUtils.isNotBlank(processInstanceId)&& StringUtils.isNotBlank(taskId)&&StringUtils.isNotBlank(taskDef)){
+            List<String> types = departWithTaskMapper.selectMyType(processInstanceId, taskId, taskDef, userId);
+            types.stream().forEach(i->{
+                if (StringUtils.isNotBlank(i)&& i.contains("主办"))deptOptTypes.add(8);
+                if (StringUtils.isNotBlank(i)&& i.contains("辅办"))deptOptTypes.add(9);
+                if (StringUtils.isNotBlank(i)&& i.contains("传阅"))deptOptTypes.add(10);
+            });
+
+        }
+
+        //查询是主板/辅办/传阅
+        result.put("deptOptTypes",deptOptTypes);
         long l4 = System.currentTimeMillis();
         System.out.println("================>>>按钮+意见:" + (l4 - lcu));
 
