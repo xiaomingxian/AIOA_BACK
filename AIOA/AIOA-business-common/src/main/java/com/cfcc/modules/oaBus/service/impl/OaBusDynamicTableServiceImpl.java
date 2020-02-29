@@ -168,10 +168,10 @@ public class OaBusDynamicTableServiceImpl implements OaBusDynamicTableService {
 
         String sourceFileNum = busData.get("s_file_num") == null ? null : busData.get("s_file_num").toString();
         if (sName.contains("收文")) {//
-            if (null!=taskInfoVO.getIsDept() && taskInfoVO.getIsDept()) {
+            if (null != taskInfoVO.getIsDept() && taskInfoVO.getIsDept()) {
                 mainDept = taskInfoVO.getTaskWithDepts().getMainDept();
             }
-            if (StringUtils.isNotBlank(mainDept)){
+            if (StringUtils.isNotBlank(mainDept)) {
                 busData.put("s_create_dept", mainDept);
             }
             s_receive_num = busData.get("s_receive_num") == null ? "" : busData.get("s_receive_num").toString();
@@ -716,8 +716,8 @@ public class OaBusDynamicTableServiceImpl implements OaBusDynamicTableService {
             updateMap.put("s_file_num", jsonParam.get("s_file_num")); //文件字号
             updateMap.put("d_sealdate", jsonParam.get("d_sealdate"));  //封发日期
 //            updateMap.put("s_main_dept_names", jsonParam.get("s_main_dept_names")); //主送部门
-            updateMap.put("s_varchar5", jsonParam.get("s_create_name")); //拟稿时间
-            updateMap.put("s_varchar6", jsonParam.get("s_create_dept"));
+            updateMap.put("s_create_name", jsonParam.get("s_create_name")); //拟稿时间
+            updateMap.put("s_create_dept", jsonParam.get("s_create_dept")); //拟稿部门
             updateMap.put("s_main_unit_names", jsonParam.get("s_main_unit_names")); //主送单位
             updateMap.put("s_signer", jsonParam.get("s_signer")); //签发人
             updateMap.put("s_varchar1", jsonParam.get("table"));  //业务数据表
@@ -726,11 +726,11 @@ public class OaBusDynamicTableServiceImpl implements OaBusDynamicTableService {
             updateMap.put("i_urgency", jsonParam.get("i_urgency"));  //缓急
             updateMap.put("i_bigint1", jsonParam.get("i_id")); //传阅业务数据id
             updateMap.put("i_bigint2", jsonParam.get("i_bus_model_id")); //传阅业务模块id
-            updateMap.put("i_bigint4", jsonParam.get("i_bus_function_id")); //传阅业务id
+            updateMap.put("i_bigint3", jsonParam.get("i_bus_function_id")); //传阅业务id
             //业务名称
             Map<String, Object> names = oaBusdataService.getFuncitonDataById(functionId);
-            updateMap.put("s_varchar11", names.get("mName"));
-            updateMap.put("s_varchar12", names.get("fName"));
+            updateMap.put("s_varchar5", names.get("mName"));
+            updateMap.put("s_varchar6", names.get("fName"));
             updateMap.put("i_is_display", "0"); //是否临时
             updateMap.put("i_is_es", 3); //es
             LocalDate nowDate = LocalDate.now();
@@ -792,20 +792,38 @@ public class OaBusDynamicTableServiceImpl implements OaBusDynamicTableService {
     }
 
     @Override
-    public void insertOaOutLog(Map<String, Object> map,HttpServletRequest request) {
+    public void insertOaOutLog(Map<String, Object> map, HttpServletRequest request) {
         LoginInfo loginInfo = isysUserService.getLoginInfo(request);
-        map.put("s_send_by",loginInfo.getId()); //创建用户
-        map.put("d_create_time",new Date());  //发送时间
+        map.put("s_send_by", loginInfo.getId()); //创建用户
+        map.put("d_create_time", new Date());  //发送时间
         dynamicTableMapper.insertData(map);
     }
 
     @Override
     public boolean deleteBusdata(Map<String, Object> map) {
+        boolean b = false;
         if (map.get("processInstanceId") != null) {
             taskCommonService.del(map.get("processInstanceId") + "");
             map.remove("processInstanceId");
         }
-        boolean b = dynamicTableMapper.deleteData(map);
+        //删除业务数据
+        b = dynamicTableMapper.deleteData(map);
+        //更改文号状态
+        Map<String, Object> docManageParam = new HashMap<>();
+        docManageParam.put("table", "oa_docnum_manage");
+        docManageParam.put("i_busdata_id", map.get("i_id") + "");
+        //已删除业务关联文号状态改为1
+        try {
+            Map<String, Object> docManage = dynamicTableMapper.queryDataById(docManageParam);
+            if (docManage != null) {
+                docManageParam.put("i_busdata_id", 1);
+                docManageParam.put("i_id", docManage.get("i_id")+"");
+                dynamicTableMapper.updateData(docManageParam);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            log.info("文号状态修改失败！");
+        }
         return b;
     }
 

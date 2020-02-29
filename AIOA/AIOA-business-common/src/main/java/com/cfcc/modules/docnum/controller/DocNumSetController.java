@@ -9,11 +9,13 @@ import com.cfcc.common.system.query.QueryGenerator;
 import com.cfcc.common.system.util.JwtUtil;
 import com.cfcc.common.system.vo.LoginUser;
 import com.cfcc.common.util.oConvertUtils;
+import com.cfcc.modules.docnum.entity.DocNumExport;
 import com.cfcc.modules.docnum.entity.DocNumSet;
 import com.cfcc.modules.docnum.mapper.DocNumSetMapper;
 import com.cfcc.modules.docnum.service.IDocNumSetService;
 import com.cfcc.modules.oaBus.entity.BusFunction;
 import com.cfcc.modules.oaBus.entity.BusModel;
+import com.cfcc.modules.oaBus.entity.oaCalendar;
 import com.cfcc.modules.shiro.vo.DefContants;
 import com.cfcc.modules.system.entity.SysDepart;
 import com.cfcc.modules.system.entity.SysUser;
@@ -23,6 +25,7 @@ import com.cfcc.modules.system.service.ISysUserService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.ibatis.annotations.Param;
 import org.apache.shiro.SecurityUtils;
 import org.jeecgframework.poi.excel.ExcelImportUtil;
 import org.jeecgframework.poi.excel.def.NormalExcelConstants;
@@ -41,6 +44,7 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
@@ -229,6 +233,34 @@ public class DocNumSetController {
 			result.setSuccess(true);
 		}
 		return result;
+	}
+
+	/**
+	 * 导出excel
+	 *
+	 * @param request
+	 * @param response
+	 */
+	@RequestMapping(value = "/docNumExportXls")
+	public ModelAndView docNumExportXls(HttpServletRequest request, HttpServletResponse response) {
+		String iid = request.getParameter("iid");
+		String s_create_by = request.getParameter("s_create_by");
+		List<Map<String, Object>> functionData = docNumSetMapper.selectBusdataLIstsByDocId(Integer.valueOf(iid));
+		List<DocNumExport> exportsData = new ArrayList<>();
+		int i = 0;
+		for (Map<String,Object> table:functionData) {
+			i++;
+			DocNumExport docNumExport = docNumSetMapper.selectBusdataByIid(table.get("s_busdata_table") + "", (Integer) table.get("i_busdata_id"));
+			docNumExport.setIId(i);
+			exportsData.add(docNumExport);
+		}
+		ModelAndView mv = new ModelAndView(new JeecgEntityExcelView());
+		//导出文件名称
+		mv.addObject(NormalExcelConstants.FILE_NAME, "文号配置列表");
+		mv.addObject(NormalExcelConstants.CLASS, DocNumExport.class);
+		mv.addObject(NormalExcelConstants.PARAMS, new ExportParams("文号使用情况", "导出人:"+s_create_by, "文号使用列表"));
+		mv.addObject(NormalExcelConstants.DATA_LIST, exportsData);
+		return mv;
 	}
 
   /**

@@ -1,5 +1,6 @@
 package com.cfcc.modules.docnum.entity;
 
+import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import io.swagger.annotations.ApiModel;
@@ -7,6 +8,7 @@ import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.experimental.Accessors;
+import net.bytebuddy.asm.Advice;
 import org.jeecgframework.poi.excel.annotation.Excel;
 import org.springframework.format.annotation.DateTimeFormat;
 
@@ -22,7 +24,7 @@ import org.springframework.format.annotation.DateTimeFormat;
 @Accessors(chain = true)
 @ApiModel(value="oa_docnum对象", description="文号配置")
 public class DocNumSet {
-    
+
 	/**主键id*/
 	@Excel(name = "主键id", width = 15)
     @ApiModelProperty(value = "主键id")
@@ -90,13 +92,16 @@ public class DocNumSet {
 
 	@Excel(name = "部门列表", width = 20)
 	@ApiModelProperty(value = "部门列表")
+	@TableField(exist = false)
 	private String selecteddeparts;
 
 	@Excel(name = "所属模块名称", width = 20)
 	@ApiModelProperty(value = "所属模块名称")
+	@TableField(exist = false)
 	private String mName;
 
 	@Excel(name = "所属业务名称", width = 20)
 	@ApiModelProperty(value = "所属模块名称")
+	@TableField(exist = false)
 	private String fName;
 }
