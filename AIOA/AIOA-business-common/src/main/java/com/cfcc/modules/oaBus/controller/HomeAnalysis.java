@@ -139,8 +139,10 @@ public class HomeAnalysis {
             strBuf.append("}} ") ;
             Result<IPage<Map<String, Object>>> byModelId = oaBusdataService.getByModelId(strBuf.toString(), username, username);
             log.info(byModelId.toString());
+            if (byModelId!=null && byModelId.getResult()!=null) {
             List<Map<String, Object>> oaList1 = byModelId.getResult().getRecords() ;
             oaList.addAll(oaList1 ) ;
+             }
             String TableName= iBusFunctionPermitService.findTabelName(function.getIBusModelId());
             String sName = busFunction.getSName();
             if(function.getIBusModelId()==1){ //发文管理

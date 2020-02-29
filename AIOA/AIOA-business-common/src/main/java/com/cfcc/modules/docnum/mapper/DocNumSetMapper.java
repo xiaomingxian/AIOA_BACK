@@ -1,6 +1,7 @@
 package com.cfcc.modules.docnum.mapper;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+import com.cfcc.modules.docnum.entity.DocNumExport;
 import com.cfcc.modules.oaBus.entity.BusFunction;
 import com.cfcc.modules.oaBus.entity.BusModel;
 import com.cfcc.modules.docnum.entity.DocNumSet;
@@ -8,6 +9,7 @@ import com.cfcc.modules.system.entity.SysDepart;
 import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * @Description: 文号配置
@@ -113,4 +115,7 @@ public interface DocNumSetMapper extends BaseMapper<DocNumSet> {
      */
     List<DocNumSet> getDocNumNameList(@Param("iBusFunctionId") Integer iBusFunctionId,@Param("sDeptId") String sDeptId);
 
+    List<Map<String,Object>> selectBusdataLIstsByDocId(@Param("docId") Integer docId);
+
+    DocNumExport selectBusdataByIid(@Param("table") String table, @Param("iid") Integer iid);
 }

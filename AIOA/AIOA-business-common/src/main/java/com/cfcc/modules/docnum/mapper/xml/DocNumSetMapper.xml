@@ -12,7 +12,7 @@
         FROM oa_docnum WHERE i_id = #{id}
     </select>
     <!--分页查询-->
-    <select id="selectDocNumList"  resultType="com.cfcc.modules.docnum.entity.DocNumSet">
+    <select id="selectDocNumList" resultType="com.cfcc.modules.docnum.entity.DocNumSet">
         SELECT
         d.i_id,
         d.i_bus_model_id,
@@ -51,14 +51,14 @@
     </select>
 
     <!--条件查询统计条数-->
-    <select id="selectDocNumTotal"  resultType="integer">
-        select  count(i_id) as total from oa_docnum
+    <select id="selectDocNumTotal" resultType="integer">
+        select count(i_id) as total from oa_docnum
         <where>
             <if test="iBusModelId != null and iBusModelId != ''">
                 i_bus_model_id=#{iBusModelId}
             </if>
             <if test="iBusFunctionId != null and iBusFunctionId != ''">
-               and i_bus_function_id=#{iBusFunctionId}
+                and i_bus_function_id=#{iBusFunctionId}
             </if>
             <if test="sName !=null and sName!=''">
                 and s_name=#{sName}
@@ -98,7 +98,7 @@
     <!--新增文号配置-->
     <insert id="insertDocNum" parameterType="com.cfcc.modules.docnum.entity.DocNumSet">
         INSERT INTO oa_docnum (i_id,i_bus_model_id,i_bus_function_id,i_order,s_name,s_doc_rule,i_doc_num,i_utemplate_id,
-                     i_dtemplate_id,i_atemplate_id,s_remarks,s_create_by,d_create_time)
+        i_dtemplate_id,i_atemplate_id,s_remarks,s_create_by,d_create_time)
         VALUES(0,#{iBusModelId},#{iBusFunctionId},#{iOrder},#{sName},#{sDocRule},#{iDocNum},#{iUtemplateId},#{iDtemplateId},#{iAtemplateId},#{sRemarks},#{sCreateBy},NOW())
         <selectKey resultType="integer" keyProperty="iId" order="AFTER">
             SELECT LAST_INSERT_ID()
@@ -126,4 +126,24 @@
     <delete id="deleteDocNumDeptByIdocId">
         DELETE FROM oa_docnum_dept WHERE i_docnum_id= #{docId}
     </delete>
+
+    <!--根据文号配置id查询相关业务数据信息-->
+    <select id="selectBusdataLIstsByDocId" resultType="java.util.Map">
+        SELECT  m.s_busdata_table s_busdata_table ,m.i_busdata_id i_busdata_id  from oa_docnum d LEFT JOIN oa_docnum_manage m ON m.i_docnum_id = d.i_id WHERE d.i_id = #{docId}
+    </select>
+
+    <!--根据业务表和id查询导出文件信息-->
+    <select id="selectBusdataByIid" resultType="com.cfcc.modules.docnum.entity.DocNumExport">
+        SELECT
+            bf.s_name s_left_parameter,
+            bus.s_file_num s_file_num,
+            bus.i_create_year i_create_year,
+            bus.s_title s_title,
+            bus.s_create_dept s_create_dept,
+            bus.s_create_name s_create_name,
+            bus.d_create_time d_create_time
+        FROM ${table} bus
+        LEFT JOIN oa_bus_function bf ON bf.i_id = bus.i_bus_function_id
+        WHERE bus.i_id = #{iid}
+    </select>
 </mapper>
