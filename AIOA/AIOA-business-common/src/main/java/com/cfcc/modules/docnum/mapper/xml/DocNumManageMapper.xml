@@ -13,7 +13,7 @@
             <if test="doc.sYear != null and doc.sYear != ''">
                 and dm.s_year=#{doc.sYear}
             </if>
-            and dm.i_busdata_id in (0,-1)
+            and dm.i_busdata_id in (0,1,-1)
         </where>
         limit #{pageNo},#{pageSize}
     </select>
@@ -37,7 +37,7 @@
             <if test="sYear != null and sYear != ''">
                 and dm.s_year=#{sYear}
             </if>
-            and dm.i_busdata_id in (0,-1)
+            and dm.i_busdata_id in (0,1,-1)
         </where>
     </select>
 
