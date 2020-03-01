@@ -250,10 +250,12 @@ public class DocNumSetController {
 		List<DocNumExport> exportsData = new ArrayList<>();
 		int i = 0;
 		for (Map<String,Object> table:functionData) {
-			i++;
-			DocNumExport docNumExport = docNumSetMapper.selectBusdataByIid(table.get("s_busdata_table") + "", (Integer) table.get("i_busdata_id"));
-			docNumExport.setIId(i);
-			exportsData.add(docNumExport);
+			if ((Integer) table.get("i_busdata_id")!=0 && (Integer) table.get("i_busdata_id") !=1 && (Integer) table.get("i_busdata_id") !=-1) {
+				i++;
+				DocNumExport docNumExport = docNumSetMapper.selectBusdataByIid(table.get("s_busdata_table") + "", (Integer) table.get("i_busdata_id"));
+				docNumExport.setIId(i);
+				exportsData.add(docNumExport);
+			}
 		}
 		ModelAndView mv = new ModelAndView(new JeecgEntityExcelView());
 		//导出文件名称
