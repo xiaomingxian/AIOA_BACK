@@ -56,5 +56,5 @@ public interface DocNumManageMapper extends BaseMapper<DocNumManage> {
 
     List<DocNumManage> getBusdataDocNum(DocNumManage docNumManage);
 
-
+    List<Integer> selectNowDocNumList(DocNumManage docNumManage);
 }
