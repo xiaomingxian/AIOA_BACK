@@ -39,7 +39,7 @@
     <!--分页查询-->
     <select id="queryButton" resultType="com.cfcc.modules.oabutton.entity.OaOpinionSet">
         select i_id, i_proc_opinion_id,i_proc_set_id,i_task_opinion_name,i_task_opinion_order,
-        PROC_DEF_KEY_,TASK_DEF_KEY_
+        PROC_DEF_KEY_,TASK_DEF_KEY_,TYPE_
         from oa_opinion_set
         <where>
             <if test="opinionset.iTaskOpinionName != null and opinionset.iTaskOpinionName != ''">
@@ -81,6 +81,12 @@
         from oa_opinion_set where TASK_DEF_KEY_ = #{taskDefKey}
         and i_proc_opinion_id=#{iProcOpinionId}
         and PROC_DEF_KEY_=#{procDefKey}
+        <if test="type==null or type==''">
+            and TYPE_ is NULL
+        </if>
+        <if test="type!=null and type!=''">
+            and TYPE_=#{type}
+        </if>
     </select>
 
     <!--根据意见Id 查询列表-->

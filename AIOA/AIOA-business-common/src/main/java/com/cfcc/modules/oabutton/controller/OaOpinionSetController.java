@@ -155,6 +155,9 @@ public class OaOpinionSetController {
 			result.error500("当前意见不存在");
 			return result;
 		}
+		if (oaOpinionSet!=null|| oaOpinionSet.getType().equals("9999")){
+			oaOpinionSet.setType(null);
+		}
 		List<OaOpinionSet> oaOpinionSets = oaOpinionSetService.queryByType(oaOpinionSet.getType(), oaOpinionSet.getIProcOpinionId());
 		if (oaOpinionSet.getType()!=null&&oaOpinionSet.getType().trim().length()>0&&oaOpinionSets.size()>0){
 			result.error500("当前意见类型已存在");
@@ -187,6 +190,9 @@ public class OaOpinionSetController {
 		if (oaOpinionSet==null|| oaOpinionSet.getIProcOpinionId()==null){
 			result.error500("当前意见不存在");
 			return result;
+		}
+		if (oaOpinionSet!=null|| oaOpinionSet.getType().equals("9999")){
+			oaOpinionSet.setType(null);
 		}
 //		List<OaOpinionSet> oaOpinionSets = oaOpinionSetService.queryByType(oaOpinionSet.getType(), oaOpinionSet.getIProcOpinionId());
 //		if (oaOpinionSet.getType()!=null&&oaOpinionSet.getType().trim().length()>0&&oaOpinionSets.size()>0&&oaOpinionSets.get(0).getIId()!=oaOpinionSet.getIId()){
@@ -278,9 +284,12 @@ public class OaOpinionSetController {
 	 @PostMapping(value = "/queryByTaskDefKey")
 	 public Result<OaOpinionSet> queryByTaskKey(@RequestBody Map<String,Object> map) {
 		 Result<OaOpinionSet> result = new Result<OaOpinionSet>();
-		 if (map.get("taskDefKey")==null || map.get("iProcOpinionId")==null ||map.get("procDefKey")==null){
+		 if (map.get("taskDefKey")==null||map.get("type")==null || map.get("iProcOpinionId")==null ||map.get("procDefKey")==null){
 			 result.error500("未找到对应实体");
 			 return result;
+		 }
+		 if(map.get("type")==" "|| map.get("type").equals("9999")){
+			 map.put("type",null);
 		 }
 		 OaOpinionSet oaOpinionSet = oaOpinionSetService.queryByTaskKey(map);
 		 if (oaOpinionSet == null) {
