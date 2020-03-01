@@ -43,7 +43,7 @@
                 and d.i_bus_function_id=#{doc.iBusFunctionId}
             </if>
             <if test="doc.sName !=null and doc.sName!=''">
-                and d.s_name=#{doc.sName}
+                and d.s_name like concat('%', #{doc.sName},'%')
             </if>
         </where>
         ORDER BY d_create_time DESC
@@ -61,7 +61,7 @@
                 and i_bus_function_id=#{iBusFunctionId}
             </if>
             <if test="sName !=null and sName!=''">
-                and s_name=#{sName}
+                and s_name like concat('%', #{sName},'%')
             </if>
         </where>
     </select>

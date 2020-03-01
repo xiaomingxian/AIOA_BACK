@@ -17,7 +17,7 @@
                 i_type=#{temp.iType}
             </if>
             <if test="temp.sName !=null and temp.sName!=''">
-                and s_name=#{temp.sName}
+                and s_name like concat('%', #{temp.sName},'%')
             </if>
         </where>
         ORDER BY d_create_time DESC
@@ -31,7 +31,7 @@
                 i_type=#{iType}
             </if>
             <if test="sName !=null and sName!=''">
-                and s_name=#{sName}
+                and s_name like concat('%', #{sName},'%')
             </if>
         </where>
     </select>
