@@ -14,6 +14,7 @@ import com.cfcc.common.util.RedisUtil;
 import com.cfcc.common.util.StringUtil;
 import com.cfcc.modules.oaBus.entity.*;
 import com.cfcc.modules.oaBus.mapper.BusFunctionMapper;
+import com.cfcc.modules.oaBus.mapper.OaBusDynamicTableMapper;
 import com.cfcc.modules.oaBus.mapper.OaBusdataMapper;
 import com.cfcc.modules.oaBus.service.*;
 import com.cfcc.modules.system.entity.*;
@@ -77,8 +78,6 @@ public class OaBusdataServiceImpl extends ServiceImpl<OaBusdataMapper, OaBusdata
     @Autowired
     private IBusProcSetService iBusProcSetService;
     @Autowired
-    private TaskCommonService taskCommonService;
-    @Autowired
     private OaBusDynamicTableService dynamicTableService;
     @Autowired
     private ISysDictService sysDictService;
@@ -108,9 +107,11 @@ public class OaBusdataServiceImpl extends ServiceImpl<OaBusdataMapper, OaBusdata
     @Autowired
     private ButtonPermissionService buttonPermissionService;
 
-
     @Autowired
     private DepartWithTaskMapper departWithTaskMapper;
+
+    @Autowired
+    private OaBusDynamicTableMapper dynamicTableMapper;
 
     //private Logger logger = LoggerFactory.getLogger(OaBusdataServiceImpl.class);
     @Override
@@ -444,12 +445,6 @@ public class OaBusdataServiceImpl extends ServiceImpl<OaBusdataMapper, OaBusdata
 
         long l2 = System.currentTimeMillis();
         String userId=user.getId();
-//        if (status!=null && "agent".equalsIgnoreCase(status)){//代理人情况
-//            SysUser agentUser = ((LoginInfo) user).getAgentUser();
-//            if (agentUser!=null){
-//                userId=agentUser.getId();
-//            }
-//        }
 
         System.out.println("================>>>业务详情查询时间::" + (l2 - l1));
         //********************************************************************* 流程信息查询
@@ -459,6 +454,7 @@ public class OaBusdataServiceImpl extends ServiceImpl<OaBusdataMapper, OaBusdata
         String processDefinitionId = null;
         String taskDef = null;
         String executionId = null;
+        String taskDefName=null;
         if (StringUtils.isBlank(proKey)) {//没有流程
             result.put("optionTable", null);
         } else {//有流程
@@ -507,12 +503,14 @@ public class OaBusdataServiceImpl extends ServiceImpl<OaBusdataMapper, OaBusdata
                     processDefinitionId = task.getProcessDefinitionId();
                     taskDef = task.getTaskDefinitionKey();
                     executionId = task.getExecutionId();
+                    taskDefName=task.getName();
                 } else if (historicTaskInstance != null) {
                     taskId = historicTaskInstance.getId();
                     processInstanceId = historicTaskInstance.getProcessInstanceId();
                     processDefinitionId = historicTaskInstance.getProcessDefinitionId();
                     taskDef = historicTaskInstance.getTaskDefinitionKey();
                     executionId = historicTaskInstance.getExecutionId();
+                    taskDefName=historicTaskInstance.getName();
                 }
             }
         }
@@ -520,13 +518,6 @@ public class OaBusdataServiceImpl extends ServiceImpl<OaBusdataMapper, OaBusdata
         long l3 = System.currentTimeMillis();
         System.out.println("================>>>流程信息查询时间:" + (l3 - l2));
 
-        //******************************************   更新状态为已读
-        //只是待办状态时修改
-        if (StringUtils.isNotBlank(status) && "todo".equalsIgnoreCase(status)) {
-            iBusFunctionPermitService.updateReade(tableName + "_permit", loginInfo.getId(), functionId, busdataId);
-        }
-        long lstatus = System.currentTimeMillis();
-        System.out.println("================>>>修改状态时间:" + (lstatus - l3));
 
 
         String optionTable = tableName + "_opinion";
@@ -537,11 +528,20 @@ public class OaBusdataServiceImpl extends ServiceImpl<OaBusdataMapper, OaBusdata
         result.put("taskId", taskId);
         result.put("processDefinitionId", processDefinitionId);
         result.put("processInstanceId", processInstanceId);
+        result.put("taskDefName", taskDefName);
         result.put("status", status);
         result.put("table", tableName);
         result.put("executionId", executionId);
         result.put("functionId", functionId);
 
+
+        //******************************************   更新状态为已读
+        //只是待办状态时修改
+        if (StringUtils.isNotBlank(status) && "todo".equalsIgnoreCase(status)) {
+            iBusFunctionPermitService.updateReade(tableName + "_permit", loginInfo.getId(), functionId, busdataId);
+        }
+        long lstatus = System.currentTimeMillis();
+        System.out.println("================>>>修改状态时间:" + (lstatus - l3));
 
         //******************************************   按钮/意见
         Map<String, Boolean> currentUserPermission =
