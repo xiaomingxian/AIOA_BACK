@@ -1223,8 +1223,11 @@ public class TaskCommonServiceImpl implements TaskCommonService {
             if (userId.contains(",")) {
                 split = userId.split(",");
                 userId = userId.substring(0, (userId.length() - 1));
-                if (split.length > 1) qiangQian = true;
-                map.put("s_create_by", "");
+                if (split.length > 1){
+                    qiangQian = true;
+                    map.put("s_create_by", "");
+                }
+                if (split.length==1) map.put("s_create_by", userId);
             }
             String busMsg = VarsWithBus.getBusMsg(map);
 
