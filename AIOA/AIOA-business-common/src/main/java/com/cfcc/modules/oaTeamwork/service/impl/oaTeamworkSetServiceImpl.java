@@ -123,8 +123,8 @@ public class oaTeamworkSetServiceImpl extends ServiceImpl<oaTeamworkSetMapper, o
             Integer max = oaTeamworkInstMapper.findMax(OpinionList.get(i).getITeamworkId());
             if(max != null){
                 if(OpinionList.get(i).getIOrder()<max){
-                    String busdata =  oaTeamworkMapper.getBusData(OpinionList.get(i).getITeamworkId(),OpinionList.get(i).getIOrder());
-                    String  Stitle= oaTeamworkMapper.getTitle(busdata,OpinionList.get(i).getIOrder());
+                    String busdata =  oaTeamworkMapper.getBusData2(OpinionList.get(i).getITeamworkId(),OpinionList.get(i).getIOrder());
+                    String  Stitle= oaTeamworkMapper.getTitle1(busdata,OpinionList.get(i).getIOrder(),OpinionList.get(i).getIId(),OpinionList.get(i).getITeamworkId());
                     OpinionList.get(i).setSTitle(Stitle);
                 }else{
                     OpinionList.get(i).setSTitle("");

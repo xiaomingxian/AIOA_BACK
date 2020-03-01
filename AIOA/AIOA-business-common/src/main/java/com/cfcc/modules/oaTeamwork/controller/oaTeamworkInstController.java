@@ -21,6 +21,7 @@ import com.cfcc.modules.oaBus.service.IBusFunctionService;
 import com.cfcc.modules.oaTeamwork.entity.oaTeamwork;
 import com.cfcc.modules.oaTeamwork.entity.oaTeamworkInst;
 import com.cfcc.modules.oaTeamwork.service.IoaTeamworkInstService;
+import com.cfcc.modules.oaTeamwork.service.IoaTeamworkSetService;
 import lombok.extern.slf4j.Slf4j;
 
 import org.jeecgframework.poi.excel.ExcelImportUtil;
@@ -54,6 +55,9 @@ public class oaTeamworkInstController {
 
 	@Autowired
 	private IBusFunctionService iBusFunctionService;
+
+	@Autowired
+	private IoaTeamworkSetService ioaTeamworkSetService;
 	/**
 	  * 分页列表查询
 	 * @param oaTeamworkInst
@@ -119,11 +123,47 @@ public class oaTeamworkInstController {
             oaTeamworkInst oaTeamworkInst1 = JSONObject.toJavaObject( jsonObject1,oaTeamworkInst.class);
             oaTeamworkInst oaTeamworkInst2 = JSONObject.toJavaObject( jsonObject2,oaTeamworkInst.class);
 			if(oaTeamworkInst1 != null){
-				oaTeamworkInstService.Insert(oaTeamworkInst1);
+				Integer iOrder = oaTeamworkInst1.getIOrder();
+				int max = ioaTeamworkSetService.findMax(oaTeamworkInst1.getITeamworkId());
+				if(max == iOrder){//证明是最后一步
+					iOrder = iOrder-1;
+					Integer iVersion = oaTeamworkInst1.getIVersion();
+					oaTeamworkInst oaTeamworkInst = oaTeamworkInstService.setUp(iOrder,iVersion);
+					if(oaTeamworkInst!=null){
+						Integer iId = oaTeamworkInst.getIId();
+						oaTeamworkInst oaTeamwork = oaTeamworkInstService.findById(iId);
+						oaTeamwork.setIText(1);
+						oaTeamworkInstService.updateByIid(oaTeamwork);
+					}
+					oaTeamworkInst1.setIText(1);
+					oaTeamworkInstService.Insert(oaTeamworkInst1);
+				}else{
+					if(iOrder-1!=0){
+						iOrder = iOrder-1;
+						Integer iVersion = oaTeamworkInst1.getIVersion();
+						oaTeamworkInst oaTeamworkInst = oaTeamworkInstService.setUp(iOrder,iVersion);
+						if(oaTeamworkInst!=null){
+							Integer iId = oaTeamworkInst.getIId();
+							oaTeamworkInst oaTeamwork = oaTeamworkInstService.findById(iId);
+							oaTeamwork.setIText(1);
+							oaTeamworkInstService.updateByIid(oaTeamwork);
+						}
+						oaTeamworkInstService.Insert(oaTeamworkInst1);
+					}else{
+						oaTeamworkInstService.Insert(oaTeamworkInst1);
+					}
+				}
+
+
 			}
 
 			if(oaTeamworkInst2 != null){
-				oaTeamworkInstService.Insert(oaTeamworkInst2);
+				Integer iOrder = oaTeamworkInst2.getIOrder();
+				int max = ioaTeamworkSetService.findMax(oaTeamworkInst2.getITeamworkId());
+				if(max == iOrder){//证明是最后一步
+					oaTeamworkInst2.setIText(1);
+					oaTeamworkInstService.Insert(oaTeamworkInst2);
+				}
 			}
 
 

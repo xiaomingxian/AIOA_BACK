@@ -29,4 +29,6 @@ public interface IoaTeamworkInstService extends IService<oaTeamworkInst> {
     List<oaTeamworkInst> findList(oaTeamworkInst oaTeamworkInst);
 
     List<Integer> findOrder(Integer iteamworkId);
+
+    oaTeamworkInst setUp(Integer iOrder, Integer iVersion);
 }

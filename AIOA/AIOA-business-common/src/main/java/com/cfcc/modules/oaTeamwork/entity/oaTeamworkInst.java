@@ -58,8 +58,12 @@ public class oaTeamworkInst {
 	private java.lang.Integer iVersion;
 	/**业务数据id*/
 	@Excel(name = "业务数据id", width = 15)
-    @ApiModelProperty(value = "业务数据id")
+	@ApiModelProperty(value = "业务数据id")
 	private java.lang.Integer iBusdataId;
+	/**测试数据*/
+	@Excel(name = "测试数据", width = 15)
+	@ApiModelProperty(value = "测试数据")
+	private java.lang.Integer iText;
 
 	@TableField(exist = false)
 	private java.lang.String iTeamworkName; //个人协同办公业务配置分类名称

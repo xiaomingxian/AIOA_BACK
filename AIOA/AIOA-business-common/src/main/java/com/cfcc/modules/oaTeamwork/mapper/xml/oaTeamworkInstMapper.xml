@@ -10,7 +10,8 @@
          i_bus_function_id,
          i_version,
          i_busdata_id,
-         i_order
+         i_order,
+         i_text
         ) values
         (null,
         #{iTeamworkId},
@@ -19,12 +20,13 @@
         #{iBusFunctionId},
         #{iVersion},
         #{iBusdataId},
-        #{iOrder}
+        #{iOrder},
+        #{iText}
         )
     </insert>
 
     <update id="updateByIid">
-      	UPDATE oa_teamwork_inst SET i_teamwork_set_id = #{iTeamworkSetId},i_teamwork_id = #{iTeamworkId},i_bus_model_id = #{iBusModelId} ,i_bus_function_id = #{iBusFunctionId},i_version = #{iVersion},i_busdata_id =  #{iBusdataId} where i_id = #{iId}
+      	UPDATE oa_teamwork_inst SET i_teamwork_set_id = #{iTeamworkSetId},i_teamwork_id = #{iTeamworkId},i_bus_model_id = #{iBusModelId} ,i_bus_function_id = #{iBusFunctionId},i_version = #{iVersion},i_busdata_id =  #{iBusdataId},i_text=#{iText} where i_id = #{iId}
     </update>
 
     <delete id="deleteByid">
@@ -43,7 +45,7 @@
          select count(*) from oa_teamwork_set where i_teamwork_id = #{iteamworkId}
     </select>
     <select id="LastOrder" resultType="java.lang.Integer">
-        select MAX(i_order) from oa_teamwork_inst where i_teamwork_id = #{iteamworkId}
+        select MAX(i_order) from oa_teamwork_inst where   i_text!='' and  i_teamwork_id = #{iteamworkId}
     </select>
     <select id="count" resultType="java.lang.Integer">
         select count(1) from oa_teamwork_inst c
@@ -91,7 +93,7 @@
     <select id="findPage" resultType="com.cfcc.modules.oaTeamwork.entity.oaTeamworkInst">
         select *  from oa_teamwork_inst c
         <where>
-            c.i_order = 1
+            c.i_order = 1 and  c.i_text!=''
             <if test="oaTeamworkInst.iTeamworkId != null and oaTeamworkInst.iTeamworkId != '' ">
                 and  c.i_teamwork_id = #{oaTeamworkInst.iTeamworkId}
             </if>
@@ -131,6 +133,7 @@
     <select id="findList" resultType="com.cfcc.modules.oaTeamwork.entity.oaTeamworkInst">
         select *  from oa_teamwork_inst c
         <where>
+            c.i_text!=''
             <if test="oaTeamworkInst.iTeamworkId != null and oaTeamworkInst.iTeamworkId != '' ">
                 and  c.i_teamwork_id = #{oaTeamworkInst.iTeamworkId}
             </if>
@@ -171,6 +174,9 @@
     </select>
     <select id="getDataId" resultType="java.lang.Integer">
         select i_busdata_id from oa_teamwork_inst where i_bus_function_id  = #{iBusFunctionId} and i_version = #{iVersion}
+    </select>
+    <select id="setUp" resultType="com.cfcc.modules.oaTeamwork.entity.oaTeamworkInst">
+        SELECT * from oa_teamwork_inst  where i_order = #{iOrder} and i_version = #{iVersion}
     </select>
 
 </mapper>

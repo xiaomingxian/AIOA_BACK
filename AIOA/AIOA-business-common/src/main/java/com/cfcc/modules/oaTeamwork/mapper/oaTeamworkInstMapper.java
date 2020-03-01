@@ -38,4 +38,6 @@ public interface oaTeamworkInstMapper extends BaseMapper<oaTeamworkInst> {
     List<Integer> findOrder(Integer iteamworkId);
 
     Integer getDataId(Integer iBusFunctionId,Integer iVersion);
+
+    oaTeamworkInst setUp(Integer iOrder, Integer iVersion);
 }

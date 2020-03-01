@@ -93,13 +93,18 @@
      select s_name from  oa_bus_model where i_id =  (select i_bus_model_id from oa_teamwork_set where i_teamwork_id = #{iTeamworkId} limit 0,1)
     </select>
     <select id="getBusData" resultType="java.lang.String">
-     select s_busdata_table from oa_bus_model b INNER JOIN oa_teamwork_inst i where b.i_id = i.i_bus_model_id and i.i_teamwork_id = #{iTeamworkId} and i.i_order = #{iorder}
+     select s_busdata_table from oa_bus_model b INNER JOIN oa_teamwork_inst i where b.i_id = i.i_bus_model_id and i.i_teamwork_id = #{iTeamworkId} and i.i_order = #{iorder} and i.i_id = #{id}
     </select>
     <select id="getTitle" resultType="java.lang.String">
-        select  s_title from  ${busdata}  t  INNER JOIN oa_teamwork_inst  j WHERE j.i_busdata_id = t.i_id  and j.i_order = #{iorder}
+        select  s_title from  ${busdata}  t  INNER JOIN oa_teamwork_inst  j WHERE j.i_busdata_id = t.i_id  and j.i_order = #{iorder}  and t.i_id=#{busdataId}
+    </select>
+    <select id="getTitle1" resultType="java.lang.String">
+        select  s_title from  ${busdata}  t  INNER JOIN oa_teamwork_inst  j WHERE j.i_busdata_id = t.i_id  and j.i_order = #{iorder}  and  j.i_id =#{iId} and j.i_teamwork_id =#{itemworkId}
     </select>
     <select id="getBusData1" resultType="java.lang.String">
         select s_busdata_table from oa_bus_model b INNER JOIN oa_teamwork_inst i where b.i_id = i.i_bus_model_id and i.i_teamwork_id = #{iTeamworkId} and i.i_id =#{id}
     </select>
-
+    <select id="getBusData2" resultType="java.lang.String">
+        select s_busdata_table from oa_bus_model b INNER JOIN oa_teamwork_inst i where b.i_id = i.i_bus_model_id and i.i_teamwork_id = #{iTeamworkId} and i.i_order = #{iOrder}
+    </select>
 </mapper>
