@@ -87,7 +87,7 @@ public class SysRoleController {
      * @return
      */
     @RequestMapping(value = "/list", method = RequestMethod.GET)
-    public Result<IPage<Map<String,Object>>> queryPageList(String role,
+    public Result<IPage<Map<String,Object>>> queryPageList(String roleName,
                                                 @RequestParam(name = "pageNo", defaultValue = "1") Integer pageNo,
                                                 @RequestParam(name = "pageSize", defaultValue = "10") Integer pageSize,
                                                 HttpServletRequest req) {
@@ -96,7 +96,7 @@ public class SysRoleController {
 //        Page<SysRole> page = new Page<SysRole>(pageNo, pageSize);
 //        queryWrapper.like("role_name",role );
 //        IPage<SysRole> pageList = sysRoleService.page(page, queryWrapper);
-        IPage<Map<String,Object>> pageList = sysRoleService.pageOneSysRole(role, pageNo, pageSize);
+        IPage<Map<String,Object>> pageList = sysRoleService.pageOneSysRole(roleName, pageNo, pageSize);
         result.setSuccess(true);
         result.setResult(pageList);
         return result;
