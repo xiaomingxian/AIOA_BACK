@@ -223,9 +223,10 @@ public class DocNumSetController {
 	@AutoLog(value = "文号配置-通过id查询")
 	@ApiOperation(value="文号配置-通过id查询", notes="文号配置-通过id查询")
 	@GetMapping(value = "/queryById")
-	public Result<DocNumSet> queryById(@RequestParam(name="id",required=true) Integer id) {
+	public Result<DocNumSet> queryById(@RequestParam(name="id",required=true) Integer id,
+									   @RequestParam(name="sYear",required=false) String sYear) {
 		Result<DocNumSet> result = new Result<DocNumSet>();
-		DocNumSet docNumSet = docNumSetService.queryById(id);
+		DocNumSet docNumSet = docNumSetService.queryById(id,sYear);
 		if(docNumSet==null) {
 			result.error500("未找到对应实体");
 		}else {
@@ -249,10 +250,12 @@ public class DocNumSetController {
 		List<DocNumExport> exportsData = new ArrayList<>();
 		int i = 0;
 		for (Map<String,Object> table:functionData) {
-			i++;
-			DocNumExport docNumExport = docNumSetMapper.selectBusdataByIid(table.get("s_busdata_table") + "", (Integer) table.get("i_busdata_id"));
-			docNumExport.setIId(i);
-			exportsData.add(docNumExport);
+			if ((Integer) table.get("i_busdata_id")!=0 && (Integer) table.get("i_busdata_id") !=1 && (Integer) table.get("i_busdata_id") !=-1) {
+				i++;
+				DocNumExport docNumExport = docNumSetMapper.selectBusdataByIid(table.get("s_busdata_table") + "", (Integer) table.get("i_busdata_id"));
+				docNumExport.setIId(i);
+				exportsData.add(docNumExport);
+			}
 		}
 		ModelAndView mv = new ModelAndView(new JeecgEntityExcelView());
 		//导出文件名称

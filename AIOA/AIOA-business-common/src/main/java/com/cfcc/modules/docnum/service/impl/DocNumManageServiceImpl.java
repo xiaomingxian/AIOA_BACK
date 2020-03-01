@@ -9,6 +9,8 @@ import com.cfcc.modules.docnum.service.IDocNumManageService;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -67,6 +69,21 @@ public class DocNumManageServiceImpl extends ServiceImpl<DocNumManageMapper, Doc
         }
         DocNumManage maxDocNum = docNumManageMapper.queryMaxDocNum(docNumManage);
         docNumManageMapper.updateMaxNum(maxDocNum);
+        List<Integer> docNumList = docNumManageMapper.selectNowDocNumList(docNumManage);
+        List<Integer> maxNumList = new ArrayList<>();
+        for (int i = 1; i < maxDocNum.getIDocNum() + 1; i++) {
+            maxNumList.add(i);
+        }
+        if (!docNumList.containsAll(maxNumList)) {
+            List<Object> differentNum = compare(docNumList.toArray(), maxNumList.toArray());
+            for (Object num: differentNum){
+                docNumManage.setIId(null);
+                docNumManage.setIDocNum(Integer.parseInt(String.valueOf(num)));
+                docNumManage.setIBusdataId(0);
+                docNumManageMapper.insert(docNumManage);
+            }
+        }
+
         return maxDocNum.getIDocNum();
     }
 
@@ -74,5 +91,17 @@ public class DocNumManageServiceImpl extends ServiceImpl<DocNumManageMapper, Doc
     public List<DocNumManage> checkDocNum(DocNumManage docNumManage) {
         List<DocNumManage> docNumManages = docNumManageMapper.checkDocNum(docNumManage);
         return docNumManages;
+    }
+
+    public <T> List<T> compare(T[] t1, T[] t2) {
+        List<T> list1 = Arrays.asList(t1);
+        List<T> list2 = new ArrayList<T>();
+        for (T t : t2) {
+            if (!list1.contains(t)) {
+                list2.add(t);
+            }
+        }
+        return list2;
+
     }
 }
