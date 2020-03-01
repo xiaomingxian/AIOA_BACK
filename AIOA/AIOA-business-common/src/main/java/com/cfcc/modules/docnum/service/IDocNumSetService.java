@@ -19,7 +19,15 @@ import java.util.List;
 public interface IDocNumSetService extends IService<DocNumSet> {
 
     /**
-     * 根据id查询
+     * 根据年、文号id查询最大docnum
+     * @param id
+     * @param sYear 选填
+     * @return
+     */
+    DocNumSet queryById(Integer id,String sYear);
+
+    /**
+     *根据id查询
      * @param id
      * @return
      */

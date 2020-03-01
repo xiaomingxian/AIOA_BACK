@@ -224,9 +224,7 @@
         <if test="pojo.iImport!=null and pojo.iImport!=''">
             and v.text_ like CONCAT('%^important%',#{pojo.iImport},'%^%')
         </if>
-        )ut where 1=1
-        order by cast(ut.id as SIGNED INTEGER) desc
-
+        )ut
         )s
         GROUP BY s.processInstanceId
         order by

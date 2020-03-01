@@ -352,7 +352,7 @@ public class TaskCommonServiceImpl implements TaskCommonService {
                     for (String id : ids) {
                         if (StringUtils.isBlank(id)) continue;
                         SysUser sysUser = users.get(id);
-                        if(sysUser==null)continue;
+                        if (sysUser == null) continue;
 
                         HashMap<String, Object> map = new HashMap<>();
                         map.put("userName", sysUser.getUsername());
@@ -1219,10 +1219,15 @@ public class TaskCommonServiceImpl implements TaskCommonService {
             String bussinessKey = map.get("i_id") + "";
             String userId = map.get("s_create_by") + "";
             boolean qiangQian = false;
+            String[] split = null;
             if (userId.contains(",")) {
+                split = userId.split(",");
                 userId = userId.substring(0, (userId.length() - 1));
-                qiangQian = true;
-                map.put("s_create_by", "");
+                if (split.length > 1){
+                    qiangQian = true;
+                    map.put("s_create_by", "");
+                }
+                if (split.length==1) map.put("s_create_by", userId);
             }
             String busMsg = VarsWithBus.getBusMsg(map);
 
@@ -1235,7 +1240,13 @@ public class TaskCommonServiceImpl implements TaskCommonService {
                 //传过来的是抢签 但是只允许普通 提示
                 throw new AIOAException("该流程第一环节不支持抢签,请检查流程设计或业务配置");
             }
-            vars.put(draft, userId);
+
+            //抢签-多用户
+            if (qiangQian){
+                vars.put(draft, split);
+            }else {//单用户(不区分抢签)
+                vars.put(draft, userId);
+            }
 
 
             //流程相关展示存储

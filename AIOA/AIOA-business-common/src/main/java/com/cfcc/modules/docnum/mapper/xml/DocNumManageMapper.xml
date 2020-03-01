@@ -27,6 +27,7 @@
         LEFT JOIN oa_docnum  d ON d.i_id = m.i_docnum_id
         WHERE  m.i_docnum_id = #{iDocnumId} AND  m.s_year = #{sYear}
     </select>
+
     <!--统计空号数量-->
     <select id="getNumListTotal" resultType="java.lang.Integer">
         SELECT count(i_id) AS iId FROM oa_docnum_manage as dm
@@ -46,6 +47,7 @@
         SELECT i_id,i_docnum_id,s_year,i_doc_num,s_busdata_table,i_busdata_id from oa_docnum_manage WHERE i_docnum_id=#{iDocnumId} AND s_year=#{sYear} AND i_doc_num = #{iDocNum}
     </select>
 
+    <!--  获取文号详情  -->
     <select id="getBusdataDocNum" resultType="com.cfcc.modules.docnum.entity.DocNumManage">
         SELECT i_id,i_docnum_id,s_year,i_doc_num,s_busdata_table,i_busdata_id
         FROM oa_docnum_manage
@@ -54,6 +56,11 @@
         <if test="sBusdataTable != null and sBusdataTable != ''">
             and s_busdata_table=#{sBusdataTable}
         </if>
+    </select>
+
+    <!--    查询当前文号编号列表-->
+    <select id="selectNowDocNumList" resultType="java.lang.Integer">
+        SELECT	i_doc_num FROM	oa_docnum_manage WHERE	i_docnum_id = #{iDocnumId} AND s_year = #{sYear}
     </select>
 
     <!--登记文号-->

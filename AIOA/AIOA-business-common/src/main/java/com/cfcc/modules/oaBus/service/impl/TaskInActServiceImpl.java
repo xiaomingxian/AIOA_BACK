@@ -24,6 +24,7 @@ import org.activiti.engine.impl.interceptor.CommandExecutor;
 import org.activiti.engine.impl.persistence.entity.TaskEntity;
 import org.activiti.engine.runtime.Execution;
 import org.activiti.engine.task.Task;
+import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -60,13 +61,20 @@ public class TaskInActServiceImpl implements TaskInActService {
 
     @Override
     public void doTask(TaskInfoVO taskInfoVO, HttpServletRequest request) {
+        LoginInfo loginInfo = sysUserService.getLoginInfo(request);
 
-        //1 流程办理
-        String nextTaskMsg = taskCommonService.doTask(taskInfoVO);
         //2 业务相关
         Map<String, Object> busData = taskInfoVO.getBusData();
+        //3 如果是抢签(可能会没有创建者-需要把抢到签的用户作为创建者)
+        String userId = busData.get("s_create_by") == null ? null : busData.get("s_create_by").toString();
+        if (StringUtils.isBlank(userId)) {
+            busData.put("s_create_by", loginInfo.getId());
+        }
+        //1 流程办理
+        String nextTaskMsg = taskCommonService.doTask(taskInfoVO);
+
+
         if (nextTaskMsg.endsWith("  ")) {
-            LoginInfo loginInfo = sysUserService.getLoginInfo(request);
             busData.put("s_signer", loginInfo.getUsername());
 
             busData.put("d_date1", new Date());//new SimpleDateFormat("yyyy-MM-dd").format(new Date()));//
