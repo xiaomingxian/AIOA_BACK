@@ -4,6 +4,8 @@ import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.cfcc.modules.docnum.entity.DocNumManage;
 
+import java.util.List;
+
 /**
  * @Description: 文号管理表
  * @Author: jeecg-boot
@@ -27,5 +29,7 @@ public interface IDocNumManageService extends IService<DocNumManage> {
     boolean updateDocNumStatus(DocNumManage docNumManage);
 
     int addDocNum(DocNumManage docNumManage);
+
+    List<DocNumManage> checkDocNum(DocNumManage docNumManage);
 
 }

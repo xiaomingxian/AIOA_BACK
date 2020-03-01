@@ -66,6 +66,8 @@ public class oaTeamworkInst {
 	@TableField(exist = false)
 	private java.lang.String busModelName;
 	@TableField(exist = false)
+	private java.lang.String sTitle;
+	@TableField(exist = false)
 	private java.lang.String busFunctionName;
 	@TableField(exist = false)
 	private java.lang.String TeamworkName;
@@ -85,6 +87,7 @@ public class oaTeamworkInst {
 	@JsonFormat(timezone = "GMT+8",pattern = "yyyy-MM-dd HH:mm:ss")
 	@DateTimeFormat(pattern="yyyy-MM-dd HH:mm:ss")
 	private Date dCreateTime;
+	@TableField(exist = false)
 	private boolean tableOrder;
 
 

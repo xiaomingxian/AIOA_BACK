@@ -65,9 +65,15 @@ public class oaTeamworkInstServiceImpl extends ServiceImpl<oaTeamworkInstMapper,
             oaTeamwork oaTeamwork = oaTeamworkMapper.findById(oaTeamworkInstList.get(i).getITeamworkId());
             Integer sumorder = oaTeamworkInstMapper.SumOrder((oaTeamworkInstList.get(i).getITeamworkId()));
             Integer lastOrder = oaTeamworkInstMapper.LastOrder(oaTeamworkInstList.get(i).getITeamworkId());
-            String modelName  = oaTeamworkMapper.getfirstModel(oaTeamworkInstList.get(i).getITeamworkId());
-
-            oaTeamworkInstList.get(i).setBusModelName(modelName);
+            lastOrder = lastOrder-1 ;
+           // String modelName  = oaTeamworkMapper.getfirstModel(oaTeamworkInstList.get(i).getITeamworkId());
+            if(lastOrder!=null){
+                String busdata =  oaTeamworkMapper.getBusData(oaTeamworkInstList.get(i).getITeamworkId(),lastOrder);
+                String  Stitle= oaTeamworkMapper.getTitle(busdata,lastOrder);
+                oaTeamworkInstList.get(i).setSTitle(Stitle);
+            }else{
+                oaTeamworkInstList.get(i).setSTitle("");
+            }
             oaTeamworkInstList.get(i).setOrders(sumorder.toString());//总步骤
             oaTeamworkInstList.get(i).setLastOrder(lastOrder.toString());//当前步骤
             if(oaTeamwork != null){
@@ -113,8 +119,17 @@ public class oaTeamworkInstServiceImpl extends ServiceImpl<oaTeamworkInstMapper,
             oaTeamwork oaTeamwork = oaTeamworkMapper.findById(oaTeamworkInstList.get(i).getITeamworkId());
             Integer sumorder = oaTeamworkInstMapper.SumOrder((oaTeamworkInstList.get(i).getITeamworkId()));
             Integer lastOrder = oaTeamworkInstMapper.LastOrder(oaTeamworkInstList.get(i).getITeamworkId());
+            lastOrder = lastOrder -1;
             oaTeamworkInstList.get(i).setOrders(sumorder.toString());//总步骤
             oaTeamworkInstList.get(i).setLastOrder(lastOrder.toString());//当前步骤
+            Integer iTeamworkId = oaTeamworkInstList.get(i).getITeamworkId();
+            if(lastOrder!=null){
+                String busdata =  oaTeamworkMapper.getBusData1(iTeamworkId,oaTeamworkInstList.get(i).getIId());
+                String  Stitle= oaTeamworkMapper.getTitle(busdata,oaTeamworkInstList.get(i).getIOrder());
+                oaTeamworkInstList.get(i).setSTitle(Stitle);
+            }else{
+                oaTeamworkInstList.get(i).setSTitle("");
+            }
             if(oaTeamwork != null){
                 oaTeamworkInstList.get(i).setITeamworkName(oaTeamwork.getSTeamworkName());
                 oaTeamworkInstList.get(i).setDCreateTime(oaTeamwork.getDCreateTime());

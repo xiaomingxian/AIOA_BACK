@@ -39,4 +39,7 @@ public interface IoaTeamworkSetService extends IService<oaTeamworkSet> {
     IPage<oaTeamworkSet> queryList(Integer pageNo, Integer pageSize, oaTeamworkSet oaTeamworkSet);
 
     oaTeamworkSet select(oaTeamworkSet oaTeamworkSet);
+
+    Integer findMaxId();
+
 }

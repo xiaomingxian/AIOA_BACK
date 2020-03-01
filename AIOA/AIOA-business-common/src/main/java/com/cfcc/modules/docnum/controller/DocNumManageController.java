@@ -11,6 +11,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 /**
  * @Description: 文号管理表
  * @Author: jeecg-boot
@@ -78,13 +80,30 @@ public class DocNumManageController {
 	@GetMapping(value = "/selectNum")
 	public Result<DocNumManage> edit( DocNumManage button) {
 		Result<DocNumManage> result = new Result<DocNumManage>();
-		boolean ok = docNumManageService.updateDocNumStatus(button);
-		if(ok) {
+		try {
+			docNumManageService.updateDocNumStatus(button);
 			result.success("修改成功!");
+			result.setResult(button);
+		} catch (Exception e) {
+			e.printStackTrace();
+			log.info("文号设置失败！");
 		}
 		return result;
 	}
 
-
+	@AutoLog(value = "业务按钮-选择使用")
+	@ApiOperation(value="业务按钮-选择使用", notes="业务按钮-选择使用")
+	@GetMapping(value = "/checkDocNum")
+	public Result checkDocNum( DocNumManage docNumManage) {
+		Result result = new Result<>();
+		try {
+			List<DocNumManage> docNumManages = docNumManageService.checkDocNum(docNumManage);
+			result.setResult(docNumManages);
+		} catch (Exception e) {
+			e.printStackTrace();
+			result.setMessage("查询失败！");
+		}
+		return result;
+	}
 
 }

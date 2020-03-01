@@ -168,10 +168,10 @@ public class OaBusDynamicTableServiceImpl implements OaBusDynamicTableService {
 
         String sourceFileNum = busData.get("s_file_num") == null ? null : busData.get("s_file_num").toString();
         if (sName.contains("收文")) {//
-            if (null!=taskInfoVO.getIsDept() && taskInfoVO.getIsDept()) {
+            if (null != taskInfoVO.getIsDept() && taskInfoVO.getIsDept()) {
                 mainDept = taskInfoVO.getTaskWithDepts().getMainDept();
             }
-            if (StringUtils.isNotBlank(mainDept)){
+            if (StringUtils.isNotBlank(mainDept)) {
                 busData.put("s_create_dept", mainDept);
             }
             s_receive_num = busData.get("s_receive_num") == null ? "" : busData.get("s_receive_num").toString();
@@ -792,20 +792,38 @@ public class OaBusDynamicTableServiceImpl implements OaBusDynamicTableService {
     }
 
     @Override
-    public void insertOaOutLog(Map<String, Object> map,HttpServletRequest request) {
+    public void insertOaOutLog(Map<String, Object> map, HttpServletRequest request) {
         LoginInfo loginInfo = isysUserService.getLoginInfo(request);
-        map.put("s_send_by",loginInfo.getId()); //创建用户
-        map.put("d_create_time",new Date());  //发送时间
+        map.put("s_send_by", loginInfo.getId()); //创建用户
+        map.put("d_create_time", new Date());  //发送时间
         dynamicTableMapper.insertData(map);
     }
 
     @Override
     public boolean deleteBusdata(Map<String, Object> map) {
+        boolean b = false;
         if (map.get("processInstanceId") != null) {
             taskCommonService.del(map.get("processInstanceId") + "");
             map.remove("processInstanceId");
         }
-        boolean b = dynamicTableMapper.deleteData(map);
+        //删除业务数据
+        b = dynamicTableMapper.deleteData(map);
+        //更改文号状态
+        Map<String, Object> docManageParam = new HashMap<>();
+        docManageParam.put("table", "oa_docnum_manage");
+        docManageParam.put("i_busdata_id", map.get("i_id") + "");
+        //已删除业务关联文号状态改为1
+        try {
+            Map<String, Object> docManage = dynamicTableMapper.queryDataById(docManageParam);
+            if (docManage != null) {
+                docManageParam.put("i_busdata_id", 1);
+                docManageParam.put("i_id", docManage.get("i_id")+"");
+                dynamicTableMapper.updateData(docManageParam);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            log.info("文号状态修改失败！");
+        }
         return b;
     }
 

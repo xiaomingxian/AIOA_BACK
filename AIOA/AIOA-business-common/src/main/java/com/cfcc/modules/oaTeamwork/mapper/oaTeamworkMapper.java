@@ -31,4 +31,10 @@ public interface oaTeamworkMapper extends BaseMapper<oaTeamwork> {
     oaTeamwork selectByName(String teamworkName);
 
     String getfirstModel(Integer iTeamworkId);
+
+    String getTitle(String busdata, Integer iorder);
+
+    String getBusData(Integer iTeamworkId, int iorder);
+
+    String getBusData1(Integer iTeamworkId,Integer id);
 }

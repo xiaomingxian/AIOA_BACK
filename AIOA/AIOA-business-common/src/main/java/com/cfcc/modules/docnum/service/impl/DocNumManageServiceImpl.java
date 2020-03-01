@@ -14,18 +14,18 @@ import java.util.List;
 /**
  * @Description: 文号管理表
  * @Author: jeecg-boot
- * @Date:   2019-11-18
+ * @Date: 2019-11-18
  * @Version: V1.0
  */
 @Service
 public class DocNumManageServiceImpl extends ServiceImpl<DocNumManageMapper, DocNumManage> implements IDocNumManageService {
-  @Resource
-  private  DocNumManageMapper docNumManageMapper;
+    @Resource
+    private DocNumManageMapper docNumManageMapper;
 
     @Override
     public IPage<DocNumManage> getNumList(DocNumManage docNumManage, Integer pageNo, Integer pageSize) {
         int total = docNumManageMapper.getNumListTotal(docNumManage);
-        List<DocNumManage> list = docNumManageMapper.getNumList(docNumManage, (pageNo-1)*pageSize,pageSize);
+        List<DocNumManage> list = docNumManageMapper.getNumList(docNumManage, (pageNo - 1) * pageSize, pageSize);
         IPage<DocNumManage> pageList = new Page<DocNumManage>();
         pageList.setTotal(total);
         pageList.setCurrent(pageNo);
@@ -36,14 +36,43 @@ public class DocNumManageServiceImpl extends ServiceImpl<DocNumManageMapper, Doc
 
     @Override
     public boolean updateDocNumStatus(DocNumManage docNumManage) {
+        List<DocNumManage> busdataDocNum = docNumManageMapper.getBusdataDocNum(docNumManage);
+        if (busdataDocNum.size() > 0 && busdataDocNum.get(0) != null) {
+            busdataDocNum.get(0).setIBusdataId(0);
+            docNumManageMapper.updateDocNumStatus(busdataDocNum.get(0));
+        }
         return docNumManageMapper.updateDocNumStatus(docNumManage);
     }
 
     @Override
     public int addDocNum(DocNumManage docNumManage) {
-        int i = docNumManageMapper.addDocNum(docNumManage);
+        List<DocNumManage> busdataDocNum = docNumManageMapper.getBusdataDocNum(docNumManage);
+        if (busdataDocNum.size() > 0 && busdataDocNum.get(0) != null) {
+            busdataDocNum.get(0).setIBusdataId(0);
+            docNumManageMapper.updateDocNumStatus(busdataDocNum.get(0));
+            if (docNumManage.getStatus() != null) {
+                /**
+                 * 修改原文号状态为0
+                 * 修改现文号为业务id
+                 */
+                DocNumManage docNumUpdata = new DocNumManage();
+                docNumUpdata.setIId(docNumManage.getStatus());
+                docNumUpdata.setIBusdataId(docNumManage.getIBusdataId());
+                docNumManageMapper.updateDocNumStatus(docNumUpdata);
+            } else {
+                docNumManageMapper.addDocNum(docNumManage);
+            }
+        } else {
+            docNumManageMapper.addDocNum(docNumManage);
+        }
         DocNumManage maxDocNum = docNumManageMapper.queryMaxDocNum(docNumManage);
-        int num = docNumManageMapper.updateMaxNum(maxDocNum);
-        return num;
+        docNumManageMapper.updateMaxNum(maxDocNum);
+        return maxDocNum.getIDocNum();
+    }
+
+    @Override
+    public List<DocNumManage> checkDocNum(DocNumManage docNumManage) {
+        List<DocNumManage> docNumManages = docNumManageMapper.checkDocNum(docNumManage);
+        return docNumManages;
     }
 }

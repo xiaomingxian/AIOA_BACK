@@ -46,4 +46,7 @@ public interface oaTeamworkSetMapper extends BaseMapper<oaTeamworkSet> {
     List<String> findByModelId(Integer iTeamworkId);
 
     oaTeamworkSet select(oaTeamworkSet oaTeamworkSet);
+
+    Integer findMaxId();
+
 }

@@ -13,7 +13,7 @@
             <if test="doc.sYear != null and doc.sYear != ''">
                 and dm.s_year=#{doc.sYear}
             </if>
-            and dm.i_busdata_id in (0,-1)
+            and dm.i_busdata_id in (0,1,-1)
         </where>
         limit #{pageNo},#{pageSize}
     </select>
@@ -21,11 +21,11 @@
     <!--查询最大文号-->
     <select id="queryMaxDocNum" resultType="com.cfcc.modules.docnum.entity.DocNumManage">
         SELECT
-	    d.i_id,MAX(m.i_doc_num) as i_doc_num
+	    d.i_id iId,MAX(m.i_doc_num) as iDocNum
         FROM
     	oa_docnum_manage m
         LEFT JOIN oa_docnum  d ON d.i_id = m.i_docnum_id
-        WHERE  m.i_docnum_id = #{iId} AND  m.s_year = #{sYear}
+        WHERE  m.i_docnum_id = #{iDocnumId} AND  m.s_year = #{sYear}
     </select>
     <!--统计空号数量-->
     <select id="getNumListTotal" resultType="java.lang.Integer">
@@ -37,8 +37,23 @@
             <if test="sYear != null and sYear != ''">
                 and dm.s_year=#{sYear}
             </if>
-            and dm.i_busdata_id in (0,-1)
+            and dm.i_busdata_id in (0,1,-1)
         </where>
+    </select>
+
+    <!-- 查询文号是否使用-->
+    <select id="checkDocNum" resultType="com.cfcc.modules.docnum.entity.DocNumManage">
+        SELECT i_id,i_docnum_id,s_year,i_doc_num,s_busdata_table,i_busdata_id from oa_docnum_manage WHERE i_docnum_id=#{iDocnumId} AND s_year=#{sYear} AND i_doc_num = #{iDocNum}
+    </select>
+
+    <select id="getBusdataDocNum" resultType="com.cfcc.modules.docnum.entity.DocNumManage">
+        SELECT i_id,i_docnum_id,s_year,i_doc_num,s_busdata_table,i_busdata_id
+        FROM oa_docnum_manage
+        WHERE
+        i_docnum_id = #{iDocnumId} AND s_year = #{sYear} AND i_busdata_id =#{iBusdataId}
+        <if test="sBusdataTable != null and sBusdataTable != ''">
+            and s_busdata_table=#{sBusdataTable}
+        </if>
     </select>
 
     <!--登记文号-->

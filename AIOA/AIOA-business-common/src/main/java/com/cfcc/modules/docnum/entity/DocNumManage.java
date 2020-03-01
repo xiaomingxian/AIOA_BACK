@@ -56,4 +56,7 @@ public class DocNumManage {
 	@Excel(name = "发送对象：1 上报 2 下发", width = 15)
     @ApiModelProperty(value = "发送对象：1 上报 2 下发")
 	private java.lang.Integer iSendObj;
+
+	@TableField(exist = false)
+	private java.lang.Integer status;
 }

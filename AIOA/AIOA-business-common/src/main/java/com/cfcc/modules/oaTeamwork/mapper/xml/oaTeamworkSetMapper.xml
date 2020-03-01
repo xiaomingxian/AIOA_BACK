@@ -103,6 +103,9 @@
             <if test="oaTeamworkSet.iBusFunctionId != null and oaTeamworkSet.iBusFunctionId != '' ">
                 and s.i_bus_function_id = #{oaTeamworkSet.iBusFunctionId}
             </if>
+            <if test="oaTeamworkSet.sCreateBy != null and oaTeamworkSet.sCreateBy != '' ">
+                and s.s_create_by = #{oaTeamworkSet.sCreateBy}
+            </if>
         </where>
         ORDER BY s.i_order asc
         limit #{pageNo},#{pageSize}
@@ -118,6 +121,9 @@
     </select>
     <select id="select" resultType="com.cfcc.modules.oaTeamwork.entity.oaTeamworkSet">
        select * from oa_teamwork_set where i_teamwork_id = #{iTeamworkId} and i_order = #{iOrder}
+    </select>
+    <select id="findMaxId" resultType="java.lang.Integer">
+         select max(i_id) from oa_teamwork_set
     </select>
 
 </mapper>
