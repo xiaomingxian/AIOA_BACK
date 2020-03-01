@@ -214,5 +214,11 @@
         (SELECT parent_id FROM sys_depart WHERE org_code = #{orgCode})
     </select>
 
+    <select id="queryOaOutLogById" resultType="com.cfcc.modules.oaBus.entity.OaOutLog">
+      select  i_id,s_send_by,s_send_name,i_bus_model_id,i_bus_function_id,s_busdata_table,i_busdata_id,i_type, s_rec_unitid,d_create_time
+      from  oa_out_log
+      WHERE i_bus_model_id=#{iBusModelId} AND i_bus_function_id =#{iBusFunctionId} AND s_busdata_table=#{sBusdataTable}  AND i_busdata_id=#{iBusdataId}
+      AND i_type=#{iType} and s_send_name= #{sSendName}
+    </select>
 
 </mapper>

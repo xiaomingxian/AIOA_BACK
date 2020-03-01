@@ -2,6 +2,7 @@ package com.cfcc.modules.oaBus.mapper;
 
 import com.cfcc.modules.oaBus.entity.ButtonPermit;
 import com.cfcc.modules.oaBus.entity.OaBusdataOpinion;
+import com.cfcc.modules.oaBus.entity.OaOutLog;
 import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Select;
 
@@ -91,4 +92,6 @@ public interface OaBusDynamicTableMapper {
     List<Map<String, Object>> queryUsersByUnit(String unitId);
 
     Map<String,Object> getTableByUnitAndFunction(String unitId, String functionId);
+
+    List<OaOutLog> queryOaOutLogById(OaOutLog oaOutLog);
 }

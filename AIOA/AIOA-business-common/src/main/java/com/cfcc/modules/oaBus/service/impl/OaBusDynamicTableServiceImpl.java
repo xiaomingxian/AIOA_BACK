@@ -800,6 +800,16 @@ public class OaBusDynamicTableServiceImpl implements OaBusDynamicTableService {
     }
 
     @Override
+    public List<String> queryOaOutLogById(OaOutLog oaOutLog) {
+        List<OaOutLog> oaOutLogs = dynamicTableMapper.queryOaOutLogById(oaOutLog);
+        List<String> list = new ArrayList<>();
+        for (OaOutLog log :oaOutLogs){
+            list.add(log.getSRecUnitid());
+        }
+        return list;
+    }
+
+    @Override
     public boolean deleteBusdata(Map<String, Object> map) {
         boolean b = false;
         if (map.get("processInstanceId") != null) {
@@ -817,7 +827,7 @@ public class OaBusDynamicTableServiceImpl implements OaBusDynamicTableService {
             Map<String, Object> docManage = dynamicTableMapper.queryDataById(docManageParam);
             if (docManage != null) {
                 docManageParam.put("i_busdata_id", 1);
-                docManageParam.put("i_id", docManage.get("i_id")+"");
+                docManageParam.put("i_id", docManage.get("i_id") + "");
                 dynamicTableMapper.updateData(docManageParam);
             }
         } catch (Exception e) {

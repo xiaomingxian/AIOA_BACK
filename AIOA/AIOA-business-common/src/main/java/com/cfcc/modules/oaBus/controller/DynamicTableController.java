@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.cfcc.common.api.vo.Result;
 import com.cfcc.common.constant.workflow.TaskConstant;
 import com.cfcc.common.exception.AIOAException;
+import com.cfcc.modules.oaBus.entity.OaOutLog;
 import com.cfcc.modules.oaBus.service.OaBusDynamicTableService;
 import com.cfcc.modules.system.entity.LoginInfo;
 import com.cfcc.modules.system.entity.SysDepart;
@@ -450,6 +451,21 @@ public class DynamicTableController {
         } catch (Exception e) {
             e.printStackTrace();
             result.error500("新增传输日志失败");
+        }
+        return result;
+    }
+
+    @ApiOperation(value = "根据业务信息查询外传输日志")
+    @GetMapping("queryOaOutLogById")
+    public Result queryOaOutLogById(OaOutLog oaOutLog) {
+        Result result = new Result<>();
+        try {
+            List<String> strings = dynamicTableService.queryOaOutLogById(oaOutLog);
+            result.setSuccess(true);
+            result.setResult(strings);
+        } catch (Exception e) {
+            e.printStackTrace();
+            result.error500("查询传输日志失败");
         }
         return result;
     }

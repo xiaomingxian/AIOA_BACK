@@ -3,6 +3,7 @@ package com.cfcc.modules.oaBus.service;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.cfcc.common.api.vo.Result;
 import com.cfcc.modules.oaBus.entity.ButtonPermit;
+import com.cfcc.modules.oaBus.entity.OaOutLog;
 import com.cfcc.modules.system.entity.LoginInfo;
 import com.cfcc.modules.system.entity.SysDepart;
 
@@ -67,4 +68,6 @@ public interface OaBusDynamicTableService {
     Result provinceToCityInsideClient(HttpServletRequest request);
 
     void insertOaOutLog(Map<String, Object> map,HttpServletRequest request);
+
+    List<String> queryOaOutLogById(OaOutLog oaOutLog);
 }
