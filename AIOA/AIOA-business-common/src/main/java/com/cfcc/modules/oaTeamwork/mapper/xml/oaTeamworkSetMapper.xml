@@ -103,6 +103,9 @@
             <if test="oaTeamworkSet.iBusFunctionId != null and oaTeamworkSet.iBusFunctionId != '' ">
                 and s.i_bus_function_id = #{oaTeamworkSet.iBusFunctionId}
             </if>
+            <if test="oaTeamworkSet.sCreateBy != null and oaTeamworkSet.sCreateBy != '' ">
+                and s.s_create_by = #{oaTeamworkSet.sCreateBy}
+            </if>
         </where>
         ORDER BY s.i_order asc
         limit #{pageNo},#{pageSize}

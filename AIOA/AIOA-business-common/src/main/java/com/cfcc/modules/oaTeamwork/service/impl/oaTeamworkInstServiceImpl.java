@@ -67,7 +67,7 @@ public class oaTeamworkInstServiceImpl extends ServiceImpl<oaTeamworkInstMapper,
             Integer lastOrder = oaTeamworkInstMapper.LastOrder(oaTeamworkInstList.get(i).getITeamworkId());
             lastOrder = lastOrder-1 ;
            // String modelName  = oaTeamworkMapper.getfirstModel(oaTeamworkInstList.get(i).getITeamworkId());
-            if(lastOrder.equals(0)){
+            if(lastOrder!=null){
                 String busdata =  oaTeamworkMapper.getBusData(oaTeamworkInstList.get(i).getITeamworkId(),lastOrder);
                 String  Stitle= oaTeamworkMapper.getTitle(busdata,lastOrder);
                 oaTeamworkInstList.get(i).setSTitle(Stitle);
@@ -123,7 +123,7 @@ public class oaTeamworkInstServiceImpl extends ServiceImpl<oaTeamworkInstMapper,
             oaTeamworkInstList.get(i).setOrders(sumorder.toString());//总步骤
             oaTeamworkInstList.get(i).setLastOrder(lastOrder.toString());//当前步骤
             Integer iTeamworkId = oaTeamworkInstList.get(i).getITeamworkId();
-            if(lastOrder.equals(0)){
+            if(lastOrder!=null){
                 String busdata =  oaTeamworkMapper.getBusData1(iTeamworkId,oaTeamworkInstList.get(i).getIId());
                 String  Stitle= oaTeamworkMapper.getTitle(busdata,oaTeamworkInstList.get(i).getIOrder());
                 oaTeamworkInstList.get(i).setSTitle(Stitle);
