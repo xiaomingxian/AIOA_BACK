@@ -9,6 +9,7 @@ import com.cfcc.modules.system.entity.SysUser;
 import com.cfcc.modules.system.service.ISysUserService;
 import com.cfcc.modules.utils.IWfConstant;
 import com.cfcc.modules.workflow.pojo.*;
+import com.cfcc.modules.workflow.service.ActPicService;
 import com.cfcc.modules.workflow.service.ProcessManagerService;
 import com.cfcc.modules.workflow.service.ReCallTaskService;
 import com.cfcc.modules.workflow.service.TaskCommonService;
@@ -16,13 +17,25 @@ import com.cfcc.modules.workflow.vo.TaskInfoVO;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
-import org.activiti.engine.HistoryService;
-import org.activiti.engine.RuntimeService;
+import org.activiti.bpmn.model.BpmnModel;
+import org.activiti.engine.*;
+import org.activiti.engine.history.HistoricActivityInstance;
+import org.activiti.engine.history.HistoricProcessInstance;
+import org.activiti.engine.impl.cfg.ProcessEngineConfigurationImpl;
+import org.activiti.engine.impl.context.Context;
+import org.activiti.engine.impl.persistence.entity.ProcessDefinitionEntity;
+import org.activiti.engine.impl.pvm.PvmTransition;
+import org.activiti.engine.impl.pvm.process.ActivityImpl;
+import org.activiti.image.ProcessDiagramGenerator;
 import org.apache.ibatis.annotations.Param;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -41,6 +54,9 @@ public class TaskCommonController {
 
     @Autowired
     private ProcessManagerService processManagerService;
+
+    @Autowired
+    private ActPicService actPicService;
 
 
     @GetMapping("finish")
@@ -402,6 +418,17 @@ public class TaskCommonController {
 
 
     }
+
+
+
+
+    @RequestMapping("queryProPlan")
+    public void queryProPlan(HttpServletRequest request, HttpServletResponse response) throws IOException {
+        String processInstanceId = request.getParameter("ProcessInstanceId");
+        //获取历史流程实例
+        actPicService.queryProPlan(processInstanceId,response);
+    }
+
 
 
 }
