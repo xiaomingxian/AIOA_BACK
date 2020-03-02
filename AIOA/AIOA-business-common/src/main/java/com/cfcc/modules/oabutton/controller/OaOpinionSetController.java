@@ -155,7 +155,7 @@ public class OaOpinionSetController {
 			result.error500("当前意见不存在");
 			return result;
 		}
-		if (oaOpinionSet!=null|| oaOpinionSet.getType().equals("9999")){
+		if (oaOpinionSet!=null && oaOpinionSet.getType().equals("9999")){
 			oaOpinionSet.setType(null);
 		}
 		List<OaOpinionSet> oaOpinionSets = oaOpinionSetService.queryByType(oaOpinionSet.getType(), oaOpinionSet.getIProcOpinionId());
@@ -191,7 +191,7 @@ public class OaOpinionSetController {
 			result.error500("当前意见不存在");
 			return result;
 		}
-		if (oaOpinionSet!=null|| oaOpinionSet.getType().equals("9999")){
+		if (oaOpinionSet!=null && oaOpinionSet.getType().equals("9999")){
 			oaOpinionSet.setType(null);
 		}
 //		List<OaOpinionSet> oaOpinionSets = oaOpinionSetService.queryByType(oaOpinionSet.getType(), oaOpinionSet.getIProcOpinionId());
