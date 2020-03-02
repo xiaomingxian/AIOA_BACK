@@ -7,6 +7,7 @@ import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.cfcc.common.api.vo.Result;
 import com.cfcc.common.aspect.annotation.AutoLog;
+import com.cfcc.common.mycat.MycatSchema;
 import com.cfcc.modules.elasticsearch.entity.EsSearch;
 import com.cfcc.modules.elasticsearch.service.EsSearchService;
 import com.cfcc.modules.elasticsearch.service.SearchService;
@@ -71,24 +72,6 @@ public class OaElasticsearchController {
     @RequestMapping(value = "/getsearch")
     public Result<List<EsSearch>> getEsSearchList(@RequestBody String keyWord, HttpServletRequest request){
         Result<List<EsSearch>> result = new Result<List<EsSearch>>();
-        /*String Driver = "com.mysql.jdbc.Driver";
-        Connection conn = null;
-        try {
-            Class.forName(Driver);
-//            conn = DriverManager.getConnection()
-            DatabaseMetaData metaData = conn.getMetaData();
-
-            //获取数据库的url
-            String url = metaData.getURL();
-            //
-        } catch (ClassNotFoundException e) {
-            e.printStackTrace();
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }*/
-
-
-
         Map map = (Map) JSONObject.parse(keyWord);
         String keyWord1 =  map.get("keyWord").toString().trim();
 
@@ -100,7 +83,6 @@ public class OaElasticsearchController {
         result.setResult(esSearchList);
         return result;
     }
-
 
     /**
      * 分页列表查询
@@ -114,6 +96,10 @@ public class OaElasticsearchController {
 //                                                    @RequestParam(name="pageSize", defaultValue="10") Integer pageSize
     ) {
         Result<IPage<Map<String, Object>>> result = new Result<IPage<Map<String, Object>>>();
+
+        String DBvalue = MycatSchema.getMycatAnnot();
+
+
         IPage<Map<String, Object>> sourceList = null;
         Map map = (Map) JSONObject.parse(keyWord);
         String keyWord1 =  map.get("keyWord").toString().trim();
@@ -125,13 +111,13 @@ public class OaElasticsearchController {
         String departId = sysUserService.getdeptIdByUser(username);
 
         Integer pageSize = 10;
-        String DBvalue =  "";
         String indexName = "";
-        if (map.get("DBvalue") != null){
-            DBvalue = map.get("DBvalue")+"";
+        if (DBvalue != ""){
+            DBvalue = DBvalue.substring(DBvalue.indexOf("=")+1,DBvalue.lastIndexOf("*"));
         }
-        indexName = DBvalue+departId+1+"";
-        String indexType = "oaBusdate";
+        indexName = "elasticsearch"+DBvalue+departId+1;
+//        String indexName = "elasticsearch1";
+        String indexType = "oaBusdata";
         try {
             if (!keyWord.equals("")){   //输入查询的数据为空时，则为全查
 //                sourceList = searchService.queryAll(INDEX_NAME1,pageNo,pageSize);
@@ -153,13 +139,14 @@ public class OaElasticsearchController {
 
 
     @AutoLog(value = "全文检索-分页列表查询")
-    @ApiOperation(value="业务配置表[全文检索]-分页列表查询", notes="业务配置表[全文检索]-分页列表查询")
+    @ApiOperation(value="业务配置表[全文检索]-分页列表查询", notes="业务配置表[附件检索]-分页列表查询")
     @RequestMapping(value = "/oafile")
     public Result<IPage<Map<String, Object>>> queryOaFileList(@RequestBody String keyWord,HttpServletRequest request
 //                                                           @RequestParam(name="pageNo", defaultValue="1") Integer pageNo,
 //                                                           @RequestParam(name="pageSize", defaultValue="10") Integer pageSize
     ) {
         Result<IPage<Map<String, Object>>> result = new Result<IPage<Map<String, Object>>>();
+        String DBvalue = MycatSchema.getMycatAnnot();
         Map map = (Map) JSONObject.parse(keyWord);
         String keyWord1 =  map.get("keyWord").toString().trim();
         Integer pageNo = Integer.parseInt(map.get("pageNo").toString());
@@ -170,14 +157,12 @@ public class OaElasticsearchController {
         String username = currentUser.getUsername();
         //获取用户所属支行id
         String departId = sysUserService.getdeptIdByUser(username);
-        String DBvalue =  "";
         String indexName = "";
-        if (map.get("DBvalue") != null){
-            DBvalue = map.get("DBvalue")+"";
+        if (DBvalue != ""){
+            DBvalue = DBvalue.substring(DBvalue.indexOf("=")+1,DBvalue.lastIndexOf("*"));
         }
-        indexName = DBvalue+departId+2+"";
+        indexName = "elasticsearch"+DBvalue+departId+2;
         String indexType = "oaFile";
-        System.out.println("---oafile------"+keyWord);
         try {
             if (!keyWord.equals("")){  //输入查询的数据为空时，则为不查
 //                sourceList = searchService.queryAll(INDEX_NAME2,(pageNo-1)*pageSize,pageSize);
@@ -189,7 +174,7 @@ public class OaElasticsearchController {
         }
         result.setResult(sourceList);
         result.setSuccess(true);
-        System.out.println("------------全文检索完毕-------------");
+//        System.out.println("------------全文检索完毕-------------");
         return result;
     }
 }

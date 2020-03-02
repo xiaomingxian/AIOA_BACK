@@ -130,7 +130,7 @@ public class OaFile implements Job {
             if (oaBusdataList.size() != 0){
                 try {
                     //索引名 = 库名+银行id+1
-                    String indexName = DBvalue+departId+1;
+                    String indexName = "elasticsearch"+DBvalue+departId+1;
                     String indexType = "oaBusdate";
                     if (!searchService.existsIndex(indexName)){
                         logger.info(indexName+"索引开始创建！！！！");
@@ -175,7 +175,7 @@ public class OaFile implements Job {
             if (oaFileListAll.size() != 0){
                 try {
                     //索引名 = 库名+银行id+2
-                    String indexName = DBvalue+departId+2;
+                    String indexName = "elasticsearch"+DBvalue+departId+2;
                     String indexType = "oaFile";
                     if (!searchService.existsIndex(indexName)){
                         logger.info(indexName+"索引开始创建！！！！");
@@ -249,8 +249,9 @@ public class OaFile implements Job {
                 if (oaBusdataList.size() != 0){
                     try {
                         //索引名 = 库名+银行id+1
-                        String indexName = DBtext+departId+1;
-                        String indexType = "oaBusdate";
+                        String DBvalue1 = DBvalue.substring(DBvalue.indexOf("=")+1,DBvalue.lastIndexOf("*"));
+                        String indexName = "elasticsearch"+DBvalue1+departId+1;
+                        String indexType = "oaBusdata";
                         if (!searchService.existsIndex(indexName)){
                             logger.info(indexName+"索引开始创建！！！！");
                             searchService.createIndex(indexName,indexType);
@@ -263,7 +264,7 @@ public class OaFile implements Job {
                                 log.info("-----------------oa_busdata添加数据成功-------------------");
                             }else {
                                 log.info("-----------------oa_busdata添加数据失败-------------------");
-                                while (restStatus.equals("OK")){
+                                while (!restStatus.equals("OK")){
                                     restStatus = searchService.saveOrUpdate(json, map.get("table_name").toString() + map.get("i_id").toString() , indexName, indexType);
                                 }
                                 log.info("-----------------oa_busdata添加数据成功-------------------");
@@ -293,7 +294,8 @@ public class OaFile implements Job {
                 if (oaFileListAll.size() != 0){
                     try {
                         //索引名 = 库名+银行id+2
-                        String indexName = DBtext+departId+2;
+                        String DBvalue2 = DBvalue.substring(DBvalue.indexOf("=")+1,DBvalue.lastIndexOf("*"));
+                        String indexName = "elasticsearch"+DBvalue2+departId+2;
                         String indexType = "oaFile";
                         if (!searchService.existsIndex(indexName)){
                             logger.info(indexName+"索引开始创建！！！！");
@@ -301,14 +303,14 @@ public class OaFile implements Job {
                         }
                         for (Map<String, Object> map : oaFileListAll) {
                             String json = JSON.toJSONString(map);
-                            RestStatus restStatus = searchService.saveOrUpdate(json, map.get("i_id").toString(), indexName, indexType);
+                            RestStatus restStatus = searchService.saveOrUpdate(json, map.get("tableName").toString() + map.get("tableId").toString(), indexName, indexType);
                             System.out.println("----是否添加成功----"+restStatus);
                             if (restStatus.equals("OK")){
                                 log.info("-----------------oa_busdata添加数据成功-------------------");
                             }else {
                                 log.info("-----------------oa_busdata添加数据失败-------------------");
-                                while (restStatus.equals("OK")){
-                                    restStatus = searchService.saveOrUpdate(json, map.get("i_id").toString(), indexName, indexType);
+                                while (!restStatus.equals("OK")){
+                                    restStatus = searchService.saveOrUpdate(json, map.get("tableName").toString() + map.get("tableId").toString(), indexName, indexType);
                                 }
                                 log.info("-----------------oa_busdata添加数据成功-------------------");
                             }
