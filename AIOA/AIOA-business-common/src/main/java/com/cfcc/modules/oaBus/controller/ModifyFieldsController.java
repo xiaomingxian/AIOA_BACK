@@ -124,6 +124,16 @@ public class ModifyFieldsController {
             result.error500("数据查询失败");
             return result;
         }
+        List<BusPageDetail> allColumsListPageDtail = busPageDetailService.getAllColumsListPageDtail(busFunction.getIId(), busFunction.getIPageId());
+        if (allColumsListPageDtail==null||allColumsListPageDtail.size()<1){
+            result.error500("无数据");
+            return result;
+        }
+        Map<String, Object> sqlCodeDictAllSelect = oaBusdataService.getSqlCodeDictAllSelect(allColumsListPageDtail);
+        if (sqlCodeDictAllSelect==null){
+            result.error500("数据查询失败");
+            return result;
+        }
         List<Map<String,String>> allColumsList = busPageDetailService.getAllColumsList(busFunction.getIId(), busFunction.getIPageId());
         if(allColumsList==null || allColumsList.size()<1) {
             result.error500("暂无数据");
@@ -141,6 +151,7 @@ public class ModifyFieldsController {
                 return result;
             }
             objectMap.put("allColumsList",allColumsList);
+            objectMap.put("columnAlldata",sqlCodeDictAllSelect);
             objectMap.put("data",list);
             result.setResult(objectMap);
             result.setSuccess(true);

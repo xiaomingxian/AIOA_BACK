@@ -42,6 +42,8 @@ public interface BusPageDetailMapper extends BaseMapper<BusPageDetail> {
     //List<BusPageDetail> getConColumsDao(int functionId);
     List<Map<String,String>> getConColumsDao(@Param("functionId")int functionId, @Param("iPageId")Integer iPageId);
 
+    List<BusPageDetail>  getAllColumsListPageDtail(@Param("functionId")Integer functionId, @Param("iPageId")Integer iPageId);
+
     List<Map<String,String>>  getAllColumsList(@Param("functionId")Integer functionId, @Param("iPageId")Integer iPageId);
 
     List<Map<String,String>> getColumsByTableName(@Param("tableName") String tableName,@Param("functionId") String functionId);

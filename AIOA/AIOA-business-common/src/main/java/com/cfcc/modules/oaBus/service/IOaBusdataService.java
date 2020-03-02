@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.cfcc.common.api.vo.Result;
 import com.cfcc.modules.oaBus.entity.BusFunction;
+import com.cfcc.modules.oaBus.entity.BusPageDetail;
 import com.cfcc.modules.oaBus.entity.OaBusdata;
 import com.cfcc.modules.oaBus.entity.TableCol;
 import com.cfcc.modules.system.entity.LoginInfo;
@@ -34,7 +35,8 @@ public interface IOaBusdataService  extends  IService<OaBusdata>{
     void updateIsES(List<Map<String, Object>> oaFileList,String DBvalue);
 
     List<Map> selectByTable(String table, String cols);
-
+    //获取数据字典，sql字典所有数据
+    Map<String, Object> getSqlCodeDictAllSelect(List<BusPageDetail> busPageDetailList);
     /**
      * 通过model_id，进行简单的查询，返回map
      *

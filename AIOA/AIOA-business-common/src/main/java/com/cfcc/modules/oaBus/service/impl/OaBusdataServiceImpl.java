@@ -174,6 +174,13 @@ public class OaBusdataServiceImpl extends ServiceImpl<OaBusdataMapper, OaBusdata
         return oaBusdataMapper.selectByTable(table, cols);
     }
 
+    @Override
+    public Map<String, Object> getSqlCodeDictAllSelect(List<BusPageDetail> busPageDetailList) {
+        Map<String, Object> optionMap=new TreeMap<>();
+        Map<String, String> map=new TreeMap<>();
+        return selOptionByDtailList(optionMap,map,busPageDetailList,null);
+    }
+
     /**
      * {i_id=598, i_bus_function_id=64, s_title=会计师；了不懂法, s_create_name=管理员, s_create_dept=科技科,
      * d_create_time=2019-12-27 18:03:38.0, s_remarks=哈哈哈, table_name=oa_busdata30, i_safetylevel=1}
@@ -670,6 +677,8 @@ public class OaBusdataServiceImpl extends ServiceImpl<OaBusdataMapper, OaBusdata
     public List<Map<String, Object>> getOaBusdataList(String columnLists, BusFunction busFunction, String DBvalue) {
         return oaBusdataMapper.getBusdataByTable(columnLists, busFunction, DBvalue);
     }
+
+
 
 
     /**

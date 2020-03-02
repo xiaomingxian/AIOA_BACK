@@ -19,6 +19,8 @@ public interface IBusPageDetailService extends IService<BusPageDetail> {
 //    查询含义表所有列-lvjian
     List<Map<String,String>>  getAllColumsList(Integer functionId,Integer iPageId);
 
+    List<BusPageDetail>  getAllColumsListPageDtail(Integer functionId,Integer iPageId);
+
     IPage<BusPageDetail> getBusPageDetailpage(Integer pageNo, Integer pageSize, BusPageDetail busPageDetail);
 
     void saveBusPageDetail(BusPageDetail busPageDetail);
