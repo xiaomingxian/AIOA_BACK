@@ -40,6 +40,7 @@ import org.activiti.engine.repository.ProcessDefinition;
 import org.activiti.engine.task.Task;
 import org.activiti.engine.task.TaskQuery;
 import org.apache.commons.lang.StringUtils;
+import org.apache.ibatis.annotations.Param;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -1056,6 +1057,12 @@ public class OaBusdataServiceImpl extends ServiceImpl<OaBusdataMapper, OaBusdata
             }
         }
         return true;
+    }
+
+    //查询某一条具体业务数据
+    @Override
+    public List<Map<String, Object>> getModifyFieldDataOne(String column, String tableName, Integer iid) {
+        return oaBusdataMapper.getModifyFieldDataOne(column,tableName,iid);
     }
 
    /* @Override

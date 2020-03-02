@@ -144,6 +144,11 @@ public interface OaBusdataMapper extends BaseMapper<OaBusdata> {
 
     int updateAllOaData(Map<String, Object> map);
 
+    //查询某一条具体业务数据
+    List<Map<String, Object>> getModifyFieldDataOne(@Param("column") String column,
+                                                    @Param("tableName") String tableName,
+                                                    @Param("iid") Integer iid);
+
 //无权限 全部查询业务数据表
     List<Map<String, Object>> getModifyFieldList(@Param("pageNo") int pageNo,
                                                      @Param("pageSize") int pageSize,

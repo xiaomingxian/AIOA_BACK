@@ -9,9 +9,17 @@
         <!--WHERE -->
     <!--</select>-->
 
+    <!--查询具体某一条数据-->
+    <select id="getModifyFieldDataOne" resultType="java.util.Map">
+        select i_id,${column} from ${tableName} b
+        where i_id=#{iid}
+    </select>
+
+
+
     <!--根据表名列名查询所有数据-->
     <select id="getModifyFieldList" resultType="java.util.Map">
-        select ${column} from ${tableName} b
+        select i_id,${column} from ${tableName} b
         <where>
             <if test="map.size>0">
                 <foreach collection="map" item="value" index="key" separator="and" >
@@ -36,6 +44,7 @@
                     </choose>
                 </foreach>
             </if>
+            and i_is_display=0
         </where>
         order by b.d_create_time desc
         limit ${pageNo},${pageSize}
