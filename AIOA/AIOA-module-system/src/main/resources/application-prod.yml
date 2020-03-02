@@ -191,7 +191,7 @@ cas:
 
 #首页展示模块默认配置
 home:
-  model: 1,2,3,4
+  model: 120,103,112,107
 #系统部署年份
 system:
   runDate : 2014
