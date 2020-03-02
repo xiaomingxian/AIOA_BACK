@@ -191,6 +191,11 @@
 		where c.i_bus_function_id = #{functionId} and c.i_bus_page_id = #{iPageId} and c.i_is_listtitle = 1 order by if(ISNULL(i_order),1,0),i_order ,i_id asc
 	</select>
 
+	<select id="getAllColumsList" resultType="java.util.Map">
+		select * from oa_bus_page_detail c
+		where c.i_bus_function_id = #{functionId} and c.i_bus_page_id = #{iPageId}  order by if(ISNULL(i_order),1,0),i_order ,i_id asc
+	</select>
+
 	<select id="getColumsByTableName" resultType="java.util.Map">
 		select * from oa_bus_page_detail c
 		where c.s_busdata_table = #{tableName} and c.i_bus_function_id = #{functionId} and c.i_is_listtitle = 1

@@ -28,6 +28,11 @@ public class BusPageDetailServiceImpl extends ServiceImpl<BusPageDetailMapper, B
     BusPageDetailMapper busPageDetailMapper;
 
     @Override
+    public List<Map<String,String>> getAllColumsList(Integer functionId, Integer iPageId) {
+        return busPageDetailMapper.getAllColumsList(functionId,iPageId);
+    }
+
+    @Override
     public IPage<BusPageDetail> getBusPageDetailpage(Integer pageNo, Integer pageSize, BusPageDetail busPageDetail) {
         int total = busPageDetailMapper.queryBusPageDetailCount(busPageDetail);
         List<BusPageDetail> modelList = busPageDetailMapper.queryBusPageDetail((pageNo - 1) * pageSize, pageSize, busPageDetail);

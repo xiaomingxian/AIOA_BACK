@@ -9,6 +9,7 @@ import com.cfcc.modules.oaBus.entity.TableCol;
 import com.cfcc.modules.system.entity.LoginInfo;
 import com.cfcc.modules.system.entity.SysDepart;
 import com.cfcc.modules.system.entity.SysUser;
+import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
 import java.util.Map;
@@ -92,6 +93,12 @@ public interface IOaBusdataService  extends  IService<OaBusdata>{
      * @return
      */
     boolean commitPer(String json, SysUser currentUser);
+
+    //查询某一条具体业务数据
+    List<Map<String, Object>> getModifyFieldDataOne(@Param("column") String column,
+                                                    @Param("tableName") String tableName,
+                                                    @Param("iid") Integer iid);
+
 
     //无权限 全部查询业务数据表
     IPage<Map<String, Object>> getModifyFieldList(int pageNo,int pageSize,String column, String tableName, Map<String, Object> map);
