@@ -3,6 +3,7 @@ package com.cfcc.modules.oaBus.service;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.cfcc.modules.oaBus.entity.BusPageDetail;
+import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
 import java.util.Map;
@@ -14,6 +15,11 @@ import java.util.Map;
  * @Version: V1.0
  */
 public interface IBusPageDetailService extends IService<BusPageDetail> {
+
+//    查询含义表所有列-lvjian
+    List<Map<String,String>>  getAllColumsList(Integer functionId,Integer iPageId);
+
+    List<BusPageDetail>  getAllColumsListPageDtail(Integer functionId,Integer iPageId);
 
     IPage<BusPageDetail> getBusPageDetailpage(Integer pageNo, Integer pageSize, BusPageDetail busPageDetail);
 

@@ -163,6 +163,8 @@ public class oaTeamworkInstController {
 				if(max == iOrder){//证明是最后一步
 					oaTeamworkInst2.setIText(1);
 					oaTeamworkInstService.Insert(oaTeamworkInst2);
+				}else{
+					oaTeamworkInstService.Insert(oaTeamworkInst2);
 				}
 			}
 

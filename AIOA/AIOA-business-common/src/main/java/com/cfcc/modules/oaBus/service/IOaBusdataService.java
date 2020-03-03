@@ -4,11 +4,13 @@ import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.cfcc.common.api.vo.Result;
 import com.cfcc.modules.oaBus.entity.BusFunction;
+import com.cfcc.modules.oaBus.entity.BusPageDetail;
 import com.cfcc.modules.oaBus.entity.OaBusdata;
 import com.cfcc.modules.oaBus.entity.TableCol;
 import com.cfcc.modules.system.entity.LoginInfo;
 import com.cfcc.modules.system.entity.SysDepart;
 import com.cfcc.modules.system.entity.SysUser;
+import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
 import java.util.Map;
@@ -33,7 +35,8 @@ public interface IOaBusdataService  extends  IService<OaBusdata>{
     void updateIsES(List<Map<String, Object>> oaFileList,String DBvalue);
 
     List<Map> selectByTable(String table, String cols);
-
+    //获取数据字典，sql字典所有数据
+    Map<String, Object> getSqlCodeDictAllSelect(List<BusPageDetail> busPageDetailList);
     /**
      * 通过model_id，进行简单的查询，返回map
      *
@@ -92,6 +95,12 @@ public interface IOaBusdataService  extends  IService<OaBusdata>{
      * @return
      */
     boolean commitPer(String json, SysUser currentUser);
+
+    //查询某一条具体业务数据
+    List<Map<String, Object>> getModifyFieldDataOne(@Param("column") String column,
+                                                    @Param("tableName") String tableName,
+                                                    @Param("iid") Integer iid);
+
 
     //无权限 全部查询业务数据表
     IPage<Map<String, Object>> getModifyFieldList(int pageNo,int pageSize,String column, String tableName, Map<String, Object> map);
