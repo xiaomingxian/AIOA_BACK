@@ -533,7 +533,7 @@ public class TaskInActController {
         Map<String, Object> busData2 = taskInfoVO.getBusData();
 
         HashMap<String, Object> busData = new HashMap<>();
-        busData.keySet().forEach(k->{
+        busData2.keySet().forEach(k->{
             Object o = busData2.get(k);
             busData.put(k,o);
         });
