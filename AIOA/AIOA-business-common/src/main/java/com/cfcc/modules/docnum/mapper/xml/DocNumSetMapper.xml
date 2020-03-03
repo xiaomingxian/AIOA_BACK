@@ -3,7 +3,7 @@
 <mapper namespace="com.cfcc.modules.docnum.mapper.DocNumSetMapper">
 
     <select id="queryById" parameterType="integer" resultType="com.cfcc.modules.docnum.entity.DocNumSet">
-        SELECT i_utemplate_id,i_dtemplate_id,i_atemplate_id FROM oa_docnum WHERE i_id = #{id}
+        SELECT   i_id, i_bus_unit_id, i_bus_model_id, i_bus_function_id, i_order, s_name, s_doc_rule, i_doc_num, i_utemplate_id, i_dtemplate_id, i_atemplate_id, s_remarks, s_create_by, d_create_time, s_update_by, d_update_time FROM oa_docnum WHERE i_id = #{id}
     </select>
 
     <!--根据id查询-->

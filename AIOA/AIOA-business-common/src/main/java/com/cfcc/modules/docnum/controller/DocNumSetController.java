@@ -106,6 +106,7 @@ public class DocNumSetController {
 			String token = request.getHeader("X-Access-Token");
 			String username = JwtUtil.getUsername(token);
 			docNumSet.setSCreateBy(username);
+			docNumSet.setIDocNum(0); //文号配置默认从0开始；
 			docNumSetService.insertDocNum(docNumSet);
 			String[] departList = docNumSet.getSelecteddeparts().split(",");
 			for (int i = 0; i <departList.length; i++) {
@@ -247,7 +248,13 @@ public class DocNumSetController {
 	public ModelAndView docNumExportXls(HttpServletRequest request, HttpServletResponse response) {
 		String iid = request.getParameter("iid");
 		String s_create_by = request.getParameter("s_create_by");
-		List<Map<String, Object>> functionData = docNumSetMapper.selectBusdataLIstsByDocId(Integer.valueOf(iid));
+		List<Map<String, Object>> functionData = null;
+		try {
+			functionData = docNumSetMapper.selectBusdataLIstsByDocId(Integer.valueOf(iid));
+		} catch (NumberFormatException e) {
+			Result.error("暂无业务数据！");
+			e.printStackTrace();
+		}
 		List<DocNumExport> exportsData = new ArrayList<>();
 		int i = 0;
 		for (Map<String,Object> table:functionData) {
