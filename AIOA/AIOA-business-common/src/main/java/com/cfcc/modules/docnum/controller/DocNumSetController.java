@@ -135,7 +135,7 @@ public class DocNumSetController {
 			String username = JwtUtil.getUsername(token);
 			docNumSet.setSCreateBy(username);
 			Integer docId = docNumSet.getIId();
-			docNumSet.setIId(0);
+			docNumSet.setIDocNum(0);
 			docNumSetService.insertDocNum(docNumSet);
 			String[] departList = docNumSetMapper.selectDepartIds(docId+"").split(",");
 			for (int i = 0; i <departList.length; i++) {
