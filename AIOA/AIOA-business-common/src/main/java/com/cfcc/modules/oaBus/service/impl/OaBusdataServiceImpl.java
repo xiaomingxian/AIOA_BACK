@@ -176,9 +176,9 @@ public class OaBusdataServiceImpl extends ServiceImpl<OaBusdataMapper, OaBusdata
 
     @Override
     public Map<String, Object> getSqlCodeDictAllSelect(List<BusPageDetail> busPageDetailList) {
-        Map<String, Object> optionMap=new TreeMap<>();
-        Map<String, String> map=new TreeMap<>();
-        return selOptionByDtailList(optionMap,map,busPageDetailList,null);
+        Map<String, Object> optionMap = new TreeMap<>();
+        Map<String, String> map = new TreeMap<>();
+        return selOptionByDtailList(optionMap, map, busPageDetailList, null);
     }
 
     /**
@@ -469,7 +469,9 @@ public class OaBusdataServiceImpl extends ServiceImpl<OaBusdataMapper, OaBusdata
             result.put("optionTable", null);
         } else {//有流程
             processInstanceId = oaBusdata.get("s_varchar10") == null ? null : oaBusdata.get("s_varchar10").toString();
-            if (StringUtils.isNotBlank(status) && status.equalsIgnoreCase("newtask")) {//新建
+            String taskDefData = oaBusdata.get("s_cur_task_name") == null ? null : oaBusdata.get("s_cur_task_name").toString();
+            if (StringUtils.isNotBlank(status) && status.equalsIgnoreCase("newtask")
+                    &&(taskDefData==null||(taskDefData!=null&&taskDefData.contains("newtask")))) {//新建
                 ProcessDefinition processDefinition = repositoryService.createProcessDefinitionQuery()
                         .processDefinitionKey(proKey).latestVersion().singleResult();
                 if (processDefinition == null) throw new AIOAException("未找到流程信息请检查流程是否部署");
@@ -677,8 +679,6 @@ public class OaBusdataServiceImpl extends ServiceImpl<OaBusdataMapper, OaBusdata
     public List<Map<String, Object>> getOaBusdataList(String columnLists, BusFunction busFunction, String DBvalue) {
         return oaBusdataMapper.getBusdataByTable(columnLists, busFunction, DBvalue);
     }
-
-
 
 
     /**
@@ -1071,7 +1071,7 @@ public class OaBusdataServiceImpl extends ServiceImpl<OaBusdataMapper, OaBusdata
     //查询某一条具体业务数据
     @Override
     public List<Map<String, Object>> getModifyFieldDataOne(String column, String tableName, Integer iid) {
-        return oaBusdataMapper.getModifyFieldDataOne(column,tableName,iid);
+        return oaBusdataMapper.getModifyFieldDataOne(column, tableName, iid);
     }
 
    /* @Override
