@@ -38,6 +38,7 @@ import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.multipart.MultipartHttpServletRequest;
 import org.springframework.web.servlet.ModelAndView;
 
+import javax.annotation.PostConstruct;
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -350,9 +351,9 @@ public class DocNumSetController {
 	 @AutoLog(value = "文号配置-业务下拉选列表")
 	 @ApiOperation(value="文号配置-业务下拉选列表", notes="文号配置-业务下拉选列表")
 	 @GetMapping(value = "/busFunctionList")
-	 public Result busFunctionList(@RequestParam(name="ibusModelId",required=true) Integer ibusModelId) {
+	 public Result busFunctionList(DocNumSet docNumSet) {
 		 Result<List<BusFunction>> result = new Result<>();
-		 List<BusFunction> busModelList = docNumSetService.busFunctionList(ibusModelId);
+		 List<BusFunction> busModelList = docNumSetService.busFunctionList(docNumSet);
 		 if (busModelList.size() == 0) {
 			 result.error500("未找到对应实体");
 		 } else {

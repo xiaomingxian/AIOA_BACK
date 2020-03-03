@@ -66,7 +66,7 @@ public interface DocNumSetMapper extends BaseMapper<DocNumSet> {
      * 查询业务下拉列表
      * @return
      */
-    List<BusFunction> busFunctionList(@Param("ibusModelId") Integer ibusModelId);
+    List<BusFunction> busFunctionList(DocNumSet docNumSet);
 
     /**
      * 新增

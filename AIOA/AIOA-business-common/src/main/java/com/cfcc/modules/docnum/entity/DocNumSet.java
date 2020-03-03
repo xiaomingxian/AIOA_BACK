@@ -29,6 +29,12 @@ public class DocNumSet {
 	@Excel(name = "主键id", width = 15)
     @ApiModelProperty(value = "主键id")
 	private Integer iId;
+
+	/**业务机构id*/
+	@Excel(name = "业务机构id", width = 15)
+	@ApiModelProperty(value = "业务机构id")
+	private String iBusUnitId;
+
 	/**业务功能id*/
 	@Excel(name = "业务功能id", width = 15)
     @ApiModelProperty(value = "业务功能id")
@@ -101,7 +107,12 @@ public class DocNumSet {
 	private String mName;
 
 	@Excel(name = "所属业务名称", width = 20)
-	@ApiModelProperty(value = "所属模块名称")
+	@ApiModelProperty(value = "所属业务名称")
 	@TableField(exist = false)
 	private String fName;
+
+	@Excel(name = "所属机构名称", width = 20)
+	@ApiModelProperty(value = "所属机构名称")
+	@TableField(exist = false)
+	private String uName;
 }
