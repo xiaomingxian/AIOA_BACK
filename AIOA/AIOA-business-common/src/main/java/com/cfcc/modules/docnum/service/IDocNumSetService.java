@@ -65,7 +65,7 @@ public interface IDocNumSetService extends IService<DocNumSet> {
      * 查询业务下拉列表
      * @return
      */
-    List<BusFunction> busFunctionList(Integer ibusModelId);
+    List<BusFunction> busFunctionList(DocNumSet docNumSet);
 
     /**
      * 新增

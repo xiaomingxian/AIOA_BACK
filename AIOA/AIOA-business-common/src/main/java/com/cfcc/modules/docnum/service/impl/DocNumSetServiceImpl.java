@@ -94,8 +94,8 @@ public class DocNumSetServiceImpl extends ServiceImpl<DocNumSetMapper, DocNumSet
     }
 
     @Override
-    public List<BusFunction> busFunctionList(Integer ibusModelId) {
-        return docNumSetMapper.busFunctionList(ibusModelId);
+    public List<BusFunction> busFunctionList(DocNumSet docNumSet) {
+        return docNumSetMapper.busFunctionList(docNumSet);
     }
 
 
