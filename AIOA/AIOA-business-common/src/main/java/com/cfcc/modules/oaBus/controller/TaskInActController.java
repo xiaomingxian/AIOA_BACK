@@ -530,7 +530,13 @@ public class TaskInActController {
 
     private void busDataSet(TaskInfoVO taskInfoVO) {
         Map<String, Object> vars = taskInfoVO.getVars();
-        Map<String, Object> busData = taskInfoVO.getBusData();
+        Map<String, Object> busData2 = taskInfoVO.getBusData();
+
+        HashMap<String, Object> busData = new HashMap<>();
+        busData.keySet().forEach(k->{
+            Object o = busData2.get(k);
+            busData.put(k,o);
+        });
         //根据functionId查出function名称
         String i_bus_function_id = busData.get("i_bus_function_id").toString();
         BusFunction busFunction = busFunctionService.getOneByFunId(i_bus_function_id);
@@ -541,13 +547,13 @@ public class TaskInActController {
 
         String mainDept = "";
         String s_receive_num = "";
-        Object file_num = busData.get("s_file_num");
-        String s_file_num = null;
-        if (file_num != null) {
-            s_file_num = busData.get("s_file_num").toString();
-        }
-
-        String sourceFileNum = busData.get("s_file_num") == null ? null : busData.get("s_file_num").toString();
+//        Object file_num = busData.get("s_file_num");
+//        String s_file_num = null;
+//        if (file_num != null) {
+//            s_file_num = busData.get("s_file_num").toString();
+//        }
+//
+//        String sourceFileNum = busData.get("s_file_num") == null ? null : busData.get("s_file_num").toString();
         if (sName.contains("收文")) {//
             if (taskInfoVO.getIsDept()) {
                 mainDept = taskInfoVO.getTaskWithDepts().getMainDept();
@@ -563,16 +569,16 @@ public class TaskInActController {
 
         String busMsg = VarsWithBus.getBusMsg(busData);
 
-        busData.put("s_file_num", sourceFileNum);
+//        busData.put("s_file_num", sourceFileNum);
 
 
         if (vars != null) {
             vars.put("busMsg", busMsg);
         }
         taskInfoVO.setVars(vars);
-        if (sName.contains("收文")) {
-            busData.put("s_file_num", s_file_num);
-        }
+//        if (sName.contains("收文")) {
+//            busData.put("s_file_num", s_file_num);
+//        }
     }
 
     @PostMapping("doTaskMore")
