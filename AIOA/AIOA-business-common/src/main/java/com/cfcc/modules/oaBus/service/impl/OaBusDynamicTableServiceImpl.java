@@ -601,6 +601,9 @@ public class OaBusDynamicTableServiceImpl implements OaBusDynamicTableService {
             paramMap.put("i_urgency", jsonParam.get("i_urgency"));
             paramMap.put("i_bigint1", jsonParam.get("i_bigint1"));
             paramMap.put("i_bigint2", jsonParam.get("i_bigint2"));
+            paramMap.put("s_main_unit_names", jsonParam.get("s_main_unit_names")); //主送单位
+            paramMap.put("s_cc_unit_names", jsonParam.get("s_cc_unit_names")); //辅办单位
+            paramMap.put("s_inside_deptnames", jsonParam.get("s_inside_deptnames")); //内部传送单位
             paramMap.put("table", result.getResult().get("tableName"));
             paramMap.put("i_id", result.getResult().get("busdataId"));
 
