@@ -68,9 +68,13 @@ public class FileNtkoController {
     public Result<String> upload(HttpServletRequest request,
                                  @RequestParam(value = "stable", required = true) String stable,
                                  @RequestParam(value = "tableid", required = true) String tableid,
-                                 @RequestParam(value = "fileType", required = true) String fileType) {
+                                 @RequestParam(value = "fileType", required = true) String fileType,
+                                 @RequestParam(value = "orgSchema", required = true) String orgSchema) {
         Result<String> result = new Result<>();
         try {
+            if (orgSchema!=null){
+                request.setAttribute("orgSchema",orgSchema);
+            }
             String ctxPath = uploadpath;
 //            String tempPath = uploadfilepath;
             Map<String, Object> map = FileUtils.Upload(ctxPath, request);
@@ -179,10 +183,13 @@ public class FileNtkoController {
     public Result<String> editFile(HttpServletRequest request,
                                    @RequestParam(name = "stable", required = true) String stable,
                                    @RequestParam(value = "tableid", required = true) Integer tableid,
-                                   @RequestParam(value = "fileType", required = true) String fileType) throws IOException {
+                                   @RequestParam(value = "fileType", required = true) String fileType,
+                                   @RequestParam(value = "orgSchema", required = true) String orgSchema) throws IOException {
 
         Result<String> result = new Result<>();
-
+        if (orgSchema!=null){
+            request.setAttribute("orgSchema",orgSchema);
+        }
         String ctxPath = uploadpath;
         Map<String, Object> map = FileUtils.Upload(ctxPath,request);
 
@@ -223,9 +230,13 @@ public class FileNtkoController {
     @PostMapping(value = "/editFile")
     public Result<String> editEndsource(HttpServletRequest request,
                                         @RequestParam(value = "fileId", required = false) String fileId,
-                                        @RequestParam(value = "fileType", required = false) String fileType) throws IOException {
+                                        @RequestParam(value = "fileType", required = false) String fileType,
+                                        @RequestParam(value = "orgSchema", required = true) String orgSchema) throws IOException {
         OaFile initFile = oaFileService.getById(fileId);
         Result<String> result = new Result<>();
+        if (orgSchema!=null){
+            request.setAttribute("orgSchema",orgSchema);
+        }
         Calendar calendar = Calendar.getInstance();
         String path = uploadpath.replace("//", "/" +
                 "") + "/" + calendar.get(Calendar.YEAR) +
