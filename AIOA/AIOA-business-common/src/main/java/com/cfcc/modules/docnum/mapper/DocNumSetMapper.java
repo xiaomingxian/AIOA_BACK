@@ -113,7 +113,7 @@ public interface DocNumSetMapper extends BaseMapper<DocNumSet> {
      * @param sDeptId
      * @return
      */
-    List<DocNumSet> getDocNumNameList(@Param("iBusFunctionId") Integer iBusFunctionId,@Param("sDeptId") String sDeptId);
+    List<DocNumSet> getDocNumNameList(@Param("iBusFunctionId") Integer iBusFunctionId,@Param("sDeptId") String sDeptId,@Param("iBusUnitId") Integer iBusUnitId);
 
     List<Map<String,Object>> selectBusdataLIstsByDocId(@Param("docId") Integer docId);
 

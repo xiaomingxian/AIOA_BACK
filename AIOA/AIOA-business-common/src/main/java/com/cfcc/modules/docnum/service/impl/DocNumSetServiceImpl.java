@@ -47,7 +47,9 @@ public class DocNumSetServiceImpl extends ServiceImpl<DocNumSetMapper, DocNumSet
         docNumManage.setIDocnumId(docNumSet.getIId());
         docNumManage.setSYear(sYear);
         DocNumManage maxDocNum= docNumManageMapper.queryMaxDocNum(docNumManage);
-        docNumSet.setIDocNum(maxDocNum.getIDocNum());
+        if (maxDocNum != null){
+            docNumSet.setIDocNum(maxDocNum.getIDocNum());
+        }
         return docNumSet;
     }
 
@@ -169,8 +171,8 @@ public class DocNumSetServiceImpl extends ServiceImpl<DocNumSetMapper, DocNumSet
     }
 
     @Override
-    public List<DocNumSet> getDocNumNameListByBf(Integer iBusFunctionId, String sDeptId) {
-        return docNumSetMapper.getDocNumNameList(iBusFunctionId, sDeptId);
+    public List<DocNumSet> getDocNumNameListByBf(Integer iBusFunctionId, String sDeptId,Integer iBusUnitId) {
+        return docNumSetMapper.getDocNumNameList(iBusFunctionId, sDeptId,iBusUnitId);
     }
 
 

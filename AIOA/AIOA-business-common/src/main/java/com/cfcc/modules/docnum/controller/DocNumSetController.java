@@ -411,7 +411,10 @@ public class DocNumSetController {
 		//根据编码查询部门id
 		SysDepart depart = sysUserRoleMapper.getDeptById(user.getOrgCode());
 		Result<List<DocNumSet>> result = new Result<>();
-		List<DocNumSet> button = docNumSetService.getDocNumNameListByBf(iBusFunctionId,depart.getId());
+        if (depart.getParentId() == "") {
+            depart.setParentId(depart.getId());
+        }
+		List<DocNumSet> button = docNumSetService.getDocNumNameListByBf(iBusFunctionId,depart.getId(),Integer.valueOf(depart.getParentId()));
 		if(button==null) {
 			result.error500("未找到对应实体");
 		}else {

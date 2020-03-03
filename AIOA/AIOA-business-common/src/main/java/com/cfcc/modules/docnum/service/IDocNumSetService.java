@@ -86,7 +86,7 @@ public interface IDocNumSetService extends IService<DocNumSet> {
      * @param sDeptId
      * @return
      */
-    List<DocNumSet> getDocNumNameListByBf(Integer iBusFunctionId, String sDeptId);
+    List<DocNumSet> getDocNumNameListByBf(Integer iBusFunctionId, String sDeptId,Integer iBusUnitId);
 
     Integer queryByTemplateId(DocNumManage docNumManage);
 }
