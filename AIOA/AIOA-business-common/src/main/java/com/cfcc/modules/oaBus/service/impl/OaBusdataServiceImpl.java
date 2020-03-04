@@ -552,8 +552,6 @@ public class OaBusdataServiceImpl extends ServiceImpl<OaBusdataMapper, OaBusdata
             }
         }
 
-        long l3 = System.currentTimeMillis();
-        System.out.println("================>>>流程信息查询时间:" + (l3 - l2));
 
 
         String optionTable = tableName + "_opinion";
@@ -577,15 +575,12 @@ public class OaBusdataServiceImpl extends ServiceImpl<OaBusdataMapper, OaBusdata
             iBusFunctionPermitService.updateReade(tableName + "_permit", loginInfo.getId(), functionId, busdataId);
         }
         long lstatus = System.currentTimeMillis();
-        System.out.println("================>>>修改状态时间:" + (lstatus - l3));
 
         //******************************************   按钮/意见
         Map<String, Boolean> currentUserPermission =
                 buttonPermissionService.currentUserPermission(proKey, oaBusdata, loginInfo,
                         taskDef, proInstanId, taskId, status);
 
-        long lcu = System.currentTimeMillis();
-        System.out.println("================>>>用户权限时间:" + (lcu - lstatus));
 
         Map<String, Object> btnAndOpt = ButtonPermissionService.getBtnAndOpt(result, currentUserPermission);
         result.put("btnAndOpt", btnAndOpt);
@@ -604,10 +599,21 @@ public class OaBusdataServiceImpl extends ServiceImpl<OaBusdataMapper, OaBusdata
 
         //查询是主板/辅办/传阅
         result.put("deptOptTypes", deptOptTypes);
+
+
+        // 查询意见
+        if (busProcSet1 != null) {
+            String opt = busProcSet1.getIProcOpinionId() == null ? null : busProcSet1.getIProcOpinionId().toString();
+            List<Map<String, Object>> optList = dynamicTableMapper.queryOptions(opt, busProcSet1.getIId().toString(), proKey,
+                    (String) result.get("taskDefKey"), (String) result.get("optionTable"), (String) result.get("busdataId"));
+            btnAndOpt.put("opt", optList);
+        } else {
+            log.error("===================>>>>流程配置信息为空,可能是redis数据错误");
+            result.put("opt", new ArrayList<>());
+        }
+
+
         long l4 = System.currentTimeMillis();
-        System.out.println("================>>>按钮+意见:" + (l4 - lcu));
-
-
         System.out.println("================>>>总共查询时间：" + (l4 - l1));
 
 

@@ -27,7 +27,10 @@ public interface RoleScope {
     /**
      * 部门选择
      */
-    String ALLDEPT="all_dept";
-
+    String ALLDEPT = "all_dept";
+    /**
+     * 主板部门
+     */
+    String MAINDEPT = "main_dept";
 
 }

@@ -65,7 +65,7 @@ public class ButtonPermissionServiceImpl implements ButtonPermissionService {
 
 
     @Override
-    public Map<String, Object> getBtnAndOpt(Map<String, Object> result,Map<String, Boolean> currentUserPermission) {
+    public Map<String, Object> getBtnAndOpt(Map<String, Object> result, Map<String, Boolean> currentUserPermission) {
 
 
         HashMap<String, Object> data = new HashMap<>();
@@ -167,21 +167,9 @@ public class ButtonPermissionServiceImpl implements ButtonPermissionService {
 
         data.put("btn", buttons);
 
-        // 查询意见
-        if (busProcSet != null) {
-            String opt = busProcSet.getIProcOpinionId() == null ? null : busProcSet.getIProcOpinionId().toString();
-            List<Map<String, Object>> optList = dynamicTableMapper.queryOptions(opt, busProcSet.getIId().toString(), procDefKey,
-                    (String) result.get("taskDefKey"), (String) result.get("optionTable"), (String) result.get("busdataId"));
-            data.put("opt", optList);
-        } else {
-            log.error("===================>>>>流程配置信息为空,可能是redis数据错误");
-            data.put("opt", new ArrayList<>());
-        }
 
         return data;
     }
-
-
 
 
     /**
@@ -210,11 +198,11 @@ public class ButtonPermissionServiceImpl implements ButtonPermissionService {
         }
         boolean isShow = false;
         String[] excfields = sExcfield.split(";");
-        if(excfields.length > 0){
-            for (int i = 0; i < excfields.length; i++){
+        if (excfields.length > 0) {
+            for (int i = 0; i < excfields.length; i++) {
                 String[] strs = excfields[i].split("=");
                 if (strs.length > 1 && strs[1].equals(String.valueOf(oaBusdata.get(strs[0])))) {
-                    if(i == excfields.length - 1){
+                    if (i == excfields.length - 1) {
                         isShow = true;
                     }
                 } else {
@@ -329,16 +317,16 @@ public class ButtonPermissionServiceImpl implements ButtonPermissionService {
 
     @Override
     public List<Map<String, Object>> reloadOpinionList(Map<String, Object> map) {
-        String proSetId = map.get("proSetId")+"";
-        String taskDefKey = map.get("taskDefKey")+"";
-        String opinionTable = map.get("opinionTable")+"";
-        String busdataId = map.get("busdataId")+"";
-        Map<String,Object> procsetParam = new HashMap<>();
-        procsetParam.put("table","oa_bus_proc_set");
-        procsetParam.put("i_id",proSetId);
+        String proSetId = map.get("proSetId") + "";
+        String taskDefKey = map.get("taskDefKey") + "";
+        String opinionTable = map.get("opinionTable") + "";
+        String busdataId = map.get("busdataId") + "";
+        Map<String, Object> procsetParam = new HashMap<>();
+        procsetParam.put("table", "oa_bus_proc_set");
+        procsetParam.put("i_id", proSetId);
         Map<String, Object> procsetData = dynamicTableMapper.queryDataById(procsetParam);
-        String procDefKey = procsetData.get("PROC_DEF_KEY_")+"";
-        String opt = procsetData.get("i_proc_opinion_id")+"";
+        String procDefKey = procsetData.get("PROC_DEF_KEY_") + "";
+        String opt = procsetData.get("i_proc_opinion_id") + "";
         List<Map<String, Object>> maps = dynamicTableMapper.queryOptions(opt, proSetId, procDefKey, taskDefKey, opinionTable, busdataId);
         return maps;
     }
