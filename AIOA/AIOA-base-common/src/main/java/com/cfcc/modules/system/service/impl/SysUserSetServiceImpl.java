@@ -113,4 +113,10 @@ public class SysUserSetServiceImpl extends ServiceImpl<SysUserSetMapper, SysUser
         return  sysUserSet1;
     }
 
+    @Override
+    public List<String> queryUserSetByIds(String nameStr) {
+
+        return sysUserSetMapper.queryUserSetByIdsDao(nameStr);
+    }
+
 }

@@ -51,12 +51,13 @@ public class ButtonController {
             LoginInfo loginInfo = userService.getLoginInfo(request);
 
             oaBusdata.put("table",table);
-            Map<String, Boolean> currentUserPermission = buttonPermissionService.currentUserPermission(proKey, oaBusdata, loginInfo,
+            Map<String, Boolean> currentUserPermission =
+                    buttonPermissionService.currentUserPermission(proKey, oaBusdata, loginInfo,
                     taskDef, proInstanId, taskId, status);
 
 
             Map<String, Object> result = new HashMap<>();
-            result.put("proSetId", proSetId);
+            result.put("proSetId", Integer.parseInt(proSetId));
             result.put("loginInfo", loginInfo);
             result.put("taskDefKey", taskDef);
             result.put("oaBusdata", oaBusdata);

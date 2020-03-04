@@ -32,4 +32,6 @@ public interface ISysUserSetService extends IService<SysUserSet> {
     List<SysUserSet> findByIId(Integer iId);
 
     SysUserSet HomeAndDay(SysUserSet sysUserSet);
+
+    List<String> queryUserSetByIds(String nameStr);
 }

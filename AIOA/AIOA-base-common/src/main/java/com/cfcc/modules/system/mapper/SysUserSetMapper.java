@@ -32,4 +32,6 @@ public interface SysUserSetMapper extends BaseMapper<SysUserSet> {
     List<SysUserSet> findByIId(Integer iId);
 
     SysUserSet HomeAndDay(SysUserSet sysUserSet);
+
+    List<String> queryUserSetByIdsDao(@Param("nameStr")String nameStr);
 }

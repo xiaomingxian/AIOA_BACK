@@ -1,6 +1,7 @@
 package com.cfcc.common.util;
 
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.util.FileCopyUtils;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.multipart.MultipartHttpServletRequest;
@@ -13,7 +14,7 @@ import java.util.Calendar;
 import java.util.HashMap;
 import java.util.Map;
 
-
+@Slf4j
 public class FileUtils {
     /**
      * 数字转换中文大写
@@ -57,8 +58,11 @@ public class FileUtils {
             FileCopyUtils.copy(mf.getBytes(), savefile);
             map.put("fileName",fileName);
             map.put("savePath",savePath);
+            log.info("文件保存成功！！") ;
+            System.out.println("AAAAA文件保存成功！！");
         } catch (IOException e) {
             e.printStackTrace();
+            log.error(e.toString());
         }
         return map;
     }

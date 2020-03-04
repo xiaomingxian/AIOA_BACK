@@ -82,6 +82,38 @@ public class LoginController {
     }
 
 
+    /**
+     * RTX登录接口
+     */
+    @PostMapping("/RTXLogin")
+    @ApiOperation("RTX登录接口")
+    public Result<JSONObject> RTXLogin(@RequestBody String userName ,HttpServletRequest request){
+        Result<JSONObject> result = new Result<JSONObject>();
+        String ip = request.getHeader("X-Forwarded-For");
+        Map map = (Map) JSONObject.parse(userName);
+        String name =  map.get("userName") + "";
+        SysUser sysUser = sysUserService.getUserByName(name);
+        if (sysUser != null) {
+            if (sysUser.getAvatar() != null) {
+                if (!sysUser.getAvatar().equals("")) {
+                    if (!sysUser.getAvatar().equalsIgnoreCase(ip)) {
+                        result.setSuccess(false);
+                        result.error500("请在指定IP地址上登录！");
+                        return result;
+                    }
+                }
+            }
+        }else{
+            result.error500("用户不存在！");
+            return result;
+        }
+
+        userInfo(sysUser, result);
+        sysBaseAPI.addLog("用户名: " + userName + ",登录成功！", CommonConstant.LOG_TYPE_1, null);
+
+        return result ;
+    }
+
     @RequestMapping(value = "/login", method = RequestMethod.POST)
     @ApiOperation("登录接口")
     public Result<JSONObject> login(@RequestBody SysLoginModel sysLoginModel, HttpServletRequest request) throws Exception {
