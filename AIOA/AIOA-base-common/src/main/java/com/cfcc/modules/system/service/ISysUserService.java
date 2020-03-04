@@ -170,4 +170,6 @@ public interface ISysUserService extends IService<SysUser> {
     List<String> selectDeptsBysUsers(List<String> deptUsers);
 
     String getdeptIdByUser(String username);
+
+    List<Map<String, Object>> getNextUsersMainDept(String candidates, String s_main_unit_names);
 }

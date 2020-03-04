@@ -385,6 +385,11 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser> impl
     }
 
     @Override
+    public List<Map<String, Object>> getNextUsersMainDept(String candidates, String s_main_unit_names) {
+        return userMapper.getNextUsersMainDept(candidates,s_main_unit_names);
+    }
+
+    @Override
     public Map<String, Object> getAllUserMsg(String username) {
 
 
@@ -467,4 +472,6 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser> impl
         }
         return mapDepart.get("deptId")+"";
     }
+
+
 }

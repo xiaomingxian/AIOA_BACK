@@ -8,6 +8,7 @@ import com.cfcc.common.util.workflow.VarsWithBus;
 import com.cfcc.modules.oaBus.entity.BusFunction;
 import com.cfcc.modules.oaBus.service.IBusFunctionPermitService;
 import com.cfcc.modules.oaBus.service.IBusFunctionService;
+import com.cfcc.modules.oaBus.service.OaBusDynamicTableService;
 import com.cfcc.modules.oaBus.service.TaskInActService;
 import com.cfcc.modules.system.entity.LoginInfo;
 import com.cfcc.modules.system.entity.SysUser;
@@ -68,40 +69,35 @@ public class TaskInActController {
 
     @Autowired
     private RepositoryService repositoryService;
+    @Autowired
+    private OaBusDynamicTableService dynamicTableService;
 
-
-    //TODO 过滤行领导 *****************************************************
 
     @ApiOperation("查询追加用户")
     @GetMapping("departChuanYueUser")
-    public Result departChuanYueUser(String drafterId, String procInstId, String procKey, HttpServletRequest request) {
+    public Result departChuanYueUser(String drafterId, String procInstId, String procKey,
+                                     String i_id, String table, HttpServletRequest request) {
         try {
-            //查询 流程 办理没办理信息(根据用户信息+procId)
-            if (StringUtils.isBlank(procInstId)) {
-                List<Map<String, Object>> list = nexUserQuery(procKey, procInstId, drafterId, null, request);
-                //走普通的下一任务查询
-                return Result.ok(list);
-            } else {
-                //追加视图--查询第一个环节
-                List<HistoricTaskInstance> list = historyService.createHistoricTaskInstanceQuery().processInstanceId(procInstId).list();
-                if (list.size() == 0) return Result.error("未找到产生的任务信息");
-                String processDefinitionId = list.get(0).getProcessDefinitionId();
-                ProcessDefinitionEntity proc = (ProcessDefinitionEntity) repositoryService.getProcessDefinition(processDefinitionId);
-                List<ActivityImpl> activities = proc.getActivities();
-                if (activities.size() == 0) throw new AIOAException("未找到流程环节,请检查流程图是否合法");
-                String taskDefKey = activities.get(0).getId();//第一个环节的key
-                String hiTaskId = null;
-                for (HistoricTaskInstance historicTaskInstance : list) {
-                    String taskDefinitionKey = historicTaskInstance.getTaskDefinitionKey();
-                    if (taskDefinitionKey.equalsIgnoreCase(taskDefKey)) {
-                        hiTaskId = historicTaskInstance.getId();
-                        break;
-                    }
+            //追加视图--查询第一个环节
+            List<HistoricTaskInstance> list = historyService.createHistoricTaskInstanceQuery().processInstanceId(procInstId).list();
+            if (list.size() == 0) return Result.error("未找到产生的任务信息");
+            String processDefinitionId = list.get(0).getProcessDefinitionId();
+            ProcessDefinitionEntity proc = (ProcessDefinitionEntity) repositoryService.getProcessDefinition(processDefinitionId);
+            List<ActivityImpl> activities = proc.getActivities();
+            if (activities.size() == 0) throw new AIOAException("未找到流程环节,请检查流程图是否合法");
+            String taskDefKey = activities.get(0).getId();//第一个环节的key
+            String hiTaskId = null;
+            for (HistoricTaskInstance historicTaskInstance : list) {
+                String taskDefinitionKey = historicTaskInstance.getTaskDefinitionKey();
+                if (taskDefinitionKey.equalsIgnoreCase(taskDefKey)) {
+                    hiTaskId = historicTaskInstance.getId();
+                    break;
                 }
-                return canAddUsers(hiTaskId, true, request);
-
-
             }
+            return canAddUsers(hiTaskId, true, i_id, table, request);
+
+
+//            }
         } catch (AIOAException e) {
             return Result.error(e.getMessage());
         } catch (Exception e) {
@@ -114,10 +110,10 @@ public class TaskInActController {
 
     @ApiOperation("查询追加用户")
     @GetMapping("addUsersQuery")
-    public Result addUsersQuery(String taskId, HttpServletRequest request) {
+    public Result addUsersQuery(String taskId, String i_id, String table, HttpServletRequest request) {
 
         try {
-            return canAddUsers(taskId, false, request);
+            return canAddUsers(taskId, false, i_id, table, request);
         } catch (AIOAException e) {
             return Result.error(e.getMessage());
         } catch (Exception e) {
@@ -125,7 +121,7 @@ public class TaskInActController {
         }
     }
 
-    private Result canAddUsers(String taskId, boolean isChuanyue, HttpServletRequest request) {
+    private Result canAddUsers(String taskId, boolean isChuanyue, String i_id, String table, HttpServletRequest request) {
         //查找是自己发出的任务
         List<TaskInfoJsonAble> taskJsonAbles = taskCommonService.sendByMe(taskId);
         if (taskJsonAbles == null || (taskJsonAbles != null && taskJsonAbles.size() <= 0)) {
@@ -155,7 +151,7 @@ public class TaskInActController {
         String key = taskInfoJsonAble.getProDefName();
         String processDefinitionId = taskInfoJsonAble.getProcessDefinitionId();
 
-        Result result = nextUserQuery(key, processDefinitionId, drafterId, taskId, request);
+        Result result = nextUserQuery(key, processDefinitionId, drafterId, taskId, i_id, table, request);
         //查找已经选择的用户 标记出来
         if (result.isSuccess()) {
             List<Map<String, Object>> actMsgs = (List<Map<String, Object>>) result.getResult();
@@ -305,14 +301,14 @@ public class TaskInActController {
 
                 Map<String, Object> vars = taskInfoVO1.getVars();
                 Collection<Object> values = vars.values();
-                boolean flag=false;
+                boolean flag = false;
                 for (Object value : values) {
-                    if (value instanceof  String && value!=null && value.toString().contains("no-")){
-                        flag=true;
+                    if (value instanceof String && value != null && value.toString().contains("no-")) {
+                        flag = true;
                         break;
                     }
                 }
-                if (!flag){
+                if (!flag) {
                     taskInfoVOS.add(taskInfoVO1);
                 }
             }
@@ -336,11 +332,14 @@ public class TaskInActController {
     @ApiOperation(value = "查询下一办理人")
     @GetMapping("nextUserQuery")
     public Result nextUserQuery(String procDefkey, String drafterId, String processDefinitionId,
-                                @RequestParam(required = false) String taskId, HttpServletRequest request) {
+                                @RequestParam(required = false) String taskId, String i_id, String table, HttpServletRequest request) {
 
         try {
-
-            List<Map<String, Object>> list = nexUserQuery(procDefkey, processDefinitionId, drafterId, taskId, request);
+            HashMap<String, Object> query = new HashMap<>();
+            query.put("i_id", i_id);
+            query.put("table", table);
+            Map<String, Object> busData = dynamicTableService.queryDataById(query);
+            List<Map<String, Object>> list = nexUserQuery(procDefkey, processDefinitionId, drafterId, taskId, busData, request);
 
             return Result.ok(list);
         } catch (AIOAException e) {
@@ -354,7 +353,8 @@ public class TaskInActController {
 
 
     private List<Map<String, Object>> nexUserQuery(String procDefkey, String processDefinitionId, String drafterId,
-                                                   @RequestParam(required = false) String taskId, HttpServletRequest request) {
+                                                   @RequestParam(required = false) String taskId,
+                                                   Map<String, Object> busData, HttpServletRequest request) {
         if (StringUtils.isBlank(procDefkey)) {
             throw new AIOAException("传入的流程定义为空，请检查此业务是否配置了流程");
         }
@@ -410,7 +410,7 @@ public class TaskInActController {
                 }
                 //查询具体数据
                 List<Map<String, Object>> nextUsers = new ArrayList<>();
-                nexUsersQuery(drafterId, id, oaProcActinst, nextUsers, user, excludeMySelf);
+                nexUsersQuery(drafterId, id, oaProcActinst, nextUsers, user, busData, excludeMySelf);
 
                 //3 办理人信息
                 oneAct.put("nextUsers", nextUsers);
@@ -426,9 +426,16 @@ public class TaskInActController {
 
     @ApiOperation(value = "查询该节点办理人")
     @GetMapping("currentUserQuery")
-    public Result currentUserQuery(String procDefKey, String taskId, String taskName, String drafterId, HttpServletRequest request) {
+    public Result currentUserQuery(String procDefKey, String taskId, String taskName,
+                                   String drafterId, String i_id, String table, HttpServletRequest request) {
 
         try {
+
+            HashMap<String, Object> query = new HashMap<>();
+            query.put("i_id", i_id);
+            query.put("table", table);
+            Map<String, Object> busData = dynamicTableService.queryDataById(query);
+
             //当前用户
             LoginInfo user = sysUserService.getLoginInfo(request);
             String id = user.getId();
@@ -448,7 +455,7 @@ public class TaskInActController {
             List<Map<String, Object>> nextUsers = new ArrayList<>();
             //如果存在数据应该只有一条
             for (OaProcActinst oaProcActinst : oaProcActinsts) {
-                nexUsersQuery(drafterId, id, oaProcActinst, nextUsers, user, true);//排除自己
+                nexUsersQuery(drafterId, id, oaProcActinst, nextUsers, user, busData, true);//排除自己
             }
 
             return Result.ok(nextUsers);
@@ -533,9 +540,9 @@ public class TaskInActController {
         Map<String, Object> busData2 = taskInfoVO.getBusData();
 
         HashMap<String, Object> busData = new HashMap<>();
-        busData2.keySet().forEach(k->{
+        busData2.keySet().forEach(k -> {
             Object o = busData2.get(k);
-            busData.put(k,o);
+            busData.put(k, o);
         });
         //根据functionId查出function名称
         String i_bus_function_id = busData.get("i_bus_function_id").toString();
@@ -576,9 +583,9 @@ public class TaskInActController {
             vars.put("busMsg", busMsg);
         }
         taskInfoVO.setVars(vars);
-//        if (sName.contains("收文")) {
-//            busData.put("s_file_num", s_file_num);
-//        }
+        if (sName.contains("收文")) {
+            busData2.put("s_main_unit_names", mainDept);//收文的主办部门
+        }
     }
 
     @PostMapping("doTaskMore")
@@ -673,7 +680,9 @@ public class TaskInActController {
 
 
     private void nexUsersQuery(String drafterId, String id, OaProcActinst oaProcActinst,
-                               List<Map<String, Object>> nextUsers, LoginInfo user, boolean excludeMySelf) {
+                               List<Map<String, Object>> nextUsers, LoginInfo user,
+                               Map<String, Object> busData,
+                               boolean excludeMySelf) {
         String roleScope = oaProcActinst.getRoleScope();
         String userOrRole = oaProcActinst.getUserOrRole();
         String candidates = oaProcActinst.getCandidates();
@@ -687,12 +696,12 @@ public class TaskInActController {
             List<Map<String, Object>> depts = sysUserService.selectAllDept(parentId);
 
             Iterator<Map<String, Object>> iterator = depts.iterator();
-            while (iterator.hasNext()){
+            while (iterator.hasNext()) {
                 Map<String, Object> next = iterator.next();
                 Object departName = next.get("departName");
-                if (departName!=null){
+                if (departName != null) {
                     String s = departName.toString();
-                    if (dontChoiceDepts.contains(s)){
+                    if (dontChoiceDepts.contains(s)) {
                         iterator.remove();
                     }
                 }
@@ -723,6 +732,15 @@ public class TaskInActController {
                 case RoleScope.ALLDEPT:
                     //
                     draftMsg = sysUserService.getNextUsersAllDept(candidates);
+                    break;
+                case RoleScope.MAINDEPT:
+                    //主办部门
+                    String s_main_unit_names = busData.get("s_main_unit_names") == null ? null : busData.get("s_main_unit_names").toString();
+                    if (StringUtils.isNotBlank(s_main_unit_names)) {
+                        draftMsg = sysUserService.getNextUsersMainDept(candidates,s_main_unit_names);
+                    } else {
+                        draftMsg = new ArrayList<>();
+                    }
                     break;
 
             }

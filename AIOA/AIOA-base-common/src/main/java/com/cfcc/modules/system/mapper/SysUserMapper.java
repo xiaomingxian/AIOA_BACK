@@ -177,6 +177,20 @@ public interface SysUserMapper extends BaseMapper<SysUser> {
             "</script>")
     List<SysUser> selectUsersByDeptAndRole(@Param("role") String role, @Param("deptids") ArrayList<String> deptids);
 
+
+    @Select("SELECT\n" +
+            "\t u.id uid,u.username uname,d.depart_name dname   \n" +
+            "FROM\n" +
+            "\tsys_user u\n" +
+            "LEFT JOIN sys_user_depart ud ON ud.user_id = u.id\n" +
+            "LEFT JOIN sys_depart d ON d.id = ud.dep_id\n" +
+            "LEFT JOIN sys_user_role ur ON ur.user_id = u.id\n" +
+            "LEFT JOIN sys_role r ON r.id = ur.role_id\n" +
+            "\n" +
+            "where d.depart_name=#{departName} and  r.role_name=#{roleName}" +
+            "")
+    List<Map<String, Object>> getNextUsersMainDept(@Param("roleName") String candidates,@Param("departName") String s_main_unit_names);
+
     @Select("<script>" +
             "SELECT " +
             " u.id uid, " +
@@ -263,4 +277,5 @@ public interface SysUserMapper extends BaseMapper<SysUser> {
     List<String> selectDeptsBysUsers(@Param("ids") List<String> deptUsers);
 
     Map<String,Object> getdeptIdByUser(@Param("username") String username);
+
 }
