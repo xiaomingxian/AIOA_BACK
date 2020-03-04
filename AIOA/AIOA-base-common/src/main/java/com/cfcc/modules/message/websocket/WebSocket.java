@@ -78,6 +78,7 @@ public class WebSocket {
         if (session != null&&session.isOpen()) {
             try {
             	log.info("【websocket消息】 单点消息:"+message);
+                System.out.println("【websocket消息】 单点消息:"+message);
                 session.getAsyncRemote().sendText(message);
             } catch (Exception e) {
                 e.printStackTrace();

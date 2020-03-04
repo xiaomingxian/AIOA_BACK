@@ -148,4 +148,8 @@ public class BusFunction implements Serializable {
     @TableField(exist = false)
     private String sBusdataTable;
 
+    @ApiModelProperty(value = "对应的存储表名")
+    @TableField(exist = false)
+    private String unitId;
+
 }

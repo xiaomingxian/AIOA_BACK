@@ -20,7 +20,7 @@
         DELETE from sys_user_set  where i_id = #{id}
     </delete>
     <!-- 根据Id查询-->
-    <select id="findById" resultType="com.cfcc.modules.system.entity.SysUserSet"  parameterType="integer">
+    <select id="findById" resultType="com.cfcc.modules.system.entity.SysUserSet" parameterType="integer">
         SELECT * from sys_user_set  where i_id = #{iId}
     </select>
     <select id="count" resultType="integer">
@@ -63,7 +63,7 @@
             <if test="sysUserSet.iIsCalendar != null and sysUserSet.iIsCalendar != '' ">
                 and c.i_is_calendar = #{iIsCalendar}
             </if>
-             <if test="sysUserSet.iCalendarDay != null and sysUserSet.iCalendarDay != '' ">
+            <if test="sysUserSet.iCalendarDay != null and sysUserSet.iCalendarDay != '' ">
                 and c.i_calendar_day = #{iCalendarDay}
             </if>
             <if test="sysUserSet.iIsMessages != null and sysUserSet.iIsMessages != '' ">
@@ -89,6 +89,10 @@
      </select>
     <select id="HomeAndDay" resultType="com.cfcc.modules.system.entity.SysUserSet">
         select * from sys_user_set  where s_user_id=#{sUserId}
+    </select>
+    <select id="queryUserSetByIdsDao" resultType="String">
+        select d.realname from sys_user d where d.id in (select c.s_user_id from sys_user_set c
+            where c.s_user_id in (${nameStr}) and c.i_is_messages = 1  )
     </select>
 
 </mapper>

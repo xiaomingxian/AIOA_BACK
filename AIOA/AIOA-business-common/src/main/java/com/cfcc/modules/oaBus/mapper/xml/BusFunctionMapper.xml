@@ -23,7 +23,7 @@
 
     <select id="queryBusFunctionCount" resultType="java.lang.Integer">
 
-        select count(*) from oa_bus_function c
+        select count(c.i_id) from oa_bus_function c
         <where>
             <if test="iBusModelId != null and iBusModelId != '' ">
                 c.i_bus_model_id = #{iBusModelId}
@@ -31,17 +31,23 @@
             <if test="sName != null and sName != '' ">
                 and c.s_name = #{sName}
             </if>
+            <if test="unitId != null and unitId != '' ">
+                and c.i_id in(select u.i_bus_function_id from oa_bus_function_unit u where u.s_unit_id = #{unitId} )
+            </if>
         </where>
     </select>
     <select id="queryBusFunction" resultType="com.cfcc.modules.oaBus.entity.BusFunction">
 
-        select * from oa_bus_function c
+        select c.* from oa_bus_function c
         <where>
             <if test="busFunction.iBusModelId != null and busFunction.iBusModelId != '' ">
                 c.i_bus_model_id = #{busFunction.iBusModelId}
             </if>
             <if test="busFunction.sName != null and busFunction.sName != '' ">
                 and c.s_name = #{busFunction.sName}
+            </if>
+            <if test="busFunction.unitId != null and busFunction.unitId != '' ">
+                and c.i_id in(select u.i_bus_function_id from oa_bus_function_unit u where u.s_unit_id = #{busFunction.unitId} )
             </if>
         </where>
         <choose>
