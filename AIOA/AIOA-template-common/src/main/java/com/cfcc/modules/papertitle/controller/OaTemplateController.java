@@ -63,7 +63,7 @@ public class OaTemplateController {
     private String uploadfile;
 
     //上传模板文件地址
-    @Value(value = "${jeecg.path.tempFilePath}")
+    @Value(value = "${jeecg.path.templateFilePath}")
     private String templatePath;
     /**
      * 分页列表查询
