@@ -96,7 +96,7 @@ public interface SysUserMapper extends BaseMapper<SysUser> {
             " LEFT JOIN sys_user_role ur on uu.id=ur.user_id " +
             " left JOIN sys_role r on ur.role_id=r.id " +
             " where d.id = udp.depId  " +
-            " and r.role_name=#{roleName}")
+            " and r.role_name=#{roleName} ORDER BY uu.show_order")
         //当前用户所在部门 对应角色
     List<Map<String, Object>> getNextUsersByDept(@Param("userId") String userId, @Param("roleName") String roleName);
 
@@ -120,7 +120,7 @@ public interface SysUserMapper extends BaseMapper<SysUser> {
             " LEFT JOIN sys_user_role ur on uu.id=ur.user_id " +
             " left JOIN sys_role r on ur.role_id=r.id " +
             " where d.parent_id = udp.org_id  " +
-            " and r.role_name=#{candidates} ")
+            " and r.role_name=#{candidates}  ORDER BY uu.show_order")
     List<Map<String, Object>> getNextUsersByOrg(@Param("id") String id, @Param("candidates") String candidates);
 
     @Select("select u.id uid,u.username uname,d.depart_name dname  from sys_user u LEFT JOIN " +
@@ -129,7 +129,7 @@ public interface SysUserMapper extends BaseMapper<SysUser> {
             " where u.id in ( " +
             "select user_id  from sys_user_role ur where ur.role_id = " +
             "(select id from sys_role r where r.role_name=#{candidates} ) " +
-            ")")
+            ")  ORDER BY u.show_order")
     List<Map<String, Object>> getNextUsersAllDept(@Param("candidates") String candidates);
 
 
@@ -188,7 +188,7 @@ public interface SysUserMapper extends BaseMapper<SysUser> {
             "LEFT JOIN sys_role r ON r.id = ur.role_id\n" +
             "\n" +
             "where d.depart_name=#{departName} and  r.role_name=#{roleName}" +
-            "")
+            "  order BY u.show_order ")
     List<Map<String, Object>> getNextUsersMainDept(@Param("roleName") String candidates,@Param("departName") String s_main_unit_names);
 
     @Select("<script>" +
