@@ -333,7 +333,12 @@ public class OaTemplateController {
             String projectPath = System.getProperty("user.dir");
             String path1 = projectPath.substring(0, projectPath.lastIndexOf(File.separator));
             String path2 = path1.substring(0, path1.lastIndexOf(File.separator));
-            File template = new File(path2+File.separator+templatePath+File.separator+orgName);
+            //判断路径是否存在
+            File templateFile = new File(path2 + File.separator + this.templatePath);
+            if (!templateFile.exists()){
+                templateFile.mkdirs();
+            }
+            File template = new File(path2+File.separator+templatePath+File.separator+fileName);
             FileCopyUtils.copy(mf.getBytes(), template);
             OaFile oaFile = new OaFile();
             oaFile.setSFileType(type);        // 附件类型为 4 附件
@@ -342,14 +347,12 @@ public class OaTemplateController {
             oaFile.setSCreateBy(username);
             oaFile.setDCreateTime(new Date());
             oaFileService.save(oaFile);
-//            QueryWrapper<OaFile> c = new QueryWrapper<>();
-//            c.setEntity(oaFile);
-//            OaFile ad = oaFileService.getOne(c);        //查询刚刚插入的那条数据的id
 
-            Map<String,Object> map=new HashMap<>();
-            map.put("sFilePath",savePath);
-            map.put("sFileType",type);
-            oaFileService.singleCopyFile(map);
+
+//            Map<String,Object> map=new HashMap<>();
+//            map.put("sFilePath",savePath);
+//            map.put("sFileType",type);
+//            oaFileService.singleCopyFile(map);
 
             result.setResult(oaFile);
             result.setMessage(savePath);
