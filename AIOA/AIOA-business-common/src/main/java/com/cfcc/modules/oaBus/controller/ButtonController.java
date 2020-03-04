@@ -9,6 +9,7 @@ import com.cfcc.modules.system.service.ISysUserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.servlet.http.HttpServletRequest;
@@ -37,7 +38,7 @@ public class ButtonController {
                              String taskDef,
                              String proInstanId,
                              String taskId,
-                             String status,
+                          @RequestParam(required = false) String status,
                              HttpServletRequest request) {
 
         try {
