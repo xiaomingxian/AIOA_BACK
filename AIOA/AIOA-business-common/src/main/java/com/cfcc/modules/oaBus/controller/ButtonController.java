@@ -32,9 +32,9 @@ public class ButtonController {
 
     @GetMapping("getButtons")
     public Result getButtons(String proSetId,
-                             String proKey,
                              String table,
                              String id,
+                             String taskDef,
                              String proInstanId,
                              String taskId,
                              String status,
@@ -45,7 +45,7 @@ public class ButtonController {
             query.put("table", table);
             query.put("i_id", id);
             Map<String, Object> oaBusdata = dynamicTableService.queryDataById(query);
-            String taskDef=  oaBusdata.get("s_cur_proc_name")==null?null:oaBusdata.get("s_cur_proc_name").toString();
+            String proKey=  oaBusdata.get("s_cur_proc_name")==null?null:oaBusdata.get("s_cur_proc_name").toString();
 
             LoginInfo loginInfo = userService.getLoginInfo(request);
 
