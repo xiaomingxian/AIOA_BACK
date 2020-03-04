@@ -50,6 +50,7 @@ public class ButtonController {
 
             LoginInfo loginInfo = userService.getLoginInfo(request);
 
+            oaBusdata.put("table",table);
             Map<String, Boolean> currentUserPermission = buttonPermissionService.currentUserPermission(proKey, oaBusdata, loginInfo,
                     taskDef, proInstanId, taskId, status);
 
