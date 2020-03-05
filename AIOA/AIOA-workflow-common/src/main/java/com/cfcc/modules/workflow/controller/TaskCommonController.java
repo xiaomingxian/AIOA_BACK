@@ -58,6 +58,12 @@ public class TaskCommonController {
     @Autowired
     private ActPicService actPicService;
 
+    @GetMapping("taskStatus")
+    public Result taskStatus(String taskid) {
+        String status = taskCommonService.taskStatus(taskid);
+        return Result.ok(status);
+    }
+
 
     @GetMapping("finish")
     public Result finish(String taskId) {
@@ -420,15 +426,12 @@ public class TaskCommonController {
     }
 
 
-
-
     @RequestMapping("queryProPlan")
     public void queryProPlan(HttpServletRequest request, HttpServletResponse response) throws IOException {
         String processInstanceId = request.getParameter("ProcessInstanceId");
         //获取历史流程实例
-        actPicService.queryProPlan(processInstanceId,response);
+        actPicService.queryProPlan(processInstanceId, response);
     }
-
 
 
 }

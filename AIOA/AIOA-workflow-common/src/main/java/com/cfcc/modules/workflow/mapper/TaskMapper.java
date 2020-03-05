@@ -241,4 +241,6 @@ public interface TaskMapper {
 //            "            </where> " +
 //            "        </foreach> " )
     void updateRuActDept(@Param("t") Task task,@Param("pid") String randomParent);
+
+    void deleteByprocessInstanceId(@Param("processInstanceId") String processInstanceId);
 }
