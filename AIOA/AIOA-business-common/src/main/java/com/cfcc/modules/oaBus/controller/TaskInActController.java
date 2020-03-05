@@ -669,6 +669,7 @@ public class TaskInActController {
             result.setResult(res);
             return result;
         } catch (Exception e) {
+            e.printStackTrace();
             log.error(e.toString());
             return Result.error("查询失败");
         }
