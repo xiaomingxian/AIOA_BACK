@@ -106,8 +106,9 @@ public class FileNtkoController {
 //                oaBusdataService.updateFileStatus(busdataMap);
             }
             //System.out.println("---------------->>>>>>>>>>>>>>>创建保存成功");
-            //----开启webSocket，起草底稿后向前端发一个请求，表明已经保存成功。
-            sendWebSocketMessage(tableid,message) ;
+            //现在已经不使用websocket
+            // ----开启webSocket，起草底稿后向前端发一个请求，表明已经保存成功。
+            //sendWebSocketMessage(tableid,message) ;
             result.setSuccess(true);
         } catch (RuntimeException e) {
             e.printStackTrace();
