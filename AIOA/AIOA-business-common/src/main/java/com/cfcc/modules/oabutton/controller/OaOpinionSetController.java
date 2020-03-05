@@ -307,8 +307,8 @@ public class OaOpinionSetController {
 	  * @param
 	  * @return
 	  */
-	 @AutoLog(value = "发布类按钮描述-通过任务KEY和按钮ID查询")
-	 @ApiOperation(value = "发布类按钮描述-通过任务KEY和按钮ID查询", notes = "发布类按钮描述-通过任务KEY和按钮ID查询")
+	 @AutoLog(value = "意见配置-根据序号校验名字")
+	 @ApiOperation(value = "意见配置-根据序号校验名字", notes = "意见配置-根据序号校验名字")
 	 @PostMapping(value = "/queryByOrderAndKey")
 	 public Result<List<OaOpinionSet>> queryByOrderAndKey(@RequestBody Map<String,Object> map) {
 		 Result<List<OaOpinionSet>> result = new Result<>();
@@ -319,6 +319,9 @@ public class OaOpinionSetController {
 		 }
 		 List<OaOpinionSet> oaOpinionSet = oaOpinionSetService.queryByOrderAndKey(map);
 		 if (oaOpinionSet == null || oaOpinionSet.size()<1) {
+			 result.setResult(null);
+			 result.setSuccess(true);
+		 }else if(oaOpinionSet.size()==1 && map.get("iid")!=null && map.get("iid").toString()!="" && oaOpinionSet.get(0).getIId().equals(map.get("iid"))){
 			 result.setResult(null);
 			 result.setSuccess(true);
 		 }else {
