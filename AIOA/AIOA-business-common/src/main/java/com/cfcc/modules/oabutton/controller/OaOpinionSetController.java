@@ -159,7 +159,10 @@ public class OaOpinionSetController {
 			oaOpinionSet.setType(null);
 		}
 		List<OaOpinionSet> oaOpinionSets = oaOpinionSetService.queryByType(oaOpinionSet.getType(), oaOpinionSet.getIProcOpinionId());
-		if (oaOpinionSet.getType()!=null&&oaOpinionSet.getType().trim().length()>0&&oaOpinionSets.size()>0){
+		if (oaOpinionSet.getType()!=null&&oaOpinionSet.getType().trim().length()>0&&oaOpinionSets.size()>0
+				&&!oaOpinionSet.getType().equals("8")
+				&&!oaOpinionSet.getType().equals("9")
+				&&!oaOpinionSet.getType().equals("10")){
 			result.error500("当前意见类型已存在");
 			return result;
 		}
