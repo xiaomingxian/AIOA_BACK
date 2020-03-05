@@ -63,7 +63,7 @@ public class OaTemplateController {
     private String uploadfile;
 
     //上传模板文件地址
-    @Value(value = "${jeecg.path.templateFilePath}")
+    @Value(value = "${jeecg.path.tempFilePath}")
     private String templatePath;
     /**
      * 分页列表查询
@@ -330,16 +330,18 @@ public class OaTemplateController {
             FileCopyUtils.copy(mf.getBytes(), savefile);
 
             //获取后台项目路径
-            String projectPath = System.getProperty("user.dir");
+            /*String projectPath = System.getProperty("user.dir");
             String path1 = projectPath.substring(0, projectPath.lastIndexOf(File.separator));
-            String path2 = path1.substring(0, path1.lastIndexOf(File.separator));
+            String path2 = path1.substring(0, path1.lastIndexOf(File.separator));*/
+//            File template = new File(uploadpath+File.separator+"/templateFiles/"+File.separator+orgName);
+//            String path2 = path1.substring(0, path1.lastIndexOf(File.separator));
             //判断路径是否存在
-            File templateFile = new File(path2 + File.separator + this.templatePath);
-            if (!templateFile.exists()){
-                templateFile.mkdirs();
-            }
-            File template = new File(path2+File.separator+templatePath+File.separator+fileName);
-            FileCopyUtils.copy(mf.getBytes(), template);
+//            File templateFile = new File(path2 + File.separator + this.templatePath);
+//            if (!template.exists()){
+//                template.mkdirs();
+//            }
+//            File template = new File(path2+File.separator+templatePath+File.separator+fileName);
+//            FileCopyUtils.copy(mf.getBytes(), template);
             OaFile oaFile = new OaFile();
             oaFile.setSFileType(type);        // 附件类型为 4 附件
             oaFile.setSFileName(orgName);        //设置附件名字
@@ -349,10 +351,10 @@ public class OaTemplateController {
             oaFileService.save(oaFile);
 
 
-//            Map<String,Object> map=new HashMap<>();
-//            map.put("sFilePath",savePath);
-//            map.put("sFileType",type);
-//            oaFileService.singleCopyFile(map);
+            Map<String,Object> map=new HashMap<>();
+            map.put("sFilePath",savePath);
+            map.put("sFileType",type);
+            oaFileService.singleCopyFile(map);
 
             result.setResult(oaFile);
             result.setMessage(savePath);

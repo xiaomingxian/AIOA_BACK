@@ -436,18 +436,12 @@ public class OaFileServiceImpl extends ServiceImpl<OaFileMapper, OaFile> impleme
 
         String fileName = initFile.substring(initFile.lastIndexOf(File.separator) + 1, initFile.length());
         try {
-            //获取后台项目路径
-            String projectPath = System.getProperty("user.dir");
-            String path = projectPath.substring(0, projectPath.lastIndexOf(File.separator));
-            String path2 = path.substring(0, path.lastIndexOf(File.separator));
             String tempPaths = "";
             if (map.get("sFilePath") != null){
                 if (map.get("sFileType") != null){
-                    tempPaths = path2+File.separator+templateFilePath;
-//                    tempPaths = templateFilePath;
+                    tempPaths = uploadpath+"/templateFiles";
                 }else {
-                    tempPaths = path2+File.separator+tempPath;
-//                    tempPaths = tempPath;
+                    tempPaths = uploadpath+"/temporaryFiles";
                 }
             }
             File temp = new File(tempPaths);

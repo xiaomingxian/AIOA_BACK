@@ -178,8 +178,14 @@ public class OaButtonController {
 	@AutoLog(value = "按钮管理-通过id查询或名称")
 	@ApiOperation(value="按钮管理-通过id查询或名称", notes="按钮管理-通过id查询或名称")
 	@GetMapping(value = "/queryById")
-	public Result<OaButton> queryById(@RequestParam(name="id",required=false) Integer id,@RequestParam(name="sbtnName",required=false) String sBtnName) {
+	public Result<OaButton> queryById(@RequestParam(name="id",required=false) Integer id,
+									  @RequestParam(name="sbtnName",required=false) String sBtnName,
+									  @RequestParam(value = "orgSchema", required = false) String orgSchema,
+									  HttpServletRequest request) {
 		try {
+			if (!orgSchema.equals("")){
+				request.setAttribute("orgSchema",orgSchema);
+			}
 			Result<OaButton> result = new Result<>();
 			List<OaButton> oaButton = oaButtonService.queryById(id,sBtnName);
 			if(oaButton==null||oaButton.size()<1) {

@@ -24,6 +24,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.management.RuntimeErrorException;
+import javax.servlet.http.HttpServletRequest;
 import java.util.Calendar;
 import java.util.List;
 import java.util.Map;
@@ -75,9 +76,14 @@ public class FormalFileController {
     public Result<Map> queryFormalFileById(@RequestParam(name = "id", required = true) String id,
                                            @RequestParam(name = "stable", required = true) String stable,
                                            @RequestParam(value = "tableid", required = true) String tableid,
-                                           @RequestParam(value = "fileType", required = true) String fileType) {
+                                           @RequestParam(value = "fileType", required = true) String fileType,
+                                           @RequestParam(value = "orgSchema", required = false) String orgSchema,
+                                           HttpServletRequest request) {
         Result<Map> result = new Result<Map>();
         try {
+            if (!orgSchema.equals("")){
+                request.setAttribute("orgSchema",orgSchema);
+            }
             //获取文件名
             OaFile oaFile = new OaFile();
             oaFile.setSTable(stable);
@@ -153,9 +159,14 @@ public class FormalFileController {
     @GetMapping(value = "/queryById")
     public Result<Map> queryById(@RequestParam(name = "id", required = true) Integer id,
                                  @RequestParam(name = "stable", required = true) String stable,
-                                 @RequestParam(value = "tableid", required = true) Integer tableid) {
+                                 @RequestParam(value = "tableid", required = true) Integer tableid,
+                                 @RequestParam(value = "orgSchema", required = false) String orgSchema,
+                                 HttpServletRequest request) {
         Result<Map> result = new Result<Map>();
         try {
+            if (!orgSchema.equals("")){
+                request.setAttribute("orgSchema",orgSchema);
+            }
             DocNumManage docNumManage = documentMangeService.queryById(id);
             Integer tmplateId = iDocNumSetService.queryByTemplateId(docNumManage);
             OaTemplate oaTemplate = iOaTemplateService.queryById(tmplateId);

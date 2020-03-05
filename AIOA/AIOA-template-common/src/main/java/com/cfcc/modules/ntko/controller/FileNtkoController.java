@@ -6,16 +6,15 @@ import com.cfcc.common.api.vo.Result;
 import com.cfcc.common.aspect.annotation.AutoLog;
 import com.cfcc.common.util.FileUtils;
 import com.cfcc.modules.message.websocket.WebSocket;
-import com.cfcc.modules.oaBus.entity.OaBusdata;
 import com.cfcc.modules.oaBus.entity.OaFile;
 import com.cfcc.modules.oaBus.mapper.OaBusDynamicTableMapper;
 import com.cfcc.modules.oaBus.service.IOaBusdataService;
 import com.cfcc.modules.oaBus.service.IOaFileService;
-import com.cfcc.modules.oaBus.service.OaBusDynamicTableService;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.FileCopyUtils;
 import org.springframework.web.bind.annotation.*;
@@ -55,6 +54,8 @@ public class FileNtkoController {
     @Autowired
     private IOaBusdataService oaBusdataService;
     @Autowired
+    private RedisTemplate<String, Object> redisTemplate;
+    @Autowired
     private OaBusDynamicTableMapper dynamicTableMapper;
 
     /**
@@ -69,10 +70,10 @@ public class FileNtkoController {
                                  @RequestParam(value = "stable", required = true) String stable,
                                  @RequestParam(value = "tableid", required = true) String tableid,
                                  @RequestParam(value = "fileType", required = true) String fileType,
-                                 @RequestParam(value = "orgSchema", required = true) String orgSchema) {
+                                 @RequestParam(value = "orgSchema", required = false) String orgSchema) {
         Result<String> result = new Result<>();
         try {
-            if (orgSchema!=null){
+            if (!orgSchema.equals("")){
                 request.setAttribute("orgSchema",orgSchema);
             }
             String ctxPath = uploadpath;
@@ -143,10 +144,15 @@ public class FileNtkoController {
     @GetMapping(value = "/file")
     public Result<String> showFile(@RequestParam(name = "stable", required = true) String stable,
                                    @RequestParam(value = "tableid", required = true) Integer tableid,
-                                   @RequestParam(value = "fileType", required = true) String fileType) {
+                                   @RequestParam(value = "fileType", required = true) String fileType,
+                                   @RequestParam(value = "orgSchema", required = false) String orgSchema,
+                                   HttpServletRequest request) {
         Result<String> result = new Result();
 
         try {
+            if (!orgSchema.equals("")){
+                request.setAttribute("orgSchema",orgSchema);
+            }
             OaFile oaFile = new OaFile();
             oaFile.setSTable(stable);
             oaFile.setITableId(tableid);
@@ -155,9 +161,12 @@ public class FileNtkoController {
             c.setEntity(oaFile);
 
             OaFile ad = oaFileService.getOne(c);
-
-//            String fileName = ad.getSFileName();
-            String filePath=ad.getSFilePath();
+            String filePath=null;
+            //上传附件进行编辑查文件名
+            filePath=ad.getSFilePath();
+            if ("4".equals(fileType)){
+                filePath=filePath.substring(ad.getSFilePath().lastIndexOf("\\")+1);
+            }
             if (null == ad) {
                 result.setMessage("文件控件系统出现问题，请联系管理");
             } else {
@@ -173,7 +182,33 @@ public class FileNtkoController {
 
         return result;
     }
+    /**
+     * 查看查询当前的文件名
+     *
+     * @return
+     * @Author
+     */
+    @GetMapping(value = "/templateFile")
+    public Result<String> showTemplateFile(@RequestParam(name = "fileId", required = true) Integer fileId,
+                                           @RequestParam(value = "orgSchema", required = false) String orgSchema,
+                                           HttpServletRequest request) {
+        Result<String> result = new Result();
+        try {
+            if (!orgSchema.equals("")){
+                request.setAttribute("orgSchema",orgSchema);
+            }
+            OaFile oaFile=oaFileService.queryById(fileId);
+            String filePath=oaFile.getSFilePath();
+            String fileName=filePath.substring(filePath.lastIndexOf("\\")+1);
+            result.setResult(fileName);
+            return result;
+        } catch (Exception e) {
+            e.printStackTrace();
+            result.setMessage("文件控件系统出现问题，请联系管理");
+        }
 
+        return result;
+    }
     /**
      * 编辑底稿后保存上传新的文件并删除旧文件的信息
      *
@@ -188,7 +223,7 @@ public class FileNtkoController {
                                    @RequestParam(value = "orgSchema", required = true) String orgSchema) throws IOException {
 
         Result<String> result = new Result<>();
-        if (orgSchema!=null){
+        if (!orgSchema.equals("")){
             request.setAttribute("orgSchema",orgSchema);
         }
         String ctxPath = uploadpath;
@@ -235,7 +270,7 @@ public class FileNtkoController {
                                         @RequestParam(value = "orgSchema", required = true) String orgSchema) throws IOException {
         OaFile initFile = oaFileService.getById(fileId);
         Result<String> result = new Result<>();
-        if (orgSchema!=null){
+        if (!orgSchema.equals("")){
             request.setAttribute("orgSchema",orgSchema);
         }
         Calendar calendar = Calendar.getInstance();
@@ -267,10 +302,7 @@ public class FileNtkoController {
         oaFileMap.put("d_create_time",new Date());
         int num=dynamicTableMapper.updateData(oaFileMap);
         if (fileType!=null){
-            String projectPath = System.getProperty("user.dir");
-            String path1 = projectPath.substring(0, projectPath.lastIndexOf(File.separator));
-            String path2 = path1.substring(0, path1.lastIndexOf(File.separator));
-            File template = new File(path2+File.separator+tempFilePath+File.separator+fileName);
+            File template = new File(uploadpath+File.separator+"/temporaryFiles"+File.separator+fileName);
             FileCopyUtils.copy(mf.getBytes(), template);
         }
         if (num!=0){
@@ -308,26 +340,54 @@ public class FileNtkoController {
         return result;
     }
 
-    @PostMapping(value = "/fileupload")
-    public Result<String> fileupload(HttpServletRequest request,
-                                     @RequestParam(name = "stable", required = true) String stable,
-                                     @RequestParam(value = "tableid", required = true) Integer tableid) {
+    @PostMapping(value = "/getPasswordCode")
+    public Result<String> getPasswordCode() {
         Result<String> result = new Result<>();
         try {
-            String ctxPath = uploadpath;
-//            String tempPath = uploadfilepath;
-            Map<String, Object> map = FileUtils.Upload(ctxPath, request);
-            String fileName = (String) map.get("fileName");
-            String savePath = (String) map.get("savePath");
-            OaFile oaFile = new OaFile();
-            oaFile.setSTable(stable);
-            oaFile.setITableId(tableid);
-            oaFile.setSFileType("1");
-            oaFile.setSFileName(fileName);
-            oaFile.setSFilePath(savePath);
-            oaFile.setSCreateBy("admin");
-            oaFile.setDCreateTime(new Date());
-            oaFileService.save(oaFile);
+            String num=FileUtils.generatePassword(6);
+            redisTemplate.opsForValue().set("passwordCode", num);
+            if (redisTemplate.opsForValue().get("passwordCode")!=null){
+                result.setSuccess(true);
+                result.setResult(num);
+            }
+        } catch (RuntimeException e) {
+            result.setSuccess(false);
+            result.setMessage(e.getMessage());
+            log.error(e.getMessage(), e);
+        }
+        return result;
+    }
+
+    @PostMapping(value = "/checkPasswordCode")
+    public Result<String> checkPasswordCode(@RequestParam(value = "password", required = true) String password) {
+        Result<String> result = new Result<>();
+        try {
+            String codeNum=(String) redisTemplate.opsForValue().get("passwordCode");
+            if (codeNum.equals(password)){
+                redisTemplate.delete("passwordCode");
+            }
+            if (redisTemplate.hasKey("passwordCode")){
+                result.setSuccess(false);
+            }else {
+                result.setSuccess(true);
+            }
+        } catch (RuntimeException e) {
+            result.setSuccess(false);
+            result.setMessage(e.getMessage());
+            log.error(e.getMessage(), e);
+        }
+        return result;
+    }
+
+    @PostMapping(value = "/creatPath")
+    public Result<String> creatPath() {
+        Result<String> result = new Result<>();
+        try {
+            String ctxPath = uploadpath+"/templateFiles";
+            File temp = new File(ctxPath);
+            if (!temp.exists()) {
+                temp.mkdirs();
+            }
             result.setSuccess(true);
         } catch (RuntimeException e) {
             result.setSuccess(false);
@@ -336,4 +396,5 @@ public class FileNtkoController {
         }
         return result;
     }
+
 }
