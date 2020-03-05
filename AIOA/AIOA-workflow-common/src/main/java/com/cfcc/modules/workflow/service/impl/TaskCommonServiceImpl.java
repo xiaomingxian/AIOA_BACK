@@ -117,7 +117,7 @@ public class TaskCommonServiceImpl implements TaskCommonService {
     public void del(String processInstanceId) {
         //删除表中的数据
         if (StringUtils.isNotBlank(processInstanceId)) {
-            taskMapper.deleteByprocessInstanceId(processInstanceId);
+                taskMapper.deleteByprocessInstanceId(processInstanceId);
         }
 //        runtimeService.deleteProcessInstance(id, "删除流程实例");
     }
