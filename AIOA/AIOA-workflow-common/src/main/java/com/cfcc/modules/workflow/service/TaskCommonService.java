@@ -103,4 +103,6 @@ public interface TaskCommonService {
     void updateHisActDept(Task task, String randomParent);
 
     void updateRuActDept(Task task, String randomParent);
+
+    String taskStatus(String taskid);
 }

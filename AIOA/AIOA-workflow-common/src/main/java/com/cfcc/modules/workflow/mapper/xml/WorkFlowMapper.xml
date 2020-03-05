@@ -1796,7 +1796,7 @@
     </delete>
 
 
-    <update id="updateHisActDept" >
+    <update id="updateHisActDept">
             UPDATE act_hi_taskinst
             set
                 PROC_DEF_ID_=#{t.processDefinitionId} ,PROC_INST_ID_=#{t.processInstanceId},
@@ -1805,7 +1805,7 @@
               id_=#{t.id}
 
     </update>
-    <update id="updateRuActDept" >
+    <update id="updateRuActDept">
             UPDATE act_ru_task
 
             set
@@ -1813,8 +1813,17 @@
                 EXECUTION_ID_=#{t.executionId},PARENT_TASK_ID_=#{t.parentTaskId}
             where    id_=#{t.id}
 
-
-
-
     </update>
+
+    <!--删除一条流程的所有相关数据-->
+    <delete id="deleteByprocessInstanceId">
+         set foreign_key_checks = 0;
+        DELETE from act_ru_task where PROC_INST_ID_=#{processInstanceId};
+        DELETE from act_hi_taskinst where PROC_INST_ID_=#{processInstanceId};
+        DELETE from act_hi_actinst where PROC_INST_ID_=#{processInstanceId};
+        DELETE FROM act_ru_identitylink WHERE PROC_INST_ID_=#{processInstanceId};
+        DELETE from act_ru_execution where PROC_INST_ID_=#{processInstanceId};
+        DELETE FROM act_hi_varinst where PROC_INST_ID_=#{processInstanceId};
+         set foreign_key_checks = 1;
+    </delete>
 </mapper>

@@ -114,8 +114,12 @@ public class TaskCommonServiceImpl implements TaskCommonService {
 
 
     @Override
-    public void del(String id) {
-        runtimeService.deleteProcessInstance(id, "删除流程实例");
+    public void del(String processInstanceId) {
+        //删除表中的数据
+        if (StringUtils.isNotBlank(processInstanceId)) {
+                taskMapper.deleteByprocessInstanceId(processInstanceId);
+        }
+//        runtimeService.deleteProcessInstance(id, "删除流程实例");
     }
 
     /**
@@ -1005,6 +1009,14 @@ public class TaskCommonServiceImpl implements TaskCommonService {
         taskMapper.updateRuActDept(task, randomParent);
     }
 
+    @Override
+    public String taskStatus(String taskid) {
+        HistoricTaskInstance historicTaskInstance = historyService.createHistoricTaskInstanceQuery().taskId(taskid).singleResult();
+        if (historicTaskInstance == null) return "del";
+        if (StringUtils.isNotBlank(historicTaskInstance.getDeleteReason())) return "done";
+        return "todo";
+    }
+
 
     private String nextActMore(List<TaskInfoVO> taskInfoVOs, Task task) {
         String processInstanceId = task.getProcessInstanceId();
@@ -1223,11 +1235,11 @@ public class TaskCommonServiceImpl implements TaskCommonService {
             if (userId.contains(",")) {
                 split = userId.split(",");
                 userId = userId.substring(0, (userId.length() - 1));
-                if (split.length > 1){
+                if (split.length > 1) {
                     qiangQian = true;
                     map.put("s_create_by", "");
                 }
-                if (split.length==1) map.put("s_create_by", userId);
+                if (split.length == 1) map.put("s_create_by", userId);
             }
             String busMsg = VarsWithBus.getBusMsg(map);
 
@@ -1242,9 +1254,9 @@ public class TaskCommonServiceImpl implements TaskCommonService {
             }
 
             //抢签-多用户
-            if (qiangQian){
+            if (qiangQian) {
                 vars.put(draft, split);
-            }else {//单用户(不区分抢签)
+            } else {//单用户(不区分抢签)
                 vars.put(draft, userId);
             }
 
@@ -1324,6 +1336,11 @@ public class TaskCommonServiceImpl implements TaskCommonService {
                 nextAct = activity;
             }
         }
+        if (nextAct == null && nextActs.size() == 1) {
+            nextAct = nextActs.get(0);
+        }
+
+
         if (nextAct == null) return;
 
 
@@ -1368,7 +1385,12 @@ public class TaskCommonServiceImpl implements TaskCommonService {
         //Boolean userRecordVal = oaProcActinst.getUserRecordVal();
         //if (userRecordVal != null && userRecordVal) {//是否使用记录的用户
         //使用记录的用户(如果本身有用户的话就使用自己选择的用户)
-        if (vars.get(assignee) == null) {
+        if (vars!=null&&vars.get(assignee) == null) {
+            String valByEl = taskMapper.getValByEl(processInstanceId, taskDefKeyNext + "-" + assignee);
+            if (StringUtils.isNotBlank(valByEl)) vars.put(assignee, valByEl);
+        }
+        if (vars==null){
+            vars=new HashMap<String, Object>();
             String valByEl = taskMapper.getValByEl(processInstanceId, taskDefKeyNext + "-" + assignee);
             if (StringUtils.isNotBlank(valByEl)) vars.put(assignee, valByEl);
         }

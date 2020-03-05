@@ -121,7 +121,7 @@ spring:
       datasource:
         master:
           #          &allowMultiQueries=trueA
-          url: jdbc:mysql://11.130.6.145:8066/001?characterEncoding=UTF-8&useUnicode=true&useSSL=false&tinyInt1isBit=false
+          url: jdbc:mysql://11.130.6.145:8066/001?characterEncoding=UTF-8&useUnicode=true&useSSL=false&tinyInt1isBit=false&allowMultiQueries=true
           #          url: jdbc:mysql://49.234.25.12:3306/aioa_test?characterEncoding=UTF-8&useUnicode=true&useSSL=false&tinyInt1isBit=false
           username: root
           password: root

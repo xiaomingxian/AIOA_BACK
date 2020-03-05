@@ -155,7 +155,7 @@ public class OaOpinionSetController {
 			result.error500("当前意见不存在");
 			return result;
 		}
-		if (oaOpinionSet!=null && oaOpinionSet.getType().equals("9999")){
+		if (oaOpinionSet!=null && oaOpinionSet.getType()!=null && oaOpinionSet.getType().equals("9999")){
 			oaOpinionSet.setType(null);
 		}
 		List<OaOpinionSet> oaOpinionSets = oaOpinionSetService.queryByType(oaOpinionSet.getType(), oaOpinionSet.getIProcOpinionId());
@@ -191,7 +191,7 @@ public class OaOpinionSetController {
 			result.error500("当前意见不存在");
 			return result;
 		}
-		if (oaOpinionSet!=null && oaOpinionSet.getType().equals("9999")){
+		if (oaOpinionSet!=null && oaOpinionSet.getType()!=null && oaOpinionSet.getType().equals("9999")){
 			oaOpinionSet.setType(null);
 		}
 //		List<OaOpinionSet> oaOpinionSets = oaOpinionSetService.queryByType(oaOpinionSet.getType(), oaOpinionSet.getIProcOpinionId());
@@ -284,11 +284,11 @@ public class OaOpinionSetController {
 	 @PostMapping(value = "/queryByTaskDefKey")
 	 public Result<OaOpinionSet> queryByTaskKey(@RequestBody Map<String,Object> map) {
 		 Result<OaOpinionSet> result = new Result<OaOpinionSet>();
-		 if (map.get("taskDefKey")==null||map.get("type")==null || map.get("iProcOpinionId")==null ||map.get("procDefKey")==null){
+		 if (map.get("taskDefKey")==null || map.get("iProcOpinionId")==null ||map.get("procDefKey")==null){
 			 result.error500("未找到对应实体");
 			 return result;
 		 }
-		 if(map.get("type")==" "|| map.get("type").equals("9999")){
+		 if(map.get("type")!=null && map.get("type")==" "|| map.get("type")!=null && map.get("type").equals("9999")){
 			 map.put("type",null);
 		 }
 		 OaOpinionSet oaOpinionSet = oaOpinionSetService.queryByTaskKey(map);
@@ -307,8 +307,8 @@ public class OaOpinionSetController {
 	  * @param
 	  * @return
 	  */
-	 @AutoLog(value = "发布类按钮描述-通过任务KEY和按钮ID查询")
-	 @ApiOperation(value = "发布类按钮描述-通过任务KEY和按钮ID查询", notes = "发布类按钮描述-通过任务KEY和按钮ID查询")
+	 @AutoLog(value = "意见配置-根据序号校验名字")
+	 @ApiOperation(value = "意见配置-根据序号校验名字", notes = "意见配置-根据序号校验名字")
 	 @PostMapping(value = "/queryByOrderAndKey")
 	 public Result<List<OaOpinionSet>> queryByOrderAndKey(@RequestBody Map<String,Object> map) {
 		 Result<List<OaOpinionSet>> result = new Result<>();
@@ -319,6 +319,9 @@ public class OaOpinionSetController {
 		 }
 		 List<OaOpinionSet> oaOpinionSet = oaOpinionSetService.queryByOrderAndKey(map);
 		 if (oaOpinionSet == null || oaOpinionSet.size()<1) {
+			 result.setResult(null);
+			 result.setSuccess(true);
+		 }else if(oaOpinionSet.size()==1 && map.get("iid")!=null && map.get("iid").toString()!="" && oaOpinionSet.get(0).getIId().equals(map.get("iid"))){
 			 result.setResult(null);
 			 result.setSuccess(true);
 		 }else {
