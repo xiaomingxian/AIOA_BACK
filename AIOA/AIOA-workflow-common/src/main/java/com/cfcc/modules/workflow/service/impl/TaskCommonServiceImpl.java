@@ -116,7 +116,7 @@ public class TaskCommonServiceImpl implements TaskCommonService {
     @Override
     public void del(String processInstanceId) {
         //删除表中的数据
-        if (StringUtils.isNotBlank(processInstanceId)){
+        if (StringUtils.isNotBlank(processInstanceId)) {
             taskMapper.deleteByprocessInstanceId(processInstanceId);
         }
 //        runtimeService.deleteProcessInstance(id, "删除流程实例");
@@ -1336,6 +1336,11 @@ public class TaskCommonServiceImpl implements TaskCommonService {
                 nextAct = activity;
             }
         }
+        if (nextAct == null && nextActs.size() == 1) {
+            nextAct = nextActs.get(0);
+        }
+
+
         if (nextAct == null) return;
 
 
@@ -1380,7 +1385,12 @@ public class TaskCommonServiceImpl implements TaskCommonService {
         //Boolean userRecordVal = oaProcActinst.getUserRecordVal();
         //if (userRecordVal != null && userRecordVal) {//是否使用记录的用户
         //使用记录的用户(如果本身有用户的话就使用自己选择的用户)
-        if (vars.get(assignee) == null) {
+        if (vars!=null&&vars.get(assignee) == null) {
+            String valByEl = taskMapper.getValByEl(processInstanceId, taskDefKeyNext + "-" + assignee);
+            if (StringUtils.isNotBlank(valByEl)) vars.put(assignee, valByEl);
+        }
+        if (vars==null){
+            vars=new HashMap<String, Object>();
             String valByEl = taskMapper.getValByEl(processInstanceId, taskDefKeyNext + "-" + assignee);
             if (StringUtils.isNotBlank(valByEl)) vars.put(assignee, valByEl);
         }
