@@ -1126,8 +1126,10 @@ public class TaskCommonServiceImpl implements TaskCommonService {
             List<Task> list = taskService.createTaskQuery().processInstanceId(processInstanceId).list();
             if (list.size() > 0) {
                 for (Task task1 : list) {
-                    task1.setParentTaskId(taskId);
-                    taskService.saveTask(task1);
+                    if (task1.getParentTaskId()!=null){
+                        task1.setParentTaskId(taskId);
+                        taskService.saveTask(task1);
+                    }
                 }
             }
 
