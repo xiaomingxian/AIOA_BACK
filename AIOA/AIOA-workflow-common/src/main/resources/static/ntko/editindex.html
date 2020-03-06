@@ -343,13 +343,23 @@
       }
 
       if ( cmd == 10) {
-        // var basePath = getBasePath();
         fileType='4';
-        $.ajax({
+        /*$.ajax({
           type: "get",
           dataType: "json",
           url: urlContextPath + "/ntko/filentko/file",
           data: {"stable": stable, "tableid": tableid, "fileType": fileType,"orgSchema":orgSchema},
+          success: function (data) {
+            fileName=data.result;
+            var filePath = "/temporaryFiles/";
+            ntko.OpenFromURL(urlContextPath + filePath + fileName);
+          }
+        })*/
+        $.ajax({
+          type: "get",
+          dataType: "json",
+          url: urlContextPath + "/ntko/filentko/templateFile",
+          data: {"fileId":fileId,"orgSchema":orgSchema},
           success: function (data) {
             fileName=data.result;
             var filePath = "/temporaryFiles/";

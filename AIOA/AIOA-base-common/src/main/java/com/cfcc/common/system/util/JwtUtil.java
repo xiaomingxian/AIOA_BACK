@@ -26,8 +26,8 @@ import com.cfcc.common.exception.AIOAException;
  **/
 public class JwtUtil {
 
-	// 过期时间30分钟
-	public static final long EXPIRE_TIME = 30 * 60 * 1000;
+	// 过期时间10小时
+	public static final long EXPIRE_TIME = 10 * 60 * 60 * 1000;
 
 	/**
 	 * 校验token是否正确
