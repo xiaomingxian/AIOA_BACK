@@ -465,13 +465,14 @@ public class OaBusdataServiceImpl extends ServiceImpl<OaBusdataMapper, OaBusdata
         String taskDef = null;
         String executionId = null;
         String taskDefName = null;
+        String parentTaskId = null;
         if (StringUtils.isBlank(proKey)) {//没有流程
             result.put("optionTable", null);
         } else {//有流程
             processInstanceId = oaBusdata.get("s_varchar10") == null ? null : oaBusdata.get("s_varchar10").toString();
             String taskDefData = oaBusdata.get("s_cur_task_name") == null ? null : oaBusdata.get("s_cur_task_name").toString();
             if (StringUtils.isNotBlank(status) && status.equalsIgnoreCase("newtask")
-                    &&(taskDefData==null||(taskDefData!=null&&taskDefData.contains("newtask")))) {//新建
+                    && (taskDefData == null || (taskDefData != null && taskDefData.contains("newtask")))) {//新建
                 ProcessDefinition processDefinition = repositoryService.createProcessDefinitionQuery()
                         .processDefinitionKey(proKey).latestVersion().singleResult();
                 if (processDefinition == null) throw new AIOAException("未找到流程信息请检查流程是否部署");
@@ -523,6 +524,7 @@ public class OaBusdataServiceImpl extends ServiceImpl<OaBusdataMapper, OaBusdata
                     taskDef = task.getTaskDefinitionKey();
                     executionId = task.getExecutionId();
                     taskDefName = task.getName();
+                    parentTaskId = task.getParentTaskId();
                 } else if (historicTaskInstance != null) {
                     taskId = historicTaskInstance.getId();
                     processInstanceId = historicTaskInstance.getProcessInstanceId();
@@ -530,6 +532,7 @@ public class OaBusdataServiceImpl extends ServiceImpl<OaBusdataMapper, OaBusdata
                     taskDef = historicTaskInstance.getTaskDefinitionKey();
                     executionId = historicTaskInstance.getExecutionId();
                     taskDefName = historicTaskInstance.getName();
+                    parentTaskId = historicTaskInstance.getParentTaskId();
                 } else {
                     HistoricTaskInstanceQuery historicTaskInstanceQuery = historyService.createHistoricTaskInstanceQuery().processDefinitionKey(proKey)
                             .processInstanceBusinessKey(busdataId);
@@ -547,11 +550,11 @@ public class OaBusdataServiceImpl extends ServiceImpl<OaBusdataMapper, OaBusdata
                         taskDef = historicTaskInstance.getTaskDefinitionKey();
                         executionId = historicTaskInstance.getExecutionId();
                         taskDefName = historicTaskInstance.getName();
+                        parentTaskId = historicTaskInstance.getParentTaskId();
                     }
                 }
             }
         }
-
 
 
         String optionTable = tableName + "_opinion";
@@ -586,7 +589,8 @@ public class OaBusdataServiceImpl extends ServiceImpl<OaBusdataMapper, OaBusdata
         result.put("btnAndOpt", btnAndOpt);
 
 
-        ArrayList<Integer> deptOptTypes = new ArrayList<>();
+        Set<Integer> deptOptTypes = new HashSet<>();
+        //自己是部门类型
         if (StringUtils.isNotBlank(processInstanceId) && StringUtils.isNotBlank(taskId) && StringUtils.isNotBlank(taskDef)) {
             List<String> types = departWithTaskMapper.selectMyType(processInstanceId, taskId, taskDef, userId);
             types.stream().forEach(i -> {
@@ -595,6 +599,22 @@ public class OaBusdataServiceImpl extends ServiceImpl<OaBusdataMapper, OaBusdata
                 if (StringUtils.isNotBlank(i) && i.contains("传阅")) deptOptTypes.add(10);
             });
 
+        }
+        HistoricTaskInstance historicTaskInstance2 = null;
+        if (parentTaskId != null) {
+            historicTaskInstance2 = historyService.createHistoricTaskInstanceQuery().taskId(parentTaskId).singleResult();
+        }
+        //父任务是部门类型
+        if (StringUtils.isNotBlank(processInstanceId) && StringUtils.isNotBlank(parentTaskId) && historicTaskInstance2 != null) {
+
+            if (historicTaskInstance2.getAssignee() != null) {
+                List<String> types = departWithTaskMapper.selectMyParentType(processInstanceId, parentTaskId, historicTaskInstance2.getAssignee());
+                types.stream().forEach(i -> {
+                    if (StringUtils.isNotBlank(i) && i.contains("主办")) deptOptTypes.add(8);
+                    if (StringUtils.isNotBlank(i) && i.contains("辅办")) deptOptTypes.add(9);
+                    if (StringUtils.isNotBlank(i) && i.contains("传阅")) deptOptTypes.add(10);
+                });
+            }
         }
 
         //查询是主板/辅办/传阅

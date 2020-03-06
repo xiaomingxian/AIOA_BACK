@@ -205,7 +205,7 @@ public class TaskInActServiceImpl implements TaskInActService {
                 for (int i = 0; i < addDeptTask.size(); i++) {
                     Task taskdept = addDeptTask.get(i);
                     String id = taskdept.getId();
-                    String parentTaskIdDept = task.getParentTaskId();
+                    String parentTaskIdDept = taskdept.getParentTaskId();
 
                     if (parentTaskIdDept.equalsIgnoreCase(randomParent)) {
                         String taskDefinitionKey = taskdept.getTaskDefinitionKey();

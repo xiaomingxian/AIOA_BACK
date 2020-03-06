@@ -30,6 +30,11 @@ public interface DepartWithTaskMapper {
             " and task_def_key=#{taskDef}   and user_id=#{userId} limit 1")
     List<String> selectMyType(@Param("processInstanceId") String processInstanceId, @Param("taskId") String taskId
             , @Param("taskDef") String taskDef, @Param("userId") String userId);
+    @Select("select DISTINCT type from oa_task_dept   " +
+            " where proc_inst_id=#{processInstanceId} and task_id=#{taskId} " +
+            "   and user_id=#{userId} limit 1")
+    List<String> selectMyParentType(@Param("processInstanceId")  String processInstanceId,
+                                    @Param("taskId")  String parentTaskId, @Param("userId")String assignee);
 }
 
 
