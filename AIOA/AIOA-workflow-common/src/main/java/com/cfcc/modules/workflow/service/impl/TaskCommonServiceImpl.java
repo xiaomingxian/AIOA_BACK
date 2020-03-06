@@ -363,11 +363,12 @@ public class TaskCommonServiceImpl implements TaskCommonService {
                         String deptName = sysUser.getDeptName();
                         map.put("taskDefName", taskDefName);
                         map.put("endTime", endTime);
-                        log.info(id+"-------"+sysUser);
-                        Map<String, Object> dep = deptMsg.get(sysUser.getId());
 
+                        if (deptMsg!=null){
+                            Map<String, Object> dep = deptMsg.get(sysUser.getId());
+                            if (isDept && dep!=null) deptName += "【" + deptMsg.get(sysUser.getId()).get("type") + "】";
+                        }
 
-                        if (isDept && dep!=null) deptName += "【" + deptMsg.get(sysUser.getId()).get("type") + "】";
                         map.put("deptName", deptName);
 
                         iterator.add(map);
