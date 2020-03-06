@@ -117,7 +117,7 @@ public class TaskCommonServiceImpl implements TaskCommonService {
     public void del(String processInstanceId) {
         //删除表中的数据
         if (StringUtils.isNotBlank(processInstanceId)) {
-                taskMapper.deleteByprocessInstanceId(processInstanceId);
+            taskMapper.deleteByprocessInstanceId(processInstanceId);
         }
 //        runtimeService.deleteProcessInstance(id, "删除流程实例");
     }
@@ -364,9 +364,9 @@ public class TaskCommonServiceImpl implements TaskCommonService {
                         map.put("taskDefName", taskDefName);
                         map.put("endTime", endTime);
 
-                        if (deptMsg!=null){
+                        if (deptMsg != null) {
                             Map<String, Object> dep = deptMsg.get(sysUser.getId());
-                            if (isDept && dep!=null) deptName += "【" + deptMsg.get(sysUser.getId()).get("type") + "】";
+                            if (isDept && dep != null) deptName += "【" + deptMsg.get(sysUser.getId()).get("type") + "】";
                         }
 
                         map.put("deptName", deptName);
@@ -966,7 +966,8 @@ public class TaskCommonServiceImpl implements TaskCommonService {
                 taskInfoJsonAble.getUsersHaveChoice().add(assignee);
             }
             //是自己发出且 已经记录过节点
-            if (taskId.equals(parentTaskId) && !taskDefs.contains(taskDefinitionKey)) {
+            String deleteReason = task.getDeleteReason();//过滤掉已经办理的任务
+            if (taskId.equals(parentTaskId) && deleteReason == null && !taskDefs.contains(taskDefinitionKey)) {
                 taskDefs.add(taskDefinitionKey);
                 TaskInfoJsonAble hisTaskJsonAble = new TaskInfoJsonAble();
                 BeanUtils.copyProperties(task, hisTaskJsonAble);
@@ -1390,12 +1391,12 @@ public class TaskCommonServiceImpl implements TaskCommonService {
         //Boolean userRecordVal = oaProcActinst.getUserRecordVal();
         //if (userRecordVal != null && userRecordVal) {//是否使用记录的用户
         //使用记录的用户(如果本身有用户的话就使用自己选择的用户)
-        if (vars!=null&&vars.get(assignee) == null) {
+        if (vars != null && vars.get(assignee) == null) {
             String valByEl = taskMapper.getValByEl(processInstanceId, taskDefKeyNext + "-" + assignee);
             if (StringUtils.isNotBlank(valByEl)) vars.put(assignee, valByEl);
         }
-        if (vars==null){
-            vars=new HashMap<String, Object>();
+        if (vars == null) {
+            vars = new HashMap<String, Object>();
             String valByEl = taskMapper.getValByEl(processInstanceId, taskDefKeyNext + "-" + assignee);
             if (StringUtils.isNotBlank(valByEl)) vars.put(assignee, valByEl);
         }
