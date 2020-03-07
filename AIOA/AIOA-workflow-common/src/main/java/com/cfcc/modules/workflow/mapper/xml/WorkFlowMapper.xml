@@ -1826,4 +1826,19 @@
         DELETE FROM act_hi_varinst where PROC_INST_ID_=#{processInstanceId};
          set foreign_key_checks = 1;
     </delete>
+
+    <!--设置父任务id-->
+    <update id="setParentId">
+
+     UPDATE act_ru_task set  PARENT_TASK_ID_=#{taskId} where  PROC_INST_ID_=#{processInstanceId} and    PARENT_TASK_ID_ is null;
+
+     UPDATE act_hi_taskinst set  PARENT_TASK_ID_=#{taskId} where  PROC_INST_ID_=#{processInstanceId} and   DELETE_REASON_ is NULL and PARENT_TASK_ID_ is null;
+
+    </update>
+
+    <update id="updateTaskDescript">
+    UPDATE act_hi_taskinst set DESCRIPTION_=#{busMsg} where PROC_INST_ID_=#{procInstId};
+    UPDATE act_ru_task set DESCRIPTION_=#{busMsg} where PROC_INST_ID_=#{procInstId};
+
+    </update>
 </mapper>

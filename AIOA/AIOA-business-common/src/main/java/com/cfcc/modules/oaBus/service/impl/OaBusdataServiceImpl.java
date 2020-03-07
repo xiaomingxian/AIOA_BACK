@@ -32,8 +32,10 @@ import lombok.extern.slf4j.Slf4j;
 import org.activiti.engine.HistoryService;
 import org.activiti.engine.RepositoryService;
 import org.activiti.engine.TaskService;
+import org.activiti.engine.delegate.Expression;
 import org.activiti.engine.history.HistoricTaskInstance;
 import org.activiti.engine.history.HistoricTaskInstanceQuery;
+import org.activiti.engine.impl.bpmn.behavior.UserTaskActivityBehavior;
 import org.activiti.engine.impl.persistence.entity.ProcessDefinitionEntity;
 import org.activiti.engine.impl.pvm.process.ActivityImpl;
 import org.activiti.engine.repository.ProcessDefinition;
@@ -479,7 +481,11 @@ public class OaBusdataServiceImpl extends ServiceImpl<OaBusdataMapper, OaBusdata
                 ProcessDefinitionEntity proc = (ProcessDefinitionEntity) repositoryService.getProcessDefinition(processDefinition.getId());
                 List<ActivityImpl> activities = proc.getActivities();
                 if (activities.size() == 0) throw new AIOAException("未找到流程环节,请检查流程图是否合法");
-                taskDef = activities.get(0).getId();
+                ActivityImpl activity = activities.get(0);
+                taskDef = activity.getId();
+                UserTaskActivityBehavior activityBehavior = (UserTaskActivityBehavior) activity.getActivityBehavior();
+                taskDefName = ((UserTaskActivityBehavior) activity.getActivityBehavior())
+                        .getTaskDefinition().getNameExpression().toString();
             } else {//已经产生流程
                 Task task = null;
                 HistoricTaskInstance historicTaskInstance = null;

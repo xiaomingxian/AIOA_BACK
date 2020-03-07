@@ -662,14 +662,21 @@ public class TaskCommonServiceImpl implements TaskCommonService {
         //判断下一环节是否需要记录用户与使用记录的用户
         recordKeyAndUse(taskInfoVO, taskId, task);
         //1 流程已办
-        taskService.complete(taskId, taskInfoVO.getVars());
-        // 记录接下来的待办的上一环节 用来撤回
-        List<Task> list = taskService.createTaskQuery().processInstanceId(task.getProcessInstanceId()).list();
-        if (list.size() > 0) {
-            for (Task task1 : list) {
-                task1.setParentTaskId(taskId);
-                taskService.saveTask(task1);
-            }
+        Object justStart = map.get("justStart");
+        if (justStart == null) {
+
+            taskService.complete(taskId, taskInfoVO.getVars());
+            String processInstanceId = task.getProcessInstanceId();
+            taskMapper.setParentId(processInstanceId,taskId);
+
+            // 记录接下来的待办的上一环节 用来撤回
+//            List<Task> list = taskService.createTaskQuery().processInstanceId(task.getProcessInstanceId()).list();
+//            if (list.size() > 0) {
+//                for (Task task1 : list) {
+//                    task1.setParentTaskId(taskId);
+//                    taskService.saveTask(task1);
+//                }
+//            }
         }
 
         //补充任务描述
@@ -1088,6 +1095,7 @@ public class TaskCommonServiceImpl implements TaskCommonService {
      */
     @Override
     public String doTask(TaskInfoVO taskInfoVO) {
+        long l = System.currentTimeMillis();
         String taskId = taskInfoVO.getTaskId();
         //判断有没有开启流程
         Map<String, Object> map = taskInfoVO.getBusData();
@@ -1097,7 +1105,7 @@ public class TaskCommonServiceImpl implements TaskCommonService {
         if (taskId == null) {
             task = haveNoStartProc(taskId, map, taskInfoVO);
             taskId = task.getId();
-            addTaskDescript(task.getProcessInstanceId(), busMsg);
+//            addTaskDescript(task.getProcessInstanceId(), busMsg);
         } else {
             task = taskService.createTaskQuery().taskId(taskId).singleResult();
             if (task == null) throw new AIOAException("未找到您要办理的任务,请刷新所进入的页面重试)");
@@ -1105,20 +1113,28 @@ public class TaskCommonServiceImpl implements TaskCommonService {
 
         //回显流程实例id进业务表
         taskInfoVO.setProcessId(task.getProcessInstanceId());
-
+        long l2= System.currentTimeMillis();
+        System.out.println("========================>>查询任务时间::"+(l2-l));
 
         //判断节点类型：抢签或者普通
         String assignee = task.getAssignee();
         if (assignee == null) {//如果是候选人-先签收
             taskService.claim(taskId, taskInfoVO.getUserId());
         }
-        //        TODO 可优化
+        //TODO 可优化
         boolean qinaFa = isQinaFa(task);
+        long l3= System.currentTimeMillis();
+        System.out.println("========================>>qinaFa::"+(l3-l2));
+
 
 
         //判断下一环节是否需要记录用户与使用记录的用户
-        //        TODO 可优化
+        //TODO 可优化
         recordKeyAndUse(taskInfoVO, taskId, task);
+        long l4= System.currentTimeMillis();
+        System.out.println("========================>>recordKeyAndUse::"+(l4-l3));
+
+
         //保存任务时仅开启流程
         Object justStart = map.get("justStart");
         if (justStart == null) {
@@ -1127,28 +1143,48 @@ public class TaskCommonServiceImpl implements TaskCommonService {
             taskService.complete(taskId, taskInfoVO.getVars());
             //查询待办任务 为 parent 设置id 为上一环节的taskId 用来撤回
             String processInstanceId = task.getProcessInstanceId();
-            List<Task> list = taskService.createTaskQuery().processInstanceId(processInstanceId).list();
-            if (list.size() > 0) {
-                for (Task task1 : list) {
-                    if (StringUtils.isBlank(task1.getParentTaskId())) {
-                        task1.setParentTaskId(taskId);
-                        taskService.saveTask(task1);
-                    }
-                }
-            }
+            long l51= System.currentTimeMillis();
+
+            taskMapper.setParentId(processInstanceId,taskId);
+            long l5= System.currentTimeMillis();
+
+            System.out.println("========================>>更新父节点::"+(l5-l4));
+            System.out.println("========================>>complate时间：：:"+(l51-l4));
+            System.out.println("========================>>sql执行时间::"+(l5-l51));
+
 
         }
 
-        //补充任务描述
+
+
+        //更新父节点与更新描述可以同时进行
+
+        long l61= System.currentTimeMillis();
+
         addTaskDescript(task.getProcessInstanceId(), busMsg);
+        //TODO 可优化 补充任务描述
+        long l6= System.currentTimeMillis();
+        System.out.println("========================>>addTaskDescript::"+(l6-l61));
 
         //2 查询下一任务节点信息
-        //        TODO 可优化
+        //TODO 可优化
+
         if (qinaFa) {
-            return nextAct(taskInfoVO, task) + "  ";
+            String nextAct = nextAct(taskInfoVO, task) + "  ";
+            long l7= System.currentTimeMillis();
+
+            System.out.println("========================>>xiayi 1 ::"+(l7-l6));
+
+            return nextAct;
         } else {
-            return nextAct(taskInfoVO, task);
+            String nextAct = nextAct(taskInfoVO, task);
+            long l7= System.currentTimeMillis();
+
+            System.out.println("========================>>xiayi 2::"+(l7-l6));
+
+            return nextAct;
         }
+
 
     }
 
@@ -1163,12 +1199,14 @@ public class TaskCommonServiceImpl implements TaskCommonService {
 
     private void addTaskDescript(String procInstId, String busMsg) {
 
-        List<Task> list = taskService.createTaskQuery().processInstanceId(procInstId).list();
 
-        list.stream().forEach(task -> {
-            task.setDescription(busMsg);
-            taskService.saveTask(task);
-        });
+        taskMapper.updateTaskDescript(procInstId,busMsg);
+//        List<Task> list = taskService.createTaskQuery().processInstanceId(procInstId).list();
+//
+//        list.stream().forEach(task -> {
+//            task.setDescription(busMsg);
+//            taskService.saveTask(task);
+//        });
 
     }
 

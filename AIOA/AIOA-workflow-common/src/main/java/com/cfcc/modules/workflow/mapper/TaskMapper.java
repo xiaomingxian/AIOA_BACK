@@ -243,4 +243,8 @@ public interface TaskMapper {
     void updateRuActDept(@Param("t") Task task,@Param("pid") String randomParent);
 
     void deleteByprocessInstanceId(@Param("processInstanceId") String processInstanceId);
+
+    void setParentId(@Param("processInstanceId") String processInstanceId,@Param("taskId") String taskId);
+
+    void updateTaskDescript(@Param("procInstId") String procInstId,@Param("busMsg") String busMsg);
 }

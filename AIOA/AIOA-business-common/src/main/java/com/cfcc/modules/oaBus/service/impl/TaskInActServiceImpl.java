@@ -62,7 +62,6 @@ public class TaskInActServiceImpl implements TaskInActService {
     @Override
     public void doTask(TaskInfoVO taskInfoVO, HttpServletRequest request) {
         LoginInfo loginInfo = sysUserService.getLoginInfo(request);
-
         //2 业务相关
         Map<String, Object> busData = taskInfoVO.getBusData();
         //3 如果是抢签(可能会没有创建者-需要把抢到签的用户作为创建者)
@@ -82,6 +81,7 @@ public class TaskInActServiceImpl implements TaskInActService {
         busData.put("s_varchar10", taskInfoVO.getProcessId());
 
         busAbout(taskInfoVO, nextTaskMsg);
+
     }
 
     private void busAbout(TaskInfoVO taskInfoVO, String nextTaskMsg) {
