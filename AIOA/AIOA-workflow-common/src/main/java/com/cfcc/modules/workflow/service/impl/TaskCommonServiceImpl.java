@@ -39,6 +39,8 @@ import org.activiti.engine.impl.form.FormPropertyHandler;
 import org.activiti.engine.impl.identity.Authentication;
 import org.activiti.engine.impl.interceptor.CommandExecutor;
 import org.activiti.engine.impl.persistence.entity.ProcessDefinitionEntity;
+import org.activiti.engine.impl.pvm.PvmActivity;
+import org.activiti.engine.impl.pvm.PvmTransition;
 import org.activiti.engine.impl.pvm.ReadOnlyProcessDefinition;
 import org.activiti.engine.impl.pvm.delegate.ActivityBehavior;
 import org.activiti.engine.impl.pvm.process.ActivityImpl;
@@ -1110,10 +1112,12 @@ public class TaskCommonServiceImpl implements TaskCommonService {
         if (assignee == null) {//如果是候选人-先签收
             taskService.claim(taskId, taskInfoVO.getUserId());
         }
+        //        TODO 可优化
         boolean qinaFa = isQinaFa(task);
 
 
         //判断下一环节是否需要记录用户与使用记录的用户
+        //        TODO 可优化
         recordKeyAndUse(taskInfoVO, taskId, task);
         //保存任务时仅开启流程
         Object justStart = map.get("justStart");
@@ -1126,7 +1130,7 @@ public class TaskCommonServiceImpl implements TaskCommonService {
             List<Task> list = taskService.createTaskQuery().processInstanceId(processInstanceId).list();
             if (list.size() > 0) {
                 for (Task task1 : list) {
-                    if (StringUtils.isBlank(task1.getParentTaskId())){
+                    if (StringUtils.isBlank(task1.getParentTaskId())) {
                         task1.setParentTaskId(taskId);
                         taskService.saveTask(task1);
                     }
@@ -1139,6 +1143,7 @@ public class TaskCommonServiceImpl implements TaskCommonService {
         addTaskDescript(task.getProcessInstanceId(), busMsg);
 
         //2 查询下一任务节点信息
+        //        TODO 可优化
         if (qinaFa) {
             return nextAct(taskInfoVO, task) + "  ";
         } else {
@@ -1833,70 +1838,150 @@ public class TaskCommonServiceImpl implements TaskCommonService {
 
 
     @Override
-    public Result departFinish(String taskId, SysUser user) {
+    public Result departFinish(String taskId, String processInstanceId, SysUser user) {
 
-        Task currentTask = taskService.createTaskQuery().taskId(taskId).singleResult();
-        Map<String, Object> nextActNeed = new HashMap<>();
-
-        //当前节点的下几个节点
-        List<Activity> nextActs = searchNextActs(taskId, null, null);
-        Activity endAct = null;
-        for (Activity activity : nextActs) {
-            if ("endevent".equalsIgnoreCase(activity.getType())) {
-                endAct = activity;
+        HistoricTaskInstance currentTask = null;
+        List<HistoricTaskInstance> allTAsk = historyService.createHistoricTaskInstanceQuery().processInstanceId(processInstanceId).list();
+        for (HistoricTaskInstance historicTaskInstance : allTAsk) {
+            if (historicTaskInstance.getId().equals(taskId)) {
+                currentTask = historicTaskInstance;
+                break;
             }
         }
+        if (currentTask == null) throw new AIOAException("未找到要完成的任务");
+        //判断是否是主办
+        boolean isZhuBan = false;
+        OaTaskDept zhuBane = taskMapper.isZhuBane(taskId, user.getId());
+        if (zhuBane == null) throw new AIOAException("您不是部门负责人,不可部门完成");
+        if (zhuBane.getType() != null && zhuBane.getType().contains("主办")) isZhuBan = true;
+
+        //获取到当前节点
+        ProcessDefinitionEntity processDefinitionEntity = (ProcessDefinitionEntity) repositoryService.
+                getProcessDefinition(currentTask.getProcessDefinitionId());
+        ActivityImpl activity = processDefinitionEntity.findActivity(currentTask.getTaskDefinitionKey());
+
+        //获取结束节点
+        Activity endAct = getEndAct(activity);
+
         if (endAct == null) return Result.error("该部门环节没有结束节点，请检查流程图设计");
-        String assignee = getSubNextAct(currentTask);
+        String assignee = getSubNextAct(activity);
         if (assignee == null) return Result.error("下一节点没有设置办理人，请检查流程图设计");
         //去查询记录的用户
         String val = taskMapper.getValByEl(currentTask.getProcessInstanceId(), assignee);
         if (val == null) return Result.error("未为下一环节记录好用户，请检查环节配置");
+        Map<String, Object> nextActNeed = new HashMap<>();
         nextActNeed.put(assignee.split("-")[1], val);
 
 
         //读取到完成条件
         Map vars = endAct.getConditionContext();
+        vars.putAll(nextActNeed);//子流程结束时下一环节需要的变量
 
-        //判断是否是主办
-        boolean isZhuBan = taskMapper.isZhuBane(taskId, user.getId());
 
-        Task task = taskService.createTaskQuery().taskId(taskId).singleResult();
-        String executionId = task.getExecutionId();
-        List<Task> list = new ArrayList<>();
-
-        if (!isZhuBan) {
-            //向上一级结束自己部门的
-            list = taskService.createTaskQuery().executionId(executionId).list();
-            //将这些都完成
-            for (int i = 0; i < list.size(); i++) {
-                Task t = list.get(i);
-
-                if (i == list.size() - 1) {
-                    //检查该任务是否是该excutionId下的唯一一个任务
-                    List<Task> tasks = new ArrayList<>();
-                    queryAllTaskInSubAct(executionId, tasks);
-                    if (tasks.size() == 1 && tasks.get(0) != null && t.getId().equals(tasks.get(0).getId())) {
-                        vars.putAll(nextActNeed);
+        //如果是主办 就完成所有的任务 如果不是主办就只完成taskId是自己的任务
+        if (isZhuBan) {
+            String taskDefinitionKey = currentTask.getTaskDefinitionKey();
+            //所有同级任务+所发出任务(未结束)
+            List<String> parentTask = new ArrayList<>();
+            //先完成第一环节
+            for (HistoricTaskInstance historicTaskInstance : allTAsk) {
+                String id = historicTaskInstance.getId();
+                String deleteReason = historicTaskInstance.getDeleteReason();
+                String taskDefinitionKey1 = historicTaskInstance.getTaskDefinitionKey();
+                if (taskDefinitionKey.equalsIgnoreCase(taskDefinitionKey1)){
+                    parentTask.add(id);
+                    if (StringUtils.isBlank(deleteReason)){
+                        taskService.complete(id,vars);
                     }
                 }
-                taskService.complete(t.getId(), vars);
             }
-        } else {
-            queryAllTaskInSubAct(executionId, list);
-
-            for (int i = 0; i < list.size(); i++) {
-                Task t = list.get(i);
-
-                if (i == list.size() - 1) {
-                    vars.putAll(nextActNeed);
+            //完成第二环节
+            for (HistoricTaskInstance historicTaskInstance : allTAsk) {
+                String id = historicTaskInstance.getId();
+                String parentTaskId = historicTaskInstance.getParentTaskId();
+                String deleteReason = historicTaskInstance.getDeleteReason();
+                if (StringUtils.isBlank(deleteReason)&& parentTask.contains(parentTaskId)){
+                    taskService.complete(id,vars);
                 }
-                taskService.complete(t.getId(), vars);
             }
 
+
+        } else {
+            //只结束自己或者自己发出的 且未结束的
+            for (HistoricTaskInstance historicTaskInstance : allTAsk) {
+                String id = historicTaskInstance.getId();
+                String parentTaskId = historicTaskInstance.getParentTaskId();
+                String deleteReason = historicTaskInstance.getDeleteReason();
+                if ((id.equals(taskId) || taskId.equalsIgnoreCase(parentTaskId))
+                        && StringUtils.isBlank(deleteReason)) {
+                    taskService.complete(id, vars);
+                }
+            }
         }
 
+
+//        Task task = taskService.createTaskQuery().taskId(taskId).singleResult();
+//        String executionId = task.getExecutionId();
+//        List<Task> list = new ArrayList<>();
+
+//        if (!isZhuBan) {
+//            //向上一级结束自己部门的
+//            list = taskService.createTaskQuery().executionId(executionId).list();
+//            //将这些都完成
+//            for (int i = 0; i < list.size(); i++) {
+//                Task t = list.get(i);
+//
+//                if (i == list.size() - 1) {
+//                    //检查该任务是否是该excutionId下的唯一一个任务
+//                    List<Task> tasks = new ArrayList<>();
+//                    queryAllTaskInSubAct(executionId, tasks);
+//                    if (tasks.size() == 1 && tasks.get(0) != null && t.getId().equals(tasks.get(0).getId())) {
+//                        vars.putAll(nextActNeed);
+//                    }
+//                }
+//                taskService.complete(t.getId(), vars);
+//            }
+//        }
+//        else {
+//            queryAllTaskInSubAct(executionId, list);
+//
+//            for (int i = 0; i < list.size(); i++) {
+//                Task t = list.get(i);
+//
+//                if (i == list.size() - 1) {
+//                    vars.putAll(nextActNeed);
+//                }
+//                taskService.complete(t.getId(), vars);
+//            }
+//
+//        }
+
         return Result.ok("部门完成成功");
+    }
+
+    private Activity getEndAct(PvmActivity activity) {
+
+
+        List<PvmTransition> outgoingTransitions = activity.getOutgoingTransitions();
+        for (PvmTransition outgoingTransition : outgoingTransitions) {
+            PvmActivity destination = outgoingTransition.getDestination();
+            String type = (String) destination.getProperty("type");
+            if ("endEvent".equalsIgnoreCase(type)) {
+                Activity activity1 = new Activity();
+                Object conditionText = outgoingTransition.getProperty("conditionText");
+                if (conditionText != null) {
+                    Map<String, String> parse = ElParse.parseCondition((String) conditionText);
+                    activity1.getConditionContext().putAll(parse);
+                }
+
+                return activity1;
+            }
+            if (type != null && type.endsWith("Gateway")) {
+                return getEndAct(destination);
+            }
+        }
+
+        return null;
     }
 
 
@@ -1933,15 +2018,11 @@ public class TaskCommonServiceImpl implements TaskCommonService {
     /**
      * 获取子流程的下一环节(规定只能写环节)
      *
-     * @param currentTask
      * @return
      */
-    private String getSubNextAct(Task currentTask) {
+    private String getSubNextAct(ActivityImpl activity) {
         //父节点的下个节点
-        ProcessDefinitionEntity processDefinitionEntity = (ProcessDefinitionEntity) repositoryService.
-                getProcessDefinition(currentTask.getProcessDefinitionId());
         //获取输出
-        ActivityImpl activity = processDefinitionEntity.findActivity(currentTask.getTaskDefinitionKey());
         ActivityImpl parent = (ActivityImpl) activity.getParent();
         //规定只能有一条出去的线
         ActivityImpl destination = (ActivityImpl) parent.getOutgoingTransitions().get(0).getDestination();

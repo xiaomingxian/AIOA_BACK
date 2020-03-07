@@ -206,10 +206,16 @@ public class TaskCommonController {
 
     @ApiOperation("部门完成")
     @PostMapping("departFinish")
-    public Result departFinish(@Param(value = "taskId") String taskId, HttpServletRequest request) {
-        SysUser user = sysUserService.getCurrentUser(request);
+    public Result departFinish(@Param(value = "taskId") String taskId,String processInstanceId, HttpServletRequest request) {
+        try {
+            SysUser user = sysUserService.getCurrentUser(request);
 
-        return taskCommonService.departFinish(taskId, user);
+            return taskCommonService.departFinish(taskId,processInstanceId, user);
+        } catch (AIOAException e) {
+            return Result.error(e.getMessage());
+        } catch (Exception e) {
+            return Result.error("部门完成失败");
+        }
     }
 
     @ApiOperation("批量办结/部门完成")

@@ -1,9 +1,6 @@
 package com.cfcc.modules.workflow.mapper;
 
-import com.cfcc.modules.workflow.pojo.BackRecord;
-import com.cfcc.modules.workflow.pojo.HisTaskJsonAble;
-import com.cfcc.modules.workflow.pojo.OaProcActinst;
-import com.cfcc.modules.workflow.pojo.TaskInfoJsonAble;
+import com.cfcc.modules.workflow.pojo.*;
 import com.cfcc.modules.workflow.vo.TaskInfoVO;
 import org.activiti.engine.task.Task;
 import org.apache.ibatis.annotations.*;
@@ -126,8 +123,11 @@ public interface TaskMapper {
     @Select("select count(*)>0 from oa_task_dept where user_id=#{userId} and proc_inst_id=#{proInstanId} and task_id=#{taskId}")
     boolean isDeptTaskUser(@Param("proInstanId") String proInstanId, @Param("taskId") String taskId, @Param("userId") String id);
 
-    @Select("select type='主办'  from oa_task_dept where task_id=#{taskId} and user_id=#{userId}")
-    boolean isZhuBane(@Param("taskId") String taskId, @Param("userId") String id);
+    @Select("select *  from oa_task_dept where task_id=#{taskId} and user_id=#{userId} limit 1")
+    OaTaskDept isZhuBane(@Param("taskId") String taskId, @Param("userId") String id);
+
+
+
 
 
     @Select("SELECT record_val FROM `oa_task_user_record` where proc_inst_id=#{processInstanceId} and record_key=#{el};")

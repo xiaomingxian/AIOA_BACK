@@ -70,7 +70,7 @@ public interface TaskCommonService {
 
     Result batchChuanYue(List<Map<String, Object>> data, SysUser user);
 
-    Result departFinish(String taskId, SysUser user);
+    Result departFinish(String taskId, String processInstanceId,SysUser user);
 
     String doTasksMore(List<TaskInfoVO> taskInfoVOs);
 
