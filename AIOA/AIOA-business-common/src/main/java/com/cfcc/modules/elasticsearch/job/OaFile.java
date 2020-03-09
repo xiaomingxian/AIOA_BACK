@@ -85,7 +85,6 @@ public class OaFile implements Job {
         }else {
             isNull();
         }
-
     }
 
     public void isNull(){
@@ -259,18 +258,23 @@ public class OaFile implements Job {
                         for (Map<String, Object> map : oaBusdataList) {
                             String json = JSON.toJSONString(map);
                             RestStatus restStatus = searchService.saveOrUpdate(json, map.get("table_name").toString() + map.get("i_id").toString() , indexName, indexType);
+                            int res = restStatus.getStatus();
                             System.out.println("----是否添加成功----"+restStatus);
-                            if (restStatus.equals("OK")){
+                            if (res == 200){
                                 log.info("-----------------oa_busdata添加数据成功-------------------");
                             }else {
                                 log.info("-----------------oa_busdata添加数据失败-------------------");
-                                while (!restStatus.equals("OK")){
+                                while (res == 200){
                                     restStatus = searchService.saveOrUpdate(json, map.get("table_name").toString() + map.get("i_id").toString() , indexName, indexType);
+                                    res = restStatus.getStatus();
+//                                    if(res == 200){
+//                                        break;
+//                                    }
                                 }
                                 log.info("-----------------oa_busdata添加数据成功-------------------");
                             }
                         }
-                        iOaBusdataService.updateIsES(oaBusdataList,DBvalue);
+//                        iOaBusdataService.updateIsES(oaBusdataList,DBvalue);
                     } catch (Exception e) {
                         e.printStackTrace();
                     }
@@ -320,6 +324,7 @@ public class OaFile implements Job {
                         e.printStackTrace();
                     }
                 }
+                System.out.println("------------------------------------------");
             }
         }
     }
