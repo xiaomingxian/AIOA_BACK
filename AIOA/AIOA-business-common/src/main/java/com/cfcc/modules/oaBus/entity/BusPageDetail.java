@@ -73,6 +73,10 @@ public class BusPageDetail /* extends Model<BusPageDetail>*/ {
 	@Excel(name = "是否作为列表查询条件", width = 15)
     @ApiModelProperty(value = "是否作为列表查询条件")
 	private java.lang.Integer iIsListquery;
+	/**是否作为全文检索字段*/
+	@Excel(name = "是否作为全文检索字段", width = 15)
+    @ApiModelProperty(value = "是否作为全文检索字段")
+	private java.lang.Integer iIsEsquery;
 	/**是否必填校验*/
 	@Excel(name = "是否必填校验", width = 15)
     @ApiModelProperty(value = "是否必填校验")
