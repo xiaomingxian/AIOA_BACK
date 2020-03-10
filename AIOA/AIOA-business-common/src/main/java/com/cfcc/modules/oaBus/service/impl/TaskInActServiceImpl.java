@@ -110,19 +110,19 @@ public class TaskInActServiceImpl implements TaskInActService {
     @Override
     public void doTaskMore(List<TaskInfoVO> taskInfoVOs, HttpServletRequest request) {
 
-
+        //TODO 主办部门 问题
         String nextTaskMsg = taskCommonService.doTasksMore(taskInfoVOs);
         Map<String, Object> busData = taskInfoVOs.get(0).getBusData();
         if (nextTaskMsg.endsWith("  ")) {
-            LoginInfo loginInfo = sysUserService.getLoginInfo(request);
-            busData.put("s_signer", loginInfo.getUsername());
+        LoginInfo loginInfo = sysUserService.getLoginInfo(request);
+        busData.put("s_signer", loginInfo.getUsername());
 
-            busData.put("d_date1", new Date());//new SimpleDateFormat("yyyy-MM-dd").format(new Date()));//
-        }
-        busData.put("s_varchar10", taskInfoVOs.get(0).getProcessId());
-        busAboutMore(taskInfoVOs, nextTaskMsg);
-
+        busData.put("d_date1", new Date());//new SimpleDateFormat("yyyy-MM-dd").format(new Date()));//
     }
+        busData.put("s_varchar10", taskInfoVOs.get(0).getProcessId());
+    busAboutMore(taskInfoVOs, nextTaskMsg);
+
+}
 
     private void busAboutMore(List<TaskInfoVO> taskInfoVOs, String nextTaskMsg) {
         //2 更新流程对应的业务数据......

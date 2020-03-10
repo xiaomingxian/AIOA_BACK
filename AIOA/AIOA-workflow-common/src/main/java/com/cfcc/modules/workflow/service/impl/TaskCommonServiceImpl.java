@@ -1100,7 +1100,6 @@ public class TaskCommonServiceImpl implements TaskCommonService {
      */
     @Override
     public String doTask(TaskInfoVO taskInfoVO) {
-        long l = System.currentTimeMillis();
         String taskId = taskInfoVO.getTaskId();
         //判断有没有开启流程
         Map<String, Object> map = taskInfoVO.getBusData();
@@ -1118,25 +1117,17 @@ public class TaskCommonServiceImpl implements TaskCommonService {
 
         //回显流程实例id进业务表
         taskInfoVO.setProcessId(task.getProcessInstanceId());
-        long l2 = System.currentTimeMillis();
-        System.out.println("========================>>查询任务时间::" + (l2 - l));
 
         //判断节点类型：抢签或者普通
         String assignee = task.getAssignee();
         if (assignee == null) {//如果是候选人-先签收
             taskService.claim(taskId, taskInfoVO.getUserId());
         }
-        //TODO 可优化
         boolean qinaFa = isQinaFa(task);
-        long l3 = System.currentTimeMillis();
-        System.out.println("========================>>qinaFa::" + (l3 - l2));
 
 
         //判断下一环节是否需要记录用户与使用记录的用户
-        //TODO 可优化
         recordKeyAndUse(taskInfoVO, taskId, task);
-        long l4 = System.currentTimeMillis();
-        System.out.println("========================>>recordKeyAndUse::" + (l4 - l3));
 
 
         //保存任务时仅开启流程
@@ -1144,17 +1135,15 @@ public class TaskCommonServiceImpl implements TaskCommonService {
         if (justStart == null) {
 
             //1 流程已办
+            long l4 = System.currentTimeMillis();
             taskService.complete(taskId, taskInfoVO.getVars());
             //查询待办任务 为 parent 设置id 为上一环节的taskId 用来撤回
             String processInstanceId = task.getProcessInstanceId();
             long l51 = System.currentTimeMillis();
 
             taskMapper.setParentId(processInstanceId, taskId);
-            long l5 = System.currentTimeMillis();
 
-            System.out.println("========================>>更新父节点::" + (l5 - l4));
             System.out.println("========================>>complate时间：：:" + (l51 - l4));
-            System.out.println("========================>>sql执行时间::" + (l5 - l51));
 
 
         }
@@ -1162,28 +1151,18 @@ public class TaskCommonServiceImpl implements TaskCommonService {
 
         //更新父节点与更新描述可以同时进行
 
-        long l61 = System.currentTimeMillis();
 
         addTaskDescript(task.getProcessInstanceId(), busMsg);
-        //TODO 可优化 补充任务描述
-        long l6 = System.currentTimeMillis();
-        System.out.println("========================>>addTaskDescript::" + (l6 - l61));
 
         //2 查询下一任务节点信息
-        //TODO 可优化
 
         if (qinaFa) {
             String nextAct = nextAct(taskInfoVO, task) + "  ";
-            long l7 = System.currentTimeMillis();
 
-            System.out.println("========================>>xiayi 1 ::" + (l7 - l6));
 
             return nextAct;
         } else {
             String nextAct = nextAct(taskInfoVO, task);
-            long l7 = System.currentTimeMillis();
-
-            System.out.println("========================>>xiayi 2::" + (l7 - l6));
 
             return nextAct;
         }
@@ -1396,6 +1375,29 @@ public class TaskCommonServiceImpl implements TaskCommonService {
 
 
         if (nextAct == null) return;
+        //如果下一环节是 结束节点 判断它是不是子流程内的结束节点
+        Map<String, Object> subNextAct = new HashMap<>();
+
+        if ("endEvent".equalsIgnoreCase(nextAct.getType())) {
+
+            ProcessDefinitionEntity processDefinitionEntity = (ProcessDefinitionEntity) repositoryService.
+                    getProcessDefinition(task.getProcessDefinitionId());
+            ActivityImpl activity = processDefinitionEntity.findActivity(nextAct.getId());
+            if (activity.getParent() instanceof ActivityImpl) {
+                String assignee = getSubNextAct(activity);
+                //去查询记录的用户
+                String val = taskMapper.getValByEl(task.getProcessInstanceId(), assignee);
+                if (val == null && assignee != null) throw new AIOAException("未为下一环节记录好用户，请检查环节配置");
+                if (assignee != null) subNextAct.put(assignee.split("-")[1], val);
+                if (vars == null) {
+                    taskInfoVO.setVars(subNextAct);
+                } else {
+                    vars.putAll(subNextAct);
+                    taskInfoVO.setVars(vars);
+                }
+            }
+
+        }
 
 
         String processInstanceId = task.getProcessInstanceId();

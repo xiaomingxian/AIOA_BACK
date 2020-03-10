@@ -352,6 +352,76 @@ public class TaskInActController {
     }
 
 
+    @ApiOperation(value = "查询下一办理人")
+    @GetMapping("nextUserQueryEnd")
+    public Result nextUserQueryEnd(String procDefkey, String drafterId, String processDefinitionId,
+                                   @RequestParam(required = false) String taskId, String i_id, String table, HttpServletRequest request) {
+
+        try {
+            if (StringUtils.isBlank(procDefkey)) {
+                throw new AIOAException("传入的流程定义为空，请检查此业务是否配置了流程");
+            }
+            //当前用户
+            LoginInfo user = sysUserService.getLoginInfo(request);
+            String id = user.getId();
+            //查询下n个节点属性
+            ActivityImpl current = taskCommonService.currentAct(taskId, processDefinitionId, procDefkey);
+            List<Activity> acts = taskCommonService.searchNextActs(taskId, processDefinitionId, procDefkey);
+            if (acts == null) throw new AIOAException("环节配置信息不完善请检查");
+
+            //组装代办列表
+            List<Map<String, Object>> list = new ArrayList();
+            Map<String, String> conditionContext = new HashMap<>();
+
+
+            //遍历节点 查询相关业务信息(避免循环中查询(但是此数据较少))
+            for (Activity i : acts) {
+                if (i.getConditionContext() != null) {
+                    Map<String, String> conditionContext1 = i.getConditionContext();
+                    for (String key : conditionContext1.keySet()) {
+                        String val = conditionContext1.get(key);
+                        conditionContext.put(key, val);
+                    }
+                }
+                HashMap<String, Object> oneAct = new HashMap<>();
+                //查询节点信息(配置的form信息)
+                QueryWrapper<OaProcActinst> queryWrapper = new QueryWrapper<>();
+                queryWrapper.eq("PROC_DEF_KEY", procDefkey)
+                        .eq("ACT_ID", i.getId())
+                        .eq("ACT_NAME", i.getName())
+                ;
+                //1 节点信息
+                oneAct.put("actMsg", i);
+                if (!i.getType().equalsIgnoreCase("endevent")) {
+
+                    List<OaProcActinst> oaProcActinsts = ioaProcActinstService.list(queryWrapper);
+                    OaProcActinst oaProcActinst = null;
+                    if (oaProcActinsts.size() > 0) {
+                        oaProcActinst = oaProcActinsts.get(0);
+                    }
+
+                    if (oaProcActinst == null) {
+                        throw new AIOAException("没找到对应的对应环节的配置请检查环节配置:要查询的环节" +
+                                "<【" + procDefkey + "】" + i.getId() + "-" + i.getName() + ">不存在[检查是否是拷贝数据]");
+                    }
+                    //2 数据库中的节点信息
+                    oneAct.put("oaProcActinst", oaProcActinst);
+                    oneAct.put("nextUsers", new ArrayList<>());
+                }
+                list.add(oneAct);
+            }
+
+            return Result.ok(list);
+        } catch (AIOAException e) {
+            return Result.error(e.getMessage());
+        } catch (Exception e) {
+            e.printStackTrace();
+            log.error(e.toString());
+            return Result.error("查询失败");
+        }
+    }
+
+
     private List<Map<String, Object>> nexUserQuery(String procDefkey, String processDefinitionId, String drafterId,
                                                    @RequestParam(required = false) String taskId,
                                                    Map<String, Object> busData, HttpServletRequest request) {
@@ -574,8 +644,8 @@ public class TaskInActController {
                 }
 
             }
-        }else {
-            mainDept=  busData2.get("s_main_unit_names")==null?"": busData2.get("s_main_unit_names").toString();
+        } else {
+            mainDept = busData2.get("s_main_unit_names") == null ? "" : busData2.get("s_main_unit_names").toString();
             busData.put("mainDept", mainDept);
         }
         //s_crc_deptnames  会签部门
