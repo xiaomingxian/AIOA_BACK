@@ -367,7 +367,7 @@ public class OaTemplateController {
             oaFileService.save(oaFile);
 
             Map<String, Object> map = new HashMap<>();
-            map.put("sFilePath", savePath);
+            map.put("sFilePath", calendarPath + File.separator + fileName);
             map.put("sFileType", type);
             oaFileService.singleCopyFile(map,request);
 

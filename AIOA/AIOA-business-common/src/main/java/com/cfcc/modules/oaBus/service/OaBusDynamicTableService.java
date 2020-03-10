@@ -55,11 +55,11 @@ public interface OaBusDynamicTableService {
 
     boolean insertUserPermit(String param);
 
-    String provinceToCityReceiveFile(Map<String,Object> obj);
+    String provinceToCityReceiveFile(Map<String,Object> obj,HttpServletRequest request);
 
-    String provinceToCityInsideFile(Map<String,Object> obj);
+    String provinceToCityInsideFile(Map<String,Object> obj,HttpServletRequest request);
 
-    boolean shareFile(Map<String, Object> map, LoginInfo loginInfo);
+    boolean shareFile(Map<String, Object> map, LoginInfo loginInfo,HttpServletRequest request);
 
     Result provinceToCityClient(HttpServletRequest request);
 

@@ -243,17 +243,17 @@ public class OaFileServiceImpl extends ServiceImpl<OaFileMapper, OaFile> impleme
     }
 
     @Override
-    public List<Map<String,Object>> getOaFileByIdAndTable(String tableId, String table) {
-        List<Map<String,Object>> oaFileList = oaFileMapper.getOaFileByIdAndTable(tableId,table);
+    public List<Map<String, Object>> getOaFileByIdAndTable(String tableId, String table) {
+        List<Map<String, Object>> oaFileList = oaFileMapper.getOaFileByIdAndTable(tableId, table);
         Iterator<Map<String, Object>> iterator = oaFileList.iterator();
         while (iterator.hasNext()) {
             Map<String, Object> map = iterator.next();
-            String sFileName = map.get("s_file_name")+"";
+            String sFileName = map.get("s_file_name") + "";
             String str = sFileName.substring(sFileName.lastIndexOf(".") + 1);
             if (!str.equalsIgnoreCase("doc") && !str.equalsIgnoreCase("docx")
                     && !str.equalsIgnoreCase("txt") && !str.equalsIgnoreCase("pdf")
                     && !str.equalsIgnoreCase("pdf") && !str.equalsIgnoreCase("xls")
-                    && !str.equalsIgnoreCase("xlsx")){
+                    && !str.equalsIgnoreCase("xlsx")) {
                 iterator.remove();
                 continue;
             }
@@ -343,11 +343,18 @@ public class OaFileServiceImpl extends ServiceImpl<OaFileMapper, OaFile> impleme
     }
 
     @Override
-    public boolean updateDocNameById(Map<String, Object> map) {
-        String s_file_path = map.get("s_file_path") + "";
+    public boolean updateDocNameById(Map<String, Object> map, HttpServletRequest request) {
+        String sfilepath = "";
+        LoginInfo loginInfo = sysUserService.getLoginInfo(request);
+        String orgSchema = loginInfo.getOrgSchema();
+        if ( orgSchema != null &&!orgSchema.equals("")) {
+            sfilepath = uploadpath + File.separator + orgSchema + File.separator + map.get("s_file_path") + "";
+        } else {
+            sfilepath = uploadpath+ File.separator + map.get("s_file_path") + "";
+        }
         String s_file_name = map.get("s_file_name") + "";
         String iid = map.get("i_id") + "";
-        File oldFile = new File(s_file_path);
+        File oldFile = new File(sfilepath);
         String oldName = oldFile.getName().substring(0, oldFile.getName().lastIndexOf("_"));
         String newName = oldFile.getName().replace(oldName, s_file_name);
         boolean ok = false;
@@ -382,14 +389,28 @@ public class OaFileServiceImpl extends ServiceImpl<OaFileMapper, OaFile> impleme
     }
 
     @Override
-    public List<OaFile> copyFiles(String param) {
-        JSONObject obj = JSONObject.parseObject(param);
+    public List<OaFile> copyFiles(String param, HttpServletRequest request) {
+        //根据orgSchema生成文件地址
+        LoginInfo loginInfo = sysUserService.getLoginInfo(request);
         String ctxPath = uploadpath;
         Calendar calendar = Calendar.getInstance();
-        String upPath = ctxPath.replace("//", "/" +
-                "") + "/" + calendar.get(Calendar.YEAR) +
-                "/" + (calendar.get(Calendar.MONTH) + 1) +
-                "/" + calendar.get(Calendar.DATE) + "/";
+        String calendarPath = calendar.get(Calendar.YEAR) +
+                File.separator + (calendar.get(Calendar.MONTH) + 1) +
+                File.separator + calendar.get(Calendar.DATE);
+        String upPath = ""; //生成文件地址
+        String suffexPath = "";  //查询文件前缀
+        if (loginInfo.getOrgSchema() != null && !loginInfo.getOrgSchema().equals("")) {
+            upPath = ctxPath.replace("//", "/" +
+                    "") + File.separator + loginInfo.getOrgSchema() + File.separator + calendarPath;
+            suffexPath = ctxPath.replace("//", "/" +
+                    "") + File.separator + loginInfo.getOrgSchema();
+        } else {
+            upPath = ctxPath.replace("//", "/" +
+                    "") + File.separator + calendarPath;
+            suffexPath = ctxPath.replace("//", "/" + "");
+        }
+
+        JSONObject obj = JSONObject.parseObject(param);
         File file = new File(upPath);
         if (!file.exists()) {
             file.mkdirs();// 创建文件根目录
@@ -401,7 +422,7 @@ public class OaFileServiceImpl extends ServiceImpl<OaFileMapper, OaFile> impleme
         saveFile.setSFileType(obj.get("sFileType") + "");
         List<OaFile> fileList = oaFileMapper.queryFileListByType(obj.get("sTable") + "", obj.get("iTableId") + "", obj.get("sFileType") + "");
         for (OaFile oafile : fileList) {
-            File lastPath = new File(oafile.getSFilePath());
+            File lastPath = new File(suffexPath + File.separator + oafile.getSFilePath());
             StringBuilder str = new StringBuilder(oafile.getSFileName());
             StringBuilder filename = str.insert(oafile.getSFileName().indexOf("."), "_" + System.currentTimeMillis());
             File uploadPath = new File(upPath + File.separator + filename);
@@ -420,7 +441,7 @@ public class OaFileServiceImpl extends ServiceImpl<OaFileMapper, OaFile> impleme
                 saveFile.setSTable(obj.get("receiveTable") + "");
                 saveFile.setITableId((Integer) obj.get("receiveId"));
                 saveFile.setSFileName(oafile.getSFileName());
-                saveFile.setSFilePath(uploadPath.getPath());
+                saveFile.setSFilePath(calendarPath + File.separator + filename);
                 saveFile.setDCreateTime(new Date());
                 oaFileService.save(saveFile);
 //                QueryWrapper<OaFile> c = new QueryWrapper<>();
@@ -781,9 +802,6 @@ public class OaFileServiceImpl extends ServiceImpl<OaFileMapper, OaFile> impleme
     public List<OaFile> batchUploads(MultipartFile file, String sTable, Integer iTableId, String sFileType, HttpServletRequest request, HttpServletResponse response) {
         List<OaFile> fileIds = new ArrayList<>();
         try {
-            //获取用户名称
-            LoginInfo loginInfo = sysUserService.getLoginInfo(request);
-            String username = loginInfo.getUsername();
             String ctxPath = uploadpath;
             String fileName = null;
             Calendar calendar = Calendar.getInstance();
@@ -791,9 +809,10 @@ public class OaFileServiceImpl extends ServiceImpl<OaFileMapper, OaFile> impleme
                     File.separator + (calendar.get(Calendar.MONTH) + 1) +
                     File.separator + calendar.get(Calendar.DATE);
             String path = "";
-            if (loginInfo.getOrgSchema() != null && !loginInfo.getOrgSchema().equals("")) {
+            String orgSchema = request.getAttribute("orgSchema") + "";
+            if (orgSchema != null && !orgSchema.equals("")) {
                 path = ctxPath.replace("//", "/" +
-                        "") + File.separator + loginInfo.getOrgSchema() + File.separator + calendarPath;
+                        "") + File.separator + orgSchema + File.separator + calendarPath;
             } else {
                 path = ctxPath.replace("//", "/" +
                         "") + File.separator + calendarPath;
@@ -814,7 +833,7 @@ public class OaFileServiceImpl extends ServiceImpl<OaFileMapper, OaFile> impleme
                 oaFile.setSFileType(sFileType);
                 oaFile.setSFileName(orgName);        //设置附件名字
                 oaFile.setSFilePath(File.separator + calendarPath + File.separator + fileName);        //设置文件路径
-                oaFile.setSCreateBy(username);
+//                oaFile.setSCreateBy(username);
                 oaFile.setDCreateTime(new Date());
                 oaFileService.save(oaFile);
                 oaFileService.updateIorderById(oaFile.getIId());

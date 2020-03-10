@@ -334,10 +334,10 @@ public class OaFileController {
     @AutoLog(value = "业务按钮-修改附件名称")
     @ApiOperation(value = "业务按钮-修改附件名称", notes = "业务按钮-修改附件名称")
     @PostMapping(value = "/updateFileName")
-    public Result updateFileName(@RequestBody Map<String, Object> param) {
+    public Result updateFileName(@RequestBody Map<String, Object> param,HttpServletRequest request) {
         Result result = new Result<>();
         try {
-            boolean ok = oaFileService.updateDocNameById(param);
+            boolean ok = oaFileService.updateDocNameById(param,request);
             if (ok) {
                 result.success("修改成功");
             } else {
@@ -359,9 +359,9 @@ public class OaFileController {
     @AutoLog(value = "复制附件")
     @ApiOperation(value = "复制附件", notes = "复制附件")
     @PostMapping(value = "/copyFile")
-    public Result copyFileList(@RequestBody String param) {
+    public Result copyFileList(@RequestBody String param,HttpServletRequest request) {
         Result<List<OaFile>> result = new Result<List<OaFile>>();
-        List<OaFile> oaFileList = oaFileService.copyFiles(param);
+        List<OaFile> oaFileList = oaFileService.copyFiles(param,request);
         try {
             result.success("复制附件成功！");
             result.setResult(oaFileList);

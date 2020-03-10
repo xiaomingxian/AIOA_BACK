@@ -424,10 +424,10 @@ public class DynamicTableController {
 
     @ApiOperation(value = "省地收文")
     @PostMapping("provinceToCity")
-    public Result provinceToCity(@RequestBody Map<String,Object> map) {
+    public Result provinceToCity(@RequestBody Map<String,Object> map,HttpServletRequest request) {
         Result result = new Result<>();
         try {
-            String ok = dynamicTableService.provinceToCityReceiveFile(map);
+            String ok = dynamicTableService.provinceToCityReceiveFile(map,request);
             if (ok.contains("200")){
                 result.setResult(200);
             }
@@ -455,10 +455,10 @@ public class DynamicTableController {
 
     @ApiOperation(value = "省地传阅")
     @PostMapping("provinceToCityInside")
-    public Result provinceToCityInside(@RequestBody Map<String,Object> map) {
+    public Result provinceToCityInside(@RequestBody Map<String,Object> map,HttpServletRequest request) {
         Result result = new Result<>();
         try {
-            String ok = dynamicTableService.provinceToCityInsideFile(map);
+            String ok = dynamicTableService.provinceToCityInsideFile(map,request);
             if (ok.contains("200")){
                 result.setResult(200);
             }
@@ -491,7 +491,7 @@ public class DynamicTableController {
         Result result = new Result<>();
         LoginInfo loginInfo = isysUserService.getLoginInfo(request);
         try {
-            boolean ok = dynamicTableService.shareFile(map, loginInfo);
+            boolean ok = dynamicTableService.shareFile(map,loginInfo,request);
             if (ok){
                 result.setResult(ok);
             }else{
