@@ -14,9 +14,11 @@ import com.cfcc.modules.oaBus.entity.OaFile;
 import com.cfcc.modules.oaBus.mapper.*;
 import com.cfcc.modules.oaBus.service.IOaFileService;
 import com.cfcc.modules.oabutton.entity.OaButton;
+import com.cfcc.modules.system.entity.LoginInfo;
 import com.cfcc.modules.system.mapper.SysDepartMapper;
 import com.cfcc.modules.system.mapper.SysDictItemMapper;
 import com.cfcc.modules.system.mapper.SysDictMapper;
+import com.cfcc.modules.system.service.ISysUserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Lazy;
@@ -65,6 +67,10 @@ public class OaFileServiceImpl extends ServiceImpl<OaFileMapper, OaFile> impleme
     @Lazy
     private IOaFileService oaFileService;
 
+    @Autowired
+    @Lazy
+    private ISysUserService sysUserService;
+
     //附件上传地址
     @Value(value = "${jeecg.path.upload}")
     private String uploadpath;
@@ -80,7 +86,7 @@ public class OaFileServiceImpl extends ServiceImpl<OaFileMapper, OaFile> impleme
 
     @Override
     public Boolean savePicText(Integer fileType, String picText) {
-        Boolean a = oaFileMapper.savePicText( fileType, picText);
+        Boolean a = oaFileMapper.savePicText(fileType, picText);
         return a;
     }
 
@@ -188,17 +194,17 @@ public class OaFileServiceImpl extends ServiceImpl<OaFileMapper, OaFile> impleme
     }
 
     @Override
-    public List<Map<String, Object>> getOaFileByTableAndTableId(String id, String sBusdataTable,String DBvalue) {
-        List<Map<String,Object>> oaFileList = oaFileMapper.getOaFileByTableAndTableId(id,sBusdataTable,DBvalue);
+    public List<Map<String, Object>> getOaFileByTableAndTableId(String id, String sBusdataTable, String DBvalue) {
+        List<Map<String, Object>> oaFileList = oaFileMapper.getOaFileByTableAndTableId(id, sBusdataTable, DBvalue);
         Iterator<Map<String, Object>> iterator = oaFileList.iterator();
-        while (iterator.hasNext()){
+        while (iterator.hasNext()) {
             Map<String, Object> map = iterator.next();
-            String sFileName = map.get("s_file_name")+"";
+            String sFileName = map.get("s_file_name") + "";
             String str = sFileName.substring(sFileName.lastIndexOf(".") + 1);
             if (!str.equalsIgnoreCase("doc") && !str.equalsIgnoreCase("docx")
                     && !str.equalsIgnoreCase("txt") && !str.equalsIgnoreCase("pdf")
                     && !str.equalsIgnoreCase("pdf") && !str.equalsIgnoreCase("xls")
-                    && !str.equalsIgnoreCase("xlsx")){
+                    && !str.equalsIgnoreCase("xlsx")) {
                 iterator.remove();
                 continue;
             }
@@ -228,7 +234,7 @@ public class OaFileServiceImpl extends ServiceImpl<OaFileMapper, OaFile> impleme
                     default:
                         break;
                 }
-                String sTitle = oaBusdataMapper.getBusdataByIdAndTableName(id,sBusdataTable,DBvalue);
+                String sTitle = oaBusdataMapper.getBusdataByIdAndTableName(id, sBusdataTable, DBvalue);
                 map.put("s_file_path", sContent);
                 map.put("sTitle", sTitle);
             }
@@ -266,35 +272,35 @@ public class OaFileServiceImpl extends ServiceImpl<OaFileMapper, OaFile> impleme
                 if (!str.equalsIgnoreCase("doc") && !str.equalsIgnoreCase("docx")
                         && !str.equalsIgnoreCase("txt") && !str.equalsIgnoreCase("pdf")
                         && !str.equalsIgnoreCase("pdf") && !str.equalsIgnoreCase("xls")
-                        && !str.equalsIgnoreCase("xlsx")){
+                        && !str.equalsIgnoreCase("xlsx")) {
 //
                     oaFileReMoveList.add(oaFile);
                     continue;
                 }
                 if (file.exists()) { //文件存在返回true
-                        switch (str) {
-                            case "doc":
-                                sContent = FileUtils.readDocFile(sFilePath);
-                                break;
-                            case "docx":
-                                sContent = FileUtils.readDocxFile(sFilePath);
-                                break;
-                            case "txt":
-                                sContent = FileUtils.ReadTxtFile(sFilePath);
-                                break;
-                            case "pdf":
-                                sContent = FileUtils.readPdfFile(sFilePath);
-                                break;
-                            case "xls":
-                                sContent = FileUtils.readXLSFile(sFilePath);
-                                break;
-                            case "xlsx":
-                                sContent = FileUtils.readxlsxFile(sFilePath);
-                                break;
-                            default:
+                    switch (str) {
+                        case "doc":
+                            sContent = FileUtils.readDocFile(sFilePath);
+                            break;
+                        case "docx":
+                            sContent = FileUtils.readDocxFile(sFilePath);
+                            break;
+                        case "txt":
+                            sContent = FileUtils.ReadTxtFile(sFilePath);
+                            break;
+                        case "pdf":
+                            sContent = FileUtils.readPdfFile(sFilePath);
+                            break;
+                        case "xls":
+                            sContent = FileUtils.readXLSFile(sFilePath);
+                            break;
+                        case "xlsx":
+                            sContent = FileUtils.readxlsxFile(sFilePath);
+                            break;
+                        default:
 //                            System.out.println(sFilePath + "文件内容不可读取！！！！");
-                                break;
-                        }
+                            break;
+                    }
                 }
                 oaFile.setSContent(sContent);
                 String sTitle = oaBusdataMapper.getBusdataByOaFile(oaFile);
@@ -432,16 +438,15 @@ public class OaFileServiceImpl extends ServiceImpl<OaFileMapper, OaFile> impleme
     @Override
     public OaFile singleCopyFile(Map<String, Object> map) {
         OaFile file = new OaFile();
-        String initFile = map.get("sFilePath") + "";
-
+        String initFile = uploadpath + File.separator + map.get("sFilePath") + "";
         String fileName = initFile.substring(initFile.lastIndexOf(File.separator) + 1, initFile.length());
         try {
             String tempPaths = "";
-            if (map.get("sFilePath") != null){
-                if (map.get("sFileType") != null){
-                    tempPaths = uploadpath+"/templateFiles";
-                }else {
-                    tempPaths = uploadpath+"/temporaryFiles";
+            if (map.get("sFilePath") != null) {
+                if (map.get("sFileType") != null) {
+                    tempPaths = uploadpath + File.separator + "templateFiles";
+                } else {
+                    tempPaths = uploadpath + File.separator + "temporaryFiles";
                 }
             }
             File temp = new File(tempPaths);
@@ -501,7 +506,7 @@ public class OaFileServiceImpl extends ServiceImpl<OaFileMapper, OaFile> impleme
     public String getColumList(String sBusdataTable, Integer iId, String DBvalue) {
         List<String> isEsColumnLists = busPageDetailMapper.getCloumnNameByTableAndEsquery(sBusdataTable, iId, DBvalue);
         String columnLists = "";
-        if (isEsColumnLists != null){
+        if (isEsColumnLists != null) {
             String columnList = isEsColumnLists.toString().replace("[", "");
             columnLists = columnList.toString().replace("]", "");
         }
@@ -522,15 +527,15 @@ public class OaFileServiceImpl extends ServiceImpl<OaFileMapper, OaFile> impleme
     }
 
     @Override
-    public List<Map<String, Object>> getOaBusdata(String sBusdataTable, List<Map<String, Object>> oaBusdata,BusFunction busFunction,String DBvalue) {
+    public List<Map<String, Object>> getOaBusdata(String sBusdataTable, List<Map<String, Object>> oaBusdata, BusFunction busFunction, String DBvalue) {
         Iterator<Map<String, Object>> iterator = oaBusdata.iterator();
-        while (iterator.hasNext()){
+        while (iterator.hasNext()) {
             Map<String, Object> oaBusdatum = iterator.next();
             Integer functionId = null;
-            if (oaBusdatum.get("i_bus_function_id") == null && oaBusdatum.get("i_bus_function_id") != ""){
+            if (oaBusdatum.get("i_bus_function_id") == null && oaBusdatum.get("i_bus_function_id") != "") {
                 continue;
-            }else {
-                functionId = Integer.parseInt(oaBusdatum.get("i_bus_function_id")+"");
+            } else {
+                functionId = Integer.parseInt(oaBusdatum.get("i_bus_function_id") + "");
             }
             if (functionId == null) {
                 continue;
@@ -541,24 +546,24 @@ public class OaFileServiceImpl extends ServiceImpl<OaFileMapper, OaFile> impleme
                 List<String> sDictIdlist = busPageDetailMapper.getSDictIdByKey(functionId, sBusdataTable, key, DBvalue);
                 System.out.println("................." + sDictIdlist + ".................");
                 String aa = null;
-                if (sDictIdlist.size() == 0){
+                if (sDictIdlist.size() == 0) {
                     continue;
                 }
                 boolean flag = false;
                 for (int i = 0; i < sDictIdlist.size(); i++) {
                     aa = sDictIdlist.get(i);
                     System.out.println(aa);
-                    if (aa==null){
+                    if (aa == null) {
                         flag = true;
                         break;
                     }
                 }
-                if (flag){
+                if (flag) {
                     continue;
                 }
-                if ( sDictIdlist.size() == 1) {  //如果有返回值，则对其赋值
-                    if (sDictIdlist.get(0) != null && sDictIdlist.get(0).trim().length() >0){
-                        String sysDictId = sysDictMapper.getDictIdByDictCode(sDictIdlist.get(0),DBvalue);
+                if (sDictIdlist.size() == 1) {  //如果有返回值，则对其赋值
+                    if (sDictIdlist.get(0) != null && sDictIdlist.get(0).trim().length() > 0) {
+                        String sysDictId = sysDictMapper.getDictIdByDictCode(sDictIdlist.get(0), DBvalue);
                         String itemValue = sysDictItemMapper.getItemTextById(sysDictId, value, DBvalue);
                         if (itemValue == null) {
                             System.out.println("key:" + key + ",  value:" + value + "该字段查不到其含义！！！！！");
@@ -567,8 +572,8 @@ public class OaFileServiceImpl extends ServiceImpl<OaFileMapper, OaFile> impleme
                         }
                     }
                 }
-                if(key.equals("s_title")){
-                    oaBusdatum.put("【"+busFunction.getSName()+"】" + key,value);
+                if (key.equals("s_title")) {
+                    oaBusdatum.put("【" + busFunction.getSName() + "】" + key, value);
                 }
             }
             oaBusdatum.put("table_name", sBusdataTable);
@@ -593,7 +598,7 @@ public class OaFileServiceImpl extends ServiceImpl<OaFileMapper, OaFile> impleme
             String sBusdataTable = busFunction.getSBusdataTable();
             //要检索字段变为字符串格式
             String columnLists = getColumList(sBusdataTable, busFunction.getIId(), DBvalue);
-            if (columnLists.equals("")){
+            if (columnLists.equals("")) {
                 continue;
             }
             //根据表名和业务模块id查询数据
@@ -603,7 +608,7 @@ public class OaFileServiceImpl extends ServiceImpl<OaFileMapper, OaFile> impleme
                 continue;
             }
             Iterator<Map<String, Object>> iterator = oaBusdata.iterator();
-            while (iterator.hasNext()){
+            while (iterator.hasNext()) {
                 Map<String, Object> oaBusdatum = iterator.next();
                 Integer functionId = (Integer) oaBusdatum.get("i_bus_function_id");
                 if (functionId == null) {
@@ -616,25 +621,25 @@ public class OaFileServiceImpl extends ServiceImpl<OaFileMapper, OaFile> impleme
                     List<String> sDictIdlist = busPageDetailMapper.getSDictIdByKey(functionId, sBusdataTable, key, DBvalue);
                     //System.out.println("................." + sDictIdlist + ".................");
                     String aa = null;
-                    if (sDictIdlist.size() == 0){
+                    if (sDictIdlist.size() == 0) {
                         continue;
                     }
                     boolean flag = false;
                     for (int i = 0; i < sDictIdlist.size(); i++) {
                         aa = sDictIdlist.get(i);
                         //System.out.println(aa);
-                        if (aa==null){
+                        if (aa == null) {
                             flag = true;
                             break;
                         }
                     }
-                    if (flag){
+                    if (flag) {
                         continue;
                     }
-                    if ( sDictIdlist.size() == 1) {  //如果有返回值，则对其赋值
-                        if (sDictIdlist.get(0) != null && sDictIdlist.get(0).trim().length() >0){
+                    if (sDictIdlist.size() == 1) {  //如果有返回值，则对其赋值
+                        if (sDictIdlist.get(0) != null && sDictIdlist.get(0).trim().length() > 0) {
                             String sysDictId = sysDictMapper.getDictIdByDictCode(sDictIdlist.get(0), DBvalue);
-                            String itemValue = sysDictItemMapper.getItemTextById(sysDictId, value,DBvalue);
+                            String itemValue = sysDictItemMapper.getItemTextById(sysDictId, value, DBvalue);
                             if (itemValue == null) {
                                 //System.out.println("key:" + key + ",  value:" + value + "该字段查不到其含义！！！！！");
                             } else {
@@ -642,8 +647,8 @@ public class OaFileServiceImpl extends ServiceImpl<OaFileMapper, OaFile> impleme
                             }
                         }
                     }
-                    if(key.equals("s_title")){
-                        oaBusdatum.put( key,"【"+busFunction.getSName()+"】" +value);
+                    if (key.equals("s_title")) {
+                        oaBusdatum.put(key, "【" + busFunction.getSName() + "】" + value);
                     }
                 }
                 oaBusdatum.put("table_name", sBusdataTable);
@@ -660,7 +665,7 @@ public class OaFileServiceImpl extends ServiceImpl<OaFileMapper, OaFile> impleme
         List<BusFunction> busFunctionList = busFunctionMapper.getFunByIsEs(DBvalue);
         List<BusModel> busModels = new ArrayList<>();
         for (BusFunction busFunction : busFunctionList) {
-            BusModel busModel = busModelMapper.getBusModelById(busFunction.getIBusModelId(),DBvalue);
+            BusModel busModel = busModelMapper.getBusModelById(busFunction.getIBusModelId(), DBvalue);
             if (busModel.getIId() == busFunction.getIBusModelId()) {
                 busFunction.setSBusdataTable(busModel.getSBusdataTable());
                 continue;
@@ -740,7 +745,7 @@ public class OaFileServiceImpl extends ServiceImpl<OaFileMapper, OaFile> impleme
         List<BusFunction> busFunctionList = busFunctionMapper.getFunByIsEs(DBvalue);
         List<BusModel> busModelList = new ArrayList<>();
         for (BusFunction busFunction : busFunctionList) {
-            BusModel busModel = busModelMapper.getBusModelById(busFunction.getIBusModelId(),DBvalue);
+            BusModel busModel = busModelMapper.getBusModelById(busFunction.getIBusModelId(), DBvalue);
             busModelList.add(busModel);
         }
         return busModelList;
@@ -751,18 +756,22 @@ public class OaFileServiceImpl extends ServiceImpl<OaFileMapper, OaFile> impleme
         List<OaFile> fileIds = new ArrayList<>();
         try {
             //获取用户名称
-            String token = request.getHeader("X-Access-Token");
-            String username = null;
-            if (token != null) {
-                username = JwtUtil.getUsername(token);
-            }
+            LoginInfo loginInfo = sysUserService.getLoginInfo(request);
+            String username = loginInfo.getUsername();
             String ctxPath = uploadpath;
             String fileName = null;
             Calendar calendar = Calendar.getInstance();
-            String path = ctxPath.replace("//", "/" +
-                    "") + "/" + calendar.get(Calendar.YEAR) +
-                    "/" + (calendar.get(Calendar.MONTH) + 1) +
-                    "/" + calendar.get(Calendar.DATE) + "/";
+            String calendarPath = calendar.get(Calendar.YEAR) +
+                    File.separator + (calendar.get(Calendar.MONTH) + 1) +
+                    File.separator + calendar.get(Calendar.DATE);
+            String path = "";
+            if (loginInfo.getOrgSchema() != null && !loginInfo.getOrgSchema().equals("")) {
+                path = ctxPath.replace("//", "/" +
+                        "") + File.separator + loginInfo.getOrgSchema() + File.separator + calendarPath;
+            } else {
+                path = ctxPath.replace("//", "/" +
+                        "") + File.separator + calendarPath;
+            }
             if (file != null) {
                 File parent = new File(path);
                 if (!parent.exists()) {
@@ -778,7 +787,7 @@ public class OaFileServiceImpl extends ServiceImpl<OaFileMapper, OaFile> impleme
                 oaFile.setITableId(iTableId);
                 oaFile.setSFileType(sFileType);
                 oaFile.setSFileName(orgName);        //设置附件名字
-                oaFile.setSFilePath(savePath);        //设置文件路径
+                oaFile.setSFilePath(File.separator + calendarPath + File.separator + fileName);        //设置文件路径
                 oaFile.setSCreateBy(username);
                 oaFile.setDCreateTime(new Date());
                 oaFileService.save(oaFile);

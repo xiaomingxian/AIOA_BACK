@@ -10,6 +10,8 @@ import com.cfcc.modules.oaBus.service.impl.OaFileServiceImpl;
 import com.cfcc.modules.papertitle.entity.OaTemplate;
 import com.cfcc.modules.papertitle.mapper.OaTemplateMapper;
 import com.cfcc.modules.papertitle.service.IOaTemplateService;
+import com.cfcc.modules.system.entity.LoginInfo;
+import com.cfcc.modules.system.service.ISysUserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Lazy;
@@ -43,6 +45,9 @@ public class OaTemplateServiceImpl extends ServiceImpl<OaTemplateMapper, OaTempl
     @Lazy
     private OaFileServiceImpl oaFileService;
 
+    @Autowired
+    @Lazy
+    private ISysUserService sysUserService;
 
     //上传文件地址
     @Value(value = "${jeecg.path.upload}")
@@ -90,15 +95,22 @@ public class OaTemplateServiceImpl extends ServiceImpl<OaTemplateMapper, OaTempl
         List<OaFile> fileIds = new ArrayList<>();
         try {
             //获取用户名称
-            String token = request.getHeader("X-Access-Token");
-            String username = JwtUtil.getUsername(token);
+            LoginInfo loginInfo = sysUserService.getLoginInfo(request);
+            String username = loginInfo.getUsername();
             String ctxPath = uploadpath;
             String fileName = null;
             Calendar calendar = Calendar.getInstance();
-            String path = ctxPath.replace("//", "/" +
-                    "") + "/" + calendar.get(Calendar.YEAR) +
-                    "/" + (calendar.get(Calendar.MONTH) + 1) +
-                    "/" + calendar.get(Calendar.DATE) + "/";
+            String calendarPath = calendar.get(Calendar.YEAR) +
+                    File.separator + (calendar.get(Calendar.MONTH) + 1) +
+                    File.separator + calendar.get(Calendar.DATE);
+            String path= "";
+            if (loginInfo.getOrgSchema() != null && !loginInfo.getOrgSchema().equals("")) {
+                path = ctxPath.replace("//", "/" +
+                        "") + File.separator + loginInfo.getOrgSchema() + File.separator + calendarPath;
+            } else {
+                path = ctxPath.replace("//", "/" +
+                        "") + File.separator + calendarPath;
+            }
             if (files.length > 0) {
                 File parent = new File(path);
                 if (!parent.exists()) {
@@ -115,7 +127,7 @@ public class OaTemplateServiceImpl extends ServiceImpl<OaTemplateMapper, OaTempl
                     oaFile.setITableId(iTableId);
                     oaFile.setSFileType(sFileType);
                     oaFile.setSFileName(orgName);        //设置附件名字
-                    oaFile.setSFilePath(savePath);        //设置文件路径
+                    oaFile.setSFilePath(File.separator + calendarPath + File.separator + fileName);        //设置文件路径
                     oaFile.setSCreateBy(username);
                     oaFile.setDCreateTime(new Date());
                     oaFileService.save(oaFile);

@@ -12,6 +12,8 @@ import com.cfcc.modules.oaBus.entity.OaFile;
 import com.cfcc.modules.oaBus.service.impl.OaFileServiceImpl;
 import com.cfcc.modules.papertitle.entity.OaTemplate;
 import com.cfcc.modules.papertitle.service.IOaTemplateService;
+import com.cfcc.modules.system.entity.LoginInfo;
+import com.cfcc.modules.system.service.ISysUserService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
@@ -53,6 +55,8 @@ public class OaTemplateController {
     @Autowired
     private OaFileServiceImpl oaFileService;
 
+    @Autowired
+    private ISysUserService sysUserService;
 
     //上传文件地址
     @Value(value = "${jeecg.path.upload}")
@@ -65,6 +69,7 @@ public class OaTemplateController {
     //上传模板文件地址
     @Value(value = "${jeecg.path.tempFilePath}")
     private String templatePath;
+
     /**
      * 分页列表查询
      *
@@ -302,20 +307,30 @@ public class OaTemplateController {
      * @return
      */
     @PostMapping(value = "/upload")
-    public Result<?> upload(HttpServletRequest request, HttpServletResponse response,@RequestParam(value = "fileType",required = false) String type) {
+    public Result<?> upload(HttpServletRequest request, HttpServletResponse response, @RequestParam(value = "fileType", required = false) String type) {
         Result<OaFile> result = new Result<>();
         try {
-            //获取用户名称
-            String token = request.getHeader("X-Access-Token");
-            String username = JwtUtil.getUsername(token);
+//            //获取用户名称
+//            String token = request.getHeader("X-Access-Token");
+//            String username = JwtUtil.getUsername(token);
+            LoginInfo loginInfo = sysUserService.getLoginInfo(request);
+            String username = loginInfo.getUsername();
 
             String ctxPath = uploadpath;
             String fileName = null;
             Calendar calendar = Calendar.getInstance();
-            String path = ctxPath.replace("//", "/" +
-                    "") + "/" + calendar.get(Calendar.YEAR) +
-                    "/" + (calendar.get(Calendar.MONTH) + 1) +
-                    "/" + calendar.get(Calendar.DATE) + "/";
+            String calendarPath = calendar.get(Calendar.YEAR) +
+                    File.separator + (calendar.get(Calendar.MONTH) + 1) +
+                    File.separator + calendar.get(Calendar.DATE);
+            String path = "";
+            if (loginInfo.getOrgSchema() != null && !loginInfo.getOrgSchema().equals("")) {
+                path = ctxPath.replace("//", "/" +
+                        "") + File.separator + loginInfo.getOrgSchema() + File.separator + calendarPath;
+            } else {
+                path = ctxPath.replace("//", "/" +
+                        "") + File.separator + calendarPath;
+            }
+
 
             File file = new File(path);
             if (!file.exists()) {
@@ -345,15 +360,14 @@ public class OaTemplateController {
             OaFile oaFile = new OaFile();
             oaFile.setSFileType(type);        // 附件类型为 4 附件
             oaFile.setSFileName(orgName);        //设置附件名字
-            oaFile.setSFilePath(savePath);        //设置文件路径
+            oaFile.setSFilePath(File.separator + calendarPath + File.separator + fileName);        //设置文件路径
             oaFile.setSCreateBy(username);
             oaFile.setDCreateTime(new Date());
             oaFileService.save(oaFile);
 
-
-            Map<String,Object> map=new HashMap<>();
-            map.put("sFilePath",savePath);
-            map.put("sFileType",type);
+            Map<String, Object> map = new HashMap<>();
+            map.put("sFilePath", savePath);
+            map.put("sFileType", type);
             oaFileService.singleCopyFile(map);
 
             result.setResult(oaFile);
