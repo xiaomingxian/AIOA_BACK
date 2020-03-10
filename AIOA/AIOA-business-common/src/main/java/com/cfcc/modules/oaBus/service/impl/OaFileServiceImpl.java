@@ -455,9 +455,16 @@ public class OaFileServiceImpl extends ServiceImpl<OaFileMapper, OaFile> impleme
     }
 
     @Override
-    public OaFile singleCopyFile(Map<String, Object> map) {
+    public OaFile singleCopyFile(Map<String, Object> map, HttpServletRequest request) {
+        LoginInfo loginInfo = sysUserService.getLoginInfo(request);
+        String initFile = "";
+        if (loginInfo.getOrgSchema() != null && !loginInfo.getOrgSchema().equals("")) {
+            initFile = uploadpath + File.separator + loginInfo.getOrgSchema() + File.separator + map.get("sFilePath") + "";
+        } else {
+            initFile = uploadpath + File.separator + map.get("sFilePath") + "";
+        }
+
         OaFile file = new OaFile();
-        String initFile = uploadpath + File.separator + map.get("sFilePath") + "";
         String fileName = initFile.substring(initFile.lastIndexOf(File.separator) + 1, initFile.length());
         try {
             String tempPaths = "";

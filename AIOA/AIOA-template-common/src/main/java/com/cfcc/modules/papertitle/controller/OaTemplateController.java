@@ -32,6 +32,7 @@ import org.springframework.web.multipart.MultipartHttpServletRequest;
 import org.springframework.web.servlet.HandlerMapping;
 import org.springframework.web.servlet.ModelAndView;
 
+import javax.naming.Name;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.*;
@@ -360,7 +361,7 @@ public class OaTemplateController {
             OaFile oaFile = new OaFile();
             oaFile.setSFileType(type);        // 附件类型为 4 附件
             oaFile.setSFileName(orgName);        //设置附件名字
-            oaFile.setSFilePath(File.separator + calendarPath + File.separator + fileName);        //设置文件路径
+            oaFile.setSFilePath(calendarPath + File.separator + fileName);        //设置文件路径
             oaFile.setSCreateBy(username);
             oaFile.setDCreateTime(new Date());
             oaFileService.save(oaFile);
@@ -368,7 +369,7 @@ public class OaTemplateController {
             Map<String, Object> map = new HashMap<>();
             map.put("sFilePath", savePath);
             map.put("sFileType", type);
-            oaFileService.singleCopyFile(map);
+            oaFileService.singleCopyFile(map,request);
 
             result.setResult(oaFile);
             result.setMessage(savePath);
@@ -428,9 +429,16 @@ public class OaTemplateController {
      * @throws Exception
      */
     @GetMapping(value = "/download/**")
-    public void download(HttpServletRequest request, HttpServletResponse response) throws Exception {
+    public void download(HttpServletRequest request, HttpServletResponse response,@RequestParam(name="filePath") String filepath ) throws Exception {
         // ISO-8859-1 ==> UTF-8 进行编码转换
-        String filePath = uploadpath + File.separator + extractPathFromPattern(request);
+        //获取用户名称
+        LoginInfo loginInfo = sysUserService.getLoginInfo(request);
+        String filePath = "";//文件路径
+        if (loginInfo.getOrgSchema()!=null && !loginInfo.getOrgSchema().equals("")){
+            filePath = uploadpath +File.separator+ loginInfo.getOrgSchema()+File.separator + filepath;
+        }else{
+             filePath = uploadpath + File.separator + filepath;
+        }
         // 其余处理略
         InputStream inputStream = null;
         OutputStream outputStream = null;

@@ -69,7 +69,7 @@ public interface IOaFileService extends IService<OaFile> {
 
     boolean sortFile(Map<String, Object> param);
 
-    OaFile singleCopyFile(Map<String, Object> map);
+    OaFile singleCopyFile(Map<String, Object> map,HttpServletRequest request);
 
     boolean isShowFileBtn(Map<String, List<OaButton>> map);
 

@@ -11,6 +11,8 @@ import com.cfcc.common.util.oConvertUtils;
 import com.cfcc.modules.oaBus.entity.OaFile;
 import com.cfcc.modules.oaBus.service.IOaFileService;
 import com.cfcc.modules.oabutton.entity.OaButton;
+import com.cfcc.modules.system.entity.LoginInfo;
+import com.cfcc.modules.system.service.ISysUserService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
@@ -21,6 +23,7 @@ import org.jeecgframework.poi.excel.entity.ImportParams;
 import org.jeecgframework.poi.excel.view.JeecgEntityExcelView;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.multipart.MultipartHttpServletRequest;
@@ -56,6 +59,9 @@ public class OaFileController {
     @Value(value = "${jeecg.path.upload}")
     private String uploadpath;
 
+    @Autowired
+    @Lazy
+    private ISysUserService sysUserService;
     /**
      * 下载所有附件
      *
@@ -63,15 +69,25 @@ public class OaFileController {
      * @param list
      */
     @RequestMapping("/downloadZipFile")
-    public void downloadZipFile(HttpServletResponse response, @RequestBody List<OaFile> list) { //获取的对象
-        if (list.size() > 0) {
-            List<File> files = new ArrayList<>();
-            for (int i = 0; i < list.size(); i++) {
-                File file = new File(uploadpath +list.get(i).getSFilePath());
-                files.add(file);
-            }
-            ZipUtils.downFile(files, response);
+    public void downloadZipFile(HttpServletRequest request, HttpServletResponse response, @RequestBody List<OaFile> list) { //获取的对象
+        if (list.size()== 0){
+            return;
         }
+        LoginInfo loginInfo = sysUserService.getLoginInfo(request);
+        List<File> files = new ArrayList<>();
+        if (loginInfo.getOrgSchema() != null && !loginInfo.getOrgSchema().equals("")) {
+                for (int i = 0; i < list.size(); i++) {
+                    File file = new File(uploadpath + File.separator + loginInfo.getOrgSchema() + File.separator + list.get(i).getSFilePath());
+                    files.add(file);
+                }
+
+        } else {
+                for (int i = 0; i < list.size(); i++) {
+                    File file = new File(uploadpath + File.separator + list.get(i).getSFilePath());
+                    files.add(file);
+                }
+        }
+        ZipUtils.downFile(files, response);
     }
 
     /**
@@ -365,9 +381,9 @@ public class OaFileController {
     @AutoLog(value = "单文件复制")
     @ApiOperation(value = "单文件复制", notes = "单文件复制")
     @PostMapping(value = "/singleCopyFile")
-    public Result singleCopyFile(@RequestBody Map<String, Object> map) {
+    public Result singleCopyFile(@RequestBody Map<String, Object> map,HttpServletRequest request) {
         Result<OaFile> result = new Result<OaFile>();
-        OaFile oa = oaFileService.singleCopyFile(map);
+        OaFile oa = oaFileService.singleCopyFile(map,request);
         try {
             if (oa != null) {
                 result.success("复制成功！");
