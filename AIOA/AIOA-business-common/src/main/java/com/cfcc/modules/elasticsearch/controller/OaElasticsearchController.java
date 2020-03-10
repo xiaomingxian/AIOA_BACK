@@ -11,6 +11,7 @@ import com.cfcc.common.mycat.MycatSchema;
 import com.cfcc.modules.elasticsearch.entity.EsSearch;
 import com.cfcc.modules.elasticsearch.service.EsSearchService;
 import com.cfcc.modules.elasticsearch.service.SearchService;
+import com.cfcc.modules.oaBus.service.IOaBusdataService;
 import com.cfcc.modules.oaBus.service.IOaFileService;
 import com.cfcc.modules.system.entity.SysUser;
 import com.cfcc.modules.system.service.ISysUserService;
@@ -55,6 +56,9 @@ public class OaElasticsearchController {
 
     @Autowired
     private IOaFileService iOaFileService;
+
+    @Autowired
+    private IOaBusdataService oaBusdataService;
 
 
     @AutoLog(value = "全文检索-统计搜索数据")

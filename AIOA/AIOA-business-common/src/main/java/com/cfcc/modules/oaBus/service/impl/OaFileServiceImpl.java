@@ -242,6 +242,25 @@ public class OaFileServiceImpl extends ServiceImpl<OaFileMapper, OaFile> impleme
         return oaFileList;
     }
 
+    @Override
+    public List<Map<String,Object>> getOaFileByIdAndTable(String tableId, String table) {
+        List<Map<String,Object>> oaFileList = oaFileMapper.getOaFileByIdAndTable(tableId,table);
+        Iterator<Map<String, Object>> iterator = oaFileList.iterator();
+        while (iterator.hasNext()) {
+            Map<String, Object> map = iterator.next();
+            String sFileName = map.get("s_file_name")+"";
+            String str = sFileName.substring(sFileName.lastIndexOf(".") + 1);
+            if (!str.equalsIgnoreCase("doc") && !str.equalsIgnoreCase("docx")
+                    && !str.equalsIgnoreCase("txt") && !str.equalsIgnoreCase("pdf")
+                    && !str.equalsIgnoreCase("pdf") && !str.equalsIgnoreCase("xls")
+                    && !str.equalsIgnoreCase("xlsx")){
+                iterator.remove();
+                continue;
+            }
+        }
+        return oaFileList;
+    }
+
     /**
      * 附件检索
      *
@@ -436,9 +455,16 @@ public class OaFileServiceImpl extends ServiceImpl<OaFileMapper, OaFile> impleme
     }
 
     @Override
-    public OaFile singleCopyFile(Map<String, Object> map) {
+    public OaFile singleCopyFile(Map<String, Object> map, HttpServletRequest request) {
+        LoginInfo loginInfo = sysUserService.getLoginInfo(request);
+        String initFile = "";
+        if (loginInfo.getOrgSchema() != null && !loginInfo.getOrgSchema().equals("")) {
+            initFile = uploadpath + File.separator + loginInfo.getOrgSchema() + File.separator + map.get("sFilePath") + "";
+        } else {
+            initFile = uploadpath + File.separator + map.get("sFilePath") + "";
+        }
+
         OaFile file = new OaFile();
-        String initFile = uploadpath + File.separator + map.get("sFilePath") + "";
         String fileName = initFile.substring(initFile.lastIndexOf(File.separator) + 1, initFile.length());
         try {
             String tempPaths = "";

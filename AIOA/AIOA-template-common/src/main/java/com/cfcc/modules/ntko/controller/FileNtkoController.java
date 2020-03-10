@@ -12,6 +12,7 @@ import com.cfcc.modules.oaBus.service.IOaBusdataService;
 import com.cfcc.modules.oaBus.service.IOaFileService;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.http.protocol.HTTP;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.redis.core.RedisTemplate;
@@ -322,11 +323,11 @@ public class FileNtkoController {
     @AutoLog(value = "单文件复制")
     @ApiOperation(value = "单文件复制", notes = "单文件复制")
     @PostMapping(value = "/singleCopyFile")
-    public Result singleCopyFile(@RequestParam(value = "filepath", required = false) String filepath) {
+    public Result singleCopyFile(@RequestParam(value = "filepath", required = false) String filepath, HttpServletRequest request) {
         Result<String> result = new Result< String >();
         Map<String,Object> map=new HashMap<>();
         map.put("sFilePath",filepath);
-        OaFile oa = oaFileService.singleCopyFile(map);
+        OaFile oa = oaFileService.singleCopyFile(map,request);
         String fileName=oa.getSFileName();
         try {
             if (oa != null){

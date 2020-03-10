@@ -34,7 +34,7 @@ public interface SearchService {
     public RestStatus saveOrUpdate(List<Map<String,Object>> oaFileList, String indexName, String indexType) throws  Exception;
 
     //通过id删除
-    public   void   deleteById(String id, String indexName, String indexType) throws  Exception;
+    public   Integer   deleteById(String id, String indexName, String indexType) throws  Exception;
 
     //全查
     public IPage<Map<String,Object>> queryAll(String indexName, Integer pageNo, Integer pageSize) throws  Exception;

@@ -259,14 +259,15 @@ public class SearchServiceImpl implements SearchService {
 
 
     @Override
-    public void deleteById(String id,String indexName, String indexType) throws Exception {
+    public Integer deleteById(String id,String indexName, String indexType) throws Exception {
 
         //(String index, String type, String id
         DeleteRequest request = new DeleteRequest(indexName,indexType,id);
 
         DeleteResponse response =  restHighLevelClient.delete(request,RequestOptions.DEFAULT);
-
+        int status = response.status().getStatus();
         logger.info("根据id删除document："+response.status());
+        return status;
     }
 
 

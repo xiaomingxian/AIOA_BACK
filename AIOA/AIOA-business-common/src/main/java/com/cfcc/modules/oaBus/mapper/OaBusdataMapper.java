@@ -175,4 +175,6 @@ public interface OaBusdataMapper extends BaseMapper<OaBusdata> {
                               @Param("userId")String userId,
                               @Param("userUnit")String userUnit,
                               @Param("userDepart")String userDepart);
+
+    Integer getOaBusFunctionIsEsByOaBusdata(@Param("tableId") String tableId,@Param("table") String table);
 }

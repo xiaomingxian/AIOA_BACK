@@ -134,7 +134,7 @@
         <if test="DBvalue != null and DBvalue != ''">
             ${DBvalue}
         </if>
-        SELECT s_table AS tableName, i_table_id AS tableId, s_file_name, s_file_path, s_create_by
+        SELECT i_id as id, s_table AS tableName, i_table_id AS tableId, s_file_name, s_file_path, s_create_by
           from oa_file
           <where>
               1 = 1
@@ -145,6 +145,9 @@
                   and  s_table = #{sBusdataTable}
               </if>
           </where>
+    </select>
+    <select id="getOaFileByIdAndTable" resultType="java.util.Map">
+        SELECT * from oa_file WHERE i_table_id = #{tableId} and s_table = #{table}
     </select>
 
     <!--修改附件名称-->

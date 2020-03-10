@@ -127,7 +127,7 @@ public class OaTemplateServiceImpl extends ServiceImpl<OaTemplateMapper, OaTempl
                     oaFile.setITableId(iTableId);
                     oaFile.setSFileType(sFileType);
                     oaFile.setSFileName(orgName);        //设置附件名字
-                    oaFile.setSFilePath(File.separator + calendarPath + File.separator + fileName);        //设置文件路径
+                    oaFile.setSFilePath(calendarPath + File.separator + fileName);        //设置文件路径
                     oaFile.setSCreateBy(username);
                     oaFile.setDCreateTime(new Date());
                     oaFileService.save(oaFile);

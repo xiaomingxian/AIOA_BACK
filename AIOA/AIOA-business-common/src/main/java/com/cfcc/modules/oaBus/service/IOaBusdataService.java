@@ -127,4 +127,7 @@ public interface IOaBusdataService  extends  IService<OaBusdata>{
     List<Map<String, Object>> getOaBusdataList(String columnLists, BusFunction busFunction,String DBvalue);
 
     boolean checkBusDataSer(String tableName, String id, String userName);
+
+    Boolean getFuncitionByBusdata(String tableId, String table);
+
 }
