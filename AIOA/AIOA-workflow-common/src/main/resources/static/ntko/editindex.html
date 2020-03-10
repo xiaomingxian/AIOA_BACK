@@ -81,7 +81,7 @@
                   type: "post",
                   dataType: "json",
                   url: urlContextPath + "/ntko/filentko/singleCopyFile",
-                  data: {"filepath": Path1},
+                  data: {"filepath": Path1,"orgSchema":orgSchema},
                   success: function (data) {
                     var mFileName = fileName;
                     // var filePath = "/templateFile/";
@@ -106,7 +106,7 @@
                   type: "post",
                   dataType: "json",
                   url: urlContextPath + "/ntko/filentko/singleCopyFile",
-                  data: {"filepath": Path1},
+                  data: {"filepath": Path1,"orgSchema":orgSchema},
                   success: function (data) {
                     // var basePath = getBasePath();
                     var filePath = "/temporaryFiles/";
@@ -151,7 +151,7 @@
                 type: "post",
                 dataType: "json",
                 url: urlContextPath + "/ntko/filentko/singleCopyFile",
-                data: {"filepath": Path1},
+                data: {"filepath": Path1,"orgSchema":orgSchema},
                 success: function (data) {
                   // var basePath = getBasePath();
                   var filePath = "/temporaryFiles/";
@@ -221,7 +221,7 @@
                     type: "post",
                     dataType: "json",
                     url: urlContextPath + "/ntko/filentko/singleCopyFile",
-                    data: {"filepath": Path1},
+                    data: {"filepath": Path1,"orgSchema":orgSchema},
                     success: function (data) {
                       var mFileName = fileName;
                       // var filePath = "/templateFile/";
@@ -259,7 +259,7 @@
                     type: "post",
                     dataType: "json",
                     url: urlContextPath + "/ntko/filentko/singleCopyFile",
-                    data: {"filepath": Path1},
+                    data: {"filepath": Path1,"orgSchema":orgSchema},
                     success: function (data) {
                       // var basePath = getBasePath();
                       var filePath = "/temporaryFiles/";
@@ -291,7 +291,7 @@
                     type: "post",
                     dataType: "json",
                     url: urlContextPath + "/ntko/filentko/singleCopyFile",
-                    data: {"filepath": Path1},
+                    data: {"filepath": Path1,"orgSchema":orgSchema},
                     success: function (data) {
                       // var basePath = getBasePath();
                       var filePath = "/temporaryFiles/";
@@ -327,9 +327,8 @@
                     type: "post",
                     dataType: "json",
                     url: urlContextPath + "/ntko/filentko/singleCopyFile",
-                    data: {"filepath": Path1},
+                    data: {"filepath": Path1,"orgSchema":orgSchema},
                     success: function (data) {
-                      // var basePath = getBasePath();
                       var filePath = "/temporaryFiles/";
                       var fileName = data.result;
                       ntko.OpenFromURL(urlContextPath + filePath + fileName);

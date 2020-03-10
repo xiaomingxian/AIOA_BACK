@@ -24,6 +24,8 @@ import org.springframework.web.multipart.MultipartHttpServletRequest;
 
 import javax.servlet.http.HttpServletRequest;
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.Calendar;
 import java.util.Date;
@@ -78,16 +80,16 @@ public class FileNtkoController {
                 request.setAttribute("orgSchema",orgSchema);
             }
             String ctxPath = uploadpath;
-//            String tempPath = uploadfilepath;
-            Map<String, Object> map = FileUtils.Upload(ctxPath, request);
+            Map<String, Object> map = FileUtils.Upload(orgSchema,ctxPath, request);
             String fileName = (String) map.get("fileName");
-            String savePath = (String) map.get("savePath");
+//            String savePath = (String) map.get("savePath");
+            String newSavePath = (String) map.get("newSavePath");
             OaFile oaFile = new OaFile();
             oaFile.setSTable(stable);
             oaFile.setITableId(Integer.parseInt(tableid));
             oaFile.setSFileType(fileType);
             oaFile.setSFileName(fileName);
-            oaFile.setSFilePath(savePath);
+            oaFile.setSFilePath(newSavePath);
             oaFile.setDCreateTime(new Date());
             Boolean flag = oaFileService.save(oaFile);
             String message = "kongjian";
@@ -166,15 +168,13 @@ public class FileNtkoController {
             //上传附件进行编辑查文件名
             filePath=ad.getSFilePath();
             if ("4".equals(fileType)){
-                filePath=filePath.substring(ad.getSFilePath().lastIndexOf("\\")+1);
+                filePath=filePath.substring(ad.getSFilePath().lastIndexOf(File.separator)+1);
             }
             if (null == ad) {
                 result.setMessage("文件控件系统出现问题，请联系管理");
             } else {
                 result.setResult(filePath);
             }
-
-            //System.out.println("----------------->>>>查看文件路径" + filePath);
             return result;
         } catch (Exception e) {
             e.printStackTrace();
@@ -200,7 +200,7 @@ public class FileNtkoController {
             }
             OaFile oaFile=oaFileService.queryById(fileId);
             String filePath=oaFile.getSFilePath();
-            String fileName=filePath.substring(filePath.lastIndexOf("\\")+1);
+            String fileName=filePath.substring(filePath.lastIndexOf(File.separator)+1);
             result.setResult(fileName);
             return result;
         } catch (Exception e) {
@@ -221,19 +221,18 @@ public class FileNtkoController {
                                    @RequestParam(name = "stable", required = true) String stable,
                                    @RequestParam(value = "tableid", required = true) Integer tableid,
                                    @RequestParam(value = "fileType", required = true) String fileType,
-                                   @RequestParam(value = "orgSchema", required = true) String orgSchema) throws IOException {
+                                   @RequestParam(value = "orgSchema", required = false) String orgSchema) throws IOException {
 
         Result<String> result = new Result<>();
         if (!orgSchema.equals("")){
             request.setAttribute("orgSchema",orgSchema);
         }
         String ctxPath = uploadpath;
-        Map<String, Object> map = FileUtils.Upload(ctxPath,request);
+        Map<String, Object> map = FileUtils.Upload(orgSchema,ctxPath,request);
 
         String fileName = (String) map.get("fileName");
-        String savePath = (String) map.get("savePath");
-
-
+//        String savePath = (String) map.get("savePath");
+        String newSavePath = (String) map.get("newSavePath");
         OaFile oaFile = new OaFile();
         oaFile.setSTable(stable);
         oaFile.setITableId(tableid);
@@ -241,13 +240,12 @@ public class FileNtkoController {
         QueryWrapper<OaFile> c = new QueryWrapper<>();
         c.setEntity(oaFile);
         Boolean flag = oaFileService.remove(c);
-
         if (flag == true) {
             oaFile.setSTable(stable);
             oaFile.setITableId(tableid);
             oaFile.setSFileType(fileType);
             oaFile.setSFileName(fileName);
-            oaFile.setSFilePath(savePath);
+            oaFile.setSFilePath(newSavePath);
             oaFile.setDCreateTime(new Date());
             oaFileService.save(oaFile);
             result.setMessage("编辑成功");
@@ -268,7 +266,7 @@ public class FileNtkoController {
     public Result<String> editEndsource(HttpServletRequest request,
                                         @RequestParam(value = "fileId", required = false) String fileId,
                                         @RequestParam(value = "fileType", required = false) String fileType,
-                                        @RequestParam(value = "orgSchema", required = true) String orgSchema) throws IOException {
+                                        @RequestParam(value = "orgSchema", required = false) String orgSchema) throws IOException {
         OaFile initFile = oaFileService.getById(fileId);
         Result<String> result = new Result<>();
         if (!orgSchema.equals("")){
@@ -276,9 +274,9 @@ public class FileNtkoController {
         }
         Calendar calendar = Calendar.getInstance();
         String path = uploadpath.replace("//", "/" +
-                "") + "/" + calendar.get(Calendar.YEAR) +
-                "/" + (calendar.get(Calendar.MONTH) + 1) +
-                "/" + calendar.get(Calendar.DATE) + "/";
+                "") + File.separator + calendar.get(Calendar.YEAR) +
+                File.separator + (calendar.get(Calendar.MONTH) + 1) +
+                File.separator + calendar.get(Calendar.DATE) + File.separator;
         File parent = new File(path);
         if (!parent.exists()){
             parent.mkdirs();
@@ -323,14 +321,37 @@ public class FileNtkoController {
     @AutoLog(value = "单文件复制")
     @ApiOperation(value = "单文件复制", notes = "单文件复制")
     @PostMapping(value = "/singleCopyFile")
-    public Result singleCopyFile(@RequestParam(value = "filepath", required = false) String filepath, HttpServletRequest request) {
+    public Result singleCopyFile(@RequestParam(value = "filepath", required = false) String filepath, HttpServletRequest request,
+                                 @RequestParam(value = "orgSchema", required = false) String orgSchema) {
         Result<String> result = new Result< String >();
         Map<String,Object> map=new HashMap<>();
-        map.put("sFilePath",filepath);
-        OaFile oa = oaFileService.singleCopyFile(map,request);
-        String fileName=oa.getSFileName();
+//        map.put("sFilePath",filepath);
+//        OaFile oa = oaFileService.singleCopyFile(map,request);
+//        String fileName=oa.getSFileName();
+        OaFile file = new OaFile();
+        String initFile = "";
+        if (!orgSchema.equals("")){
+            initFile=uploadpath + File.separator + orgSchema + filepath + "";
+        }else {
+            initFile=uploadpath + File.separator  + filepath + "";
+        }
+        String fileName = initFile.substring(initFile.lastIndexOf(File.separator) + 1, initFile.length());
         try {
-            if (oa != null){
+            String tempPaths = uploadpath + File.separator + "temporaryFiles";
+                File temp = new File(tempPaths);
+                if (!temp.exists()) {
+                    temp.mkdirs();
+                }
+                FileInputStream oldfile = new FileInputStream(initFile);
+                FileOutputStream newfile = new FileOutputStream(temp + File.separator + fileName);
+                byte[] bytes = new byte[1024];
+                int i = 0;
+                while ((i = oldfile.read(bytes)) > 0) {
+                    newfile.write(bytes);
+                }
+                file.setSFilePath(temp + File.separator + fileName);
+                file.setSFileName(fileName);
+            if (file != null){
                 result.success("复制成功！");
                 result.setResult(fileName);
             }
