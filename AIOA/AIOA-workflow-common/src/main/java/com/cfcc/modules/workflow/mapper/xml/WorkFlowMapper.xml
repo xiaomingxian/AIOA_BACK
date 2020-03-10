@@ -266,7 +266,7 @@
 
         </if>
         <if test="!pojo.tableOrder">
-            SUBSTRING( s.busMsg, 1,9) ,s.createTime desc,
+            SUBSTRING( s.busMsg, 1,1) ,s.createTime desc,
         </if>
         1=1
         limit #{pageNo},#{pageSize}
@@ -1293,7 +1293,7 @@
 
         </if>
         <if test="!pojo.tableOrder">
-            SUBSTRING( s.busMsg, 1,9) ,s.createTime desc,
+            SUBSTRING( s.busMsg, 1,1) ,s.createTime desc,
         </if>
         1=1
 
