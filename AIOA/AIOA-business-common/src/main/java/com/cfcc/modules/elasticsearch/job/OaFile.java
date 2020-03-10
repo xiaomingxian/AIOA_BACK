@@ -274,7 +274,7 @@ public class OaFile implements Job {
                                 log.info("-----------------oa_busdata添加数据成功-------------------");
                             }
                         }
-//                        iOaBusdataService.updateIsES(oaBusdataList,DBvalue);
+                        iOaBusdataService.updateIsES(oaBusdataList,DBvalue);
                     } catch (Exception e) {
                         e.printStackTrace();
                     }
@@ -308,13 +308,15 @@ public class OaFile implements Job {
                         for (Map<String, Object> map : oaFileListAll) {
                             String json = JSON.toJSONString(map);
                             RestStatus restStatus = searchService.saveOrUpdate(json, map.get("tableName").toString() + map.get("tableId").toString(), indexName, indexType);
+                            int res = restStatus.getStatus();
                             System.out.println("----是否添加成功----"+restStatus);
-                            if (restStatus.equals("OK")){
+                            if (res == 200){
                                 log.info("-----------------oa_busdata添加数据成功-------------------");
                             }else {
                                 log.info("-----------------oa_busdata添加数据失败-------------------");
-                                while (!restStatus.equals("OK")){
+                                while (res == 200){
                                     restStatus = searchService.saveOrUpdate(json, map.get("tableName").toString() + map.get("tableId").toString(), indexName, indexType);
+                                    res = restStatus.getStatus();
                                 }
                                 log.info("-----------------oa_busdata添加数据成功-------------------");
                             }
@@ -324,7 +326,7 @@ public class OaFile implements Job {
                         e.printStackTrace();
                     }
                 }
-                System.out.println("------------------------------------------");
+//                System.out.println("------------------------------------------");
             }
         }
     }
