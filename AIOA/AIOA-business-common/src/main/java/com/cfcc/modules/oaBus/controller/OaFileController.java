@@ -67,7 +67,7 @@ public class OaFileController {
         if (list.size() > 0) {
             List<File> files = new ArrayList<>();
             for (int i = 0; i < list.size(); i++) {
-                File file = new File(list.get(i).getSFilePath());
+                File file = new File(uploadpath +list.get(i).getSFilePath());
                 files.add(file);
             }
             ZipUtils.downFile(files, response);
@@ -126,11 +126,11 @@ public class OaFileController {
     @AutoLog(value = "附件表-查询busData对应的附件列表")
     @ApiOperation(value = "附件表-查询busData对应的附件列表", notes = "附件表-查询busData对应的附件列表")
     @GetMapping(value = "/queryBanWenList")
-    public Result<List<OaFile>> queryBanWenList(String tableName, String busDataId,String sFileType ) {
+    public Result<List<OaFile>> queryBanWenList(String tableName, String busDataId, String sFileType) {
         Result<List<OaFile>> result = new Result<List<OaFile>>();
 		/*QueryWrapper<OaFile> queryWrapper = QueryGenerator.initQueryWrapper(oaFile, req.getParameterMap());
 		Page<OaFile> page = new Page<OaFile>(pageNo, pageSize);*/
-        List<OaFile> pageList = oaFileService.getBanWenList(tableName, busDataId,sFileType);
+        List<OaFile> pageList = oaFileService.getBanWenList(tableName, busDataId, sFileType);
         result.setSuccess(true);
         result.setResult(pageList);
         return result;
@@ -318,14 +318,14 @@ public class OaFileController {
     @AutoLog(value = "业务按钮-修改附件名称")
     @ApiOperation(value = "业务按钮-修改附件名称", notes = "业务按钮-修改附件名称")
     @PostMapping(value = "/updateFileName")
-    public Result updateFileName(@RequestBody Map<String,Object> param) {
+    public Result updateFileName(@RequestBody Map<String, Object> param) {
         Result result = new Result<>();
         try {
             boolean ok = oaFileService.updateDocNameById(param);
-            if(ok){
-                 result.success("修改成功");
-            }else{
-                 result.error("文件不存在");
+            if (ok) {
+                result.success("修改成功");
+            } else {
+                result.error("文件不存在");
             }
         } catch (Exception e) {
             log.error("修改失败", e.getMessage());
@@ -344,7 +344,7 @@ public class OaFileController {
     @ApiOperation(value = "复制附件", notes = "复制附件")
     @PostMapping(value = "/copyFile")
     public Result copyFileList(@RequestBody String param) {
-        Result< List<OaFile>> result = new Result< List<OaFile>>();
+        Result<List<OaFile>> result = new Result<List<OaFile>>();
         List<OaFile> oaFileList = oaFileService.copyFiles(param);
         try {
             result.success("复制附件成功！");
@@ -365,11 +365,11 @@ public class OaFileController {
     @AutoLog(value = "单文件复制")
     @ApiOperation(value = "单文件复制", notes = "单文件复制")
     @PostMapping(value = "/singleCopyFile")
-    public Result singleCopyFile(@RequestBody Map<String,Object> map) {
-        Result<OaFile> result = new Result< OaFile>();
+    public Result singleCopyFile(@RequestBody Map<String, Object> map) {
+        Result<OaFile> result = new Result<OaFile>();
         OaFile oa = oaFileService.singleCopyFile(map);
         try {
-            if (oa != null){
+            if (oa != null) {
                 result.success("复制成功！");
                 result.setResult(oa);
             }
@@ -382,20 +382,20 @@ public class OaFileController {
 
 
     /**
-     *排序
+     * 排序
      *
      * @param
      * @return
      */
     @AutoLog(value = "附件排序按钮")
     @PostMapping(value = "/sortFile")
-    public Result sortFile(@RequestBody Map<String,Object> param) {
+    public Result sortFile(@RequestBody Map<String, Object> param) {
         Result result = new Result<>();
         try {
             boolean ok = oaFileService.sortFile(param);
-            if(ok){
+            if (ok) {
                 result.success("交换成功");
-            }else{
+            } else {
                 result.error("交换失败");
             }
         } catch (Exception e) {
@@ -407,7 +407,7 @@ public class OaFileController {
 
     @AutoLog(value = "附件按钮权限")
     @PostMapping(value = "/isFileBtn")
-    public Result isFileBtn(@RequestBody Map<String,List<OaButton>> map) {
+    public Result isFileBtn(@RequestBody Map<String, List<OaButton>> map) {
         Result result = new Result<>();
         boolean ok = oaFileService.isShowFileBtn(map);
         result.setResult(ok);

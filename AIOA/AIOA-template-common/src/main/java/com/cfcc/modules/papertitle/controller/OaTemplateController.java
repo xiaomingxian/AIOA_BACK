@@ -430,7 +430,7 @@ public class OaTemplateController {
     @GetMapping(value = "/download/**")
     public void download(HttpServletRequest request, HttpServletResponse response) throws Exception {
         // ISO-8859-1 ==> UTF-8 进行编码转换
-        String filePath = extractPathFromPattern(request);
+        String filePath = uploadpath + File.separator + extractPathFromPattern(request);
         // 其余处理略
         InputStream inputStream = null;
         OutputStream outputStream = null;
