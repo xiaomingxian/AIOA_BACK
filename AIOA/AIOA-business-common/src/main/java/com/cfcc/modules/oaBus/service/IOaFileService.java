@@ -53,7 +53,7 @@ public interface IOaFileService extends IService<OaFile> {
 
     List<Map<String,Object>> getOaFile(String DBvalue);
 
-    boolean updateDocNameById(Map<String,Object> map);
+    boolean updateDocNameById(Map<String,Object> map,HttpServletRequest request);
 
     public String getColumList(String sBusdataTable,Integer iId, String DBvalue);
 
@@ -63,7 +63,7 @@ public interface IOaFileService extends IService<OaFile> {
 
     List<OaFile> getBanWenList(String tableName, String busDataId, String sFileType);
 
-    List<OaFile> copyFiles(String param);
+    List<OaFile> copyFiles(String param,HttpServletRequest request);
 
     int updateIorderById(Integer id);
 
