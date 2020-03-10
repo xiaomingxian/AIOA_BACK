@@ -553,39 +553,48 @@ public class TaskInActController {
         busData.put("functionName", sName);
 
         String mainDept = "";
-        String s_receive_num = "";
-//        Object file_num = busData.get("s_file_num");
-//        String s_file_num = null;
-//        if (file_num != null) {
-//            s_file_num = busData.get("s_file_num").toString();
-//        }
-//
-//        String sourceFileNum = busData.get("s_file_num") == null ? null : busData.get("s_file_num").toString();
-        if (sName.contains("收文")) {//
-            if (taskInfoVO.getIsDept()) {
-                mainDept = taskInfoVO.getTaskWithDepts().getMainDept();
+
+        if (taskInfoVO.getIsDept()) {
+            TaskWithDepts taskWithDepts = taskInfoVO.getTaskWithDepts();
+            if (taskWithDepts != null) {
+                mainDept = taskWithDepts.getMainDept();
+                String fuDept = taskWithDepts.getFuDept();
+                String cyDept = taskWithDepts.getCyDept();
+
+                if (StringUtils.isNotBlank(mainDept)) {
+                    busData.put("mainDept", mainDept);
+
+                    busData2.put("s_main_unit_names", mainDept);
+                }
+                if (StringUtils.isNotBlank(fuDept)) {
+                    busData2.put("s_cc_unit_names", fuDept);
+                }
+                if (StringUtils.isNotBlank(cyDept)) {
+                    busData2.put("s_inside_deptnames", cyDept);
+                }
+
             }
-            busData.put("s_create_dept", mainDept);
+        }else {
+            mainDept=  busData2.get("s_main_unit_names")==null?"": busData2.get("s_main_unit_names").toString();
+            busData.put("mainDept", mainDept);
+        }
+        //s_crc_deptnames  会签部门
+
+        String s_receive_num = "";
+        //收文文号
+        if (sName.contains("收文")) {//
             s_receive_num = busData.get("s_receive_num") == null ? "" : busData.get("s_receive_num").toString();
             busData.put("s_file_num", s_receive_num);
-        } else {
-            mainDept = busData.get("s_create_dept") == null ? "" : busData.get("s_create_dept").toString();
         }
-        busData.put("mainDept", mainDept);
 
 
         String busMsg = VarsWithBus.getBusMsg(busData);
-
-//        busData.put("s_file_num", sourceFileNum);
 
 
         if (vars != null) {
             vars.put("busMsg", busMsg);
         }
         taskInfoVO.setVars(vars);
-        if (sName.contains("收文")) {
-            busData2.put("s_main_unit_names", mainDept);//收文的主办部门
-        }
     }
 
     @PostMapping("doTaskMore")
@@ -738,7 +747,7 @@ public class TaskInActController {
                     //主办部门
                     String s_main_unit_names = busData.get("s_main_unit_names") == null ? null : busData.get("s_main_unit_names").toString();
                     if (StringUtils.isNotBlank(s_main_unit_names)) {
-                        draftMsg = sysUserService.getNextUsersMainDept(candidates,s_main_unit_names);
+                        draftMsg = sysUserService.getNextUsersMainDept(candidates, s_main_unit_names);
                     } else {
                         draftMsg = new ArrayList<>();
                     }

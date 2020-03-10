@@ -75,6 +75,14 @@ public class TaskInfoVO implements Serializable {
      */
     private String mainDept;
     /**
+     * 辅办部门
+     */
+    private String fuDept;
+    /**
+     * 传阅部门
+     */
+    private String cyDept;
+    /**
      * 文号
      */
     private String fileNum;
