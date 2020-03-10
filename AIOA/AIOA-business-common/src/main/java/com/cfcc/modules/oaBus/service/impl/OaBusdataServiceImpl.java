@@ -708,6 +708,19 @@ public class OaBusdataServiceImpl extends ServiceImpl<OaBusdataMapper, OaBusdata
     }
 
     @Override
+    public Boolean getFuncitionByBusdata(String tableId, String table) {
+        Integer aa = oaBusdataMapper.getOaBusFunctionIsEsByOaBusdata(tableId,table);
+        if (aa != null){
+            if (aa == 1){
+                return true;
+            }
+        }
+        return false;
+    }
+
+
+
+    @Override
     public List<Map<String, Object>> getOaBusdataList(String columnLists, BusFunction busFunction, String DBvalue) {
         return oaBusdataMapper.getBusdataByTable(columnLists, busFunction, DBvalue);
     }

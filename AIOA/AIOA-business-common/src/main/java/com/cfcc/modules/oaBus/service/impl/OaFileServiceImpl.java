@@ -242,6 +242,25 @@ public class OaFileServiceImpl extends ServiceImpl<OaFileMapper, OaFile> impleme
         return oaFileList;
     }
 
+    @Override
+    public List<Map<String,Object>> getOaFileByIdAndTable(String tableId, String table) {
+        List<Map<String,Object>> oaFileList = oaFileMapper.getOaFileByIdAndTable(tableId,table);
+        Iterator<Map<String, Object>> iterator = oaFileList.iterator();
+        while (iterator.hasNext()) {
+            Map<String, Object> map = iterator.next();
+            String sFileName = map.get("s_file_name")+"";
+            String str = sFileName.substring(sFileName.lastIndexOf(".") + 1);
+            if (!str.equalsIgnoreCase("doc") && !str.equalsIgnoreCase("docx")
+                    && !str.equalsIgnoreCase("txt") && !str.equalsIgnoreCase("pdf")
+                    && !str.equalsIgnoreCase("pdf") && !str.equalsIgnoreCase("xls")
+                    && !str.equalsIgnoreCase("xlsx")){
+                iterator.remove();
+                continue;
+            }
+        }
+        return oaFileList;
+    }
+
     /**
      * 附件检索
      *

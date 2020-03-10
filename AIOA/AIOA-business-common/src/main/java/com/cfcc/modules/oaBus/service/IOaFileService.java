@@ -91,4 +91,5 @@ public interface IOaFileService extends IService<OaFile> {
 
     List<Map<String, Object>> getOaFileByTableAndTableId(String id, String sBusdataTable,String DBvalue);
 
+    List<Map<String,Object>> getOaFileByIdAndTable(String tableId, String table);
 }

@@ -451,6 +451,22 @@
         LEFT JOIN oa_bus_model m ON m.i_id = f.i_bus_model_id
         WHERE f.i_id =#{functionId}
     </select>
+
+    <select id="getOaBusFunctionIsEsByOaBusdata" resultType="java.lang.Integer">
+        SELECT
+            i_is_es
+        FROM
+            oa_bus_function
+        WHERE
+            i_id = (
+            SELECT
+                i_bus_function_id
+            FROM
+                ${table}
+        WHERE
+            i_id = #{tableId})
+    </select>
+
     <select id="getCheckData" resultType="java.util.Map">
         select i_id from ${tableName} b where
         b.i_is_display = 0 and i_bus_function_id = #{functionId}

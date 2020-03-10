@@ -73,6 +73,8 @@ public interface OaFileMapper extends BaseMapper<OaFile> {
     Integer updatePicText(@Param("fileType") Integer fileType,@Param("picText") String picText);
 
     List<Map<String, Object>> getOaFileByTableAndTableId(@Param("id") String id,@Param("sBusdataTable") String sBusdataTable,@Param("DBvalue") String DBvalue);
+
+    List<Map<String,Object>> getOaFileByIdAndTable(@Param("tableId") String tableId,@Param("table") String table);
 }
 
 
