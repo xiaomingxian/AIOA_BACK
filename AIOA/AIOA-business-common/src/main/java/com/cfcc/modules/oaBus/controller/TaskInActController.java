@@ -150,6 +150,7 @@ public class TaskInActController {
         String drafterId = taskInfoJsonAble.getDrafterId();
         String key = taskInfoJsonAble.getProDefName();
         String processDefinitionId = taskInfoJsonAble.getProcessDefinitionId();
+        String processInstanceId = taskInfoJsonAble.getProcessInstanceId();
 
         Result result = nextUserQuery(key, processDefinitionId, drafterId, taskId, i_id, table, request);
         //查找已经选择的用户 标记出来
@@ -190,7 +191,7 @@ public class TaskInActController {
                         continue;
                     }
 
-                    int count = taskCommonService.haveMainDept(taskIdRecord);//主办数量大于就排除主办
+                    int count = taskCommonService.haveMainDept(firstSonKey,processInstanceId);//主办数量大于就排除主办
                     if (count > 0) {
                         String depts = oaProcActinst.getDepts();
                         if (depts != null && depts.contains(",")) {
@@ -205,7 +206,7 @@ public class TaskInActController {
                         }
                     }
                     //查出所有用户,排除他们所在部门
-                    List<String> deptUsers = taskCommonService.deptUsers(taskIdRecord);
+                    List<String> deptUsers = taskCommonService.deptUsers(firstSonKey,processInstanceId);
                     if (deptUsers.size() > 0) {
 
                         List<String> deptIds = sysUserService.selectDeptsBysUsers(deptUsers);
@@ -315,6 +316,8 @@ public class TaskInActController {
 
 
             if (taskInfoVOS != null && taskInfoVOS.size() > 0) {
+                deptMsgAdd(taskInfoVOS);
+
                 taskInActService.doAddUsers(taskInfoVOS);
             } else {
                 return Result.error("信息不完善,拒绝追加");
@@ -702,6 +705,92 @@ public class TaskInActController {
     }
 
 
+    //追加用户部门信息
+    private void deptMsgAdd(List<TaskInfoVO> taskInfoVOs) {
+        //遍历节点
+        Map<String, Object> busData = taskInfoVOs.get(0).getBusData();
+
+        String mainDept = busData.get("s_main_unit_names") == null ? "" : busData.get("s_main_unit_names").toString();
+        String fbDept = busData.get("s_cc_unit_names") == null ? "" : busData.get("s_cc_unit_names").toString();
+        String cyDept = busData.get("s_inside_deptnames") == null ? "" : busData.get("s_inside_deptnames").toString();
+        for (TaskInfoVO taskInfoVO : taskInfoVOs) {
+            Boolean isDept = taskInfoVO.getIsDept();
+            TaskWithDepts taskWithDepts = taskInfoVO.getTaskWithDepts();
+            if (isDept) {
+                String mainFore = taskWithDepts.getMainDept();
+                String fuFore = taskWithDepts.getFuDept();
+                String cyFore = taskWithDepts.getCyDept();
+                //不存在覆盖问题
+                if (StringUtils.isNotBlank(mainFore) && StringUtils.isBlank(mainDept)) mainDept = mainFore;
+                if (StringUtils.isNotBlank(fuFore) && StringUtils.isBlank(fbDept)) fbDept = fuFore;
+                if (StringUtils.isNotBlank(cyFore) && StringUtils.isBlank(cyDept)) cyDept = cyFore;
+                //覆盖问题处理
+                if (StringUtils.isNotBlank(mainDept) && StringUtils.isNotBlank(mainFore)) {
+                    if (!mainDept.contains(mainFore)) {
+                        mainDept += "_" + mainFore;
+                    }
+                }
+                if (StringUtils.isNotBlank(fuFore) && StringUtils.isNotBlank(fbDept)) {
+                    if (!fuFore.contains("_") && !fbDept.contains(fuFore)) {
+                        fbDept += "_" + fuFore;
+                    }
+                    if (fuFore.contains("_")) {
+                        String[] fs = fuFore.split("_");
+                        for (String dept : fs) {
+                            if (!fbDept.contains(dept)) {
+                                fbDept += "_" + dept;
+                            }
+                        }
+
+                    }
+                }
+                if (StringUtils.isNotBlank(cyFore) && StringUtils.isNotBlank(cyDept)) {
+                    if (!cyFore.contains("_") && !cyDept.contains(fuFore)) {
+                        cyDept += "_" + cyFore;
+                    }
+                    if (cyFore.contains("_")) {
+                        String[] fs = cyFore.split("_");
+                        for (String dept : fs) {
+                            if (!cyDept.contains(dept)) {
+                                cyDept += "_" + dept;
+                            }
+                        }
+
+                    }
+                }
+
+            }
+
+        }
+        if (StringUtils.isNotBlank(mainDept)) {
+            busData.put("s_main_unit_names", mainDept);
+        }
+
+        if (StringUtils.isNotBlank(fbDept)) {
+            busData.put("s_cc_unit_names", fbDept);
+        }
+
+        if (StringUtils.isNotBlank(cyDept)) {
+            busData.put("s_inside_deptnames", cyDept);
+        }
+        String m = busData.get("s_main_unit_names") == null ? "" : busData.get("s_main_unit_names").toString();
+
+        busData.put("mainDept", m);
+
+
+        String busMsg = VarsWithBus.getBusMsg(busData);
+
+        Map<String, Object> vars = taskInfoVOs.get(0).getVars();
+
+        if (vars != null) {
+            vars.put("busMsg", busMsg);
+        }
+        taskInfoVOs.get(0).setVars(vars);
+
+        taskInfoVOs.get(0).setBusData(busData);
+    }
+
+    //包容网关办理任务 部门信息
     private Map<String, Object> deptMsg(List<TaskInfoVO> taskInfoVOs) {
         Map<String, Object> busData = taskInfoVOs.get(0).getBusData();
 
@@ -770,7 +859,7 @@ public class TaskInActController {
         }
         String m = busData.get("s_main_unit_names") == null ? "" : busData.get("s_main_unit_names").toString();
 
-        busData.put("mainDept",m);
+        busData.put("mainDept", m);
 
 
         taskInfoVOs.get(0).setBusData(busData);
@@ -798,7 +887,6 @@ public class TaskInActController {
         }
         taskInfoVO.setTaskWithDepts(taskWithDepts);
         taskInfoVO.setBusData(busData);
-
 
 
         return taskInfoVO;

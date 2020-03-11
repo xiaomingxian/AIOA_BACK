@@ -157,11 +157,14 @@ public class TaskInActServiceImpl implements TaskInActService {
      */
     @Override
     public void doAddUsers(ArrayList<TaskInfoVO> taskInfoVOS) {
-//        TODO 主办辅办传阅 部门追加到业务数据中
         CommandExecutor commandExecutor = taskServiceImpl.getCommandExecutor();
-
-
+        Map<String, Object> busData = taskInfoVOS.get(0).getBusData();
         String descript = null;
+        if (taskInfoVOS.get(0).getVars() != null) {
+            descript = taskInfoVOS.get(0).getVars().get("busMsg") == null ? null : taskInfoVOS.get(0).getVars().get("busMsg").toString();
+        }
+
+
         String randomParent = UUID.randomUUID().toString().replaceAll("-", "");
         List<Task> tasks = new ArrayList<>();
 
@@ -229,12 +232,24 @@ public class TaskInActServiceImpl implements TaskInActService {
                 taskCommonService.updateRuActDept(task1, null);
             }
             //********************* 写入参与人 *********************
-            Map<String, Object> busData = taskInfoVO.getBusData();
             String table = busData.get("table") + "_permit";
 
             //4 存储用户信息到 业务数据权限表 - 构造用户信息
             saveDataPermit(taskInfoVO, table);
         }
+        //更新业务表(部门数据)
+        for (TaskInfoVO taskInfoVO : taskInfoVOS) {
+
+            if (taskInfoVO.getIsDept()){
+
+                for (String remove : TaskConstant.REMOVEFILEDS) {
+                    busData.remove(remove);
+                }
+                oaBusDynamicTableMapper.updateData(busData);
+                break;
+            }
+        }
+
 
 
     }

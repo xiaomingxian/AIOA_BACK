@@ -1010,13 +1010,13 @@ public class TaskCommonServiceImpl implements TaskCommonService {
     }
 
     @Override
-    public int haveMainDept(String taskIdRecord) {
-        return taskMapper.haveMainDept(taskIdRecord);
+    public int haveMainDept(String taskIdRecord,String procInstId) {
+        return taskMapper.haveMainDept(taskIdRecord,procInstId);
     }
 
     @Override
-    public List<String> deptUsers(String taskIdRecord) {
-        return taskMapper.deptUsers(taskIdRecord);
+    public List<String> deptUsers(String taskIdRecord,String procInstId) {
+        return taskMapper.deptUsers(taskIdRecord,procInstId);
     }
 
     @Override
@@ -1252,6 +1252,7 @@ public class TaskCommonServiceImpl implements TaskCommonService {
                     //请求数据库 2-3 次
                     departWithTaskMapper.save(processInstanceId, taskWithDepts);
                 }
+
             }
         }
         return nextTaskMsg.toString();

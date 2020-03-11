@@ -96,9 +96,9 @@ public interface TaskCommonService {
 
     void updateHisAct(Task list);
 
-    int haveMainDept(String taskIdRecord);
+    int haveMainDept(String taskIdRecord,String procInstId);
 
-    List<String> deptUsers(String taskIdRecord);
+    List<String> deptUsers(String taskIdRecord,String procInstId);
 
     void updateHisActDept(Task task, String randomParent);
 

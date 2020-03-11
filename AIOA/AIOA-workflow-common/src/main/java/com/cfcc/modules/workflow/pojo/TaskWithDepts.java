@@ -18,6 +18,7 @@ public class TaskWithDepts implements Serializable {
     private String mainDept;
     private String fuDept;
     private String cyDept;
+    private String taskIds;
     /**
      * key:主办/辅办/传阅
      * val:用户id

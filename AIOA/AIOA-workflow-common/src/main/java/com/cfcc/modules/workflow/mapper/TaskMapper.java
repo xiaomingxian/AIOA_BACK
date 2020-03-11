@@ -207,11 +207,11 @@ public interface TaskMapper {
             "</script>")
     List<Map<String, String>> userHaveChoice(@Param("ids") ArrayList<String> taskIds);
 
-    @Select("select count(*)  FROM oa_task_dept where task_id=#{v} and type like '%主办%'")
-    int haveMainDept(String taskIdRecord);
+    @Select("select count(*)  FROM oa_task_dept where task_def_key=#{taskDefKey} and proc_inst_id=#{procInstId} and type like '%主办%'")
+    int haveMainDept(@Param("taskDefKey") String taskIdRecord,@Param("procInstId") String procInstId);
 
-    @Select("select DISTINCT user_id  FROM oa_task_dept where task_id=#{v}")
-    List<String> deptUsers(String taskIdRecord);
+    @Select("select DISTINCT user_id  FROM oa_task_dept where task_def_key=#{taskDefKey} and proc_inst_id=#{procInstId}")
+    List<String> deptUsers(@Param("taskDefKey") String taskIdRecord,@Param("procInstId") String procInstId);
 
 
     @Update("UPDATE act_hi_taskinst set PROC_DEF_ID_=#{processDefinitionId} ,PROC_INST_ID_=#{processInstanceId}," +

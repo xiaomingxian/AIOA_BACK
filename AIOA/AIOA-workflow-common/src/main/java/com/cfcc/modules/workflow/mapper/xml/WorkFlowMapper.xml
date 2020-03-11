@@ -1825,6 +1825,7 @@
         DELETE from act_ru_execution where PROC_INST_ID_=#{processInstanceId};
         DELETE FROM act_hi_varinst where PROC_INST_ID_=#{processInstanceId};
          set foreign_key_checks = 1;
+        DELETE from oa_task_dept where proc_inst_id=#{processInstanceId};
     </delete>
 
     <!--设置父任务id-->
