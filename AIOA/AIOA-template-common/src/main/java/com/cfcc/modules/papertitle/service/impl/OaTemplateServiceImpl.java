@@ -5,6 +5,7 @@ import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.cfcc.common.system.util.JwtUtil;
+import com.cfcc.common.util.FileUtils;
 import com.cfcc.modules.oaBus.entity.OaFile;
 import com.cfcc.modules.oaBus.service.impl.OaFileServiceImpl;
 import com.cfcc.modules.papertitle.entity.OaTemplate;
@@ -118,7 +119,8 @@ public class OaTemplateServiceImpl extends ServiceImpl<OaTemplateMapper, OaTempl
                 }
                 for (MultipartFile file : files) {
                     String orgName = file.getOriginalFilename();// 获取文件名
-                    fileName = orgName.substring(0, orgName.lastIndexOf(".")) + "_" + System.currentTimeMillis() + orgName.substring(orgName.indexOf("."));
+//                    fileName = orgName.substring(0, orgName.lastIndexOf(".")) + "_" + System.currentTimeMillis() + orgName.substring(orgName.indexOf("."));
+                    fileName = System.currentTimeMillis()+FileUtils.generatePassword(5)+orgName.substring(orgName.indexOf("."));
                     String savePath = parent.getPath() + File.separator + fileName;
                     File savefile = new File(savePath);
                     FileCopyUtils.copy(file.getBytes(), savefile);

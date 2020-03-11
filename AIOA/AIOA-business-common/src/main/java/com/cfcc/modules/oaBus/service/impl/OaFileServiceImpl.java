@@ -354,21 +354,25 @@ public class OaFileServiceImpl extends ServiceImpl<OaFileMapper, OaFile> impleme
         }
         String s_file_name = map.get("s_file_name") + "";
         String iid = map.get("i_id") + "";
-        File oldFile = new File(sfilepath);
-        String oldName = oldFile.getName().substring(0, oldFile.getName().lastIndexOf("_"));
-        String newName = oldFile.getName().replace(oldName, s_file_name);
+        OaFile initFile = oaFileService.queryById(Integer.valueOf(iid));
+        String oldName = initFile.getSFileName().substring(0, initFile.getSFileName().lastIndexOf("."));
+        String newName = initFile.getSFileName().replace(oldName, s_file_name);
+        initFile.setSFileName(s_file_name);
+        initFile.setSFilePath(sfilepath);
         boolean ok = false;
-        if (oldFile.exists()) {
-            String reNamePath = oldFile.getParent() + File.separator + newName;
-            File newFile = new File(reNamePath);
-            if (oldFile.renameTo(newFile)) {
-                OaFile oaFile = new OaFile();
-                oaFile.setIId(Integer.valueOf(iid));
-                oaFile.setSFileName(newName.replace(newName.substring(newName.lastIndexOf("_"), newName.lastIndexOf(".")), ""));
-                oaFile.setSFilePath(reNamePath);
-                ok = oaFileMapper.updateDocNameById(oaFile);
-            }
-        }
+        ok =  oaFileMapper.updateDocNameById(initFile);
+//        File file = new File(sfilepath);
+//        if (file.exists()) {
+//            String reNamePath = file.getParent() + File.separator + initFile.getSFileName();
+//            File newFile = new File(reNamePath);
+//            if (file.renameTo(newFile)) {
+//                OaFile oaFile = new OaFile();
+//                oaFile.setIId(Integer.valueOf(iid));
+//                oaFile.setSFileName(newFile.getName());
+//                oaFile.setSFilePath(reNamePath);
+//                ok = oaFileMapper.updateDocNameById(oaFile);
+//            }
+//        }
         return ok;
     }
 
@@ -824,7 +828,8 @@ public class OaFileServiceImpl extends ServiceImpl<OaFileMapper, OaFile> impleme
                     parent.mkdirs();// 创建文件根目录
                 }
                 String orgName = file.getOriginalFilename();// 获取文件名
-                fileName = orgName.substring(0, orgName.lastIndexOf(".")) + "_" + System.currentTimeMillis() + orgName.substring(orgName.indexOf("."));
+                fileName = System.currentTimeMillis()+ com.cfcc.common.util.FileUtils.generatePassword(5)+orgName.substring(orgName.indexOf("."));
+//                fileName = orgName.substring(0, orgName.lastIndexOf(".")) + "_" + System.currentTimeMillis() + orgName.substring(orgName.indexOf("."));
                 String savePath = parent.getPath() + File.separator + fileName;
                 File savefile = new File(savePath);
                 FileCopyUtils.copy(file.getBytes(), savefile);
