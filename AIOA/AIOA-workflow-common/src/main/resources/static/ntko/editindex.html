@@ -52,10 +52,8 @@
       }
       //起草底稿ntko
       if (cmd == 1) {
-        url="http://localhost:8080/AIOA/templateFiles/empty.doc";
-        // ntko.OpenFromURL("../templateFiles/empty.doc");
+        url=urlContextPath+"/templateFiles/empty.doc";
         ntko.OpenFromURL(url);
-        // ntko.BeginOpenFromURL(url);
       }
       //正文排版2，保存办文单7
       if (cmd == 2 || cmd == 7) {
