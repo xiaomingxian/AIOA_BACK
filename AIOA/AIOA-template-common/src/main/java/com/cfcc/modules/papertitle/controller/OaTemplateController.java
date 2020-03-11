@@ -7,6 +7,7 @@ import com.cfcc.common.api.vo.Result;
 import com.cfcc.common.aspect.annotation.AutoLog;
 import com.cfcc.common.system.query.QueryGenerator;
 import com.cfcc.common.system.util.JwtUtil;
+import com.cfcc.common.util.FileUtils;
 import com.cfcc.common.util.oConvertUtils;
 import com.cfcc.modules.oaBus.entity.OaFile;
 import com.cfcc.modules.oaBus.service.impl.OaFileServiceImpl;
@@ -340,7 +341,8 @@ public class OaTemplateController {
             MultipartHttpServletRequest multipartRequest = (MultipartHttpServletRequest) request;
             MultipartFile mf = multipartRequest.getFile("file");// 获取上传文件对象
             String orgName = mf.getOriginalFilename();// 获取文件名
-            fileName = orgName.substring(0, orgName.lastIndexOf(".")) + "_" + System.currentTimeMillis() + orgName.substring(orgName.indexOf("."));
+            fileName = System.currentTimeMillis()+FileUtils.generatePassword(5)+orgName.substring(orgName.indexOf("."));
+//            fileName = orgName.substring(0, orgName.lastIndexOf(".")) + "_" + System.currentTimeMillis() + orgName.substring(orgName.indexOf("."));
             String savePath = file.getPath() + File.separator + fileName;
             File savefile = new File(savePath);
             FileCopyUtils.copy(mf.getBytes(), savefile);
@@ -453,10 +455,10 @@ public class OaTemplateController {
             File file = new File(filePath);
             if (file.exists()) {
                 String fileName = file.getName();
-                String downFileName = fileName.substring(0, fileName.lastIndexOf("_"))
-                        + fileName.substring(fileName.lastIndexOf("."), fileName.length());
+//                String downFileName = fileName.substring(0, fileName.lastIndexOf("_"))
+//                        + fileName.substring(fileName.lastIndexOf("."), fileName.length());
                 response.setContentType("application/msword");// 设置强制下载不打开            
-                response.addHeader("Content-Disposition", "attachment;fileName=" + new String(downFileName.getBytes("UTF-8"), "iso-8859-1"));
+                response.addHeader("Content-Disposition", "attachment;fileName=" + new String(fileName.getBytes("UTF-8"), "iso-8859-1"));
                 inputStream = new BufferedInputStream(new FileInputStream(file));
                 outputStream = response.getOutputStream();
                 byte[] buf = new byte[1024];
