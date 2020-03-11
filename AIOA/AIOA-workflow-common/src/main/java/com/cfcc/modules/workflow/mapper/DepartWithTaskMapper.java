@@ -2,6 +2,7 @@ package com.cfcc.modules.workflow.mapper;
 
 import com.cfcc.common.util.StringUtil;
 import com.cfcc.modules.workflow.pojo.TaskWithDepts;
+import org.apache.ibatis.annotations.Delete;
 import org.apache.ibatis.annotations.Insert;
 import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Select;
@@ -35,6 +36,9 @@ public interface DepartWithTaskMapper {
             "   and user_id=#{userId} limit 1")
     List<String> selectMyParentType(@Param("processInstanceId")  String processInstanceId,
                                     @Param("taskId")  String parentTaskId, @Param("userId")String assignee);
+
+    @Delete("   DELETE from oa_task_dept where proc_inst_id=#{processInstanceId} and task_def_key=#{task_def_key};")
+    void deleteSameTask(@Param("processInstanceId") String processInstanceId, @Param("task_def_key") String taskDefinitionKey);
 }
 
 
