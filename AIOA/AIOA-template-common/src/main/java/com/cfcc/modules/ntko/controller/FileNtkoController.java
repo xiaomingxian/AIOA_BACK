@@ -247,6 +247,7 @@ public class FileNtkoController {
             result.setMessage("编辑成功");
         } else {
             result.setMessage("编辑功能出现问题，请联系管理员");
+            log.info("----------------->编辑底稿文档等失败");
         }
         return result;
     }
@@ -348,7 +349,7 @@ public class FileNtkoController {
         OaFile file = new OaFile();
         String initFile = "";
         if (!orgSchema.equals("")){
-            initFile=uploadpath + File.separator + orgSchema + filepath + "";
+            initFile=uploadpath + File.separator + orgSchema+ File.separator + filepath + "";
         }else {
             initFile=uploadpath + File.separator  + filepath + "";
         }
