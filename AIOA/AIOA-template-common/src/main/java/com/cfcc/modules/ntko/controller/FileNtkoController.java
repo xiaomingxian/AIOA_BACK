@@ -267,24 +267,18 @@ public class FileNtkoController {
         Result<String> result = new Result<>();
         Calendar calendar = Calendar.getInstance();
         String path="";
-        String newPath="";
+        String newPath=calendar.get(Calendar.YEAR) +
+                File.separator + (calendar.get(Calendar.MONTH) + 1) +
+                File.separator + calendar.get(Calendar.DATE) + File.separator;
         if (!orgSchema.equals("")){
             request.setAttribute("orgSchema",orgSchema);
              path = uploadpath.replace("//", "/" +
                     "")+ File.separator+ orgSchema + File.separator + calendar.get(Calendar.YEAR) +
                     File.separator + (calendar.get(Calendar.MONTH) + 1) +
                     File.separator + calendar.get(Calendar.DATE) + File.separator;
-
-            newPath= orgSchema + File.separator + calendar.get(Calendar.YEAR) +
-                    File.separator + (calendar.get(Calendar.MONTH) + 1) +
-                    File.separator + calendar.get(Calendar.DATE) + File.separator;
         }else {
             path = uploadpath.replace("//", "/" +
                     "")+ File.separator + calendar.get(Calendar.YEAR) +
-                    File.separator + (calendar.get(Calendar.MONTH) + 1) +
-                    File.separator + calendar.get(Calendar.DATE) + File.separator;
-
-            newPath=  calendar.get(Calendar.YEAR) +
                     File.separator + (calendar.get(Calendar.MONTH) + 1) +
                     File.separator + calendar.get(Calendar.DATE) + File.separator;
         }
