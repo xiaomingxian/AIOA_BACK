@@ -3,6 +3,7 @@ package com.cfcc.modules.oaBus.service;
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.service.IService;
+import com.cfcc.modules.oaBus.entity.BusFunction;
 import com.cfcc.modules.oaBus.entity.BusModelPermit;
 import org.apache.poi.ss.formula.functions.T;
 
@@ -33,5 +34,5 @@ public interface IBusModelPermitService extends IService<BusModelPermit> {
     IPage<BusModelPermit> findAllList(BusModelPermit busModelPermit, Integer pageNo, Integer pageSize);
 
 
-
+    List<BusFunction> findByModelId(String id);
 }
