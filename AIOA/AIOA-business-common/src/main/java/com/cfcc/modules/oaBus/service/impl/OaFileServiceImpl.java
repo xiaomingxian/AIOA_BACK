@@ -590,6 +590,9 @@ public class OaFileServiceImpl extends ServiceImpl<OaFileMapper, OaFile> impleme
             Set<String> set = oaBusdatum.keySet();
             for (String key : set) {
                 Object value = oaBusdatum.get(key);
+                if (key.equals("s_title")) {
+                    oaBusdatum.put(key, "【" + busFunction.getSName() + "】" + value);
+                }
                 List<String> sDictIdlist = busPageDetailMapper.getSDictIdByKey(functionId, sBusdataTable, key, DBvalue);
                 System.out.println("................." + sDictIdlist + ".................");
                 String aa = null;
@@ -619,9 +622,7 @@ public class OaFileServiceImpl extends ServiceImpl<OaFileMapper, OaFile> impleme
                         }
                     }
                 }
-                if (key.equals("s_title")) {
-                    oaBusdatum.put("【" + busFunction.getSName() + "】" + key, value);
-                }
+
             }
             oaBusdatum.put("table_name", sBusdataTable);
         }
