@@ -3,7 +3,6 @@ package com.cfcc.modules.ntko.controller;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.cfcc.common.api.vo.Result;
-import com.cfcc.common.util.FileUtils;
 import com.cfcc.modules.docnum.entity.DocNumManage;
 import com.cfcc.modules.ntko.service.DocumentMangeService;
 import com.cfcc.modules.oaBus.entity.BusPageDetail;
@@ -25,6 +24,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import javax.management.RuntimeErrorException;
 import javax.servlet.http.HttpServletRequest;
+import java.io.File;
 import java.util.Calendar;
 import java.util.List;
 import java.util.Map;
@@ -99,7 +99,7 @@ public class FormalFileController {
             OaTemplate oaTemplate = iOaTemplateService.queryById(tmplateId);
             oaFile = iOaFileService.queryById(oaTemplate.getIFileId());
             String mFilePath = oaFile.getSFilePath();
-            String fileName=mFilePath.substring(mFilePath.lastIndexOf("\\")+1);
+            String fileName=mFilePath.substring(mFilePath.lastIndexOf(File.separator)+1);
             //根据业务表名和id查业务数据
             Map<String, Object> map = iOaBusdataService.getBusDataById(stable, Integer.parseInt(tableid));
             //根据业务功能id查业务含义数据

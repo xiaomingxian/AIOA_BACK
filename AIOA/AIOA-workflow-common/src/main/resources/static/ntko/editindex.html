@@ -341,19 +341,8 @@
         }
       }
 
-      if ( cmd == 10) {
+      if (cmd == 9 || cmd == 10) {
         fileType='4';
-        /*$.ajax({
-          type: "get",
-          dataType: "json",
-          url: urlContextPath + "/ntko/filentko/file",
-          data: {"stable": stable, "tableid": tableid, "fileType": fileType,"orgSchema":orgSchema},
-          success: function (data) {
-            fileName=data.result;
-            var filePath = "/temporaryFiles/";
-            ntko.OpenFromURL(urlContextPath + filePath + fileName);
-          }
-        })*/
         $.ajax({
           type: "get",
           dataType: "json",
@@ -367,15 +356,27 @@
         })
       }
 
-      if(cmd == 9 || cmd == 11){
+      if( cmd == 11){
         $.ajax({
           type: "get",
           dataType: "json",
           url: urlContextPath + "/ntko/filentko/templateFile",
           data: {"fileId":fileId,"orgSchema":orgSchema},
           success: function (data) {
+              // var Path1=data.message;
+              // $.ajax({
+              //     type: "post",
+              //     dataType: "json",
+              //     url: urlContextPath + "/ntko/filentko/singleCopyFile",
+              //     data: {"filepath": Path1,"fileType":"3","orgSchema":orgSchema},
+              //     success: function (data) {
+              //         var filePath = "/templateFiles/";
+              //         var fileName = data.result;
+              //         ntko.OpenFromURL(urlContextPath + filePath + fileName);
+              //     }
+              // });
             fileName=data.result;
-            var filePath = "/temporaryFiles/";
+            var filePath = "/templateFiles/";
             ntko.OpenFromURL(urlContextPath + filePath + fileName);
           }
         })
@@ -410,8 +411,6 @@
     //Saved属性用来判断文档是否被修改过,文档打开的时候设置成ture,当文档被修改,自动被设置为false,该属性由office提供.
     ntko.activeDocument.Saved = true;
     var userName = getQueryString('userName');
-    var docNumId=getQueryString('docNumId');
-    var  fileId=getQueryString('fileId');
     //按钮权限
     setBtn();
     function setBtn() {
@@ -536,7 +535,7 @@
         }
       })
     }
-    if (cmd==9 || cmd ==11) {
+    if (cmd==9) {
       ntko.SetReadOnly(true, "", 3);
       if (cmd == 3 || cmd == 5 || cmd == 9 || cmd ==12) {
         //是否显示工具栏

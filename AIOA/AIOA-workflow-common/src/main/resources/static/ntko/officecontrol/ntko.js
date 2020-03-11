@@ -84,13 +84,17 @@ function saveOldFileToUrl(cmd, stable, tableid, fileId,orgSchema) {
   if (cmd == 6) {
     fileType = "2"
   }
+  if (cmd == 11){
+    fileType="3";
+  }
   if (cmd == 4 || cmd == 6) {
     action = urlContextPath + "/ntko/filentko/edit?" + "stable=" + stable + "&tableid=" + tableid
         + "&fileType=" + fileType+"&orgSchema="+orgSchema;
-  } else if (cmd == 10 ) {
-    action = urlContextPath + "/ntko/filentko/editFile?" + "fileId=" + fileId+"&orgSchema="+orgSchema ;
-  }else if (cmd ==11) {
-    fileType="2";
+  }
+  if (cmd == 10 ) {
+    action = urlContextPath + "/ntko/filentko/editFile?" + "fileId=" + fileId +"&orgSchema="+orgSchema ;
+  }
+  if (cmd == 11) {
     action = urlContextPath + "/ntko/filentko/editFile?" + "fileId=" + fileId
         + "&fileType=" + fileType+"&orgSchema="+orgSchema;
   }

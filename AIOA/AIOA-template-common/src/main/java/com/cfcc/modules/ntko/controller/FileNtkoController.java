@@ -44,12 +44,6 @@ public class FileNtkoController {
     @Value(value = "${jeecg.path.upload}")
     private String uploadpath;
 
-    @Value(value = "${jeecg.path.uploadfile}")
-    private String uploadfilepath;
-
-    @Value(value = "${jeecg.path.templateFilePath}")
-    private String tempFilePath;
-
     @Autowired
     private IOaFileService oaFileService;
     @Autowired
@@ -202,6 +196,7 @@ public class FileNtkoController {
             String filePath=oaFile.getSFilePath();
             String fileName=filePath.substring(filePath.lastIndexOf(File.separator)+1);
             result.setResult(fileName);
+            result.setMessage(filePath);
             return result;
         } catch (Exception e) {
             e.printStackTrace();
@@ -210,6 +205,7 @@ public class FileNtkoController {
 
         return result;
     }
+
     /**
      * 编辑底稿后保存上传新的文件并删除旧文件的信息
      *
@@ -265,18 +261,33 @@ public class FileNtkoController {
     @PostMapping(value = "/editFile")
     public Result<String> editEndsource(HttpServletRequest request,
                                         @RequestParam(value = "fileId", required = false) String fileId,
-                                        @RequestParam(value = "fileType", required = false) String fileType,
                                         @RequestParam(value = "orgSchema", required = false) String orgSchema) throws IOException {
         OaFile initFile = oaFileService.getById(fileId);
         Result<String> result = new Result<>();
+        Calendar calendar = Calendar.getInstance();
+        String path="";
+        String newPath="";
         if (!orgSchema.equals("")){
             request.setAttribute("orgSchema",orgSchema);
+             path = uploadpath.replace("//", "/" +
+                    "")+ File.separator+ orgSchema + File.separator + calendar.get(Calendar.YEAR) +
+                    File.separator + (calendar.get(Calendar.MONTH) + 1) +
+                    File.separator + calendar.get(Calendar.DATE) + File.separator;
+
+            newPath= orgSchema + File.separator + calendar.get(Calendar.YEAR) +
+                    File.separator + (calendar.get(Calendar.MONTH) + 1) +
+                    File.separator + calendar.get(Calendar.DATE) + File.separator;
+        }else {
+            path = uploadpath.replace("//", "/" +
+                    "")+ File.separator + calendar.get(Calendar.YEAR) +
+                    File.separator + (calendar.get(Calendar.MONTH) + 1) +
+                    File.separator + calendar.get(Calendar.DATE) + File.separator;
+
+            newPath=  calendar.get(Calendar.YEAR) +
+                    File.separator + (calendar.get(Calendar.MONTH) + 1) +
+                    File.separator + calendar.get(Calendar.DATE) + File.separator;
         }
-        Calendar calendar = Calendar.getInstance();
-        String path = uploadpath.replace("//", "/" +
-                "") + File.separator + calendar.get(Calendar.YEAR) +
-                File.separator + (calendar.get(Calendar.MONTH) + 1) +
-                File.separator + calendar.get(Calendar.DATE) + File.separator;
+
         File parent = new File(path);
         if (!parent.exists()){
             parent.mkdirs();
@@ -289,7 +300,7 @@ public class FileNtkoController {
         FileCopyUtils.copy(mf.getBytes(), savefile);
 
         String saveFileName = fileName.replace(fileName.substring(fileName.lastIndexOf('_'), fileName.lastIndexOf('.')), "");
-
+        String newSavePath=newPath+fileName;
         Map<String,Object> oaFileMap=new HashMap<>();
         oaFileMap.put("table","oa_file");
         oaFileMap.put("i_id",initFile.getIId());
@@ -297,11 +308,15 @@ public class FileNtkoController {
         oaFileMap.put("i_table_id",initFile.getITableId());
         oaFileMap.put("s_file_type",initFile.getSFileType());
         oaFileMap.put("s_file_name",saveFileName);
-        oaFileMap.put("s_file_path",savePath);
+        oaFileMap.put("s_file_path",newSavePath);
         oaFileMap.put("d_create_time",new Date());
         int num=dynamicTableMapper.updateData(oaFileMap);
-        if (fileType!=null){
-            File template = new File(uploadpath+File.separator+"/temporaryFiles"+File.separator+fileName);
+        if ("4".equals(initFile.getSFileType())){
+            File template = new File(uploadpath+File.separator+"temporaryFiles"+File.separator+fileName);
+            FileCopyUtils.copy(mf.getBytes(), template);
+        }
+        if ("7".equals(initFile.getSFileType())){
+            File template = new File(uploadpath+File.separator+"templateFiles"+File.separator+fileName);
             FileCopyUtils.copy(mf.getBytes(), template);
         }
         if (num!=0){
@@ -321,8 +336,10 @@ public class FileNtkoController {
     @AutoLog(value = "单文件复制")
     @ApiOperation(value = "单文件复制", notes = "单文件复制")
     @PostMapping(value = "/singleCopyFile")
-    public Result singleCopyFile(@RequestParam(value = "filepath", required = false) String filepath, HttpServletRequest request,
-                                 @RequestParam(value = "orgSchema", required = false) String orgSchema) {
+    public Result singleCopyFile(@RequestParam(value = "filepath", required = false) String filepath,
+                                 @RequestParam(value = "fileType", required = false) String fileType,
+                                 @RequestParam(value = "orgSchema", required = false) String orgSchema,HttpServletRequest request) {
+
         Result<String> result = new Result< String >();
         Map<String,Object> map=new HashMap<>();
 //        map.put("sFilePath",filepath);
@@ -337,7 +354,12 @@ public class FileNtkoController {
         }
         String fileName = initFile.substring(initFile.lastIndexOf(File.separator) + 1, initFile.length());
         try {
-            String tempPaths = uploadpath + File.separator + "temporaryFiles";
+            String tempPaths="";
+            if ("3".equals(fileType)){
+                tempPaths = uploadpath + File.separator + "templateFiles";
+            }else {
+                 tempPaths = uploadpath + File.separator + "temporaryFiles";
+            }
                 File temp = new File(tempPaths);
                 if (!temp.exists()) {
                     temp.mkdirs();
