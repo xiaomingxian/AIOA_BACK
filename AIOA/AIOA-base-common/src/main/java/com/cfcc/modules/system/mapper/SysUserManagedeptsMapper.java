@@ -50,4 +50,6 @@ public interface SysUserManagedeptsMapper extends BaseMapper<sysUserManagedepts>
 
 //    @Insert("insert into sys_user_managedepts(user_id)")
     public void saveDepartIdByUserId(@Param("userId")String userId,@Param("departId")String departId);
+
+    void deleteUserManageDepartsListByUserId(@Param("id") String id);
 }

@@ -1,14 +1,12 @@
 package com.cfcc.modules.system.service;
 
 
-import java.util.List;
-
+import com.baomidou.mybatisplus.extension.service.IService;
 import com.cfcc.modules.system.entity.SysUser;
 import com.cfcc.modules.system.entity.SysUserDepart;
 import com.cfcc.modules.system.model.DepartIdModel;
 
-
-import com.baomidou.mybatisplus.extension.service.IService;
+import java.util.List;
 
 /**
  * <p>
@@ -34,4 +32,6 @@ public interface ISysUserDepartService extends IService<SysUserDepart> {
 	 * @return
 	 */
 	List<SysUser> queryUserByDepId(String depId);
+
+    void deleteUserDepartByUserId(String id);
 }

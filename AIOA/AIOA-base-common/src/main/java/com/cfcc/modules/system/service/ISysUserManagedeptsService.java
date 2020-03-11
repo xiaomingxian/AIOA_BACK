@@ -24,4 +24,6 @@ public interface ISysUserManagedeptsService extends IService<sysUserManagedepts>
     public Boolean saveDepartIdByUserId(Map<String,Object> map);
 
     public IPage<Map<String,Object>> findUserManageDeptsByUserName(String username,Integer start,Integer pageSize);
+
+    void deleteUserManageDepartsListByUserId(String id);
 }

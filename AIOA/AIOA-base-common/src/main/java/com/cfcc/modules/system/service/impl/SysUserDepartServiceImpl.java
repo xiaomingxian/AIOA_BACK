@@ -1,9 +1,7 @@
 package com.cfcc.modules.system.service.impl;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import com.cfcc.modules.system.service.ISysUserService;
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.cfcc.modules.system.entity.SysDepart;
 import com.cfcc.modules.system.entity.SysUser;
 import com.cfcc.modules.system.entity.SysUserDepart;
@@ -11,11 +9,12 @@ import com.cfcc.modules.system.mapper.SysUserDepartMapper;
 import com.cfcc.modules.system.model.DepartIdModel;
 import com.cfcc.modules.system.service.ISysDepartService;
 import com.cfcc.modules.system.service.ISysUserDepartService;
+import com.cfcc.modules.system.service.ISysUserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
-import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * <P>
@@ -30,6 +29,9 @@ public class SysUserDepartServiceImpl extends ServiceImpl<SysUserDepartMapper, S
 	private ISysDepartService sysDepartService;
 	@Autowired
 	private ISysUserService sysUserService;
+
+	@Autowired
+	private SysUserDepartMapper sysUserDepartMapper;
 	
 
 	/**
@@ -90,5 +92,10 @@ public class SysUserDepartServiceImpl extends ServiceImpl<SysUserDepartMapper, S
 		}
 		return new ArrayList<SysUser>();
 	}
-	
+
+	@Override
+	public void deleteUserDepartByUserId(String id) {
+		sysUserDepartMapper.deleteUserDepartByUserId(id);
+	}
+
 }
