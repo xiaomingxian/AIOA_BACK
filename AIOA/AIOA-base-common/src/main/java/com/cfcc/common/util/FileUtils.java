@@ -32,14 +32,30 @@ public class FileUtils {
     /**
      * 文件上传
      */
-    public static Map<String,Object> Upload(String Path1, HttpServletRequest request){
+    public static Map<String,Object> Upload(String orgSchema,String Path1, HttpServletRequest request){
         Map<String,Object> map = new HashMap<>();
         try {
+            String path="";
+            String savePath1="";
             Calendar calendar = Calendar.getInstance();
-            String path = Path1.replace("//", "/" +
-                    "") + "/" + calendar.get(Calendar.YEAR) +
-                    "/" + (calendar.get(Calendar.MONTH) + 1) +
-                    "/" + calendar.get(Calendar.DATE) + "/";
+            if (!orgSchema.equals("")){
+                path = Path1.replace("//", "/" +
+                        "")+File.separator+ orgSchema + File.separator + calendar.get(Calendar.YEAR) +
+                        File.separator + (calendar.get(Calendar.MONTH) + 1) +
+                        File.separator + calendar.get(Calendar.DATE) + File.separator;
+                savePath1= orgSchema + File.separator + calendar.get(Calendar.YEAR) +
+                        File.separator + (calendar.get(Calendar.MONTH) + 1) +
+                        File.separator + calendar.get(Calendar.DATE) + File.separator;
+            }else {
+                path = Path1.replace("//", "/" +
+                        "") + File.separator + calendar.get(Calendar.YEAR) +
+                        File.separator + (calendar.get(Calendar.MONTH) + 1) +
+                        File.separator + calendar.get(Calendar.DATE) + File.separator;
+                savePath1=  calendar.get(Calendar.YEAR) +
+                        File.separator + (calendar.get(Calendar.MONTH) + 1) +
+                        File.separator + calendar.get(Calendar.DATE) + File.separator;
+            }
+
             File file = new File(path);
             if (!file.exists()) {
                 file.mkdirs();// 创建文件根目录
@@ -49,10 +65,12 @@ public class FileUtils {
             String orgName = mf.getOriginalFilename();// 获取文件名
             String fileName = orgName.substring(0, orgName.lastIndexOf(".")) + "_" + System.currentTimeMillis() + orgName.substring(orgName.indexOf("."));
             String savePath = file.getPath() + File.separator + fileName;
+            String newSavePath = savePath1 + fileName;
             File savefile = new File(savePath);
             FileCopyUtils.copy(mf.getBytes(), savefile);
             map.put("fileName",fileName);
             map.put("savePath",savePath);
+            map.put("newSavePath",newSavePath);
             log.info("文件保存成功！！") ;
             System.out.println("AAAAA文件保存成功！！");
         } catch (IOException e) {
