@@ -36,22 +36,18 @@ public class FileUtils {
         Map<String,Object> map = new HashMap<>();
         try {
             String path="";
-            String savePath1="";
             Calendar calendar = Calendar.getInstance();
+            String savePath1=calendar.get(Calendar.YEAR) +
+                    File.separator + (calendar.get(Calendar.MONTH) + 1) +
+                    File.separator + calendar.get(Calendar.DATE) + File.separator;;
             if (!orgSchema.equals("")){
                 path = Path1.replace("//", "/" +
                         "")+File.separator+ orgSchema + File.separator + calendar.get(Calendar.YEAR) +
                         File.separator + (calendar.get(Calendar.MONTH) + 1) +
                         File.separator + calendar.get(Calendar.DATE) + File.separator;
-                savePath1= orgSchema + File.separator + calendar.get(Calendar.YEAR) +
-                        File.separator + (calendar.get(Calendar.MONTH) + 1) +
-                        File.separator + calendar.get(Calendar.DATE) + File.separator;
             }else {
                 path = Path1.replace("//", "/" +
                         "") + File.separator + calendar.get(Calendar.YEAR) +
-                        File.separator + (calendar.get(Calendar.MONTH) + 1) +
-                        File.separator + calendar.get(Calendar.DATE) + File.separator;
-                savePath1=  calendar.get(Calendar.YEAR) +
                         File.separator + (calendar.get(Calendar.MONTH) + 1) +
                         File.separator + calendar.get(Calendar.DATE) + File.separator;
             }
