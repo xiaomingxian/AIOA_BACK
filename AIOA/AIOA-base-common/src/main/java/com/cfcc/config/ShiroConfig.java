@@ -73,7 +73,7 @@ public class ShiroConfig {
         filterChainDefinitionMap.put("/sys/common/download/**", "anon");//文件下载不限制token
         filterChainDefinitionMap.put("/papertitle/oaTemplate/download/**", "anon");//模板文件下载不限制token
         filterChainDefinitionMap.put("/modify/fields/upload/**", "anon");//模板文件下载不限制token
-        filterChainDefinitionMap.put("/oaBus/dynamic/provinceToCityClient", "anon");//公共省地收文不限制token
+        filterChainDefinitionMap.put("/oaBus/dynamic/provinceToCityReceviceClient", "anon");//公共省地收文不限制token
         filterChainDefinitionMap.put("/oaBus/dynamic/provinceToCityInsideClient", "anon");//公共省地传阅不限制token
 
         filterChainDefinitionMap.put("/sys/common/pdf/**", "anon");//pdf预览
