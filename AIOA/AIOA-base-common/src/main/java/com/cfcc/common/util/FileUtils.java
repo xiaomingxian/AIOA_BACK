@@ -63,12 +63,13 @@ public class FileUtils {
             MultipartHttpServletRequest multipartRequest = (MultipartHttpServletRequest) request;
             MultipartFile mf = multipartRequest.getFile("file");// 获取上传文件对象
             String orgName = mf.getOriginalFilename();// 获取文件名
-            String fileName = orgName.substring(0, orgName.lastIndexOf(".")) + "_" + System.currentTimeMillis() + orgName.substring(orgName.indexOf("."));
-            String savePath = file.getPath() + File.separator + fileName;
-            String newSavePath = savePath1 + fileName;
+            String fileName = orgName.substring(0, orgName.lastIndexOf(".")) + "_" + System.currentTimeMillis()+FileUtils.generatePassword(10) + orgName.substring(orgName.indexOf("."));
+            String numName=fileName.substring(fileName.indexOf("_")+1);
+            String savePath = file.getPath() + File.separator + numName;
+            String newSavePath = savePath1 + numName;
             File savefile = new File(savePath);
             FileCopyUtils.copy(mf.getBytes(), savefile);
-            map.put("fileName",fileName);
+            map.put("fileName",numName);
             map.put("savePath",savePath);
             map.put("newSavePath",newSavePath);
             log.info("文件保存成功！！") ;
