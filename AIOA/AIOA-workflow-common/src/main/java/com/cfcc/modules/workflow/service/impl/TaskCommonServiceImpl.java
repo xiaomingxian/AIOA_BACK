@@ -407,7 +407,10 @@ public class TaskCommonServiceImpl implements TaskCommonService {
                     if (deptMsg.get(sysUser.getId()) == null) {
                         //当前任务已经被移交给其他人
                         //查询移交记录----根据taskid去查移交记录表
-                        String sourceUserId = taskTransfer.getSourceUserId();
+                        String sourceUserId = null;
+                        if (taskTransfer!=null){
+                            taskTransfer.getSourceUserId();
+                        }
                         if (sourceUserId == null) ;
                         else {
                             sysUser.setUsername(taskTransfer.getTransferLog());
@@ -1010,13 +1013,13 @@ public class TaskCommonServiceImpl implements TaskCommonService {
     }
 
     @Override
-    public int haveMainDept(String taskIdRecord,String procInstId) {
-        return taskMapper.haveMainDept(taskIdRecord,procInstId);
+    public int haveMainDept(String taskIdRecord, String procInstId) {
+        return taskMapper.haveMainDept(taskIdRecord, procInstId);
     }
 
     @Override
-    public List<String> deptUsers(String taskIdRecord,String procInstId) {
-        return taskMapper.deptUsers(taskIdRecord,procInstId);
+    public List<String> deptUsers(String taskIdRecord, String procInstId) {
+        return taskMapper.deptUsers(taskIdRecord, procInstId);
     }
 
     @Override
@@ -1631,17 +1634,33 @@ public class TaskCommonServiceImpl implements TaskCommonService {
             String processInstanceId = jumpMsg.getProcessInstanceId();
             List<Task> list = taskService.createTaskQuery().processInstanceId(processInstanceId).list();
             //存储部门相关信息
+
             TaskWithDepts taskWithDepts = jumpMsg.getTaskWithDepts();
+
+
             //变量与任务的对应关系----如何区分主办/辐办/传阅
+            boolean delFlag = true;
             for (Task t : list) {
                 String id = t.getId();
                 String taskDefinitionKey = t.getTaskDefinitionKey();
-                taskWithDepts.setTskId(id);
-                taskWithDepts.setTaskDefKey(taskDefinitionKey);
-                //存储下个节点的任务id---主办/辐办/传阅等类型都存储起来(会有重复数据)[数量=用户量*种类]
-                //请求数据库 2-3 次
-                departWithTaskMapper.save(processInstanceId, taskWithDepts);
+                String parentTaskId = t.getParentTaskId();
+                if (parentTaskId.equalsIgnoreCase(sourceTaskId + type)) {
+                    taskWithDepts.setTskId(id);
+                    taskWithDepts.setTaskDefKey(taskDefinitionKey);
+                    if (delFlag) {
+                        //第一次删除以前记录的数据
+                        departWithTaskMapper.deleteSameTask(processInstanceId, taskDefinitionKey);
+                        delFlag = false;
+                    }
+
+                    //存储下个节点的任务id---主办/辐办/传阅等类型都存储起来(会有重复数据)[数量=用户量*种类]
+                    //请求数据库 2-3 次
+                    departWithTaskMapper.save(processInstanceId, taskWithDepts);
+                }
+
             }
+            //TODO 更新业务信息中的主办 辅办 代办
+
         }
 
         //将父节点是它的任务的节点置空
