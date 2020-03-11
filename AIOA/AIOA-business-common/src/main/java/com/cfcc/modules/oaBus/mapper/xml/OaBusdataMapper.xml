@@ -45,6 +45,7 @@
                 i_bus_model_id = #{busFunction.iBusModelId}
             </if>
             and i_is_es in (1,3)
+            and i_is_display != 1
         </where>
     </select>
 
