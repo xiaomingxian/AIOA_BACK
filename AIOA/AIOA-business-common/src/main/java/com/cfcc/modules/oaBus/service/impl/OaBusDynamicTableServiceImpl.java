@@ -25,6 +25,7 @@ import com.cfcc.modules.workflow.vo.TaskInfoVO;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -86,8 +87,9 @@ public class OaBusDynamicTableServiceImpl implements OaBusDynamicTableService {
     @Lazy
     private OaBusDynamicTableService dynamicTableService;
 
-    @Autowired
-    private ISysUserService isysUserService;
+    //附件上传地址
+    @Value(value = "${jeecg.path.upload}")
+    private String uploadpath;
 
     @Override
     public Map<String, Object> getBusProcSet(Integer iprocSetId) {
@@ -445,7 +447,7 @@ public class OaBusDynamicTableServiceImpl implements OaBusDynamicTableService {
     }
 
     @Override
-    public String provinceToCityReceiveFile(Map<String, Object> param) {
+    public String provinceToCityReceiveFile(Map<String, Object> param,HttpServletRequest request) {
         JSONObject object = JSONObject.parseObject(JSON.toJSONString(param));
         JSONObject busData = object.getJSONObject("busData");
         List<Map<String, Object>> httpUrl = (List<Map<String, Object>>) object.get("cityUrl");
@@ -456,8 +458,15 @@ public class OaBusDynamicTableServiceImpl implements OaBusDynamicTableService {
         //查询附件list
         List<OaFile> fileList = oaFileMapper.queryFileListByType(fileTable, fileTableId, fileSfileType);
         List<String> files = new ArrayList<>();
-        for (OaFile file : fileList) {
-            files.add(file.getSFilePath());
+        LoginInfo loginInfo = userService.getLoginInfo(request);
+        if (loginInfo.getOrgSchema() != null && !loginInfo.getOrgSchema().equals("")) {
+            for (OaFile file : fileList) {
+                files.add(uploadpath + File.separator + loginInfo.getOrgSchema() + File.separator + file.getSFilePath());
+            }
+        } else {
+            for (OaFile file : fileList) {
+                files.add(uploadpath + File.separator + file.getSFilePath());
+            }
         }
         busData.put("fileList", fileList); //附件key名称固定
         String status = "";
@@ -472,7 +481,7 @@ public class OaBusDynamicTableServiceImpl implements OaBusDynamicTableService {
     }
 
     @Override
-    public String provinceToCityInsideFile(Map<String, Object> param) {
+    public String provinceToCityInsideFile(Map<String, Object> param, HttpServletRequest request) {
         JSONObject object = JSONObject.parseObject(JSON.toJSONString(param));
         JSONObject busData = object.getJSONObject("busData");
         List<Map<String, Object>> httpUrl = (List<Map<String, Object>>) object.get("cityUrl");
@@ -483,9 +492,17 @@ public class OaBusDynamicTableServiceImpl implements OaBusDynamicTableService {
         //查询附件list
         List<OaFile> fileList = oaFileMapper.queryFileListByType(fileTable, fileTableId, fileSfileType);
         List<String> files = new ArrayList<>();
-        for (OaFile file : fileList) {
-            files.add(file.getSFilePath());
+        LoginInfo loginInfo = userService.getLoginInfo(request);
+        if (loginInfo.getOrgSchema() != null && !loginInfo.getOrgSchema().equals("")) {
+            for (OaFile file : fileList) {
+                files.add(uploadpath + File.separator + loginInfo.getOrgSchema() + File.separator + file.getSFilePath());
+            }
+        } else {
+            for (OaFile file : fileList) {
+                files.add(uploadpath + File.separator + file.getSFilePath());
+            }
         }
+
         busData.put("fileList", fileList); //附件key名称固定
         String status = "";
         if (httpUrl.size() > 0) {
@@ -499,7 +516,7 @@ public class OaBusDynamicTableServiceImpl implements OaBusDynamicTableService {
     }
 
     @Override
-    public boolean shareFile(Map<String, Object> map, LoginInfo loginInfo) {
+    public boolean shareFile(Map<String, Object> map, LoginInfo loginInfo, HttpServletRequest request) {
         boolean flag = false;
         Integer oldId = (Integer) map.get("i_id");
         String oldTable = map.get("table") + "";
@@ -551,7 +568,7 @@ public class OaBusDynamicTableServiceImpl implements OaBusDynamicTableService {
         copyFileMap.put("sFileType", "4,6");
         copyFileMap.put("receiveTable", receiveTable);
         copyFileMap.put("receiveId", Integer.valueOf(receiveId));
-        List<OaFile> oaFiles = oaFileService.copyFiles(JSON.toJSONString(copyFileMap));
+        List<OaFile> oaFiles = oaFileService.copyFiles(JSON.toJSONString(copyFileMap), request);
         flag = true;
         return flag;
     }
@@ -796,7 +813,7 @@ public class OaBusDynamicTableServiceImpl implements OaBusDynamicTableService {
 
     @Override
     public void insertOaOutLog(Map<String, Object> map, HttpServletRequest request) {
-        LoginInfo loginInfo = isysUserService.getLoginInfo(request);
+        LoginInfo loginInfo = userService.getLoginInfo(request);
         map.put("s_send_by", loginInfo.getId()); //创建用户
         map.put("d_create_time", new Date());  //发送时间
         dynamicTableMapper.insertData(map);
@@ -806,7 +823,7 @@ public class OaBusDynamicTableServiceImpl implements OaBusDynamicTableService {
     public List<String> queryOaOutLogById(OaOutLog oaOutLog) {
         List<OaOutLog> oaOutLogs = dynamicTableMapper.queryOaOutLogById(oaOutLog);
         List<String> list = new ArrayList<>();
-        for (OaOutLog log :oaOutLogs){
+        for (OaOutLog log : oaOutLogs) {
             list.add(log.getSRecUnitid());
         }
         return list;

@@ -302,8 +302,8 @@ public class DynamicTableController {
 
                 //根据oa_busdata表中的id和table去查询数据该业务是否纳入全文检索，
                 // 如果纳入了则删除es库中的数据，如果没有纳入，则不会执行删除es数据
-                Boolean flag = oaBusdataService.getFuncitionByBusdata(tableId,table);
-                if (flag){
+//                Boolean flag = oaBusdataService.getFuncitionByBusdata(tableId,table);
+//                if (flag){
                     indexName = "elasticsearch"+DBvalue+departId+1;
                     String indexType = "oaBusdata";
                     try {
@@ -314,17 +314,17 @@ public class DynamicTableController {
                     } catch (Exception e) {
                         e.printStackTrace();
                     }
-                }
+//                }
                 List<Map<String,Object>> oaFileList = oaFileService.getOaFileByIdAndTable(tableId,table);
                 if (oaFileList.size() > 0){
                     for (Map<String, Object> oaFileMap : oaFileList) {
                         indexName = "elasticsearch"+DBvalue+departId+2;
-                        String indexType = "oaFile";
+                        String indexType2 = "oaFile";
                         id = id+oaFileMap.get("i_id");
                         try {
-                            Integer res = searchService.deleteById(id, indexName, indexType);
+                            Integer res = searchService.deleteById(id, indexName, indexType2);
                             if (res != 200){
-                                res = searchService.deleteById(id, indexName, indexType);
+                                res = searchService.deleteById(id, indexName, indexType2);
                             }
                         } catch (Exception e) {
                             e.printStackTrace();
@@ -424,10 +424,10 @@ public class DynamicTableController {
 
     @ApiOperation(value = "省地收文")
     @PostMapping("provinceToCity")
-    public Result provinceToCity(@RequestBody Map<String,Object> map) {
+    public Result provinceToCity(@RequestBody Map<String,Object> map,HttpServletRequest request) {
         Result result = new Result<>();
         try {
-            String ok = dynamicTableService.provinceToCityReceiveFile(map);
+            String ok = dynamicTableService.provinceToCityReceiveFile(map,request);
             if (ok.contains("200")){
                 result.setResult(200);
             }
@@ -455,10 +455,10 @@ public class DynamicTableController {
 
     @ApiOperation(value = "省地传阅")
     @PostMapping("provinceToCityInside")
-    public Result provinceToCityInside(@RequestBody Map<String,Object> map) {
+    public Result provinceToCityInside(@RequestBody Map<String,Object> map,HttpServletRequest request) {
         Result result = new Result<>();
         try {
-            String ok = dynamicTableService.provinceToCityInsideFile(map);
+            String ok = dynamicTableService.provinceToCityInsideFile(map,request);
             if (ok.contains("200")){
                 result.setResult(200);
             }
@@ -491,7 +491,7 @@ public class DynamicTableController {
         Result result = new Result<>();
         LoginInfo loginInfo = isysUserService.getLoginInfo(request);
         try {
-            boolean ok = dynamicTableService.shareFile(map, loginInfo);
+            boolean ok = dynamicTableService.shareFile(map,loginInfo,request);
             if (ok){
                 result.setResult(ok);
             }else{

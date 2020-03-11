@@ -365,11 +365,14 @@ public class OaTemplateController {
             oaFile.setSCreateBy(username);
             oaFile.setDCreateTime(new Date());
             oaFileService.save(oaFile);
+            //如果类型不为7
+            if(type.equals("7")){
+                Map<String, Object> map = new HashMap<>();
+                map.put("sFilePath", calendarPath + File.separator + fileName);
+                map.put("sFileType", type);
+                oaFileService.singleCopyFile(map,request);
+            }
 
-            Map<String, Object> map = new HashMap<>();
-            map.put("sFilePath", savePath);
-            map.put("sFileType", type);
-            oaFileService.singleCopyFile(map,request);
 
             result.setResult(oaFile);
             result.setMessage(savePath);

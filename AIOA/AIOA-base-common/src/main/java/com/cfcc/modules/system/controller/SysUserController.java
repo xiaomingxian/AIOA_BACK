@@ -77,6 +77,9 @@ public class SysUserController {
     private ISysUserRoleService userRoleService;
 
     @Autowired
+    private ISysUserManagedeptsService sysUserManagedeptsService;
+
+    @Autowired
     private RedisUtil redisUtil;
 
     @GetMapping(value = "/queryAllUser")
@@ -215,11 +218,21 @@ public class SysUserController {
         if (ids == null || "".equals(ids.trim())) {
             result.error500("参数不识别！");
         } else {
-            this.sysUserService.removeByIds(Arrays.asList(ids.split(",")));
-            // 当批量删除时,删除在SysUserDepart中对应的所有部门数据
-            for (String id : idArry) {
-                query.eq(SysUserDepart::getUserId, id);
-                this.sysUserDepartService.remove(query);
+//            this.sysUserService.removeByIds(Arrays.asList(ids.split(",")));
+//            // 当批量删除时,删除在SysUserDepart中对应的所有部门数据
+//            for (String id : idArry) {
+//                query.eq(SysUserDepart::getUserId, id);
+//                this.sysUserDepartService.remove(query);
+//            }
+            try {
+                for (String id : idArry) {
+                    sysUserService.deleteUserById(id);
+                    sysUserDepartService.deleteUserDepartByUserId(id);
+                    sysUserManagedeptsService.deleteUserManageDepartsListByUserId(id);
+                }
+            } catch (Exception e) {
+//                e.printStackTrace();
+                result.success("删除异常");
             }
             result.success("删除成功!");
         }
