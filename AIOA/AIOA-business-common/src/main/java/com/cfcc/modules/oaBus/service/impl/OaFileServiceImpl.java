@@ -490,7 +490,7 @@ public class OaFileServiceImpl extends ServiceImpl<OaFileMapper, OaFile> impleme
         try {
             String tempPaths = "";
             if (map.get("sFilePath") != null) {
-                if (map.get("sFileType") != null) {
+                if ((map.get("sFileType") != null) && (map.get("sFileType")+"").equals("7")) {
                     tempPaths = uploadpath + File.separator + "templateFiles";
                 } else {
                     tempPaths = uploadpath + File.separator + "temporaryFiles";
