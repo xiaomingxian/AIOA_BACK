@@ -9,7 +9,7 @@ import java.util.List;
 
 public interface SysUserDepartMapper extends BaseMapper<SysUserDepart>{
 
-	@Select("select dep_id from sys_user_depart where user_id = #{userId}")
+    @Select("select dep_id from sys_user_depart where user_id = #{userId}")
 	List<String> getDepIdByUserId(@Param("userId")String userId);
 
 	List<SysUserDepart> getUserDepartByUid(@Param("userId") String userId);
@@ -17,4 +17,6 @@ public interface SysUserDepartMapper extends BaseMapper<SysUserDepart>{
     Long findDepartIdByUserId(@Param("userId") String userId,@Param("departId") String departId);
 
 	void saveDepartIdByUserId(String userId, String departId);
+
+    void deleteUserDepartByUserId(@Param("id") String id);
 }

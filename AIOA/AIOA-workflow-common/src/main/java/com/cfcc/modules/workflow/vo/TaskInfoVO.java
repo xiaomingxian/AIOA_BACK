@@ -46,7 +46,7 @@ public class TaskInfoVO implements Serializable {
      * 是否是部门办理
      * 即是办理任务的参数，又是查询条件
      */
-    private Boolean isDept;
+    private Boolean isDept=false;
 
     //如果下一节点是选部门-存入部门信息
     private TaskWithDepts taskWithDepts;

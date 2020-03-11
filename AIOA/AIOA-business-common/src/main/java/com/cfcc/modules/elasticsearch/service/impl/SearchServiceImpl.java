@@ -37,10 +37,7 @@ import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 /**
  * @Description:
@@ -215,6 +212,21 @@ public class SearchServiceImpl implements SearchService {
             System.out.println(map);
         }
         System.out.println("总条数：" + total);
+        if (total>0){
+            Iterator<Map<String, Object>> iterator = sourceList.iterator();
+            while (iterator.hasNext()){
+                Map map = iterator.next();
+
+                Iterator<Map.Entry<String, Object>> it = map.entrySet().iterator();
+                while(it.hasNext()){
+                    Map.Entry<String, Object> entry = it.next();
+                    String key = entry.getKey();
+                    if(key.contains(".keyword")) {
+                        it.remove();
+                    }
+                }
+            }
+        }
 
         IPage<Map<String,Object>> pageList = new Page<Map<String,Object>>();
         pageList.setRecords(sourceList);

@@ -679,10 +679,16 @@ public class TaskInActController {
                 TaskInfoVO taskInfoVO1 = mapToObject(taskInfoVO);
                 taskInfoVO1.setUserId(loginInfo.getId());
                 taskInfoVOS.add(taskInfoVO1);
+
             }
 
 
             if (taskInfoVOS != null && taskInfoVOS.size() > 0) {
+                Map<String, Object> busData = deptMsg(taskInfoVOS);
+                taskInfoVOS.get(0).setBusData(busData);
+                busDataSet(taskInfoVOS.get(0));
+
+
                 taskInActService.doTaskMore(taskInfoVOS, request);
             } else {
                 return Result.error("信息不完善,拒绝办理");
@@ -693,6 +699,83 @@ public class TaskInActController {
             log.error("办理任务失败" + e.toString());
             return Result.error("办理任务失败");
         }
+    }
+
+
+    private Map<String, Object> deptMsg(List<TaskInfoVO> taskInfoVOs) {
+        Map<String, Object> busData = taskInfoVOs.get(0).getBusData();
+
+        String mainDept = "";
+        String fbDept = "";
+        String cyDept = "";
+        for (TaskInfoVO taskInfoVO : taskInfoVOs) {
+            Boolean isDept = taskInfoVO.getIsDept();
+            TaskWithDepts taskWithDepts = taskInfoVO.getTaskWithDepts();
+            if (isDept) {
+                String mainFore = taskWithDepts.getMainDept();
+                String fuFore = taskWithDepts.getFuDept();
+                String cyFore = taskWithDepts.getCyDept();
+                //不存在覆盖问题
+                if (StringUtils.isNotBlank(mainFore) && StringUtils.isBlank(mainDept)) mainDept = mainFore;
+                if (StringUtils.isNotBlank(fuFore) && StringUtils.isBlank(fbDept)) fbDept = fuFore;
+                if (StringUtils.isNotBlank(cyFore) && StringUtils.isBlank(cyDept)) cyDept = cyFore;
+                //覆盖问题处理
+                if (StringUtils.isNotBlank(mainDept) && StringUtils.isNotBlank(mainFore)) {
+                    if (!mainDept.contains(mainFore)) {
+                        mainDept += "_" + mainFore;
+                    }
+                }
+                if (StringUtils.isNotBlank(fuFore) && StringUtils.isNotBlank(fbDept)) {
+                    if (!fuFore.contains("_") && !fbDept.contains(fuFore)) {
+                        fbDept += "_" + fuFore;
+                    }
+                    if (fuFore.contains("_")) {
+                        String[] fs = fuFore.split("_");
+                        for (String dept : fs) {
+                            if (!fbDept.contains(dept)) {
+                                fbDept += "_" + dept;
+                            }
+                        }
+
+                    }
+                }
+                if (StringUtils.isNotBlank(cyFore) && StringUtils.isNotBlank(cyDept)) {
+                    if (!cyFore.contains("_") && !cyDept.contains(fuFore)) {
+                        cyDept += "_" + cyFore;
+                    }
+                    if (cyFore.contains("_")) {
+                        String[] fs = cyFore.split("_");
+                        for (String dept : fs) {
+                            if (!cyDept.contains(dept)) {
+                                cyDept += "_" + dept;
+                            }
+                        }
+
+                    }
+                }
+
+            }
+
+        }
+        if (StringUtils.isNotBlank(mainDept)) {
+            busData.put("s_main_unit_names", mainDept);
+        }
+
+        if (StringUtils.isNotBlank(fbDept)) {
+            busData.put("s_cc_unit_names", fbDept);
+        }
+
+        if (StringUtils.isNotBlank(cyDept)) {
+            busData.put("s_inside_deptnames", cyDept);
+        }
+        String m = busData.get("s_main_unit_names") == null ? "" : busData.get("s_main_unit_names").toString();
+
+        busData.put("mainDept",m);
+
+
+        taskInfoVOs.get(0).setBusData(busData);
+
+        return busData;
     }
 
     public TaskInfoVO mapToObject(Map<String, Object> map) throws Exception {
@@ -716,7 +799,6 @@ public class TaskInActController {
         taskInfoVO.setTaskWithDepts(taskWithDepts);
         taskInfoVO.setBusData(busData);
 
-        busDataSet(taskInfoVO);
 
 
         return taskInfoVO;

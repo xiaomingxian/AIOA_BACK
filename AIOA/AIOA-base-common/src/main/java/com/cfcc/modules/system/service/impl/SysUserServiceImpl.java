@@ -390,6 +390,11 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser> impl
     }
 
     @Override
+    public void deleteUserById(String id) {
+        sysUserMapper.deleteUserById(id);
+    }
+
+    @Override
     public Map<String, Object> getAllUserMsg(String username) {
 
 

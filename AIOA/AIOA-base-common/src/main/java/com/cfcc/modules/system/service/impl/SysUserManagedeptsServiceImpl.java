@@ -104,6 +104,11 @@ public class SysUserManagedeptsServiceImpl extends ServiceImpl<SysUserManagedept
     }
 
     @Override
+    public void deleteUserManageDepartsListByUserId(String id) {
+        sysUserManagedeptsMapper.deleteUserManageDepartsListByUserId(id);
+    }
+
+    @Override
     public Boolean saveDepartIdByUserId(Map<String,Object> map){
         String userId = map.get("userId") + "";
         List<String> departIdList = (List<String>) map.get("departId");

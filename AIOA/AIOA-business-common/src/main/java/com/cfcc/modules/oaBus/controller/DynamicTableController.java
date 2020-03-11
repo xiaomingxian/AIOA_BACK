@@ -302,8 +302,8 @@ public class DynamicTableController {
 
                 //根据oa_busdata表中的id和table去查询数据该业务是否纳入全文检索，
                 // 如果纳入了则删除es库中的数据，如果没有纳入，则不会执行删除es数据
-                Boolean flag = oaBusdataService.getFuncitionByBusdata(tableId,table);
-                if (flag){
+//                Boolean flag = oaBusdataService.getFuncitionByBusdata(tableId,table);
+//                if (flag){
                     indexName = "elasticsearch"+DBvalue+departId+1;
                     String indexType = "oaBusdata";
                     try {
@@ -314,17 +314,17 @@ public class DynamicTableController {
                     } catch (Exception e) {
                         e.printStackTrace();
                     }
-                }
+//                }
                 List<Map<String,Object>> oaFileList = oaFileService.getOaFileByIdAndTable(tableId,table);
                 if (oaFileList.size() > 0){
                     for (Map<String, Object> oaFileMap : oaFileList) {
                         indexName = "elasticsearch"+DBvalue+departId+2;
-                        String indexType = "oaFile";
+                        String indexType2 = "oaFile";
                         id = id+oaFileMap.get("i_id");
                         try {
-                            Integer res = searchService.deleteById(id, indexName, indexType);
+                            Integer res = searchService.deleteById(id, indexName, indexType2);
                             if (res != 200){
-                                res = searchService.deleteById(id, indexName, indexType);
+                                res = searchService.deleteById(id, indexName, indexType2);
                             }
                         } catch (Exception e) {
                             e.printStackTrace();
