@@ -110,25 +110,26 @@ public class TaskInActServiceImpl implements TaskInActService {
     @Override
     public void doTaskMore(List<TaskInfoVO> taskInfoVOs, HttpServletRequest request) {
 
-        //TODO 主办部门 问题
-        String nextTaskMsg = taskCommonService.doTasksMore(taskInfoVOs);
         Map<String, Object> busData = taskInfoVOs.get(0).getBusData();
+
+        String nextTaskMsg = taskCommonService.doTasksMore(taskInfoVOs);
         if (nextTaskMsg.endsWith("  ")) {
-        LoginInfo loginInfo = sysUserService.getLoginInfo(request);
-        busData.put("s_signer", loginInfo.getUsername());
+            LoginInfo loginInfo = sysUserService.getLoginInfo(request);
+            busData.put("s_signer", loginInfo.getUsername());
 
-        busData.put("d_date1", new Date());//new SimpleDateFormat("yyyy-MM-dd").format(new Date()));//
-    }
+            busData.put("d_date1", new Date());//new SimpleDateFormat("yyyy-MM-dd").format(new Date()));//
+        }
         busData.put("s_varchar10", taskInfoVOs.get(0).getProcessId());
-    busAboutMore(taskInfoVOs, nextTaskMsg);
+        busAboutMore(taskInfoVOs, nextTaskMsg);
 
-}
+    }
 
     private void busAboutMore(List<TaskInfoVO> taskInfoVOs, String nextTaskMsg) {
         //2 更新流程对应的业务数据......
-        //排除掉多余的字段
-        //移除多余字段
+        //处理部门记录问题
         Map<String, Object> busData = taskInfoVOs.get(0).getBusData();
+
+
         //更新当前节点信息
         busData.put("s_cur_task_name", nextTaskMsg);
         if ("end-已结束".equals(nextTaskMsg)) {
@@ -156,6 +157,7 @@ public class TaskInActServiceImpl implements TaskInActService {
      */
     @Override
     public void doAddUsers(ArrayList<TaskInfoVO> taskInfoVOS) {
+//        TODO 主办辅办传阅 部门追加到业务数据中
         CommandExecutor commandExecutor = taskServiceImpl.getCommandExecutor();
 
 
