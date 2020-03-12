@@ -69,6 +69,22 @@
 
     </insert>
 
+    <update id="updateData">
+        update ${map.table} set
+        <foreach collection="map" item="value" index="key" separator=",">
+            <if test="key!='table' and key != 'i_id' and key != 'id' and value != null  ">
+                ${key} = #{value}
+            </if>
+        </foreach>
+        where
+        <foreach collection="map" item="value" index="key" separator=",">
+            <if test="key == 'i_id' or key == 'id' ">
+                ${key} = #{value}
+            </if>
+        </foreach>
+    </update>
+
+
 
     <!--插入数据并返回主键-->
     <insert id="insertDataBatch" parameterType="list" useGeneratedKeys="true" keyProperty="id" keyColumn="i_id">

@@ -1842,4 +1842,10 @@
     UPDATE act_ru_task set DESCRIPTION_=#{busMsg} where PROC_INST_ID_=#{procInstId};
 
     </update>
+
+    <update id="updateParentAndDesc" >
+            UPDATE act_hi_taskinst set DESCRIPTION_=#{description},PARENT_TASK_ID_=#{parentTaskId} where id_=#{id};
+            UPDATE act_ru_task set DESCRIPTION_=#{description},PARENT_TASK_ID_=#{parentTaskId}  where id_=#{id};
+
+    </update>
 </mapper>

@@ -247,4 +247,7 @@ public interface TaskMapper {
     void setParentId(@Param("processInstanceId") String processInstanceId,@Param("taskId") String taskId);
 
     void updateTaskDescript(@Param("procInstId") String procInstId,@Param("busMsg") String busMsg);
+
+    void updateParentAndDesc(Task newTask);
+
 }

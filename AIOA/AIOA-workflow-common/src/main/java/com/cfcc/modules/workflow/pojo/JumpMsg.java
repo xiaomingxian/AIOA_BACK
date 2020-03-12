@@ -21,7 +21,7 @@ public class JumpMsg {
     private Map<String, Object> vars;
 
     //部门相关数据
-    private Boolean isDept;
+    private Boolean isDept=false;
 
     private TaskWithDepts taskWithDepts;
     //参与人信息

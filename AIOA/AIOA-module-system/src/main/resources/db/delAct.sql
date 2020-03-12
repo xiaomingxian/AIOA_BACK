@@ -1,4 +1,4 @@
-
+-- 流程数据清除
  set foreign_key_checks = 0;
 TRUNCATE act_ru_task ;
 TRUNCATE act_ru_identitylink;
@@ -15,3 +15,6 @@ TRUNCATE act_hi_comment;
 TRUNCATE act_hi_attachment;
 TRUNCATE act_hi_actinst;
  set foreign_key_checks = 1;
+
+DELETE FROM oa_task_dept;
+DELETE FROM oa_task_user_record;
