@@ -357,7 +357,7 @@ public class OaFileServiceImpl extends ServiceImpl<OaFileMapper, OaFile> impleme
         OaFile initFile = oaFileService.queryById(Integer.valueOf(iid));
         String oldName = initFile.getSFileName().substring(0, initFile.getSFileName().lastIndexOf("."));
         String newName = initFile.getSFileName().replace(oldName, s_file_name);
-        initFile.setSFileName(s_file_name);
+        initFile.setSFileName(newName);
         initFile.setSFilePath(sfilepath);
         boolean ok = false;
         ok =  oaFileMapper.updateDocNameById(initFile);
@@ -428,7 +428,7 @@ public class OaFileServiceImpl extends ServiceImpl<OaFileMapper, OaFile> impleme
         for (OaFile oafile : fileList) {
             File lastPath = new File(suffexPath + File.separator + oafile.getSFilePath());
             String filename = System.currentTimeMillis() + com.cfcc.common.util.FileUtils.generatePassword(5);
-            String newFileName = oafile.getSFileName().replace(oafile.getSFileName().substring(0, oafile.getSFileName().lastIndexOf(".")), filename.substring(0, filename.lastIndexOf(".")));
+            String newFileName = oafile.getSFileName().replace(oafile.getSFileName().substring(0, oafile.getSFileName().lastIndexOf(".")), filename);
 //            StringBuilder str = new StringBuilder(oafile.getSFileName());
 //            StringBuilder filename = str.insert(oafile.getSFileName().indexOf("."), "_" + System.currentTimeMillis());
             File uploadPath = new File(upPath + File.separator + newFileName);
@@ -806,7 +806,7 @@ public class OaFileServiceImpl extends ServiceImpl<OaFileMapper, OaFile> impleme
     }
 
     @Override
-    public List<OaFile> batchUploads(MultipartFile file, String sTable, Integer iTableId, String sFileType, HttpServletRequest request, HttpServletResponse response) {
+    public List<OaFile> batchUploads(MultipartFile file,String filename, String sTable, Integer iTableId, String sFileType, HttpServletRequest request, HttpServletResponse response) {
         List<OaFile> fileIds = new ArrayList<>();
         try {
             String ctxPath = uploadpath;
@@ -817,7 +817,7 @@ public class OaFileServiceImpl extends ServiceImpl<OaFileMapper, OaFile> impleme
                     File.separator + calendar.get(Calendar.DATE);
             String path = "";
             String orgSchema = request.getAttribute("orgSchema") + "";
-            if (orgSchema != null && !orgSchema.equals("")) {
+            if (orgSchema != null && !orgSchema.equals("null")) {
                 path = ctxPath.replace("//", "/" +
                         "") + File.separator + orgSchema + File.separator + calendarPath;
             } else {
@@ -829,7 +829,7 @@ public class OaFileServiceImpl extends ServiceImpl<OaFileMapper, OaFile> impleme
                 if (!parent.exists()) {
                     parent.mkdirs();// 创建文件根目录
                 }
-                String orgName = file.getOriginalFilename();// 获取文件名
+                String orgName = filename;// 获取文件名
                 fileName = System.currentTimeMillis()+ com.cfcc.common.util.FileUtils.generatePassword(5)+orgName.substring(orgName.indexOf("."));
 //                fileName = orgName.substring(0, orgName.lastIndexOf(".")) + "_" + System.currentTimeMillis() + orgName.substring(orgName.indexOf("."));
                 String savePath = parent.getPath() + File.separator + fileName;
@@ -840,7 +840,7 @@ public class OaFileServiceImpl extends ServiceImpl<OaFileMapper, OaFile> impleme
                 oaFile.setITableId(iTableId);
                 oaFile.setSFileType(sFileType);
                 oaFile.setSFileName(orgName);        //设置附件名字
-                oaFile.setSFilePath(File.separator + calendarPath + File.separator + fileName);        //设置文件路径
+                oaFile.setSFilePath(calendarPath + File.separator + fileName);        //设置文件路径
 //                oaFile.setSCreateBy(username);
                 oaFile.setDCreateTime(new Date());
                 oaFileService.save(oaFile);

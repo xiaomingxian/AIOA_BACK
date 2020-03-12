@@ -85,7 +85,7 @@ public interface IOaFileService extends IService<OaFile> {
      * @param response
      * @return
      */
-    List<OaFile> batchUploads(MultipartFile files, String sTable, Integer iTableId, String sFileType, HttpServletRequest request, HttpServletResponse response);
+    List<OaFile> batchUploads(MultipartFile files,String filename ,String sTable, Integer iTableId, String sFileType, HttpServletRequest request, HttpServletResponse response);
 
     List<Map<String, Object>> getOaBusdata(String sBusdataTable, List<Map<String, Object>> oaBusdata, BusFunction busFunction, String DBvalue);
 
