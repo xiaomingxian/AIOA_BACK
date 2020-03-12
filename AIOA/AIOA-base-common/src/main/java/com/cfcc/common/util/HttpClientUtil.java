@@ -2,6 +2,7 @@ package com.cfcc.common.util;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
+import com.cfcc.common.api.vo.Result;
 
 import java.io.*;
 import java.net.HttpURLConnection;
@@ -17,6 +18,7 @@ public class HttpClientUtil {
 
     private static final String BOUNDARY = "-------45962402127348";
     private static final String FILE_ENCTYPE = "multipart/form-data";
+
     public static void main(String[] args) {
         String url = "http://192.168.1.118:8080/AIOA/papertitle/oaTemplate/receiveStream";
         //文件列表，搞了三个本地文件
@@ -26,21 +28,20 @@ public class HttpClientUtil {
         fileList.add("D:\\upFiles\\业务功能_1572707314975.doc");
 
         //json字符串，模拟了一个，传图片名字吧
-        Map<String,Object> busData = new HashMap<>();
-        busData.put("i_id",1120);
-        busData.put("i_bus_function",6);
-        busData.put("i_bus_model",666);
+        Map<String, Object> busData = new HashMap<>();
+        busData.put("i_id", 1120);
+        busData.put("i_bus_function", 6);
+        busData.put("i_bus_model", 666);
         String jsonString = JSON.toJSONString(busData);
         JSONObject json = JSONObject.parseObject(jsonString);
-        doPostFileStreamAndJsonObj(url, fileList, json);
+        doPostFileStreamAndJsonObj(url, json);
     }
 
-    public static String doPostFileStreamAndJsonObj(String url, List<String> fileList, JSONObject json) {
-        String result = "200";//请求返回参数
+    public static Result doPostFileStreamAndJsonObj(String url, JSONObject json) {
+        Result result = new Result();
+        String respStr ="";
         String jsonString = json.toJSONString();//获得jsonstirng,或者toString都可以，只要是json格式，给了别人能解析成json就行
-//        System.out.println("================");
-//        System.out.println(xml);//可以打印出来瞅瞅
-//        System.out.println("================");
+        List<Map<String, Object>> fileList = (List<Map<String, Object>>) json.get("fileList");
         try {
             //开始设置模拟请求的参数，额，不一个个介绍了，根据需要拿
             String boundary = "------WebKitFormBoundaryUey8ljRiiZqhZHBu";
@@ -75,36 +76,39 @@ public class HttpClientUtil {
             out.write(sb.toString().getBytes("utf-8"));
             out.write("\r\n".getBytes("utf-8"));
 
+            //文件写入请求
             int leng = fileList.size();
-            for (int i = 0; i < leng; i++) {
-                File file = new File(fileList.get(i));
-                if(file.exists()){
-                    sb = new StringBuilder();
-                    sb.append("--");
-                    sb.append(boundary);
-                    sb.append("\r\n");
-                    //这里的参数啥的是我项目里对方接收要用到的，具体的看你的项目怎样的格式
-                    sb.append("Content-Disposition: form-data;name=\"File"
-                            + "\";filename=\"" + file.getName() + "\"\r\n");
-                    //这里拼接个fileName，方便后面用第一种方式接收（如果是纯文件，不带其他参数，就可以不用这个了，因为Multipart可以直接解析文件）
-                    sb.append("FileName:"+ file.getName() + "\r\n");
-                    //发送文件是以流的方式发送，所以这里的content-type是octet-stream流
-                    sb.append("Content-Type:application/octet-stream\r\n\r\n");
-                    byte[] data = sb.toString().getBytes();
-                    out.write(data);
-                    DataInputStream in = new DataInputStream(new FileInputStream(file));
-                    int bytes = 0;
-                    byte[] bufferOut = new byte[1024];
-                    while ((bytes = in.read(bufferOut)) != -1) {
-                        out.write(bufferOut, 0, bytes);
+            if (leng > 0) {
+                for (int i = 0; i < leng; i++) {
+                    File file = new File(fileList.get(i).get("sFilePath") + "");
+                    if (file.exists()) {
+                        sb = new StringBuilder();
+                        sb.append("--");
+                        sb.append(boundary);
+                        sb.append("\r\n");
+                        //这里的参数啥的是我项目里对方接收要用到的，具体的看你的项目怎样的格式
+                        sb.append("Content-Disposition: form-data;name=\"File"
+                                + "\";filename=\"" + fileList.get(i).get("sFileName") + "\"\r\n");
+                        //这里拼接个fileName，方便后面用第一种方式接收（如果是纯文件，不带其他参数，就可以不用这个了，因为Multipart可以直接解析文件）
+                        sb.append("FileName:" + fileList.get(i).get("sFileName") + "\r\n");
+                        //发送文件是以流的方式发送，所以这里的content-type是octet-stream流
+                        sb.append("Content-Type:application/octet-stream\r\n\r\n");
+                        byte[] data = sb.toString().getBytes();
+                        out.write(data);
+                        DataInputStream in = new DataInputStream(new FileInputStream(file));
+                        int bytes = 0;
+                        byte[] bufferOut = new byte[1024];
+                        while ((bytes = in.read(bufferOut)) != -1) {
+                            out.write(bufferOut, 0, bytes);
+                        }
+                        int j = i + 1;
+                        if (leng > 1 && j != leng) {
+                            out.write("\r\n".getBytes()); // 多个文件时，二个文件之间加入这个
+                        }
+                        in.close();
+                    } else {
+                        System.out.println("没有发现文件");
                     }
-                    int j = i + 1;
-                    if (leng > 1 && j != leng) {
-                        out.write("\r\n".getBytes()); // 多个文件时，二个文件之间加入这个
-                    }
-                    in.close();
-                }else{
-                    System.out.println("没有发现文件");
                 }
             }
             //发送流
@@ -116,22 +120,30 @@ public class HttpClientUtil {
                     conn.getInputStream()));
             String line = "";
             while ((line = reader.readLine()) != null) {
-                result += line;
+                respStr += line;
             }
-//            System.out.println("================");
-//            System.out.println(result.toString());//可以把结果打印出来瞅瞅
-//            System.out.println("================");
+            Map<String,Object> responseData = (Map<String, Object>) JSON.parse(respStr);
+            boolean success = Boolean.parseBoolean(responseData.get("success")+"");
+            String message = responseData.get("message")+"";
+            Integer code = Integer.valueOf(responseData.get("code")+"");
+            result.setSuccess(success);
+            result.setCode(code);
+            result.setMessage(message);
+            System.out.println(JSON.toJSONString(respStr));
             //后面可以对结果进行解析（如果返回的是格式化的数据的话）
         } catch (Exception e) {
-            System.out.println("发送POST请求出现异常！" + e);
             e.printStackTrace();
+            result.setSuccess(false);
+            result.setCode(500);
+            result.setMessage("请求出现异常！");
+            System.out.println("发送POST请求出现异常！" + e);
+        }finally {
+            return result;
         }
-        return result;
     }
 
 
     /**
-     *
      * @param urlStr http请求路径
      * @param params 请求参数
      * @param images 上传文件
@@ -155,7 +167,8 @@ public class HttpClientUtil {
                     + BOUNDARY);
 
             StringBuilder sb = null;
-            DataOutputStream dos = new DataOutputStream(con.getOutputStream());;
+            DataOutputStream dos = new DataOutputStream(con.getOutputStream());
+            ;
             if (params != null) {
                 sb = new StringBuilder();
                 for (String s : params.keySet()) {
