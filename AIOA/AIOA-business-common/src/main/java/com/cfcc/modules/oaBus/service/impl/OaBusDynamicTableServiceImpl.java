@@ -447,72 +447,81 @@ public class OaBusDynamicTableServiceImpl implements OaBusDynamicTableService {
     }
 
     @Override
-    public String provinceToCityReceiveFile(Map<String, Object> param,HttpServletRequest request) {
+    public Result provinceToCityReceiveFile(Map<String, Object> param, HttpServletRequest request) {
+        Result result = new Result();
         JSONObject object = JSONObject.parseObject(JSON.toJSONString(param));
         JSONObject busData = object.getJSONObject("busData");
-        List<Map<String, Object>> httpUrl = (List<Map<String, Object>>) object.get("cityUrl");
+        Map<String, Object> urlData = (Map<String, Object>) object.get("cityUrl");
+        if (urlData == null) {
+            result.setSuccess(false);
+            result.setCode(500);
+            result.setMessage("请配置" + urlData.get("text") + "调用接口地址！");
+            return result;
+        }
         String fileTable = busData.get("table") + "";
         String fileTableId = busData.get("i_id") + "";
         String fileSfileType = "4,6";
 
         //查询附件list
         List<OaFile> fileList = oaFileMapper.queryFileListByType(fileTable, fileTableId, fileSfileType);
-        List<String> files = new ArrayList<>();
+        List<Map<String, Object>> mapFiles = new ArrayList<>();
         LoginInfo loginInfo = userService.getLoginInfo(request);
+        String orgSchema = "";
         if (loginInfo.getOrgSchema() != null && !loginInfo.getOrgSchema().equals("")) {
-            for (OaFile file : fileList) {
-                files.add(uploadpath + File.separator + loginInfo.getOrgSchema() + File.separator + file.getSFilePath());
-            }
-        } else {
-            for (OaFile file : fileList) {
-                files.add(uploadpath + File.separator + file.getSFilePath());
-            }
+            orgSchema = loginInfo.getOrgSchema();
         }
-        busData.put("fileList", fileList); //附件key名称固定
-        String status = "";
-        if (httpUrl.size() > 0) {
-            for (Map<String, Object> map : httpUrl) {
-                busData.put("org_schema", map.get("value"));
-                String url = "http://" + map.get("description") + "/AIOA/oaBus/dynamic/provinceToCityReceviceClient";
-                status = HttpClientUtil.doPostFileStreamAndJsonObj(url, files, busData);
-            }
+        for (OaFile file : fileList) {
+            Map<String, Object> map = new HashMap<>();
+            map.put("sFilePath", uploadpath + File.separator + orgSchema + File.separator + file.getSFilePath());
+            map.put("sFileName", file.getSFileName());
+            mapFiles.add(map);
         }
-        return status;
+        busData.put("fileList", mapFiles); //附件key名称固定
+        if (urlData.get("value") != null) {
+            busData.put("org_schema", urlData.get("value"));
+        }
+        String url = "http://" + urlData.get("description") + "/AIOA/oaBus/dynamic/provinceToCityReceviceClient";
+        result = HttpClientUtil.doPostFileStreamAndJsonObj(url, busData);
+        return result;
     }
 
     @Override
-    public String provinceToCityInsideFile(Map<String, Object> param, HttpServletRequest request) {
+    public Result provinceToCityInsideFile(Map<String, Object> param, HttpServletRequest request) {
+        Result result = new Result<>();
         JSONObject object = JSONObject.parseObject(JSON.toJSONString(param));
         JSONObject busData = object.getJSONObject("busData");
-        List<Map<String, Object>> httpUrl = (List<Map<String, Object>>) object.get("cityUrl");
+        Map<String, Object> urlData = (Map<String, Object>) object.get("cityUrl");
+        if (urlData == null) {
+            result.setSuccess(false);
+            result.setCode(500);
+            result.setMessage("请配置" + urlData.get("text") + "调用接口地址！");
+            return result;
+        }
         String fileTable = busData.get("table") + "";
         String fileTableId = busData.get("i_id") + "";
         String fileSfileType = "4,6";
 
         //查询附件list
         List<OaFile> fileList = oaFileMapper.queryFileListByType(fileTable, fileTableId, fileSfileType);
-        List<String> files = new ArrayList<>();
+        List<Map<String, Object>> mapFiles = new ArrayList<>();
         LoginInfo loginInfo = userService.getLoginInfo(request);
+        String orgSchema = "";
         if (loginInfo.getOrgSchema() != null && !loginInfo.getOrgSchema().equals("")) {
-            for (OaFile file : fileList) {
-                files.add(uploadpath + File.separator + loginInfo.getOrgSchema() + File.separator + file.getSFilePath());
-            }
-        } else {
-            for (OaFile file : fileList) {
-                files.add(uploadpath + File.separator + file.getSFilePath());
-            }
+            orgSchema = loginInfo.getOrgSchema();
         }
-
-        busData.put("fileList", fileList); //附件key名称固定
-        String status = "";
-        if (httpUrl.size() > 0) {
-            for (Map<String, Object> map : httpUrl) {
-                busData.put("org_schema", map.get("value"));
-                String url = "http://" + map.get("description") + "/AIOA/oaBus/dynamic/provinceToCityInsideClient";
-                status = HttpClientUtil.doPostFileStreamAndJsonObj(url, files, busData);
-            }
+        for (OaFile file : fileList) {
+            Map<String, Object> map = new HashMap<>();
+            map.put("sFilePath", uploadpath + File.separator + orgSchema + File.separator + file.getSFilePath());
+            map.put("sFileName", file.getSFileName());
+            mapFiles.add(map);
         }
-        return status;
+        busData.put("fileList", mapFiles); //附件key名称固定
+        if (urlData.get("value") != null) {
+            busData.put("org_schema", urlData.get("value"));
+        }
+        String url = "http://" + urlData.get("description") + "/AIOA/oaBus/dynamic/provinceToCityInsideClient";
+        result = HttpClientUtil.doPostFileStreamAndJsonObj(url, busData);
+        return result;
     }
 
     @Override
@@ -576,10 +585,10 @@ public class OaBusDynamicTableServiceImpl implements OaBusDynamicTableService {
     @Override
     public Result provinceToCityClient(HttpServletRequest request) {
         log.info("========省会向地市转收文服务开始============");
-        Result resultStatus = new Result();
+        Result respData = new Result();
         try {
             Collection<Part> parts = request.getParts();
-            List<Map<String, Object>> fileList = new ArrayList<>();
+//            List<Map<String, Object>> fileList = new ArrayList<>();
             JSONObject jsonParam = new JSONObject();
             for (Iterator<Part> iterator = parts.iterator(); iterator.hasNext(); ) {
                 Part part = iterator.next();
@@ -592,23 +601,43 @@ public class OaBusDynamicTableServiceImpl implements OaBusDynamicTableService {
                         parseString += line;
                     }
                     jsonParam = JSONObject.parseObject(parseString);
-                    String sceam = jsonParam.get("org_schema") + "";
-                    request.setAttribute("orgSchema", sceam);
-                    fileList = (List<Map<String, Object>>) jsonParam.get("fileList");
+                    if (jsonParam.get("org_schema") != null) {
+                        String sceam = jsonParam.get("org_schema") + "";
+                        request.setAttribute("orgSchema", sceam);
+                    }
+//                    fileList = (List<Map<String, Object>>) jsonParam.get("fileList");
 //                    System.out.println("=====业务数据为=======" + jsonParam.toString());
 //                    System.out.println("=====附件数据为=======" + fileList.toString());
                 }
             }
             //数据字典获取模块和业务id
             List<Map<String, Object>> functonDict = sysDictService.getDictByKey("btn_sdSend");
+            if (functonDict.size() < 1) {
+                respData.setMessage("请完善收文数据配置！");
+                respData.setCode(500);
+                respData.setSuccess(false);
+                return respData;
+            }
             String functionId = functonDict.get(0).get("dictVal") + "";
             String unitId = functonDict.get(0).get("dictItem") + "";
             Map<String, Object> tableData = dynamicTableMapper.queryModelByFunctionId(functonDict.get(0).get("dictVal") + "");
+            if (tableData == null) {
+                respData.setMessage("请完善模块配置！");
+                respData.setCode(500);
+                respData.setSuccess(false);
+                return respData;
+            }
             String table = tableData.get("s_busdata_table") + "";
             String modelId = tableData.get("i_id") + "";
             LoginInfo loginInfo = new LoginInfo();
 //        loginInfo.setOrgCode("A01A01");
             Result<Map<String, Object>> result = oaBusdataService.queryDataByModelAndFunctionId(modelId, functionId, loginInfo);
+            if (result == null) {
+                respData.setMessage("请完善业务配置！");
+                respData.setCode(500);
+                respData.setSuccess(false);
+                return respData;
+            }
             //组装业务数据
             Map<String, Object> paramMap = new HashMap<>();
             paramMap.put("s_title", jsonParam.get("s_title"));
@@ -626,6 +655,12 @@ public class OaBusDynamicTableServiceImpl implements OaBusDynamicTableService {
 
             //查询收文管理员角色用户（编码710）
             List<Map<String, Object>> userList = dynamicTableMapper.queryUsersByUnit(unitId);
+            if (userList.size() < 1) {
+                result.setMessage("无管理员角色用户！");
+                result.setCode(500);
+                result.setSuccess(false);
+                return result;
+            }
             String sCreateBy = "";
             for (Map<String, Object> map : userList) {
                 sCreateBy += map.get("userId") + ",";
@@ -633,6 +668,12 @@ public class OaBusDynamicTableServiceImpl implements OaBusDynamicTableService {
             paramMap.put("s_create_by", sCreateBy);
 
             int num = dynamicTableMapper.updateData(paramMap);
+            if (num != 1) {
+                result.setMessage("修改数据失败！");
+                result.setCode(500);
+                result.setSuccess(false);
+                return result;
+            }
             Map<String, Object> queryMap = new HashMap<>();
             queryMap.put("i_id", paramMap.get("i_id") + "");
             queryMap.put("table", paramMap.get("table"));
@@ -645,7 +686,14 @@ public class OaBusDynamicTableServiceImpl implements OaBusDynamicTableService {
             busDataMap.put("d_create_time", format);
 
             //开启流程
-            dynamicTableService.checkProc(busDataMap);
+            try {
+                dynamicTableService.checkProc(busDataMap);
+            } catch (Exception e) {
+                e.printStackTrace();
+                log.info("流程开启失败！");
+                result.setCode(500);
+                result.setSuccess(false);
+            }
 
             //写入用户权限
             Map<String, Object> permitMap = new HashMap<>();
@@ -660,39 +708,37 @@ public class OaBusDynamicTableServiceImpl implements OaBusDynamicTableService {
             List<MultipartFile> files = multRequest.getFiles("File");
             int fileTotal = 0;
             HttpServletResponse response = null;
-            while (fileTotal < files.size()) {
-                MultipartFile mf = files.get(fileTotal);
-                String sTable = "";
-                Integer iTableId = 0;
-                String sFileType = "4";
-                for (Map<String, Object> map : fileList) {
-                    String pathFileName = (map.get("sFilePath") + "").substring((map.get("sFilePath") + "").lastIndexOf(File.separator) + 1);
-                    if (mf.getOriginalFilename().equals(pathFileName)) {
-                        sTable = result.getResult().get("tableName") + "";
-                        iTableId = Integer.valueOf(result.getResult().get("busdataId") + "");
-                        oaFileService.batchUploads(mf, sTable, iTableId, sFileType, request, response);
-                    }
+            if (files.size() > 0) {
+                while (fileTotal < files.size()) {
+                    MultipartFile mf = files.get(fileTotal);
+                    String sFileType = "4";
+                    String sTable = result.getResult().get("tableName") + "";
+                    Integer iTableId = Integer.valueOf(result.getResult().get("busdataId") + "");
+                    oaFileService.batchUploads(mf, mf.getOriginalFilename(), sTable, iTableId, sFileType, request, response);
+                    fileTotal++;
                 }
-                fileTotal++;
             }
+
         } catch (IOException e) {
             e.printStackTrace();
         } catch (ServletException e) {
             e.printStackTrace();
         }
         log.info("========省会向地市转收文服务结束============");
-        resultStatus.setResult(200);
-        return resultStatus;
+        respData.setCode(200);
+        respData.setMessage("收文传输完毕！");
+        respData.setSuccess(true);
+        return respData;
     }
 
 
     @Override
     public Result provinceToCityInsideClient(HttpServletRequest request) {
+        Result result = new Result();
         log.info("========省会向地市传阅服务开始============");
-        Result resultStatus = new Result();
         try {
             Collection<Part> parts = request.getParts();
-            List<Map<String, Object>> fileList = new ArrayList<>();
+//            List<Map<String, Object>> fileList = new ArrayList<>();
             JSONObject jsonParam = new JSONObject();
             for (Iterator<Part> iterator = parts.iterator(); iterator.hasNext(); ) {
                 Part part = iterator.next();
@@ -705,22 +751,42 @@ public class OaBusDynamicTableServiceImpl implements OaBusDynamicTableService {
                         parseString += line;
                     }
                     jsonParam = JSONObject.parseObject(parseString);
-                    String sceam = jsonParam.get("org_schema") + "";
-                    request.setAttribute("orgSchema", sceam);
-                    fileList = (List<Map<String, Object>>) jsonParam.get("fileList");
+                    if (jsonParam.get("org_schema") != null) {
+                        String sceam = jsonParam.get("org_schema") + "";
+                        request.setAttribute("orgSchema", sceam);
+                    }
+//                    fileList = (List<Map<String, Object>>) jsonParam.get("fileList");
 //                    System.out.println("=====业务数据为=======" + jsonParam.toString());
 //                    System.out.println("=====附件数据为=======" + fileList.toString());
                 }
             }
             //数据字典获取模块和业务id
             List<Map<String, Object>> functonDict = sysDictService.getDictByKey("btn_insideSend");
+            if (functonDict.size() < 1) {
+                result.setMessage("请完善传阅数据配置！");
+                result.setCode(500);
+                result.setSuccess(false);
+                return result;
+            }
             String functionId = functonDict.get(0).get("dictVal") + "";
             String unitId = functonDict.get(0).get("dictItem") + "";
             Map<String, Object> tableData = dynamicTableMapper.queryModelByFunctionId(functonDict.get(0).get("dictVal") + "");
+            if (tableData == null) {
+                result.setMessage("请完善模块配置！");
+                result.setCode(500);
+                result.setSuccess(false);
+                return result;
+            }
             Map<String, Object> functionMap = new HashMap<>();
             functionMap.put("i_id", functionId);
             functionMap.put("table", "oa_bus_function");
             Map<String, Object> functionData = dynamicTableMapper.queryDataById(functionMap);
+            if (functionData == null) {
+                result.setMessage("请完善业务配置！");
+                result.setCode(500);
+                result.setSuccess(false);
+                return result;
+            }
             String table = tableData.get("s_busdata_table") + "";
 //            String modelId = tableData.get("i_id") + "";
 //            LoginInfo loginInfo = new LoginInfo();
@@ -762,17 +828,34 @@ public class OaBusDynamicTableServiceImpl implements OaBusDynamicTableService {
             if (busProcSet == null) return Result.error("无此类数据配置");
             int iVsersion = busProcSet.getIVersion() == null ? 1 : busProcSet.getIVersion();
             updateMap.put("i_fun_version", iVsersion);
-            dynamicTableMapper.insertData(updateMap);
+            int i = dynamicTableMapper.insertData(updateMap);
+            if (i != 1) {
+                result.setMessage("写入数据失败！");
+                result.setCode(500);
+                result.setSuccess(false);
+                return result;
+            }
 
             //查询收文管理员角色用户（编码710）
             List<Map<String, Object>> userList = dynamicTableMapper.queryUsersByUnit(unitId);
+            if (userList.size() < 1) {
+                result.setMessage("无管理员角色用户！");
+                result.setCode(500);
+                result.setSuccess(false);
+                return result;
+            }
             String sCreateBy = "";
             for (Map<String, Object> map : userList) {
                 sCreateBy += map.get("userId") + ",";
             }
             updateMap.put("s_create_by", sCreateBy);
             int num = dynamicTableMapper.updateData(updateMap);
-
+            if (num != 1) {
+                result.setMessage("数据修改失败！");
+                result.setCode(500);
+                result.setSuccess(false);
+                return result;
+            }
             //写入用户权限
             Map<String, Object> permitMap = new HashMap<>();
             permitMap.put("list", userList);
@@ -786,20 +869,15 @@ public class OaBusDynamicTableServiceImpl implements OaBusDynamicTableService {
             List<MultipartFile> files = multRequest.getFiles("File");
             int fileTotal = 0;
             HttpServletResponse response = null;
-            while (fileTotal < files.size()) {
-                MultipartFile mf = files.get(fileTotal);
-                String sTable = "";
-                Integer iTableId = 0;
-                String sFileType = "4";
-                for (Map<String, Object> map : fileList) {
-                    String pathFileName = (map.get("sFilePath") + "").substring((map.get("sFilePath") + "").lastIndexOf(File.separator) + 1);
-                    if (mf.getOriginalFilename().equals(pathFileName)) {
-                        sTable = table;
-                        iTableId = Integer.valueOf(updateMap.get("i_id") + "");
-                        oaFileService.batchUploads(mf, sTable, iTableId, sFileType, request, response);
-                    }
+            if (files.size() > 0) {
+                while (fileTotal < files.size()) {
+                    MultipartFile mf = files.get(fileTotal);
+                    String sFileType = "4";
+                    String sTable = table;
+                    Integer iTableId = Integer.valueOf(updateMap.get("i_id") + "");
+                    oaFileService.batchUploads(mf, mf.getOriginalFilename(), sTable, iTableId, sFileType, request, response);
+                    fileTotal++;
                 }
-                fileTotal++;
             }
         } catch (IOException e) {
             e.printStackTrace();
@@ -807,8 +885,10 @@ public class OaBusDynamicTableServiceImpl implements OaBusDynamicTableService {
             e.printStackTrace();
         }
         log.info("========省会向地市传阅服务结束============");
-        resultStatus.setResult(200);
-        return resultStatus;
+        result.setSuccess(true);
+        result.setCode(200);
+        result.setMessage("传阅完毕！");
+        return result;
     }
 
     @Override

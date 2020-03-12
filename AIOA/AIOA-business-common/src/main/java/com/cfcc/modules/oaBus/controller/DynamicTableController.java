@@ -427,14 +427,12 @@ public class DynamicTableController {
     public Result provinceToCity(@RequestBody Map<String,Object> map,HttpServletRequest request) {
         Result result = new Result<>();
         try {
-            String ok = dynamicTableService.provinceToCityReceiveFile(map,request);
-            if (ok.contains("200")){
-                result.setResult(200);
-            }
+            result = dynamicTableService.provinceToCityReceiveFile(map,request);
         } catch (Exception e) {
             e.printStackTrace();
+            result.setMessage("接口调用失败！");
+            result.setCode(500);
             result.setSuccess(false);
-            result.setMessage("地市接口调用失败");
         }
         return result;
     }
@@ -444,11 +442,12 @@ public class DynamicTableController {
     public Result provinceToCityReceviceClient(HttpServletRequest request) {
         Result result = new Result<>();
         try {
-            dynamicTableService.provinceToCityClient(request);
+            result= dynamicTableService.provinceToCityClient(request);
         } catch (Exception e) {
             e.printStackTrace();
+            result.setMessage("服务调用失败！");
+            result.setCode(500);
             result.setSuccess(false);
-            result.setMessage("服务调用失败");
         }
         return result;
     }
@@ -458,14 +457,12 @@ public class DynamicTableController {
     public Result provinceToCityInside(@RequestBody Map<String,Object> map,HttpServletRequest request) {
         Result result = new Result<>();
         try {
-            String ok = dynamicTableService.provinceToCityInsideFile(map,request);
-            if (ok.contains("200")){
-                result.setResult(200);
-            }
+            result = dynamicTableService.provinceToCityInsideFile(map,request);
         } catch (Exception e) {
             e.printStackTrace();
+            result.setMessage("接口调用失败！");
+            result.setCode(500);
             result.setSuccess(false);
-            result.setMessage("地市接口调用失败");
         }
         return result;
     }
@@ -476,11 +473,12 @@ public class DynamicTableController {
     public Result provinceToCityInsideClient(HttpServletRequest request) {
         Result result = new Result<>();
         try {
-            dynamicTableService.provinceToCityInsideClient(request);
+            result= dynamicTableService.provinceToCityInsideClient(request);
         } catch (Exception e) {
             e.printStackTrace();
+            result.setMessage("服务调用失败！");
+            result.setCode(500);
             result.setSuccess(false);
-            result.setMessage("服务调用失败");
         }
         return result;
     }
