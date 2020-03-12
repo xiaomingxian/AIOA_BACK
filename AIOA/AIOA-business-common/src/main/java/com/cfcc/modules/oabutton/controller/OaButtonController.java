@@ -214,7 +214,12 @@ public class OaButtonController {
 			 Result<List<OaButton>> result = new Result<>();
 			 List<OaButton> oaButton = oaButtonService.queryById(null,sBtnName.trim());
 			 if(oaButton==null||oaButton.size()==0) {
-				 result.error500("未找到对应实体");
+			 	OaButton oatest=new OaButton();
+				 oatest.setIId(1000000);
+				 oaButton.add(oatest);
+				 result.setResult(oaButton);
+				 result.setSuccess(true);
+//				 result.error500("未找到对应实体");
 			 }else {
 				 result.setResult(oaButton);
 				 result.setSuccess(true);
