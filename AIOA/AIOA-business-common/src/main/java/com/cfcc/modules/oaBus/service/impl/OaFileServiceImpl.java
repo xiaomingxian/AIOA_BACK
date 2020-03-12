@@ -427,9 +427,11 @@ public class OaFileServiceImpl extends ServiceImpl<OaFileMapper, OaFile> impleme
         List<OaFile> fileList = oaFileMapper.queryFileListByType(obj.get("sTable") + "", obj.get("iTableId") + "", obj.get("sFileType") + "");
         for (OaFile oafile : fileList) {
             File lastPath = new File(suffexPath + File.separator + oafile.getSFilePath());
-            StringBuilder str = new StringBuilder(oafile.getSFileName());
-            StringBuilder filename = str.insert(oafile.getSFileName().indexOf("."), "_" + System.currentTimeMillis());
-            File uploadPath = new File(upPath + File.separator + filename);
+            String filename = System.currentTimeMillis() + com.cfcc.common.util.FileUtils.generatePassword(5);
+            String newFileName = oafile.getSFileName().replace(oafile.getSFileName().substring(0, oafile.getSFileName().lastIndexOf(".")), filename.substring(0, filename.lastIndexOf(".")));
+//            StringBuilder str = new StringBuilder(oafile.getSFileName());
+//            StringBuilder filename = str.insert(oafile.getSFileName().indexOf("."), "_" + System.currentTimeMillis());
+            File uploadPath = new File(upPath + File.separator + newFileName);
             try {
                 uploadPath.createNewFile();
                 FileInputStream oldfile = new FileInputStream(lastPath);
@@ -445,7 +447,7 @@ public class OaFileServiceImpl extends ServiceImpl<OaFileMapper, OaFile> impleme
                 saveFile.setSTable(obj.get("receiveTable") + "");
                 saveFile.setITableId((Integer) obj.get("receiveId"));
                 saveFile.setSFileName(oafile.getSFileName());
-                saveFile.setSFilePath(calendarPath + File.separator + filename);
+                saveFile.setSFilePath(calendarPath + File.separator + newFileName);
                 saveFile.setDCreateTime(new Date());
                 oaFileService.save(saveFile);
 //                QueryWrapper<OaFile> c = new QueryWrapper<>();

@@ -169,5 +169,10 @@ public class BusModelPermitServiceImpl extends ServiceImpl<BusModelPermitMapper,
         return pageList;
     }
 
+    @Override
+    public List<BusFunction> findByModelId(String id) {
+        return busModelPermitMapper.findByModelId(id);
+    }
+
 
 }

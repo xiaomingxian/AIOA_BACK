@@ -65,7 +65,9 @@
 	<select id="findRoleId" resultType="com.cfcc.modules.system.entity.SysRole">
 		select id from sys_role
 	</select>
-
+    <select id="findByModelId" resultType="com.cfcc.modules.oaBus.entity.BusFunction">
+		select * from oa_bus_function where  i_bus_model_id = #{id}
+	</select>
 
 
 </mapper>
