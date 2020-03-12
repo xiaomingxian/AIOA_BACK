@@ -23,6 +23,8 @@ public interface CommonDynamicTableMapper {
      */
     int insertDataBatch(@Param("list") List<Map<String,Object>> list);
 
+    int updateData(@Param("map") Map<String, Object> map);
+
 
     List<Map<String, Object>> queryByEquals(@Param("pageNo") Integer pageNo, @Param("pageSize") Integer pageSize, @Param("query") Map<String, Object> query, @Param("table") String table);
 

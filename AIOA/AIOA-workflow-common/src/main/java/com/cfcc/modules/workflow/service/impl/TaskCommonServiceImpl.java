@@ -14,6 +14,7 @@ import com.cfcc.modules.system.entity.LoginInfo;
 import com.cfcc.modules.system.entity.SysDepart;
 import com.cfcc.modules.system.entity.SysUser;
 import com.cfcc.modules.system.entity.SysUserAgent;
+import com.cfcc.modules.system.mapper.CommonDynamicTableMapper;
 import com.cfcc.modules.system.mapper.SysUserAgentMapper;
 import com.cfcc.modules.system.mapper.SysUserMapper;
 import com.cfcc.modules.system.service.ISysUserService;
@@ -57,6 +58,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import java.util.*;
 import java.util.concurrent.Callable;
@@ -72,6 +74,10 @@ public class TaskCommonServiceImpl implements TaskCommonService {
 
     @Autowired
     private CommonDynamicTableService dynamicTableService;
+
+
+    @Autowired
+    private CommonDynamicTableMapper dynamicTableMapper;
 
 
     @Autowired
@@ -408,7 +414,7 @@ public class TaskCommonServiceImpl implements TaskCommonService {
                         //当前任务已经被移交给其他人
                         //查询移交记录----根据taskid去查移交记录表
                         String sourceUserId = null;
-                        if (taskTransfer!=null){
+                        if (taskTransfer != null) {
                             taskTransfer.getSourceUserId();
                         }
                         if (sourceUserId == null) ;
@@ -1606,16 +1612,34 @@ public class TaskCommonServiceImpl implements TaskCommonService {
         //当前节点
         ActivityImpl curr = (ActivityImpl) processDefinition.findActivity(jumpMsg.getCurrActDefKey());
 
+        TaskWithDepts taskWithDepts = jumpMsg.getTaskWithDepts();
+
+        //主办部门更新
+        String description = task.getDescription();
+        if (StringUtils.isNotBlank(description) && jumpMsg.getIsDept()){//是部门任务
+            String[] split = description.split("@mainDept");
+            String s = split[0];
+            description=s+"@mainDept:"+taskWithDepts.getMainDept()+"@";
+            Map<String, Object> vars = jumpMsg.getVars();
+            vars.put("busMsg",description);
+        }
 
         commandExecutor.execute(new JumpTaskCmd(jumpMsg.getTaskId(), jumpMsg.getExecutionId(),
                 jumpMsg.getProcessInstanceId(), dest, jumpMsg.getVars(), curr, jumpMsg.getDeleteReason()));
+
+
 
         //查到所有 产生的任务实例
         List<Task> newTasks = taskService.createTaskQuery().processInstanceId(jumpMsg.getProcessInstanceId()).list();
         String type = deleteReason.contains("back") ? "_back" : "_jump";
         if (newTasks.size() > 0) {
+            //跳转或回退后更新 描述信息 与父节点
             for (Task newTask : newTasks) {
+
+                newTask.setDescription(description);
+
                 newTask.setParentTaskId(sourceTaskId + type);
+                taskMapper.updateParentAndDesc(newTask);
                 taskService.saveTask(newTask);
             }
         }
@@ -1635,7 +1659,6 @@ public class TaskCommonServiceImpl implements TaskCommonService {
             List<Task> list = taskService.createTaskQuery().processInstanceId(processInstanceId).list();
             //存储部门相关信息
 
-            TaskWithDepts taskWithDepts = jumpMsg.getTaskWithDepts();
 
 
             //变量与任务的对应关系----如何区分主办/辐办/传阅
@@ -1659,7 +1682,17 @@ public class TaskCommonServiceImpl implements TaskCommonService {
                 }
 
             }
-            //TODO 更新业务信息中的主办 辅办 代办
+            String dataTable = jumpMsg.getTable();
+            if (StringUtils.isNotBlank(dataTable)) {
+                Map<String, Object> data = new HashMap<>();
+                data.put("table", dataTable);
+                data.put("i_id", tableId);
+                data.put("s_main_unit_names", taskWithDepts.getMainDept());
+                data.put("s_cc_unit_names", taskWithDepts.getFuDept());
+                data.put("s_inside_deptnames", taskWithDepts.getCyDept());
+                dynamicTableMapper.updateData(data);
+            }
+
 
         }
 
