@@ -1,6 +1,7 @@
 package com.cfcc.modules.oaBus.mapper;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+import com.cfcc.modules.oaBus.entity.BusFunction;
 import com.cfcc.modules.oaBus.entity.BusModelPermit;
 import com.cfcc.modules.system.entity.SysRole;
 import com.cfcc.modules.system.entity.SysUserRole;
@@ -38,4 +39,5 @@ public interface BusModelPermitMapper extends BaseMapper<BusModelPermit> {
     List<SysRole> findRoleId();
 
 
+    List<BusFunction> findByModelId(String id);
 }

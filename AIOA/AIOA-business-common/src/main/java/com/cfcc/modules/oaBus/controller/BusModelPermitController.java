@@ -10,6 +10,7 @@ import com.cfcc.common.mycat.MycatSchema;
 import com.cfcc.common.system.query.QueryGenerator;
 import com.cfcc.common.system.util.JwtUtil;
 import com.cfcc.common.util.oConvertUtils;
+import com.cfcc.modules.oaBus.entity.BusFunction;
 import com.cfcc.modules.oaBus.entity.BusFunctionPermit;
 import com.cfcc.modules.oaBus.entity.BusModelPermit;
 import com.cfcc.modules.oaBus.service.IBusModelPermitService;
@@ -285,6 +286,21 @@ public class BusModelPermitController {
             result.error500("未找到对应实体");
         } else {
             result.setResult(busModelPermit);
+            result.setSuccess(true);
+        }
+        return result;
+    }
+
+    @AutoLog(value = "查询业务模块")
+    @ApiOperation(value = "业务模板-查询业务模块", notes = "业务模板-查询业务模块")
+    @GetMapping(value = "/findFunctionListByModelId")
+    public Result<List<BusFunction>> findFunctionListByModelId(@RequestParam(name = "id", required = true) String id) {
+        Result<List<BusFunction>> result = new Result<List<BusFunction>>();
+        List<BusFunction> busFunction = busModelPermitService.findByModelId(id);
+        if (busFunction == null) {
+            result.error500("未找到对应实体");
+        } else {
+            result.setResult(busFunction);
             result.setSuccess(true);
         }
         return result;
