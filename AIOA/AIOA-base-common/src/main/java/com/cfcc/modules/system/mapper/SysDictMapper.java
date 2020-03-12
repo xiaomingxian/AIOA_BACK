@@ -109,7 +109,7 @@ public interface SysDictMapper extends BaseMapper<SysDict> {
     List<DictModel> getDescribeDictCodeDao(@Param("dictCode")String dictCode);
 
     @Select("SELECT   " +
-            "  d.id dictId,d.dict_code dictCode,d.dict_name dictName,   " +
+            " i.id id, d.id dictId,d.dict_code dictCode,d.dict_name dictName,   " +
             "  i.item_text text,i.item_value value,i.description description,GROUP_CONCAT(dp.s_unit_id) departIds   " +
             "  FROM   " +
             "  `sys_dict` d   " +
