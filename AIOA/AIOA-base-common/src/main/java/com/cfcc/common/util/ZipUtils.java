@@ -8,6 +8,7 @@ import javax.swing.filechooser.FileSystemView;
 import java.io.*;
 import java.text.DecimalFormat;
 import java.util.List;
+import java.util.Map;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
@@ -22,7 +23,7 @@ public class ZipUtils {
      * @param response
      * @return
      */
-    public static HttpServletResponse downFile(List<File> list, HttpServletResponse response) {
+    public static HttpServletResponse downFile(List<Map<String,Object>> list, HttpServletResponse response) {
         try {
             String zipFiles = FileSystemView.getFileSystemView().getHomeDirectory().getAbsolutePath() + System.currentTimeMillis() + ".zip"; //根据毫秒数生成一个ZIP文件
             File file = new File(zipFiles);
@@ -50,11 +51,10 @@ public class ZipUtils {
      * @param files
      * @param outputStream
      */
-    public static void zipFiles(List<File> files, ZipOutputStream outputStream) {
+    public static void zipFiles( List<Map<String,Object>> files, ZipOutputStream outputStream) {
         int size = files.size();
-        for (int i = 0; i < size; i++) {
-            File file = files.get(i);
-            zipFile(file, outputStream);
+        for (Map map :files) {
+            zipFile(map, outputStream);
         }
     }
 
@@ -62,12 +62,12 @@ public class ZipUtils {
      * @param inputFile   //文档路径
      * @param ouputStream
      */
-    public static void zipFile(File inputFile, ZipOutputStream ouputStream) {
+    public static void zipFile(Map<String,Object> inputFile, ZipOutputStream ouputStream) {
         try {
             //File路径
-            FileInputStream IN = new FileInputStream(inputFile);
+            FileInputStream IN = new FileInputStream(inputFile.get("sfilePath")+"");
             BufferedInputStream bins = new BufferedInputStream(IN, 1024);
-            ZipEntry entry = new ZipEntry(inputFile.getName());
+            ZipEntry entry = new ZipEntry(inputFile.get("sfileName")+"");
             ouputStream.putNextEntry(entry);
             // 向压缩文件中输出数据
             int nNumber;

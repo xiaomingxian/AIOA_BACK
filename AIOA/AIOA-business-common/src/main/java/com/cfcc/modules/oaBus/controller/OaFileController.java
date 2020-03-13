@@ -35,7 +35,6 @@ import java.io.File;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
@@ -69,25 +68,19 @@ public class OaFileController {
      * @param list
      */
     @RequestMapping("/downloadZipFile")
-    public void downloadZipFile(HttpServletRequest request, HttpServletResponse response, @RequestBody List<OaFile> list) { //获取的对象
+    public void downloadZipFile(HttpServletRequest request, HttpServletResponse response, @RequestBody List<Map<String,Object>> list) { //获取的对象
         if (list.size()== 0){
             return;
         }
         LoginInfo loginInfo = sysUserService.getLoginInfo(request);
-        List<File> files = new ArrayList<>();
+        String orgSchema ="";
         if (loginInfo.getOrgSchema() != null && !loginInfo.getOrgSchema().equals("")) {
-                for (int i = 0; i < list.size(); i++) {
-                    File file = new File(uploadpath + File.separator + loginInfo.getOrgSchema() + File.separator + list.get(i).getSFilePath());
-                    files.add(file);
-                }
-
-        } else {
-                for (int i = 0; i < list.size(); i++) {
-                    File file = new File(uploadpath + File.separator + list.get(i).getSFilePath());
-                    files.add(file);
-                }
+            orgSchema = loginInfo.getOrgSchema();
         }
-        ZipUtils.downFile(files, response);
+        for (Map map :list) {
+            map.put("sfilePath",uploadpath + File.separator + orgSchema + File.separator + map.get("sfilePath")+"");
+        }
+        ZipUtils.downFile(list, response);
     }
 
     /**
