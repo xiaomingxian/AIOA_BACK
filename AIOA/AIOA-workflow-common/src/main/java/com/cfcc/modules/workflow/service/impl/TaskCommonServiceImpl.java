@@ -1683,7 +1683,7 @@ public class TaskCommonServiceImpl implements TaskCommonService {
 
             }
             String dataTable = jumpMsg.getTable();
-            if (StringUtils.isNotBlank(dataTable)) {
+            if (StringUtils.isNotBlank(dataTable)) {//并且是部门类型
                 Map<String, Object> data = new HashMap<>();
                 data.put("table", dataTable);
                 data.put("i_id", tableId);

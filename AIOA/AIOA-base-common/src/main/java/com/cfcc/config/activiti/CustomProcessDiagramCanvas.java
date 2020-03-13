@@ -1,10 +1,6 @@
 package com.cfcc.config.activiti;
 
-import java.awt.Color;
-import java.awt.Font;
-import java.awt.Paint;
-import java.awt.RenderingHints;
-import java.awt.Stroke;
+import java.awt.*;
 import java.awt.font.FontRenderContext;
 import java.awt.font.LineBreakMeasurer;
 import java.awt.font.TextAttribute;
@@ -13,7 +9,10 @@ import java.awt.geom.Line2D;
 import java.awt.geom.Rectangle2D;
 import java.awt.geom.RoundRectangle2D;
 import java.awt.image.BufferedImage;
+import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.text.AttributedCharacterIterator;
 import java.text.AttributedString;
 
@@ -24,9 +23,12 @@ import org.activiti.bpmn.model.GraphicInfo;
 import org.activiti.image.exception.ActivitiImageException;
 import org.activiti.image.impl.DefaultProcessDiagramCanvas;
 import org.activiti.image.util.ReflectUtil;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.PropertySource;
 
 
 public class CustomProcessDiagramCanvas extends DefaultProcessDiagramCanvas {
+
 
     protected static Color LABEL_COLOR = new Color(0, 0, 0);
 
@@ -188,12 +190,12 @@ public class CustomProcessDiagramCanvas extends DefaultProcessDiagramCanvas {
         g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
         g.setPaint(Color.black);
 
-        Font font = new Font(activityFontName, Font.BOLD, FONT_SIZE);
+        Font font = this.loadFontFromResources(this.activityFontName, Font.BOLD, FONT_SIZE);
         g.setFont(font);
         this.fontMetrics = g.getFontMetrics();
 
-        LABEL_FONT = new Font(labelFontName, Font.ITALIC, 10);
-        ANNOTATION_FONT = new Font(annotationFontName, Font.PLAIN, FONT_SIZE);
+        LABEL_FONT = this.loadFontFromResources(this.labelFontName, Font.ITALIC, 10);
+        ANNOTATION_FONT = this.loadFontFromResources(this.annotationFontName, Font.PLAIN, FONT_SIZE);
         //优化加载速度
         if(flag) {
             return;
@@ -246,6 +248,50 @@ public class CustomProcessDiagramCanvas extends DefaultProcessDiagramCanvas {
             LOGGER.warn("Could not load image for process diagram creation: {}", e.getMessage());
         }
     }
+
+
+    /**
+     * 根据名称从resources中加载字体
+     *
+     * @param fontName
+     * @param fontStyle
+     * @param fontSize
+     * @return
+     */
+    public Font loadFontFromResources(String fontName, int fontStyle, float fontSize) {
+        Font font = null;
+//        System.setProperty("java.awt.headless", "true");
+//        if (StringUtils.isEmpty(fontName)) {
+//            return font;
+//        }
+        try {
+            //加载resources下的字体文件,文件命名与设置的字体名称一一对应
+            InputStream fontInputStream = this.getClass().getResourceAsStream("/fonts/static/simsun.ttc");
+//            InputStream fontInputStream = new FileInputStream(new File(fontPath));
+//            InputStream fontInputStream = this.getClass().getResourceAsStream("/fonts/song.ttc");
+            //未找到项目中相应的字体文件，则使用系统的字体
+            if (fontInputStream == null) {
+                return new Font(fontName, fontStyle, (int) fontSize);
+            }
+            font = Font.createFont(Font.TRUETYPE_FONT, fontInputStream);
+            //设置字体类型
+            if (fontStyle > -1) {
+                font = font.deriveFont(fontStyle);
+            }
+            //设置字体大小
+            if (fontSize > -1) {
+                font = font.deriveFont(fontSize);
+            }
+        } catch (FontFormatException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return font;
+    }
+
 
 
 }

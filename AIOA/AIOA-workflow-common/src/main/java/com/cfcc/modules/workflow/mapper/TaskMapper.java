@@ -163,7 +163,8 @@ public interface TaskMapper {
             " from act_hi_taskinst t " +
             " LEFT JOIN ${table} p on  t.ID_=p.s_task_id   " +
             " where (t.ASSIGNEE_ LIKE '撤回:%' " +
-            "OR t.ASSIGNEE_ LIKE '回退:%') and t.PROC_INST_ID_=#{procInstId}  " +
+            "OR (t.ASSIGNEE_ LIKE '回退:%' and p.s_opinion_type=-1 )) and t.PROC_INST_ID_=#{procInstId}  " +
+            "GROUP BY name_,START_TIME_ ,p.s_opinion " +
             "order  by cast( t.id_  as SIGNED INTEGER)  asc")
     List<BackRecord> backRecord(@Param("procInstId") String procInstId,@Param("table")String table);
 
