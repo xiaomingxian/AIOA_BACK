@@ -72,4 +72,15 @@ public interface IOaTemplateService extends IService<OaTemplate> {
      */
     List<OaFile> batchUploads(MultipartFile[] files, String sTable, Integer iTableId, String sFileType, HttpServletRequest request, HttpServletResponse response);
 
+
+    /**
+     * 只上传文件
+     * @param files
+     * @param request
+     * @param response
+     * @return
+     */
+    List<OaFile> uploadFiles(MultipartFile[] files, HttpServletRequest request, HttpServletResponse response);
+
+
 }

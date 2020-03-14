@@ -36,6 +36,7 @@ import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
@@ -420,6 +421,41 @@ public class OaFileController {
         Result result = new Result<>();
         boolean ok = oaFileService.isShowFileBtn(map);
         result.setResult(ok);
+        return result;
+    }
+
+    /**
+     * 添加
+     *
+     * @param oaFile
+     * @return
+     */
+    @AutoLog(value = "附件信息写入")
+    @ApiOperation(value = "附件信息写入", notes = "附件信息写入")
+    @PostMapping(value = "/addFiles")
+    public Result<OaFile> addFiles(@RequestBody List<Map<String,Object>> maps,HttpServletRequest request) {
+        Result<OaFile> result = new Result<OaFile>();
+        LoginInfo loginInfo = sysUserService.getLoginInfo(request);
+        String username = loginInfo.getUsername();
+        try {
+            for (Map map:maps){
+                OaFile oaFile = new OaFile();
+                oaFile.setSFilePath(map.get("sFilePath")+"");
+                oaFile.setSFileName(map.get("sFileName")+"");
+                oaFile.setSTable(map.get("sTable")+"");
+                oaFile.setITableId(Integer.valueOf(map.get("iTableId")+""));
+                oaFile.setSFileType(map.get("sFileType")+"");
+                oaFile.setSCreateBy(username);
+                oaFile.setDCreateTime(new Date());
+                oaFileService.save(oaFile);
+                oaFileService.updateIorderById(oaFile.getIId());
+                result.success("添加成功！");
+            }
+
+        } catch (Exception e) {
+            log.error(e.getMessage(), e);
+            result.error500("操作失败");
+        }
         return result;
     }
 

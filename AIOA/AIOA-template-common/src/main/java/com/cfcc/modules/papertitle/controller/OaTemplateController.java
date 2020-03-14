@@ -396,12 +396,13 @@ public class OaTemplateController {
      */
     @PostMapping(value = "/uploads")
     public Result<?> uploads(@RequestParam("file") MultipartFile[] files,
-                             @RequestParam("sTable") String sTable,
-                             @RequestParam("iTableId") Integer iTableId,
-                             @RequestParam("sFileType") String sFileType,
+                             @RequestParam(value = "sTable",required = false) String sTable,
+                             @RequestParam(value = "iTableId",required = false) Integer iTableId,
+                             @RequestParam(value = "sFileType",required = false) String sFileType,
                              HttpServletRequest request, HttpServletResponse response) {
         Result<List<OaFile>> result = new Result<List<OaFile>>();
-        List<OaFile> oaFiles = oaTemplateService.batchUploads(files, sTable, iTableId, sFileType, request, response);
+//        List<OaFile> oaFiles = oaTemplateService.batchUploads(files, sTable, iTableId, sFileType, request, response); //上传+写入附件信息
+        List<OaFile> oaFiles = oaTemplateService.uploadFiles(files,request, response); //附件信息
         result.setResult(oaFiles);
         return result;
     }

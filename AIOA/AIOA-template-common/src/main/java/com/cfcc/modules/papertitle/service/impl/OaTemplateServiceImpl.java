@@ -145,4 +145,48 @@ public class OaTemplateServiceImpl extends ServiceImpl<OaTemplateMapper, OaTempl
         }
         return fileIds;
     }
+
+    @Override
+    public List<OaFile> uploadFiles(MultipartFile[] files, HttpServletRequest request, HttpServletResponse response) {
+        List<OaFile> fileIds = new ArrayList<>();
+        try {
+            //获取用户名称
+            LoginInfo loginInfo = sysUserService.getLoginInfo(request);
+            String username = loginInfo.getUsername();
+            String ctxPath = uploadpath;
+            String fileName = null;
+            Calendar calendar = Calendar.getInstance();
+            String calendarPath = calendar.get(Calendar.YEAR) +
+                    File.separator + (calendar.get(Calendar.MONTH) + 1) +
+                    File.separator + calendar.get(Calendar.DATE);
+            String path= "";
+            if (loginInfo.getOrgSchema() != null && !loginInfo.getOrgSchema().equals("")) {
+                path = ctxPath.replace("//", "/" +
+                        "") + File.separator + loginInfo.getOrgSchema() + File.separator + calendarPath;
+            } else {
+                path = ctxPath.replace("//", "/" +
+                        "") + File.separator + calendarPath;
+            }
+            if (files.length > 0) {
+                File parent = new File(path);
+                if (!parent.exists()) {
+                    parent.mkdirs();// 创建文件根目录
+                }
+                for (MultipartFile file : files) {
+                    String orgName = file.getOriginalFilename();// 获取文件名
+                    fileName = System.currentTimeMillis()+FileUtils.generatePassword(5)+orgName.substring(orgName.indexOf("."));
+                    String savePath = parent.getPath() + File.separator + fileName;
+                    File savefile = new File(savePath);
+                    FileCopyUtils.copy(file.getBytes(), savefile);
+                    OaFile oaFile = new OaFile();
+                    oaFile.setSFileName(orgName);        //设置附件名字
+                    oaFile.setSFilePath(calendarPath + File.separator + fileName);        //设置文件路径
+                    fileIds.add(oaFile);
+                }
+            }
+        } catch (IOException e) {
+            log.error(e.getMessage(), e);
+        }
+        return fileIds;
+    }
 }
