@@ -347,18 +347,18 @@ public class OaFileServiceImpl extends ServiceImpl<OaFileMapper, OaFile> impleme
         String sfilepath = "";
         LoginInfo loginInfo = sysUserService.getLoginInfo(request);
         String orgSchema = loginInfo.getOrgSchema();
-        if ( orgSchema != null &&!orgSchema.equals("")) {
-            sfilepath = uploadpath + File.separator + orgSchema + File.separator + map.get("s_file_path") + "";
-        } else {
-            sfilepath = uploadpath+ File.separator + map.get("s_file_path") + "";
-        }
+//        if ( orgSchema != null &&!orgSchema.equals("")) {
+//            sfilepath = uploadpath + File.separator + orgSchema + File.separator + map.get("s_file_path") + "";
+//        } else {
+//            sfilepath = uploadpath+ File.separator + map.get("s_file_path") + "";
+//        }
         String s_file_name = map.get("s_file_name") + "";
         String iid = map.get("i_id") + "";
         OaFile initFile = oaFileService.queryById(Integer.valueOf(iid));
         String oldName = initFile.getSFileName().substring(0, initFile.getSFileName().lastIndexOf("."));
         String newName = initFile.getSFileName().replace(oldName, s_file_name);
         initFile.setSFileName(newName);
-        initFile.setSFilePath(sfilepath);
+//        initFile.setSFilePath(sfilepath);
         boolean ok = false;
         ok =  oaFileMapper.updateDocNameById(initFile);
 //        File file = new File(sfilepath);
