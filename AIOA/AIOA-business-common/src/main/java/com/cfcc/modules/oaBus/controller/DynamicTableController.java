@@ -286,52 +286,52 @@ public class DynamicTableController {
         try {
             boolean ok = dynamicTableService.deleteBusdata(map);
 //            Boolean ok = true;
-            if (ok){
-                String indexName = "";
-                String table = map.get("table")+"";
-                String tableId = map.get("i_id")+"";
-                String id = table+tableId;
-                String DBvalue = MycatSchema.getMycatAnnot();
-                if (DBvalue != ""){
-                    DBvalue = DBvalue.substring(DBvalue.indexOf("=")+1,DBvalue.lastIndexOf("*"));
-                }
-                SysUser currentUser = sysUserService.getCurrentUser(request);
-                String username = currentUser.getUsername();
-                //获取用户所属支行id
-                String departId = sysUserService.getdeptIdByUser(username);
-
-                //根据oa_busdata表中的id和table去查询数据该业务是否纳入全文检索，
-                // 如果纳入了则删除es库中的数据，如果没有纳入，则不会执行删除es数据
+//            if (ok){
+//                String indexName = "";
+//                String table = map.get("table")+"";
+//                String tableId = map.get("i_id")+"";
+//                String id = table+tableId;
+//                String DBvalue = MycatSchema.getMycatAnnot();
+//                if (DBvalue != ""){
+//                    DBvalue = DBvalue.substring(DBvalue.indexOf("=")+1,DBvalue.lastIndexOf("*"));
+//                }
+//                SysUser currentUser = sysUserService.getCurrentUser(request);
+//                String username = currentUser.getUsername();
+//                //获取用户所属支行id
+//                String departId = sysUserService.getdeptIdByUser(username);
+//
+//                //根据oa_busdata表中的id和table去查询数据该业务是否纳入全文检索，
+//                // 如果纳入了则删除es库中的数据，如果没有纳入，则不会执行删除es数据
 //                Boolean flag = oaBusdataService.getFuncitionByBusdata(tableId,table);
 //                if (flag){
-                    indexName = "elasticsearch"+DBvalue+departId+1;
-                    String indexType = "oaBusdata";
-                    try {
-                        Integer res = searchService.deleteById(id, indexName, indexType);
-                        if (res != 200){
-                            res = searchService.deleteById(id, indexName, indexType);
-                        }
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                    }
+//                    indexName = "elasticsearch"+DBvalue+departId+1;
+//                    String indexType = "oaBusdata";
+//                    try {
+//                        Integer res = searchService.deleteById(id, indexName, indexType);
+//                        if (res != 200){
+//                            res = searchService.deleteById(id, indexName, indexType);
+//                        }
+//                    } catch (Exception e) {
+//                        e.printStackTrace();
+//                    }
 //                }
-                List<Map<String,Object>> oaFileList = oaFileService.getOaFileByIdAndTable(tableId,table);
-                if (oaFileList.size() > 0){
-                    for (Map<String, Object> oaFileMap : oaFileList) {
-                        indexName = "elasticsearch"+DBvalue+departId+2;
-                        String indexType2 = "oaFile";
-                        id = id+oaFileMap.get("i_id");
-                        try {
-                            Integer res = searchService.deleteById(id, indexName, indexType2);
-                            if (res != 200){
-                                res = searchService.deleteById(id, indexName, indexType2);
-                            }
-                        } catch (Exception e) {
-                            e.printStackTrace();
-                        }
-                    }
-                }
-            }
+//                List<Map<String,Object>> oaFileList = oaFileService.getOaFileByIdAndTable(tableId,table);
+//                if (oaFileList.size() > 0){
+//                    for (Map<String, Object> oaFileMap : oaFileList) {
+//                        indexName = "elasticsearch"+DBvalue+departId+2;
+//                        String indexType = "oaFile";
+//                        id = id+oaFileMap.get("i_id");
+//                        try {
+//                            Integer res = searchService.deleteById(id, indexName, indexType);
+//                            if (res != 200){
+//                                res = searchService.deleteById(id, indexName, indexType);
+//                            }
+//                        } catch (Exception e) {
+//                            e.printStackTrace();
+//                        }
+//                    }
+//                }
+//            }
         } catch (Exception e) {
             e.printStackTrace();
             return Result.error("删除数据失败");

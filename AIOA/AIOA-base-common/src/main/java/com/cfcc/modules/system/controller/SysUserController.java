@@ -1018,4 +1018,14 @@ public class SysUserController {
         return Result.ok(users);
     }
 
+    @GetMapping(value = "/queryUserNameById")
+    public Result<String> queryUserNameById(@RequestParam(name = "userId",required=true) String userId,
+                                            @RequestParam(value = "orgSchema", required = false) String orgSchema,
+                                            HttpServletRequest request){
+        Result<String> result = new Result<>();
+        String userName=sysUserService.selectUserNameById(userId);
+        result.setResult(userName);
+        return result;
+    }
+
 }

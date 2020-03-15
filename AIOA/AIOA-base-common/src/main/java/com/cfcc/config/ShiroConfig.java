@@ -45,6 +45,7 @@ public class ShiroConfig {
         filterChainDefinitionMap.put("/ntko/filentko/**", "anon");//起草底稿不限制token
         filterChainDefinitionMap.put("/oafile/LoginPicture/**", "anon");//起草底稿不限制token
         filterChainDefinitionMap.put("/oafile/signPicture/**", "anon");//起草底稿不限制token
+        filterChainDefinitionMap.put("/sys/user/queryUserNameById", "anon");
 
         filterChainDefinitionMap.put("/ntko/formalfile/**", "anon");//正文排版不限制token
         filterChainDefinitionMap.put("/oabutton/oaButton/queryById", "anon");//按钮权限查询不限制token
