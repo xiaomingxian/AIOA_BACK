@@ -105,12 +105,12 @@ public class FormalFileController {
             //根据业务功能id查业务含义数据
             Integer funcationid = (Integer) map.get("i_bus_function_id");
             //修改是否排版
-            if (map.size() != 0) {
-                OaBusdata oaBusdata = new OaBusdata();
-                oaBusdata.setIId(Integer.parseInt(tableid));
-                oaBusdata.setIIsTypeset(0);
-                oaBusdataService.updateById(oaBusdata);
-            }
+//            if (map.size() != 0) {
+//                OaBusdata oaBusdata = new OaBusdata();
+//                oaBusdata.setIId(Integer.parseInt(tableid));
+//                oaBusdata.setIIsTypeset(1);
+//                oaBusdataService.updateById(oaBusdata);
+//            }
             List<BusPageDetail> busPageDetails = busPageDetailService.getListByFunID(funcationid + "");
             //遍历业务含义对象
             for (int i = 0; i < busPageDetails.size(); i++) {
@@ -175,13 +175,12 @@ public class FormalFileController {
             String fileName = oaFile.getSFilePath();
             Map<String, Object> map = iOaBusdataService.getBusDataById(stable, tableid);
             //修改是否保存办文单
-            if (map.size() != 0) {
-                OaBusdata oaBusdata = new OaBusdata();
-                oaBusdata.setIId(tableid);
-                oaBusdata.setIIsApprove(0);
-                oaBusdataService.updateById(oaBusdata);
-
-            }
+//            if (map.size() != 0) {
+//                OaBusdata oaBusdata = new OaBusdata();
+//                oaBusdata.setIId(tableid);
+//                oaBusdata.setIIsApprove(1);
+//                oaBusdataService.updateById(oaBusdata);
+//            }
             //查询附件列表中的文件名
             List<OaFile> oaFileList = iOaFileService.getOaFileList(stable, Integer.toString(tableid));
             String AccessoryFileName = "";
