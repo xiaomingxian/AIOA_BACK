@@ -100,6 +100,23 @@ public interface SysUserMapper extends BaseMapper<SysUser> {
         //当前用户所在部门 对应角色
     List<Map<String, Object>> getNextUsersByDept(@Param("userId") String userId, @Param("roleName") String roleName);
 
+    @Select("SELECT uu.id uid,uu.username uname,d.depart_name dname " +
+            " FROM  sys_user uu " +
+            " LEFT JOIN sys_user_depart ud ON uu.id = ud.user_id " +
+            " LEFT JOIN sys_depart d ON ud.dep_id = d.id " +
+            " LEFT JOIN  " +
+            " (  SELECT u.id,u.username,d.depart_name,d.parent_id org_id,d.id depId " +
+            "  FROM  sys_user u " +
+            "  LEFT JOIN sys_user_depart ud ON u.id = ud.user_id " +
+            "  LEFT JOIN sys_depart d ON ud.dep_id = d.id " +
+            "  WHERE  u.id = #{userId} order by u.show_order  ) udp on 1=1 " +
+            " LEFT JOIN sys_user_role ur on uu.id=ur.user_id " +
+            " left JOIN sys_role r on ur.role_id=r.id " +
+            " where d.id = udp.depId and  uu.id!= #{userId} " +
+            "   ORDER BY uu.show_order")
+        //当前用户所在部门 对应角色
+    List<Map<String, Object>> deptUserChoice(@Param("userId") String userId);
+
     @Select("select u.id uid,u.username uname,d.depart_name dname from sys_user u LEFT JOIN sys_user_depart ud on u.id=ud.user_id LEFT JOIN sys_depart d on d.id=ud.dep_id where u.id=#{drafterId}")
     List<Map<String, Object>> getDraftMsg(@Param("drafterId") String drafterId);
 

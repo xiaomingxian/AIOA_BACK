@@ -3,6 +3,7 @@ package com.cfcc.modules.oaBus.mapper;
 import com.cfcc.modules.oaBus.entity.ButtonPermit;
 import com.cfcc.modules.oaBus.entity.OaBusdataOpinion;
 import com.cfcc.modules.oaBus.entity.OaOutLog;
+import org.apache.ibatis.annotations.Delete;
 import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Select;
 
@@ -94,4 +95,7 @@ public interface OaBusDynamicTableMapper {
     Map<String,Object> getTableByUnitAndFunction(String unitId, String functionId);
 
     List<OaOutLog> queryOaOutLogById(OaOutLog oaOutLog);
+
+    @Delete("DELETE FROM oa_file where  s_table=#{table} and i_table_id=#{id} and s_file_type=#{type}")
+    void deleteOaFile(@Param("table") String table,@Param("id") String id,@Param("type") int i);
 }

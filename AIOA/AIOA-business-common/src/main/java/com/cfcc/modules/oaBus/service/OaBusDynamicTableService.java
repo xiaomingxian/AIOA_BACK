@@ -70,4 +70,6 @@ public interface OaBusDynamicTableService {
     void insertOaOutLog(Map<String, Object> map,HttpServletRequest request);
 
     List<String> queryOaOutLogById(OaOutLog oaOutLog);
+
+    void deleteOaFile(String table, String id, int i);
 }
