@@ -12,6 +12,7 @@ import com.cfcc.common.system.util.JwtUtil;
 import com.cfcc.common.system.vo.DictModel;
 import com.cfcc.common.util.oConvertUtils;
 import com.cfcc.modules.oaBus.entity.BusFunction;
+import com.cfcc.modules.oaBus.entity.BusModel;
 import com.cfcc.modules.oaBus.entity.OaBusdata;
 import com.cfcc.modules.oaBus.entity.TableCol;
 import com.cfcc.modules.oaBus.service.*;
@@ -277,6 +278,18 @@ public class OaBusdataController {
         return result;
     }
 
+    @GetMapping(value = "/queryModel")
+    @ResponseBody
+    public Result<String> queryModel(int modelId){
+        Result<String> result = new Result<>();
+        BusModel busModel = ibusModelService.getById(modelId) ;
+        if(busModel != null){
+            result.setResult(busModel.getIIsRadio()+"");
+        }else{
+            result.setResult("0");
+        }
+        return result ;
+    }
 
     /**
      * 通过model_id查询出对应的oa_busdata中的数据，简单查询，不带条件
