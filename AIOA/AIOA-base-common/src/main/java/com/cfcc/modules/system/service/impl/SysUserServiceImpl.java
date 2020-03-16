@@ -395,6 +395,11 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser> impl
     }
 
     @Override
+    public List<Map<String, Object>> deptUserChoice(String id) {
+        return userMapper.deptUserChoice(id);
+    }
+
+    @Override
     public Map<String, Object> getAllUserMsg(String username) {
 
 

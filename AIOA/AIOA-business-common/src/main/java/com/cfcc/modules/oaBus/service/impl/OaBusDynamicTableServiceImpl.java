@@ -919,6 +919,16 @@ public class OaBusDynamicTableServiceImpl implements OaBusDynamicTableService {
     }
 
     @Override
+    public void deleteOaFile(String table, String id, int i) {
+        dynamicTableMapper .deleteOaFile(table,id,i);
+        Map<String, Object> obj = new HashMap<>();
+        obj.put("table",table);
+        obj.put("i_id",id);
+        obj.put("i_is_typeset",0);
+        dynamicTableMapper.updateData(obj);
+    }
+
+    @Override
     public boolean deleteBusdata(Map<String, Object> map) {
         boolean b = false;
         if (map.get("processInstanceId") != null) {

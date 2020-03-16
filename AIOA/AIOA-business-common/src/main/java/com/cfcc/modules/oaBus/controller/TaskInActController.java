@@ -73,6 +73,13 @@ public class TaskInActController {
     private OaBusDynamicTableService dynamicTableService;
 
 
+    @GetMapping("deleteOaFile")
+    public  void  deleteOaFile(String table,String id ){
+        dynamicTableService.deleteOaFile(table,id,3);
+
+    }
+
+
     @ApiOperation("查询追加用户")
     @GetMapping("departChuanYueUser")
     public Result departChuanYueUser(String drafterId, String procInstId, String procKey,
@@ -354,6 +361,88 @@ public class TaskInActController {
         }
     }
 
+    @ApiOperation("本部门用户选择")
+    @GetMapping("nextUsersChoice")
+    public Result userChoice(String procDefkey,  String processDefinitionId,
+            @RequestParam(required = false) String taskId,  HttpServletRequest request) {
+
+        try {
+
+            if (StringUtils.isBlank(procDefkey)) {
+                throw new AIOAException("传入的流程定义为空，请检查此业务是否配置了流程");
+            }
+            //当前用户
+            LoginInfo user = sysUserService.getLoginInfo(request);
+            String id = user.getId();
+            //查询下n个节点属性
+            ActivityImpl current = taskCommonService.currentAct(taskId, processDefinitionId, procDefkey);
+            List<Activity> acts = taskCommonService.searchNextActs(taskId, processDefinitionId, procDefkey);
+            if (acts == null) throw new AIOAException("环节配置信息不完善请检查");
+
+            //组装代办列表
+            List<Map<String, Object>> list = new ArrayList();
+            Map<String, String> conditionContext = new HashMap<>();
+
+
+            //遍历节点 查询相关业务信息(避免循环中查询(但是此数据较少))
+            for (Activity i : acts) {
+                if (i.getConditionContext() != null) {
+                    Map<String, String> conditionContext1 = i.getConditionContext();
+                    for (String key : conditionContext1.keySet()) {
+                        String val = conditionContext1.get(key);
+                        conditionContext.put(key, val);
+                    }
+                }
+                HashMap<String, Object> oneAct = new HashMap<>();
+                //查询节点信息(配置的form信息)
+                QueryWrapper<OaProcActinst> queryWrapper = new QueryWrapper<>();
+                queryWrapper.eq("PROC_DEF_KEY", procDefkey)
+                        .eq("ACT_ID", i.getId())
+                        .eq("ACT_NAME", i.getName())
+                ;
+                //1 节点信息
+                oneAct.put("actMsg", i);
+                if (!i.getType().equalsIgnoreCase("endevent")) {
+
+                    List<OaProcActinst> oaProcActinsts = ioaProcActinstService.list(queryWrapper);
+                    OaProcActinst oaProcActinst = null;
+                    if (oaProcActinsts.size() > 0) {
+                        oaProcActinst = oaProcActinsts.get(0);
+                    }
+
+                    if (oaProcActinst == null) {
+                        throw new AIOAException("没找到对应的对应环节的配置请检查环节配置:要查询的环节" +
+                                "<【" + procDefkey + "】" + i.getId() + "-" + i.getName() + ">不存在[检查是否是拷贝数据]");
+                    }
+                    //2 数据库中的节点信息
+                    oneAct.put("oaProcActinst", oaProcActinst);
+                    // 同一环节排除自己
+                    boolean excludeMySelf = false;
+                    if (current.getId().equals(i.getId())) {
+                        excludeMySelf = true;
+                    }
+                    //查询具体数据
+                    List<Map<String, Object>> nextUsers = new ArrayList<>();
+                    nextUsers=  sysUserService.deptUserChoice(id);
+
+                    //3 办理人信息
+                    oneAct.put("nextUsers", nextUsers);
+                    list.add(oneAct);
+                }
+                if (i.getType().equalsIgnoreCase("endevent") && acts.size() == 1) {
+                    list.add(oneAct);
+                }
+            }
+
+            return Result.ok(list);
+        } catch (AIOAException e) {
+            return Result.error(e.getMessage());
+        } catch (Exception e) {
+            e.printStackTrace();
+            log.error(e.toString());
+            return Result.error("查询失败");
+        }
+    }
 
     @ApiOperation(value = "查询下一办理人")
     @GetMapping("nextUserQueryEnd")
