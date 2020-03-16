@@ -8,25 +8,17 @@ import com.cfcc.modules.system.entity.SysRole;
 import com.cfcc.modules.system.entity.SysUser;
 import com.cfcc.modules.system.service.ISysUserService;
 import com.cfcc.modules.utils.IWfConstant;
-import com.cfcc.modules.workflow.pojo.*;
+import com.cfcc.modules.workflow.pojo.Activity;
+import com.cfcc.modules.workflow.pojo.BackRecord;
+import com.cfcc.modules.workflow.pojo.JumpMsg;
+import com.cfcc.modules.workflow.pojo.TaskInfoJsonAble;
 import com.cfcc.modules.workflow.service.ActPicService;
 import com.cfcc.modules.workflow.service.ProcessManagerService;
-import com.cfcc.modules.workflow.service.ReCallTaskService;
 import com.cfcc.modules.workflow.service.TaskCommonService;
 import com.cfcc.modules.workflow.vo.TaskInfoVO;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
-import org.activiti.bpmn.model.BpmnModel;
-import org.activiti.engine.*;
-import org.activiti.engine.history.HistoricActivityInstance;
-import org.activiti.engine.history.HistoricProcessInstance;
-import org.activiti.engine.impl.cfg.ProcessEngineConfigurationImpl;
-import org.activiti.engine.impl.context.Context;
-import org.activiti.engine.impl.persistence.entity.ProcessDefinitionEntity;
-import org.activiti.engine.impl.pvm.PvmTransition;
-import org.activiti.engine.impl.pvm.process.ActivityImpl;
-import org.activiti.image.ProcessDiagramGenerator;
 import org.apache.ibatis.annotations.Param;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -34,8 +26,6 @@ import org.springframework.web.bind.annotation.*;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.io.InputStream;
-import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -206,11 +196,11 @@ public class TaskCommonController {
 
     @ApiOperation("部门完成")
     @PostMapping("departFinish")
-    public Result departFinish(@Param(value = "taskId") String taskId,String processInstanceId, HttpServletRequest request) {
+    public Result departFinish(@Param(value = "taskId") String taskId, String processInstanceId, HttpServletRequest request) {
         try {
             SysUser user = sysUserService.getCurrentUser(request);
 
-            return taskCommonService.departFinish(taskId,processInstanceId, user);
+            return taskCommonService.departFinish(taskId, processInstanceId, user);
         } catch (AIOAException e) {
             return Result.error(e.getMessage());
         } catch (Exception e) {
@@ -312,6 +302,22 @@ public class TaskCommonController {
             return Result.error("查询失败");
         }
     }
+
+
+    @ApiOperation("是否跳转或者回退到某个环节之前")
+    @PostMapping("someActFore")
+    public Result someActFore(@RequestBody JumpMsg jumpMsg) {
+
+        try {
+            boolean flag = taskCommonService.someActFore(jumpMsg);
+
+            return Result.ok(flag);
+        } catch (Exception e) {
+            return Result.error("查询状态失败");
+        }
+
+    }
+
 
     @ApiOperation("跳转")
     @PostMapping("jump")

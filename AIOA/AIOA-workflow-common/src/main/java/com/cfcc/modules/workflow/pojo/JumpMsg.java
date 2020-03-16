@@ -34,4 +34,7 @@ public class JumpMsg {
     //退回原因
     private String backReason;
 
+    //具体环节 用来判断 退回的环节是否在某个环节之前
+    private String juTiAct;
+
 }

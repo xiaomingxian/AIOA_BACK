@@ -1040,6 +1040,36 @@ public class TaskCommonServiceImpl implements TaskCommonService {
         return "todo";
     }
 
+    @Override
+    public boolean someActFore(JumpMsg jumpMsg) {
+        String juTiAct = jumpMsg.getJuTiAct();//排版
+        String destActDefName = jumpMsg.getDestActDefName();
+        String processDefinitionId = jumpMsg.getProcessDefinitionId();
+
+        ProcessDefinitionEntity proc = (ProcessDefinitionEntity) repositoryService.getProcessDefinition(processDefinitionId);
+        //顺序排列
+        List<ActivityImpl> activities = proc.getActivities();
+        boolean flag = false;
+        List<String> foreTasks = new ArrayList<>();
+        //先找到判读那节点 说明目标节点在判断节点之后
+        for (ActivityImpl activity : activities) {
+            String name = (String) activity.getProperty("name");
+            foreTasks.add(name);
+            if (
+                    (!foreTasks.contains(juTiAct) && foreTasks.contains(destActDefName)) ||
+                            (foreTasks.contains(juTiAct) && foreTasks.contains(destActDefName))
+            ) {
+                flag = true;
+                break;
+            }
+            if (foreTasks.contains(juTiAct) && !foreTasks.contains(destActDefName)){
+                flag = false;
+                break;
+            }
+        }
+        return flag;
+    }
+
 
     private String nextActMore(List<TaskInfoVO> taskInfoVOs, Task task) {
         String processInstanceId = task.getProcessInstanceId();
