@@ -6,7 +6,10 @@ import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.cfcc.common.api.vo.Result;
+import com.cfcc.common.system.vo.LoginUser;
 import com.cfcc.common.util.HttpClientUtil;
+import com.cfcc.common.util.IPUtils;
+import com.cfcc.common.util.SpringContextUtils;
 import com.cfcc.common.util.workflow.VarsWithBus;
 import com.cfcc.modules.oaBus.entity.*;
 import com.cfcc.modules.oaBus.mapper.BusFunctionMapper;
@@ -15,15 +18,18 @@ import com.cfcc.modules.oaBus.mapper.OaFileMapper;
 import com.cfcc.modules.oaBus.service.*;
 import com.cfcc.modules.system.entity.LoginInfo;
 import com.cfcc.modules.system.entity.SysDepart;
+import com.cfcc.modules.system.entity.SysLog;
 import com.cfcc.modules.system.entity.SysUser;
 import com.cfcc.modules.system.mapper.SysDictMapper;
 import com.cfcc.modules.system.service.ISysDictService;
+import com.cfcc.modules.system.service.ISysLogService;
 import com.cfcc.modules.system.service.ISysUserService;
 import com.cfcc.modules.workflow.service.ProcessManagerService;
 import com.cfcc.modules.workflow.service.TaskCommonService;
 import com.cfcc.modules.workflow.vo.TaskInfoVO;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.StringUtils;
+import org.apache.shiro.SecurityUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Lazy;
@@ -57,6 +63,8 @@ public class OaBusDynamicTableServiceImpl implements OaBusDynamicTableService {
 
     @Autowired
     private OaFileMapper oaFileMapper;
+    @Autowired
+    private ISysLogService sysLogService;
 
     @Autowired
     private BusFunctionMapper busFunctionMapper;
@@ -918,6 +926,8 @@ public class OaBusDynamicTableServiceImpl implements OaBusDynamicTableService {
         }
         //删除业务数据
         b = dynamicTableMapper.deleteData(map);
+        //添加删除日志
+        addSysLog(map);
         //更改文号状态
         Map<String, Object> docManageParam = new HashMap<>();
         docManageParam.put("table", "oa_docnum_manage");
@@ -935,6 +945,42 @@ public class OaBusDynamicTableServiceImpl implements OaBusDynamicTableService {
             log.info("文号状态修改失败！");
         }
         return b;
+    }
+
+    /**
+     * 添加操作日志
+     * @param sTitle
+     */
+    private void addSysLog(Map<String, Object> map ) {
+        String sTitle = "" ;
+        sTitle = (String) map.get("s_title") ;
+        int id = (int) map.get("i_id");
+        String tableName = (String) map.get("table");
+        System.out.println(sTitle);
+        SysLog sysLog = new SysLog();
+        //操作内容为title
+        sysLog.setLogContent(sTitle);
+        //0:操作日志;1:登录日志;2:定时任务
+        sysLog.setLogType(0);
+        sysLog.setMethod("delete");
+        //操作类型（1查询，2添加，3修改，4删除,5导入，6导出）
+        sysLog.setOperateType(4) ;
+        sysLog.setRequestParam(tableName+":"+id);
+        //获取request
+        HttpServletRequest request = SpringContextUtils.getHttpServletRequest();
+        //设置IP地址
+        sysLog.setIp(IPUtils.getIpAddr(request));
+
+        //获取登录用户信息
+        LoginUser sysUser = (LoginUser) SecurityUtils.getSubject().getPrincipal();
+        if(sysUser!=null){
+            sysLog.setUserid(sysUser.getUsername());
+            sysLog.setUsername(sysUser.getRealname());
+
+        }
+        sysLog.setCreateTime(new Date());
+        //保存系统日志
+        sysLogService.save(sysLog);
     }
 
     @Override
