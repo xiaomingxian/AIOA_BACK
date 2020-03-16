@@ -283,7 +283,7 @@
 			d.i_bus_model_id = (
 				SELECT i_bus_model_id FROM oa_bus_function z WHERE z.i_id = #{iBusFunctionId}
 			)
-        )
+        ) and s_table_column = #{sTableColumn}
     </update>
     <!--<update id="updatePageDetail" >
         UPDATE oa_bus_page_detail SET
