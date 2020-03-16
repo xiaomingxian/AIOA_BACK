@@ -10,7 +10,6 @@ import org.activiti.engine.task.Task;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -105,4 +104,6 @@ public interface TaskCommonService {
     void updateRuActDept(Task task, String randomParent);
 
     String taskStatus(String taskid);
+
+    boolean someActFore(JumpMsg jumpMsg);
 }
