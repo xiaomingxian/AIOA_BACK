@@ -481,6 +481,7 @@ public class OaBusDynamicTableServiceImpl implements OaBusDynamicTableService {
         for (OaFile file : fileList) {
             Map<String, Object> map = new HashMap<>();
             map.put("sFilePath", uploadpath + File.separator + orgSchema + File.separator + file.getSFilePath());
+            log.info("附件路径============"+map.get("sFilePath"));
             map.put("sFileName", file.getSFileName());
             mapFiles.add(map);
         }
