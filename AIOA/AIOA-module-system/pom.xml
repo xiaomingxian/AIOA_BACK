@@ -7,7 +7,7 @@
     <artifactId>AIOA-module-system</artifactId>
     <version>1.0.0</version>
     <!--打war包添加-->
-    <!--<packaging>war</packaging>-->
+    <packaging>war</packaging>
 
     <parent>
         <groupId>org.cfcc.framework.boot</groupId>
@@ -16,10 +16,11 @@
     </parent>
     <!--打包流程-->
     <!--如果要部署到tomcat下注释掉WebSocketConfig下的Bean生成方式-->
-   <!--1放开或打开本页提示注释-->
+    <!--1放开或打开本页提示注释-->
     <!--2maven视图下AIOA下clean-->
     <!--3maven视图下AIOA下install-->
     <!--4maven视图下AIOA-module-system下package-->
+    <!--5activit包需要替换 详情参考 AIOA-module-system/src/main/resources/doc/activiti部署替换包-->
     <dependencies>
         <dependency>
             <groupId>org.cfcc.framework.boot</groupId>
@@ -34,12 +35,12 @@
     </dependencies>
 
     <!-- 打war包时删除该配置 -->
-    <build>
-        <plugins>
-            <plugin>
-                <groupId>org.springframework.boot</groupId>
-                <artifactId>spring-boot-maven-plugin</artifactId>
-            </plugin>
-        </plugins>
-    </build>
+    <!--<build>-->
+        <!--<plugins>-->
+            <!--<plugin>-->
+                <!--<groupId>org.springframework.boot</groupId>-->
+                <!--<artifactId>spring-boot-maven-plugin</artifactId>-->
+            <!--</plugin>-->
+        <!--</plugins>-->
+    <!--</build>-->
 </project>

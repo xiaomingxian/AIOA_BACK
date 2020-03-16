@@ -1,0 +1,5 @@
+activiti与mycat在二进制文件处有冲突,对activiti源码做了修改, 需要对项目中的 activiti-engine-5.22.0.jar 进行替换
+
+    1 删除 AIOA/WEB-INFO/lib 下的此包
+    2 将本文档同及目录下 jar/activiti-engine-5.22.0.jar 进行替换
+    3 重启项目
