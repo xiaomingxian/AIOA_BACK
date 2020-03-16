@@ -187,12 +187,17 @@ public class BusFunctionController {
 			BeanUtils.copyProperties(busFunctionPage , busFunction);
 			busFunction.setSCreateBy(userName) ;
 
-			busFunctionService.saveMain(busFunction,
+			String str = busFunctionService.saveMain(busFunction,
                     busFunctionPage.getBusFunctionUnit(),
                     busFunctionPage.getBusProcSet(),
                     busFunctionPage.getBusFunctionView(),
 					schema);
 			result.success("添加成功！");
+			if("".equals(str)){
+				result.setMessage("添加成功！");
+			}else{
+				result.setMessage(str);
+			}
 		} catch (Exception e) {
 			log.error(e.getMessage(),e);
 			result.error500("操作失败");

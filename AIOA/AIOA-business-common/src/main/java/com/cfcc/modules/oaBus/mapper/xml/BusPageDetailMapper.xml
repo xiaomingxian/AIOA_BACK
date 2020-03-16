@@ -91,6 +91,56 @@
         </foreach>
 
     </insert>
+    <insert id="insertBusPageDetailByFunId">
+        INSERT INTO oa_bus_page_detail (
+            `i_bus_page_id`,
+            `i_bus_function_id`,
+            `s_busdata_table`,
+            `s_table_column`,
+            `i_order`,
+            `s_dict_id`,
+            `s_dict_sql_key`,
+            `s_column_name`,
+            `i_column_type`,
+            `i_is_listtitle`,
+            `i_is_listquery`,
+            `i_is_esquery`,
+            `i_check_is_null`,
+            `s_check_expjava`,
+            `s_check_expsql`,
+            `i_check_expjs`,
+            `s_check_showmsg`,
+            `s_send_key`,
+            `s_archives_key`,
+            `s_mark_key`,
+            `i_is_default`,
+            `s_column_remarks`
+        )
+        (select
+                `i_bus_page_id`,
+            #{newId},
+            `s_busdata_table`,
+            `s_table_column`,
+            `i_order`,
+            `s_dict_id`,
+            `s_dict_sql_key`,
+            `s_column_name`,
+            `i_column_type`,
+            `i_is_listtitle`,
+            `i_is_listquery`,
+            `i_is_esquery`,
+            `i_check_is_null`,
+            `s_check_expjava`,
+            `s_check_expsql`,
+            `i_check_expjs`,
+            `s_check_showmsg`,
+            `s_send_key`,
+            `s_archives_key`,
+            `s_mark_key`,
+            `i_is_default`,
+            `s_column_remarks`
+            from oa_bus_page_detail d where d.i_bus_function_id = #{oldId} )
+    </insert>
 
     <select id="getSDictIdByKey" resultType="java.lang.String">
         <if test="DBvalue != null and DBvalue != ''">

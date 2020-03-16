@@ -85,4 +85,11 @@
           (SELECT i_bus_function_id FROM oa_bus_function_unit
           WHERE s_unit_id = #{departId})
     </select>
+    <select id="queryFunByModel" resultType="com.cfcc.modules.oaBus.entity.BusFunction">
+        SELECT * FROM oa_bus_function c WHERE c.i_bus_model_id = (
+                SELECT i_bus_model_id FROM oa_bus_function d WHERE d.i_id = #{functionId}
+            )
+        and c.i_id != #{functionId}
+        ORDER BY c.s_level LIMIT 0,1
+    </select>
 </mapper>

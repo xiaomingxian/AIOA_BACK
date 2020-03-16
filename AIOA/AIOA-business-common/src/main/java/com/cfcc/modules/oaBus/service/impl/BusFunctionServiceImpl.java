@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.cfcc.common.api.vo.Result;
 import com.cfcc.common.constant.CacheConstant;
 import com.cfcc.common.system.vo.DictModel;
 import com.cfcc.common.util.StringUtil;
@@ -141,11 +142,12 @@ public class BusFunctionServiceImpl extends ServiceImpl<BusFunctionMapper, BusFu
     @Override
     @Transactional
     @CacheEvict(value = CacheConstant.FUNCTION_CACHE, allEntries = true)
-    public void saveMain(BusFunction busFunction,
-                         List<BusFunctionUnit> busFunctionUnit,
-                         BusProcSet busProcSet,
-                         List<BusFunctionView> busFunctionView,String schema) {
+    public String saveMain(BusFunction busFunction,
+                           List<BusFunctionUnit> busFunctionUnit,
+                           BusProcSet busProcSet,
+                           List<BusFunctionView> busFunctionView, String schema) {
 
+        String result  = "" ;
         StringUtil stringUtil = new StringUtil();
         busProcSet = (BusProcSet) stringUtil.changeToNull(busProcSet);
         busFunction.setDCreateTime(new Date());
@@ -181,6 +183,20 @@ public class BusFunctionServiceImpl extends ServiceImpl<BusFunctionMapper, BusFu
         });
         iBusFunctionUnitService.saveBatch(busFunctionUnit);
 
+        //设置对应的字段含义，查询该业务所属的业务分类下的已配置业务，
+        // 找到业务优先级最高的业务，复制含义配置，给新的业务功能。
+        // 如果此项业务功能是第一个，则提示用户配置业务含义。
+        //1、查询这个业务对应的model下的优先级最高的一条数据
+        BusFunction bus2 = busFunctionMapper.queryFunByModel(busFunction.getIId()) ;
+        if(bus2 == null ){
+            result = "请配置对应的含义";
+        }else{
+            //2、插入数据到busdatail中
+            int oldId =  bus2.getIId();
+            int newId = busFunction.getIId() ;
+            busPageDetailMapper.insertBusPageDetailByFunId(oldId,newId);
+        }
+        return result ;
     }
 
     /**

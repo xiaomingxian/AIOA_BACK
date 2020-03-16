@@ -50,6 +50,8 @@ public interface BusFunctionMapper extends BaseMapper<BusFunction> {
     List<BusFunction> queryByModelIdDao(@Param("modelId")String modelId);
 
     List<BusFunction> getBusFunctionListByDepartId(@Param("departId") String departId,@Param("DBvalue") String DBvalue );
+
+    BusFunction queryFunByModel(Integer functionId);
 }
 
 
