@@ -1,5 +1,14 @@
 package com.cfcc.config.activiti;
 
+import com.cfcc.common.spring.SpringContextUtilsAIOA;
+import org.activiti.bpmn.model.AssociationDirection;
+import org.activiti.bpmn.model.GraphicInfo;
+import org.activiti.image.exception.ActivitiImageException;
+import org.activiti.image.impl.DefaultProcessDiagramCanvas;
+import org.activiti.image.util.ReflectUtil;
+import org.springframework.context.ApplicationContext;
+
+import javax.imageio.ImageIO;
 import java.awt.*;
 import java.awt.font.FontRenderContext;
 import java.awt.font.LineBreakMeasurer;
@@ -15,16 +24,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.text.AttributedCharacterIterator;
 import java.text.AttributedString;
-
-import javax.imageio.ImageIO;
-
-import org.activiti.bpmn.model.AssociationDirection;
-import org.activiti.bpmn.model.GraphicInfo;
-import org.activiti.image.exception.ActivitiImageException;
-import org.activiti.image.impl.DefaultProcessDiagramCanvas;
-import org.activiti.image.util.ReflectUtil;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.context.annotation.PropertySource;
 
 
 public class CustomProcessDiagramCanvas extends DefaultProcessDiagramCanvas {
@@ -197,7 +196,7 @@ public class CustomProcessDiagramCanvas extends DefaultProcessDiagramCanvas {
         LABEL_FONT = this.loadFontFromResources(this.labelFontName, Font.ITALIC, 10);
         ANNOTATION_FONT = this.loadFontFromResources(this.annotationFontName, Font.PLAIN, FONT_SIZE);
         //优化加载速度
-        if(flag) {
+        if (flag) {
             return;
         }
         try {
@@ -265,15 +264,30 @@ public class CustomProcessDiagramCanvas extends DefaultProcessDiagramCanvas {
 //            return font;
 //        }
         try {
+
+            ApplicationContext applicationContext = SpringContextUtilsAIOA.applicationContextGet();
+            if (applicationContext==null){
+                System.err.println("===============>>>>>spring容器为空");
+                return null;//初始化的时候为null正常
+            }
+            FontBean bean = applicationContext.getBean(FontBean.class);
+            String fontPath = bean.getFontPath();
+            if (fontPath == null) {
+                System.err.println("---------->>>配置文件路径为空");
+                return null;
+            }
             //加载resources下的字体文件,文件命名与设置的字体名称一一对应
-            InputStream fontInputStream = this.getClass().getResourceAsStream("/fonts/static/simsun.ttc");
-//            InputStream fontInputStream = new FileInputStream(new File(fontPath));
-//            InputStream fontInputStream = this.getClass().getResourceAsStream("/fonts/song.ttc");
+            InputStream fontInputStream = new FileInputStream(new File(fontPath));
+//            System.err.println("=====>>>读取到的字体流：："+fontPath+","+fontInputStream);
             //未找到项目中相应的字体文件，则使用系统的字体
             if (fontInputStream == null) {
-                return new Font(fontName, fontStyle, (int) fontSize);
+                Font font1 = new Font(fontName, fontStyle, (int) fontSize);
+                System.out.println("------字体流为null,new出的字体：：" + font1);
+                return font1;
             }
             font = Font.createFont(Font.TRUETYPE_FONT, fontInputStream);
+//            System.err.println("------->>>生成的字体：："+font);
+
             //设置字体类型
             if (fontStyle > -1) {
                 font = font.deriveFont(fontStyle);
@@ -291,7 +305,6 @@ public class CustomProcessDiagramCanvas extends DefaultProcessDiagramCanvas {
         }
         return font;
     }
-
 
 
 }
