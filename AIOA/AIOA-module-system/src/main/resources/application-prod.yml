@@ -201,6 +201,8 @@ actShow:
 canAddUserRoles: 单位信息整理员,局长,基础管理员,系统管理员
 #领导部门
 dontChoiceDepts: 行领导
+#字体位置  linux位置 如果没有从windows拷贝
+fontPath: /usr/local/fonts/simsun.ttc
 logging:
   level:
     root: info
