@@ -45,71 +45,71 @@
 			)
     </insert>
 
-	<!--批量插入到数据库中 -->
+    <!--批量插入到数据库中 -->
     <insert id="insertBusPageDetailBatch" parameterType="java.util.List">
-		INSERT INTO oa_bus_page_detail (
-		i_bus_page_id,
-		i_bus_function_id,
-		s_busdata_table,
-		s_table_column,
-		s_dict_id,
-		s_column_name,
-		i_is_listtitle,
-		i_is_listquery,
-		i_check_is_null,
-		s_check_expjava,
-		s_check_expsql,
-		i_check_expjs,
-		s_check_showmsg,
-		s_send_key,
-		s_archives_key,
-		i_is_default,
-		s_column_remarks
-		)
-		VALUES
-		 <foreach collection="busPageDetailList" item="batchCode" index="index" separator=",">
-			 (
-			 #{iPageId},
-			 #{functionId},
-			 #{tableName},
-			 #{batchCode.sTableColumn},
-			 #{batchCode.sDictId},
-			 #{batchCode.sColumnName},
-			 #{batchCode.iIsListtitle},
-			 #{batchCode.iIsListquery},
-			 #{batchCode.iCheckIsNull},
-			 #{batchCode.sCheckExpjava},
-			 #{batchCode.sCheckExpsql},
-			 #{batchCode.sCheckExpjs},
-			 #{batchCode.sCheckShowmsg},
-			 #{batchCode.sSendKey},
-			 #{batchCode.sArchivesKey},
-			 #{batchCode.iIsDefault},
-			 #{batchCode.sColumnRemarks}
- 			 )
+        INSERT INTO oa_bus_page_detail (
+        i_bus_page_id,
+        i_bus_function_id,
+        s_busdata_table,
+        s_table_column,
+        s_dict_id,
+        s_column_name,
+        i_is_listtitle,
+        i_is_listquery,
+        i_check_is_null,
+        s_check_expjava,
+        s_check_expsql,
+        i_check_expjs,
+        s_check_showmsg,
+        s_send_key,
+        s_archives_key,
+        i_is_default,
+        s_column_remarks
+        )
+        VALUES
+        <foreach collection="busPageDetailList" item="batchCode" index="index" separator=",">
+            (
+            #{iPageId},
+            #{functionId},
+            #{tableName},
+            #{batchCode.sTableColumn},
+            #{batchCode.sDictId},
+            #{batchCode.sColumnName},
+            #{batchCode.iIsListtitle},
+            #{batchCode.iIsListquery},
+            #{batchCode.iCheckIsNull},
+            #{batchCode.sCheckExpjava},
+            #{batchCode.sCheckExpsql},
+            #{batchCode.sCheckExpjs},
+            #{batchCode.sCheckShowmsg},
+            #{batchCode.sSendKey},
+            #{batchCode.sArchivesKey},
+            #{batchCode.iIsDefault},
+            #{batchCode.sColumnRemarks}
+            )
 
-		 </foreach>
+        </foreach>
 
-	</insert>
+    </insert>
 
-	<select id="getSDictIdByKey" resultType="java.lang.String">
-		<if test="DBvalue != null and DBvalue != ''">
-			${DBvalue}
-		</if>
-		select s_dict_id from oa_bus_page_detail c
-		<where>
-			1 = 1
-			<if test="functionId != null ">
-				and c.i_bus_function_id = #{functionId}
-			</if>
-			<if test="sBusdataTable != null and sBusdataTable != ''">
-				and c.s_busdata_table = #{sBusdataTable}
-			</if>
-			<if test="key != null and key != ''">
-				and c.s_table_column = #{key}
-			</if>
-		</where>
-	</select>
+    <select id="getSDictIdByKey" resultType="java.lang.String">
+        <if test="DBvalue != null and DBvalue != ''">
+            ${DBvalue}
+        </if>
+        select s_dict_id from oa_bus_page_detail c
+        <where>
+            1 = 1
+            <if test="functionId != null ">
+                and c.i_bus_function_id = #{functionId}
+            </if>
+            <if test="sBusdataTable != null and sBusdataTable != ''">
+                and c.s_busdata_table = #{sBusdataTable}
+            </if>
+            <if test="key != null and key != ''">
+                and c.s_table_column = #{key}
+            </if>
+        </where>
+    </select>
 
     <select id="queryBusPageDetailCount" resultType="java.lang.Integer">
 
@@ -140,86 +140,113 @@
                 and i_bus_function_id = #{busPageDetail.iBusFunctionId}
             </if>
         </where>
-		order by c.i_id desc limit #{pageNo},#{pageSize}
+        order by c.i_id desc limit #{pageNo},#{pageSize}
     </select>
-	<select id="queryByIdDao" resultType="com.cfcc.modules.oaBus.entity.BusPageDetail">
-		select * from oa_bus_page_detail
-		<where>
-			i_bus_function_id=#{iBusFunctionId}
-		</where>
-	</select>
-	<select id="findList" resultType="com.cfcc.modules.oaBus.entity.BusPageDetail">
+    <select id="queryByIdDao" resultType="com.cfcc.modules.oaBus.entity.BusPageDetail">
+        select * from oa_bus_page_detail
+        <where>
+            i_bus_function_id=#{iBusFunctionId}
+        </where>
+    </select>
+    <select id="findList" resultType="com.cfcc.modules.oaBus.entity.BusPageDetail">
 		select * from oa_bus_page_detail
 	</select>
 
-	<select id="queryConditionByIdDao" resultType="com.cfcc.modules.oaBus.entity.BusPageDetail">
+    <select id="queryConditionByIdDao" resultType="com.cfcc.modules.oaBus.entity.BusPageDetail">
 		select * from oa_bus_page_detail where i_bus_function_id=#{iBusFunctionId} and i_is_listquery = 1
 	</select>
-	<select id="getColumsNameByTableAndColumn" resultType="com.cfcc.modules.oaBus.entity.BusPageDetail">
-		select *
-		from oa_bus_page_detail
-		<where>
-			<if test="sBusdataTable != null and sBusdataTable != ''">
-				s_busdata_table = #{sBusdataTable}
-			</if>
-			and s_table_column in
-			<foreach collection="isEsColumnLists" item="isEsColumnLists" open="(" separator="," close=")">
-				#{isEsColumnLists}
-			</foreach>
-		</where>
-	</select>
-	<select id="getCloumnNameByTableAndEsquery" resultType="java.lang.String">
-		<if test="DBvalue != null and DBvalue != ''">
-			${DBvalue}
-		</if>
-		select s_table_column
-			from oa_bus_page_detail
-		<where>
-			1 = 1
-			<if test="sBusdataTable != null and sBusdataTable != ''">
-				and s_busdata_table = #{sBusdataTable}
-			</if>
-			<if test="iId != null and iId != ''">
-				and i_bus_function_id = #{iId}
-			</if>
-			and i_is_esquery = 1
-		</where>
-	</select>
+    <select id="getColumsNameByTableAndColumn" resultType="com.cfcc.modules.oaBus.entity.BusPageDetail">
+        select *
+        from oa_bus_page_detail
+        <where>
+            <if test="sBusdataTable != null and sBusdataTable != ''">
+                s_busdata_table = #{sBusdataTable}
+            </if>
+            and s_table_column in
+            <foreach collection="isEsColumnLists" item="isEsColumnLists" open="(" separator="," close=")">
+                #{isEsColumnLists}
+            </foreach>
+        </where>
+    </select>
+    <select id="getCloumnNameByTableAndEsquery" resultType="java.lang.String">
+        <if test="DBvalue != null and DBvalue != ''">
+            ${DBvalue}
+        </if>
+        select s_table_column
+        from oa_bus_page_detail
+        <where>
+            1 = 1
+            <if test="sBusdataTable != null and sBusdataTable != ''">
+                and s_busdata_table = #{sBusdataTable}
+            </if>
+            <if test="iId != null and iId != ''">
+                and i_bus_function_id = #{iId}
+            </if>
+            and i_is_esquery = 1
+        </where>
+    </select>
 
-	<select id="getConColumsDao" resultType="java.util.Map">
+    <select id="getConColumsDao" resultType="java.util.Map">
 		select s_table_column,s_column_name from oa_bus_page_detail c
 		where c.i_bus_function_id = #{functionId} and c.i_bus_page_id = #{iPageId} and c.i_is_listtitle = 1 order by if(ISNULL(i_order),1,0),i_order ,i_id asc
 	</select>
 
-	<select id="getAllColumsList" resultType="java.util.Map">
+    <select id="getAllColumsList" resultType="java.util.Map">
 		select * from oa_bus_page_detail c
 		where c.i_bus_function_id = #{functionId} and c.i_bus_page_id = #{iPageId}  order by if(ISNULL(i_order),1,0),i_order ,i_id asc
 	</select>
 
-	<select id="getAllColumsListPageDtail" resultType="com.cfcc.modules.oaBus.entity.BusPageDetail">
+    <select id="getAllColumsListPageDtail" resultType="com.cfcc.modules.oaBus.entity.BusPageDetail">
 		select * from oa_bus_page_detail c
 		where c.i_bus_function_id = #{functionId} and c.i_bus_page_id = #{iPageId}  order by if(ISNULL(i_order),1,0),i_order ,i_id asc
 	</select>
 
-	<select id="getColumsByTableName" resultType="java.util.Map">
+    <select id="getColumsByTableName" resultType="java.util.Map">
 		select * from oa_bus_page_detail c
 		where c.s_busdata_table = #{tableName} and c.i_bus_function_id = #{functionId} and c.i_is_listtitle = 1
 	</select>
     <select id="getListByFunIDAndIPageIdDao" resultType="com.cfcc.modules.oaBus.entity.BusPageDetail">
 		select * from oa_bus_page_detail c where c.i_bus_function_id = #{functionId} and c.i_bus_page_id = #{iPageId} ;
 	</select>
-    <update id="updatePageDetail" >
-		UPDATE oa_bus_page_detail SET
-		<if test="sSendKey != null and sSendKey != ''">
-			s_send_key= #{sSendKey}
-		</if>
-		<if test="sArchivesKey != null and sArchivesKey != ''">
-			s_archives_key= #{sArchivesKey}
-		</if>
-		<if test="sMarkKey != null and sMarkKey != ''">
-			s_mark_key= #{sMarkKey}
-		</if>
-		WHERE i_bus_page_id = #{iBusPageId} AND s_table_column = #{sTableColumn}
-	</update>
+    <update id="updatePageDetail">
+        UPDATE oa_bus_page_detail SET
+        <if test="sSendKey != null and sSendKey != '' and sSendKey != '00000'">
+            s_send_key= #{sSendKey}
+        </if>
+        <if test=" sSendKey == '00000'">
+            s_send_key= null
+        </if>
+        <if test="sArchivesKey != null and sArchivesKey != '' and sArchivesKey != '00000'">
+            s_archives_key= #{sArchivesKey}
+        </if>
+        <if test="sArchivesKey == '00000'">
+            s_archives_key= null
+        </if>
+        <if test="sMarkKey != null and sMarkKey != '' and sMarkKey != '00000'">
+            s_mark_key= #{sMarkKey}
+        </if>
+        <if test="sMarkKey == '00000'">
+            s_mark_key= null
+        </if>
+        WHERE i_bus_function_id IN (
+			SELECT i_id FROM oa_bus_function d WHERE
+			d.i_bus_model_id = (
+				SELECT i_bus_model_id FROM oa_bus_function z WHERE z.i_id = #{iBusFunctionId}
+			)
+        )
+    </update>
+    <!--<update id="updatePageDetail" >
+        UPDATE oa_bus_page_detail SET
+        <if test="sSendKey != null and sSendKey != ''">
+            s_send_key= #{sSendKey}
+        </if>
+        <if test="sArchivesKey != null and sArchivesKey != ''">
+            s_archives_key= #{sArchivesKey}
+        </if>
+        <if test="sMarkKey != null and sMarkKey != ''">
+            s_mark_key= #{sMarkKey}
+        </if>
+        WHERE i_bus_page_id = #{iBusPageId} AND s_table_column = #{sTableColumn}
+    </update>-->
 
 </mapper>
