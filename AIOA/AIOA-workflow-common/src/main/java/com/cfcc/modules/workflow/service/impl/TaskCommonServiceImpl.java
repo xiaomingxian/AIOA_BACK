@@ -8,7 +8,6 @@ import com.cfcc.common.api.vo.Result;
 import com.cfcc.common.constant.workflow.TaskActType;
 import com.cfcc.common.exception.AIOAException;
 import com.cfcc.common.system.service.CommonDynamicTableService;
-import com.cfcc.common.util.StringUtil;
 import com.cfcc.common.util.workflow.VarsWithBus;
 import com.cfcc.modules.system.entity.LoginInfo;
 import com.cfcc.modules.system.entity.SysDepart;
@@ -58,13 +57,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
-import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import java.util.*;
-import java.util.concurrent.Callable;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.Future;
 
 @Service
 @Transactional
@@ -1616,17 +1610,16 @@ public class TaskCommonServiceImpl implements TaskCommonService {
 
         //主办部门更新
         String description = task.getDescription();
-        if (StringUtils.isNotBlank(description) && jumpMsg.getIsDept()){//是部门任务
+        if (StringUtils.isNotBlank(description) && jumpMsg.getIsDept()) {//是部门任务
             String[] split = description.split("@mainDept");
             String s = split[0];
-            description=s+"@mainDept:"+taskWithDepts.getMainDept()+"@";
+            description = s + "@mainDept:" + taskWithDepts.getMainDept() + "@";
             Map<String, Object> vars = jumpMsg.getVars();
-            vars.put("busMsg",description);
+            vars.put("busMsg", description);
         }
 
         commandExecutor.execute(new JumpTaskCmd(jumpMsg.getTaskId(), jumpMsg.getExecutionId(),
                 jumpMsg.getProcessInstanceId(), dest, jumpMsg.getVars(), curr, jumpMsg.getDeleteReason()));
-
 
 
         //查到所有 产生的任务实例
@@ -1660,7 +1653,6 @@ public class TaskCommonServiceImpl implements TaskCommonService {
             //存储部门相关信息
 
 
-
             //变量与任务的对应关系----如何区分主办/辐办/传阅
             boolean delFlag = true;
             for (Task t : list) {
@@ -1683,7 +1675,7 @@ public class TaskCommonServiceImpl implements TaskCommonService {
 
             }
             String dataTable = jumpMsg.getTable();
-            if (StringUtils.isNotBlank(dataTable)) {//并且是部门类型
+            if (StringUtils.isNotBlank(dataTable) && (jumpMsg != null && jumpMsg.getIsDept())) {//并且是部门类型
                 Map<String, Object> data = new HashMap<>();
                 data.put("table", dataTable);
                 data.put("i_id", tableId);
