@@ -1062,6 +1062,10 @@ public class TaskCommonServiceImpl implements TaskCommonService {
                 flag = true;
                 break;
             }
+            if (foreTasks.contains(juTiAct) && !foreTasks.contains(destActDefName)){
+                flag = false;
+                break;
+            }
         }
         return flag;
     }
