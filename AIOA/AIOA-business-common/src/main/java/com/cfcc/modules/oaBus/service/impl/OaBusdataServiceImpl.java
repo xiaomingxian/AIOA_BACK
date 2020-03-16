@@ -238,7 +238,8 @@ public class OaBusdataServiceImpl extends ServiceImpl<OaBusdataMapper, OaBusdata
         busModel.setIId(Integer.parseInt(modelId));
         queryWrapper.setEntity(busModel);
         busModel = ibusModelService.getOne(queryWrapper);
-
+        //这个是设置对应的model的显示方式，0 是下篮筐，1是页签的方式
+        result.setCode(busModel.getIIsRadio());
         Map<String, Object> condition = (Map<String, Object>) maps.get("condition");
         String schema = MycatSchema.getSchema();
         Optional<Integer> optional;
