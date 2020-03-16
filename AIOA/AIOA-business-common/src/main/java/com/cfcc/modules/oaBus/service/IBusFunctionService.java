@@ -1,6 +1,7 @@
 package com.cfcc.modules.oaBus.service;
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.cfcc.common.api.vo.Result;
 import com.cfcc.modules.oaBus.entity.*;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.cfcc.modules.oabutton.entity.OaProcOpinion;
@@ -38,7 +39,7 @@ public interface IBusFunctionService extends IService<BusFunction> {
     List<OaProcOpinion> queryoaProcOpinionSer(String key);
 
 
-    void saveMain(BusFunction busFunction, List<BusFunctionUnit> busFunctionUnit, BusProcSet busProcSet, List<BusFunctionView> busFunctionView,String schema);
+    String saveMain(BusFunction busFunction, List<BusFunctionUnit> busFunctionUnit, BusProcSet busProcSet, List<BusFunctionView> busFunctionView, String schema);
 
     IPage<BusFunction> getFunByModelId(String id);
 

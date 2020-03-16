@@ -66,4 +66,6 @@ public interface BusPageDetailMapper extends BaseMapper<BusPageDetail> {
      * @return
      */
     List<BusPageDetail> getListByFunIDAndIPageIdDao(@Param("functionId")String functionId, @Param("iPageId")String iPageId);
+
+    void insertBusPageDetailByFunId(@Param("oldId")int oldId, @Param("newId")int newId);
 }
