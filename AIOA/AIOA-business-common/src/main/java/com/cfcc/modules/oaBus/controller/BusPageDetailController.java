@@ -197,7 +197,13 @@ public class BusPageDetailController {
         return result;
     }
 
-    @AutoLog(value = "更新全部的字段")
+    /**
+     * 之前是修改全部模板page下对应的字段的值，现在要修改成为model下对应的所有的值
+     * 逻辑：修改function对应model下的所有function的对应的字段
+     * @param busPageDetail
+     * @return
+     */
+    //@AutoLog(value = "更新全部的字段")
     @ApiOperation(value = "更新全部的字段", notes = "更新全部的字段")
     @PostMapping(value = "/updateDetail")
     @ResponseBody
