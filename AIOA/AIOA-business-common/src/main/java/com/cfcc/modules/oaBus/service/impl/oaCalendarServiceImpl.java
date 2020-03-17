@@ -200,8 +200,8 @@ public class oaCalendarServiceImpl extends ServiceImpl<oaCalendarMapper, oaCalen
         List<Map<String, Object>> list = oaCalendarMapper.LinkList();
         for(int i=0;i< list.size();i++){
             String id = list.get(i).get("i_id").toString();
-            String url = oaCalendarMapper.selectUrl(Integer.parseInt(id));
-            list.get(i).put("url",url);
+            //String url = oaCalendarMapper.selectUrl(Integer.parseInt(id));
+            //list.get(i).put("url",url);
         }
         return list;
     }
