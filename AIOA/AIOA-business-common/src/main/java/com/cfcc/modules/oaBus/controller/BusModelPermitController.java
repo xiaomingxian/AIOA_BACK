@@ -294,10 +294,10 @@ public class BusModelPermitController {
     @AutoLog(value = "查询业务模块")
     @ApiOperation(value = "业务模板-查询业务模块", notes = "业务模板-查询业务模块")
     @GetMapping(value = "/findFunctionListByModelId")
-    public Result<List<BusFunction>> findFunctionListByModelId(@RequestParam(name = "id", required = true) String id) {
+    public Result findFunctionListByModelId(@RequestParam(name = "id", required = true) String id) {
         Result<List<BusFunction>> result = new Result<List<BusFunction>>();
         List<BusFunction> busFunction = busModelPermitService.findByModelId(id);
-        if (busFunction == null) {
+        if (busFunction.size() == 0) {
             result.error500("未找到对应实体");
         } else {
             result.setResult(busFunction);
@@ -305,7 +305,6 @@ public class BusModelPermitController {
         }
         return result;
     }
-
     /**
      * 导出excel
      *
