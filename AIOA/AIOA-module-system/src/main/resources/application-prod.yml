@@ -23,6 +23,11 @@ management:
 
 
 spring:
+  http:
+    encoding:
+      charset: UTF-8
+      enabled: true
+      force: true
   data:
     elasticsearch:
       indexName1: elasticsearch1
@@ -166,7 +171,9 @@ mybatis-plus:
 jeecg:
   path:
     #文件上传根目录
-    upload: D://upFiles
+#    upload: D://upFiles
+#    部署环境配置路径
+    upload: /usr/local/upFiles
     #底稿临时路径
     uploadfile: AIOA_VUE//public//ntko//files
     #附件临时路径
