@@ -4,7 +4,6 @@ import com.cfcc.common.mycat.MycatSchema;
 import com.cfcc.modules.oaBus.entity.BusModel;
 import com.cfcc.modules.oaBus.entity.BusProcSet;
 import com.cfcc.modules.oaBus.entity.ButtonPermit;
-import com.cfcc.modules.oaBus.entity.OaBusdata;
 import com.cfcc.modules.oaBus.mapper.OaBusDynamicTableMapper;
 import com.cfcc.modules.oaBus.service.ButtonPermissionService;
 import com.cfcc.modules.oaBus.service.IBusModelService;
@@ -15,22 +14,20 @@ import com.cfcc.modules.oabutton.service.IOaButtonService;
 import com.cfcc.modules.oabutton.service.IOaButtonSetService;
 import com.cfcc.modules.system.entity.LoginInfo;
 import com.cfcc.modules.system.entity.SysRole;
-import com.cfcc.modules.system.entity.SysUser;
 import com.cfcc.modules.workflow.mapper.TaskMapper;
 import com.cfcc.modules.workflow.service.IoaProcActinstService;
-import com.cfcc.modules.workflow.service.TaskCommonService;
-import io.netty.util.internal.StringUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.StringUtils;
-import org.activiti.engine.HistoryService;
-import org.activiti.engine.history.HistoricTaskInstance;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 
 @Service
@@ -267,12 +264,12 @@ public class ButtonPermissionServiceImpl implements ButtonPermissionService {
         String createBy = busData.get("s_create_by") == null ? "" : busData.get("s_create_by") + "";
         //创建者
         currentUserPermission.put("isCreate", createBy.equals(currentUser.getId()));
-        List<String> reader = dynamicTableMapper.isReader(busdataId, busData.get("table") + "_permit");
-        //参与者
-        currentUserPermission.put("isReader", reader.contains(userId));
+//        List<String> reader = dynamicTableMapper.isReader(busdataId, busData.get("table") + "_permit");
+
         //已办用户(有流程)
         boolean isLastsender = false;
         boolean isTransactors = false;//代办
+        boolean isReader = false;//代办
         Boolean deptFinsh = false;//部门完成
         if (taskDefKey != null) {
             //查询是流程已办(已办与待办不可同时出现)
@@ -307,6 +304,10 @@ public class ButtonPermissionServiceImpl implements ButtonPermissionService {
         if (isLastsender || havaAddRole) {//是已办或者
             canAddUser = true;
         }
+
+        if (!isLastsender&&isTransactors)isReader=true;
+        //参与者
+        currentUserPermission.put("isReader", isReader);
         currentUserPermission.put("isLastsender", isLastsender);
         currentUserPermission.put("isTransactors", isTransactors);
         currentUserPermission.put("deptFinsh", deptFinsh);

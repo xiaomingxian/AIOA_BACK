@@ -11,7 +11,6 @@ import com.cfcc.common.exception.AIOAException;
 import com.cfcc.common.mycat.MycatSchema;
 import com.cfcc.common.system.vo.DictModel;
 import com.cfcc.common.util.RedisUtil;
-import com.cfcc.common.util.StringUtil;
 import com.cfcc.modules.oaBus.entity.*;
 import com.cfcc.modules.oaBus.mapper.BusFunctionMapper;
 import com.cfcc.modules.oaBus.mapper.OaBusDynamicTableMapper;
@@ -25,14 +24,11 @@ import com.cfcc.modules.system.service.ISysUserRoleService;
 import com.cfcc.modules.system.service.ISysUserService;
 import com.cfcc.modules.workflow.mapper.DepartWithTaskMapper;
 import com.cfcc.modules.workflow.pojo.Activity;
-import com.cfcc.modules.workflow.pojo.TaskWithDepts;
 import com.cfcc.modules.workflow.service.ProcessManagerService;
-import com.cfcc.modules.workflow.service.TaskCommonService;
 import lombok.extern.slf4j.Slf4j;
 import org.activiti.engine.HistoryService;
 import org.activiti.engine.RepositoryService;
 import org.activiti.engine.TaskService;
-import org.activiti.engine.delegate.Expression;
 import org.activiti.engine.history.HistoricTaskInstance;
 import org.activiti.engine.history.HistoricTaskInstanceQuery;
 import org.activiti.engine.impl.bpmn.behavior.UserTaskActivityBehavior;
@@ -42,7 +38,6 @@ import org.activiti.engine.repository.ProcessDefinition;
 import org.activiti.engine.task.Task;
 import org.activiti.engine.task.TaskQuery;
 import org.apache.commons.lang.StringUtils;
-import org.apache.ibatis.annotations.Param;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -582,7 +577,7 @@ public class OaBusdataServiceImpl extends ServiceImpl<OaBusdataMapper, OaBusdata
         //******************************************   更新状态为已读
         //只是待办状态时修改
         if (StringUtils.isNotBlank(status) && "todo".equalsIgnoreCase(status)) {
-            iBusFunctionPermitService.updateReade(tableName + "_permit", loginInfo.getId(), functionId, busdataId);
+//            iBusFunctionPermitService.updateReade(tableName + "_permit", loginInfo.getId(), functionId, busdataId);
         }
         long lstatus = System.currentTimeMillis();
 
