@@ -23,11 +23,6 @@ management:
 
 
 spring:
-  http:
-    encoding:
-      charset: UTF-8
-      enabled: true
-      force: true
   data:
     elasticsearch:
       indexName1: elasticsearch1
