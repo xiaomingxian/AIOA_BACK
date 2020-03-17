@@ -41,8 +41,8 @@ spring:
     check-process-definitions: false
   servlet:
     multipart:
-      max-file-size: 10MB
-      max-request-size: 10MB
+      max-file-size: 100MB
+      max-request-size: 100MB
   mail:
     host: smtp.163.com
     username: jeecgos@163.com
@@ -121,7 +121,7 @@ spring:
       datasource:
         master:
           #          &allowMultiQueries=trueA
-          url: jdbc:mysql://11.130.6.145:8066/001?characterEncoding=UTF-8&useUnicode=true&useSSL=false&tinyInt1isBit=false&allowMultiQueries=true
+          url: jdbc:mysql://11.130.6.145:8066/000?characterEncoding=UTF-8&useUnicode=true&useSSL=false&tinyInt1isBit=false&allowMultiQueries=true
           #          url: jdbc:mysql://49.234.25.12:3306/aioa_test?characterEncoding=UTF-8&useUnicode=true&useSSL=false&tinyInt1isBit=false
           username: root
           password: root
