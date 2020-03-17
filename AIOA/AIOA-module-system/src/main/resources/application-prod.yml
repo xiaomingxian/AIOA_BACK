@@ -197,6 +197,9 @@ home:
 #系统部署年份
 system:
   runDate : 2014
+RTX:
+  hostIp : 192.168.199.108
+  port : 8012
 actShow:
   default: i_urgency,ilevel,s_file_num,s_title,s_create_name,s_create_by,i_id,table,page_ref,iprocSetId,i_bus_function_id,functionName,i_is_important,mainDept
 #有追加权限的角色
