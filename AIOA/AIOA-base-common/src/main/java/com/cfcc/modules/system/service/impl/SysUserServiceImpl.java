@@ -412,9 +412,17 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser> impl
         map.put("sysOrgCode", orgCode); // 当前登录用户部门编号
         if (null == orgCode) orgCode = userMapper.selectOrgCodeByUserId(sysUser.getId());
         SysDepart dept = getDeptById(orgCode);
-        map.put("sysDeptName", dept.getDepartName()); // 部门名称
-        map.put("deptId", dept.getId()); // 部门名称
-        map.put("parentId", dept.getParentId()); // 机构id
+        String sysDeptName=" ";
+        String deptId="";
+        String parentId="";
+        if (dept!=null){
+            sysDeptName= dept.getDepartName();
+            deptId= dept.getId();
+            parentId=dept.getParentId();
+        }
+        map.put("sysDeptName", sysDeptName); // 部门名称
+        map.put("deptId", deptId); // 部门名称
+        map.put("parentId", parentId); // 机构id
 
         List<SysRole> role = getRoleByUserId(sysUser.getId());
         map.put("role", role);
