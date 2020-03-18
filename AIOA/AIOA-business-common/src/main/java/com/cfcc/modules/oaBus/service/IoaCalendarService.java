@@ -7,6 +7,7 @@ import com.cfcc.modules.oaBus.entity.OaFile;
 import com.cfcc.modules.oaBus.entity.oaCalendar;
 import com.cfcc.modules.system.entity.SysUser;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.xml.crypto.Data;
 import java.io.IOException;
@@ -52,7 +53,7 @@ public interface IoaCalendarService extends IService<oaCalendar> {
 
     List<BusFunction> busFunctionList();
 
-    void MostUserLink(HttpServletResponse response,String id,String resourceType) throws IOException;
+    void MostUserLink(HttpServletResponse response, HttpServletRequest request,String id, String resourceType) throws IOException;
 
     List<Map<String, Object>>  LinkList() ;
 

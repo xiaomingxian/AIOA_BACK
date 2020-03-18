@@ -11,15 +11,18 @@ import com.cfcc.modules.oaBus.service.IOaBusdataService;
 import com.cfcc.modules.oaBus.service.IOaFileService;
 import com.cfcc.modules.oaBus.service.IoaCalendarService;
 import com.cfcc.modules.shiro.vo.DefContants;
+import com.cfcc.modules.system.entity.LoginInfo;
 import com.cfcc.modules.system.entity.SysUser;
 import com.cfcc.modules.system.mapper.SysUserMapper;
 import com.cfcc.modules.system.model.TreeModel;
+import com.cfcc.modules.system.service.ISysUserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.File;
 import java.io.FileInputStream;
@@ -41,6 +44,8 @@ public class oaCalendarServiceImpl extends ServiceImpl<oaCalendarMapper, oaCalen
 
     @Autowired
     private oaCalendarMapper oaCalendarMapper;
+    @Autowired
+    private ISysUserService userService;
 
     @Autowired
     IOaFileService iOaFileService;
@@ -184,13 +189,20 @@ public class oaCalendarServiceImpl extends ServiceImpl<oaCalendarMapper, oaCalen
     }
 
     @Override
-        public void MostUserLink(HttpServletResponse response,String id,String resourceType)  {
+        public void MostUserLink(HttpServletResponse response, HttpServletRequest request, String id, String resourceType)  {
 
         try {
             String filePath = oaCalendarMapper.selectPath(Integer.parseInt(id));
-            String fileName =  oaCalendarMapper.selectName(Integer.parseInt(id));
-            filePath = uploadpath+"\\"+filePath.substring(0,filePath.lastIndexOf("\\")+1)+fileName;
-            System.out.println(filePath);
+          //  String fileName =  oaCalendarMapper.selectName(Integer.parseInt(id));
+          //  filePath = uploadpath+"\\"+filePath.substring(0,filePath.lastIndexOf("\\")+1)+fileName;
+
+            LoginInfo loginInfo = userService.getLoginInfo(request);
+            if (loginInfo.getOrgSchema()!=null && !loginInfo.getOrgSchema().equals("")){
+                filePath = uploadpath + "\\"+ loginInfo.getOrgSchema()+ "\\" + filePath;
+            }else{
+                filePath = uploadpath + "\\" + filePath;
+            }
+            System.out.println(filePath+"------------------");
             File file = new File(filePath);
             FileInputStream stream = new FileInputStream(file);
             byte[] b = new byte[1024];

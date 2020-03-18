@@ -260,11 +260,11 @@ public class oaCalendarController implements Job {
 	  */
 	 @ApiOperation("查询图片数据")
 	 @GetMapping(value = "/MostUserLink")
-	 public boolean readPicture( HttpServletResponse response,@RequestParam(name="id",required=false) String id,
+	 public boolean readPicture( HttpServletResponse response,HttpServletRequest request,@RequestParam(name="id",required=false) String id,
 								@RequestParam("resourceType") String resourceType) {
 
 		 try {
-			 oaCalendarService.MostUserLink(response,id, resourceType);
+			 oaCalendarService.MostUserLink(response,request,id, resourceType);
 		 } catch (Exception e) {
 			 return false;
 		 }
