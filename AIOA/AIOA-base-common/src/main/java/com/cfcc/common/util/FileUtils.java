@@ -95,4 +95,14 @@ public class FileUtils {
         }
         return password;
     }
+
+    public static Boolean deleteFile(String sPath){
+        Boolean flag=false;
+        File file = new File(sPath);
+        if (file.isFile() && file.exists()){
+            file.delete();
+            flag=true;
+        }
+        return flag;
+    }
 }

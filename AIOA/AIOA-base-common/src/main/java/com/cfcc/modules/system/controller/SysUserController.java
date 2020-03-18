@@ -1027,5 +1027,4 @@ public class SysUserController {
         result.setResult(userName);
         return result;
     }
-
 }
