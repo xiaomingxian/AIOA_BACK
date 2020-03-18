@@ -4,9 +4,7 @@ import com.cfcc.modules.workflow.pojo.*;
 import com.cfcc.modules.workflow.vo.TaskInfoVO;
 import org.activiti.engine.task.Task;
 import org.apache.ibatis.annotations.*;
-import org.springframework.stereotype.Service;
 
-import javax.annotation.security.PermitAll;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -251,4 +249,6 @@ public interface TaskMapper {
 
     void updateParentAndDesc(Task newTask);
 
+    @Delete("delete from oa_task_dept where proc_inst_id=#{v}")
+    void deleteDeptByProcessInstceId(String processInstanceId);
 }
