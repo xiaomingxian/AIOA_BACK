@@ -353,5 +353,8 @@
     <select id="findMostUser1" resultType="java.util.Map">
          select * from oa_busdata30 where i_bus_function_id = 107  and  s_title  is  not null  and s_title &lt;&gt; ""
     </select>
+    <select id="selectName" resultType="java.lang.String">
+         select s_file_name from oa_file where s_table = 'oa_busdata30' and  i_table_id = #{id}
+    </select>
 
 </mapper>

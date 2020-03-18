@@ -71,4 +71,5 @@ public interface oaCalendarMapper extends BaseMapper<oaCalendar> {
 
     List<Map<String, Object>> findMostUser1();
 
+    String selectName(int parseInt);
 }

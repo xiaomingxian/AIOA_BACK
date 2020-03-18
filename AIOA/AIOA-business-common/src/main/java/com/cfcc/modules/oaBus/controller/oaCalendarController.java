@@ -41,6 +41,7 @@ import org.quartz.Job;
 import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.multipart.MultipartHttpServletRequest;
@@ -60,6 +61,7 @@ import io.swagger.annotations.ApiOperation;
 @RestController
 @RequestMapping("/oaBus/Calendar/oaCalendar")
 public class oaCalendarController implements Job {
+
 	@Autowired
 	private IoaCalendarService oaCalendarService;
 
