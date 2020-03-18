@@ -1848,4 +1848,6 @@
             UPDATE act_ru_task set DESCRIPTION_=#{description},PARENT_TASK_ID_=#{parentTaskId}  where id_=#{id};
 
     </update>
+
+
 </mapper>

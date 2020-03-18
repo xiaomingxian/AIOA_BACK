@@ -467,6 +467,7 @@ public class OaBusdataServiceImpl extends ServiceImpl<OaBusdataMapper, OaBusdata
         if (StringUtils.isBlank(proKey)) {//没有流程
             result.put("optionTable", null);
         } else {//有流程
+            //TODO 优化成一条sql
             processInstanceId = oaBusdata.get("s_varchar10") == null ? null : oaBusdata.get("s_varchar10").toString();
             String taskDefData = oaBusdata.get("s_cur_task_name") == null ? null : oaBusdata.get("s_cur_task_name").toString();
             if (StringUtils.isNotBlank(status) && status.equalsIgnoreCase("newtask")
@@ -577,7 +578,7 @@ public class OaBusdataServiceImpl extends ServiceImpl<OaBusdataMapper, OaBusdata
         //******************************************   更新状态为已读
         //只是待办状态时修改
         if (StringUtils.isNotBlank(status) && "todo".equalsIgnoreCase(status)) {
-//            iBusFunctionPermitService.updateReade(tableName + "_permit", loginInfo.getId(), functionId, busdataId);
+            iBusFunctionPermitService.updateReade(tableName + "_permit", loginInfo.getId(), functionId, busdataId);
         }
         long lstatus = System.currentTimeMillis();
 

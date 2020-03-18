@@ -1264,6 +1264,8 @@ public class TaskCommonServiceImpl implements TaskCommonService {
         if (list.size() == 0) {
             //任务已经完成
             nextTaskMsg.append("end").append("-'").append("已结束");
+            //清空此流程的部门记录信息
+            taskMapper.deleteDeptByProcessInstceId(processInstanceId);
         } else {
             //
             String taskKey = list.get(0).getTaskDefinitionKey();
@@ -1585,6 +1587,8 @@ public class TaskCommonServiceImpl implements TaskCommonService {
      */
     @Override
     public Task jump(JumpMsg jumpMsg, HttpServletRequest request) {
+        //TODO 部门信息处理 跳转的不是部门 就清空部门信息
+        //TODO 回退到部门环节之前就 清空部门信息 之后就追加
 
         String sourceTaskId = jumpMsg.getTaskId();
 
@@ -1705,7 +1709,7 @@ public class TaskCommonServiceImpl implements TaskCommonService {
 
             }
             String dataTable = jumpMsg.getTable();
-            if (StringUtils.isNotBlank(dataTable) && (jumpMsg != null && jumpMsg.getIsDept())) {//并且是部门类型
+            if (StringUtils.isNotBlank(dataTable)) {
                 Map<String, Object> data = new HashMap<>();
                 data.put("table", dataTable);
                 data.put("i_id", tableId);
