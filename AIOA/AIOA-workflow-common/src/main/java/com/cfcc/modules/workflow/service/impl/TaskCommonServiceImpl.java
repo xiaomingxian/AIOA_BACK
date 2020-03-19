@@ -1274,7 +1274,7 @@ public class TaskCommonServiceImpl implements TaskCommonService {
             //任务已经完成
             nextTaskMsg.append("end").append("-'").append("已结束");
             //清空此流程的部门记录信息
-            taskMapper.deleteDeptByProcessInstceId(processInstanceId);
+//            taskMapper.deleteDeptByProcessInstceId(processInstanceId);
         } else {
             //
             String taskKey = list.get(0).getTaskDefinitionKey();
