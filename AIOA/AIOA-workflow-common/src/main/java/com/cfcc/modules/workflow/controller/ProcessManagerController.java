@@ -1,6 +1,7 @@
 package com.cfcc.modules.workflow.controller;
 
 import com.cfcc.common.api.vo.Result;
+import com.cfcc.common.exception.AIOAException;
 import com.cfcc.common.mycat.MycatSchema;
 import com.cfcc.modules.workflow.pojo.Activity;
 import com.cfcc.modules.workflow.service.ProcessManagerService;
@@ -29,7 +30,7 @@ public class ProcessManagerController {
 
     @PostMapping("deploy")
     @ApiOperation("发布流程")
-    public Result deploy(@RequestParam(value = "file", required = false) MultipartFile[] files ) {
+    public Result deploy(@RequestParam(value = "file", required = false) MultipartFile[] files) {
 
 
         if (files == null || (files != null && files.length <= 0)) {
@@ -39,9 +40,16 @@ public class ProcessManagerController {
 
         String schema = MycatSchema.getSchema();
 
+        try {
+            processManagerService.deploy(files, schema);
 
-        return processManagerService.deploy(files, schema);
+        } catch (AIOAException e) {
+            return Result.error(e.getMessage());
+        } catch (Exception e) {
+            return Result.error("流程发布失败");
+        }
 
+        return Result.ok("流程发布成功");
     }
 
 

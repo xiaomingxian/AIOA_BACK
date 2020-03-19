@@ -64,7 +64,7 @@ public class ProcessManagerImpl implements ProcessManagerService {
      */
     @Override
     @CacheEvict(value = "defKv", allEntries = true)
-    public Result deploy(MultipartFile[] multipartFiles, String schemal) {
+    public void deploy(MultipartFile[] multipartFiles, String schemal) {
 
         Result result = new Result();
         try {
@@ -100,11 +100,8 @@ public class ProcessManagerImpl implements ProcessManagerService {
             result.setMessage("发布成功");
 
         } catch (Exception e) {
-            result.setSuccess(false);
-            result.setMessage("发布失败");
-            log.error("流程发布失败：" + e.toString());
+            throw  new AIOAException("发布失败,清检查流程图是否正确(建议按照手册操作)");
         }
-        return result;
     }
 
     /**

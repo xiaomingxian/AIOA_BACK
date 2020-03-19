@@ -72,7 +72,7 @@
     <update id="updateData">
         update ${map.table} set
         <foreach collection="map" item="value" index="key" separator=",">
-            <if test="key!='table' and key != 'i_id' and key != 'id' and value != null  ">
+            <if test="key!='table' and key != 'i_id' and key != 'id'   ">
                 ${key} = #{value}
             </if>
         </foreach>

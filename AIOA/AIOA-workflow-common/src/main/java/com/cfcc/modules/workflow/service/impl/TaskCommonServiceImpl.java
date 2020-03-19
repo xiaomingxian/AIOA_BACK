@@ -1052,6 +1052,15 @@ public class TaskCommonServiceImpl implements TaskCommonService {
         boolean flag = false;
         List<String> foreTasks = new ArrayList<>();
         //先找到判读那节点 说明目标节点在判断节点之后
+        boolean haveJuTi = false;
+        for (ActivityImpl activity : activities) {
+            String name = (String) activity.getProperty("name");
+            if (name.equals(juTiAct)) {
+                haveJuTi = true;
+                break;
+            }
+        }
+        if (!haveJuTi) return false;
         for (ActivityImpl activity : activities) {
             String name = (String) activity.getProperty("name");
             foreTasks.add(name);
@@ -1062,7 +1071,7 @@ public class TaskCommonServiceImpl implements TaskCommonService {
                 flag = true;
                 break;
             }
-            if (foreTasks.contains(juTiAct) && !foreTasks.contains(destActDefName)){
+            if (foreTasks.contains(juTiAct) && !foreTasks.contains(destActDefName)) {
                 flag = false;
                 break;
             }
@@ -1587,10 +1596,10 @@ public class TaskCommonServiceImpl implements TaskCommonService {
      */
     @Override
     public Task jump(JumpMsg jumpMsg, HttpServletRequest request) {
-        //TODO 部门信息处理 跳转的不是部门 就清空部门信息
-        //TODO 回退到部门环节之前就 清空部门信息 之后就追加
 
         String sourceTaskId = jumpMsg.getTaskId();
+        String dataTable = jumpMsg.getTable();
+        Integer tableId = jumpMsg.getTableId();
 
 
         CommandExecutor commandExecutor = taskServiceImpl.getCommandExecutor();
@@ -1644,14 +1653,11 @@ public class TaskCommonServiceImpl implements TaskCommonService {
 
         //主办部门更新
         String description = task.getDescription();
-        if (StringUtils.isNotBlank(description) && jumpMsg.getIsDept()) {//是部门任务
-            String[] split = description.split("@mainDept");
-            String s = split[0];
-            description = s + "@mainDept:" + taskWithDepts.getMainDept() + "@";
-            Map<String, Object> vars = jumpMsg.getVars();
-            vars.put("busMsg", description);
-        }
+        //部门问题
+        description = updateDeptMsg(jumpMsg, dataTable, tableId, task, deleteReason, taskWithDepts, description);
 
+
+        //执行重置
         commandExecutor.execute(new JumpTaskCmd(jumpMsg.getTaskId(), jumpMsg.getExecutionId(),
                 jumpMsg.getProcessInstanceId(), dest, jumpMsg.getVars(), curr, jumpMsg.getDeleteReason()));
 
@@ -1674,7 +1680,6 @@ public class TaskCommonServiceImpl implements TaskCommonService {
 
         String table = jumpMsg.getTable() + "_permit";
         Integer functionId = jumpMsg.getFunctionId();
-        Integer tableId = jumpMsg.getTableId();
         //4 存储用户信息到 业务数据权限表 - 构造用户信息
         oaBusDataPermitService.save(table, jumpMsg.getAssignee(), functionId, tableId);
 
@@ -1696,11 +1701,11 @@ public class TaskCommonServiceImpl implements TaskCommonService {
                 if (parentTaskId.equalsIgnoreCase(sourceTaskId + type)) {
                     taskWithDepts.setTskId(id);
                     taskWithDepts.setTaskDefKey(taskDefinitionKey);
-                    if (delFlag) {
-                        //第一次删除以前记录的数据
-                        departWithTaskMapper.deleteSameTask(processInstanceId, taskDefinitionKey);
-                        delFlag = false;
-                    }
+//                    if (delFlag) {
+//                        //第一次删除以前记录的数据
+//                        departWithTaskMapper.deleteSameTask(processInstanceId, taskDefinitionKey);
+//                        delFlag = false;
+//                    }
 
                     //存储下个节点的任务id---主办/辐办/传阅等类型都存储起来(会有重复数据)[数量=用户量*种类]
                     //请求数据库 2-3 次
@@ -1708,19 +1713,10 @@ public class TaskCommonServiceImpl implements TaskCommonService {
                 }
 
             }
-            String dataTable = jumpMsg.getTable();
-            if (StringUtils.isNotBlank(dataTable)) {
-                Map<String, Object> data = new HashMap<>();
-                data.put("table", dataTable);
-                data.put("i_id", tableId);
-                data.put("s_main_unit_names", taskWithDepts.getMainDept());
-                data.put("s_cc_unit_names", taskWithDepts.getFuDept());
-                data.put("s_inside_deptnames", taskWithDepts.getCyDept());
-                dynamicTableMapper.updateData(data);
-            }
 
 
         }
+
 
         //将父节点是它的任务的节点置空
         //update   `act_hi_taskinst` set PARENT_TASK_ID_=null   where PARENT_TASK_ID_='10027' PROC_INST_ID_=2560
@@ -1735,6 +1731,67 @@ public class TaskCommonServiceImpl implements TaskCommonService {
 
         return task;
 
+    }
+
+    private String updateDeptMsg(JumpMsg jumpMsg, String dataTable, Integer tableId, Task task, String deleteReason, TaskWithDepts taskWithDepts, String description) {
+        boolean needUpdateData = false;
+
+        String destActDefKey = jumpMsg.getDestActDefKey();
+
+
+        //跳转或者撤回 到 部门 或者到部门之前都需要 更新部门信息
+        if (StringUtils.isNotBlank(description) && jumpMsg.getIsDept()) {//是部门任务
+            String[] split = description.split("@mainDept");
+            String s = split[0];
+            description = s + "@mainDept:" + taskWithDepts.getMainDept() + "@";
+            needUpdateData = true;
+        } else {
+            //判断环节是否在子流程之前  之前就更新/之后就不更新
+            ProcessDefinitionEntity proc = (ProcessDefinitionEntity) repositoryService.getProcessDefinition(task.getProcessDefinitionId());
+            List<ActivityImpl> activities = proc.getActivities();
+            //顺序遍历 并记录遍历过的环节 直到遇到子流程并判断目标环节是否在 子流程之前
+            List<String> foreTasks = new ArrayList<>();
+            for (ActivityImpl activity : activities) {
+
+                String name = (String) activity.getProperty("name");
+                String id = activity.getId();
+                String type = (String) activity.getProperty("type");
+                foreTasks.add(id);
+                if (type.equalsIgnoreCase("subProcess") && foreTasks.contains(destActDefKey)) {
+                    needUpdateData = true;
+                    break;
+                }
+            }
+        }
+
+
+        if (needUpdateData) {
+
+            String[] split = description.split("@mainDept");
+            String s = split[0];
+            if (StringUtils.isBlank(taskWithDepts.getMainDept())) {
+                description = s + "@mainDept:@";
+            } else {
+                description = s + "@mainDept:" + taskWithDepts.getMainDept() + "@";
+            }
+
+            Map<String, Object> vars = jumpMsg.getVars();
+            vars.put("busMsg", description);
+            jumpMsg.setVars(vars);
+            if (StringUtils.isNotBlank(dataTable)) {
+                Map<String, Object> data = new HashMap<>();
+                data.put("table", dataTable);
+                data.put("i_id", tableId);
+                data.put("s_main_unit_names", taskWithDepts.getMainDept());
+                data.put("s_cc_unit_names", taskWithDepts.getFuDept());
+                data.put("s_inside_deptnames", taskWithDepts.getCyDept());
+                dynamicTableMapper.updateData(data);
+            }
+        }
+
+
+        //不符合条件不更新数据
+        return description;
     }
 
 
@@ -2289,6 +2346,8 @@ public class TaskCommonServiceImpl implements TaskCommonService {
 
         try {
 
+
+            //TODO 部门任务 更新
 
             TaskInfoVO next = taskInfoVOS.iterator().next();
             reCallTaskService.backProcess(next.getTaskId(), historicTaskInstance.getTaskDefinitionKey(),

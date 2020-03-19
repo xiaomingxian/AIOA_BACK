@@ -15,7 +15,7 @@ import java.util.Map;
 public interface ProcessManagerService {
 
 
-    Result deploy(MultipartFile[] files,String schema);
+    void deploy(MultipartFile[] files,String schema);
 
     Result processQuery(ProcessDefinition vo, Integer pageNo, Integer pageSize);
 

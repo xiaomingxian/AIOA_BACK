@@ -8,7 +8,6 @@ import org.activiti.engine.RepositoryService;
 import org.activiti.engine.RuntimeService;
 import org.activiti.engine.TaskService;
 import org.activiti.engine.history.HistoricActivityInstance;
-import org.activiti.engine.history.HistoricTaskInstance;
 import org.activiti.engine.impl.RepositoryServiceImpl;
 import org.activiti.engine.impl.persistence.entity.ProcessDefinitionEntity;
 import org.activiti.engine.impl.persistence.entity.TaskEntity;
@@ -67,12 +66,22 @@ public class ReCallTaskServiceImpl implements ReCallTaskService {
         List<Task> taskList = findTaskListByKey(findProcessInstanceByTaskId(
                 taskId).getId(), findTaskById(taskId).getTaskDefinitionKey());
         String procInstId = null;
-        for (Task task : taskList) {
+        for (int i = 0; i < taskList.size(); i++) {
+            Task task = taskList.get(i);
             task.setAssignee(type + ":" + task.getName() + "->" + descActName + "(" + currentUser.getUsername() + ")");
             task.setParentTaskId(null);
             taskService.saveTask(task);
             procInstId = task.getProcessInstanceId();
-            commitProcess(task.getId(), variables, activityId);
+            if (taskList.size() == 1) {
+                commitProcess(task.getId(), variables, activityId, true);
+            } else {
+                if (i == taskList.size() - 1) {
+                    commitProcess(task.getId(), variables, activityId, true);
+
+                } else {
+                    commitProcess(task.getId(), variables, activityId, false);
+                }
+            }
         }
 
         if ("撤回".equals(type)) {
@@ -96,19 +105,19 @@ public class ReCallTaskServiceImpl implements ReCallTaskService {
      * @param activityId 取回节点ID
      * @throws Exception
      */
-    public void callBackProcess(String taskId, String activityId)
-            throws Exception {
-        if (StringUtils.isEmpty(activityId)) {
-            throw new Exception("目标节点ID为空！");
-        }
-
-        // 查找所有并行任务节点，同时取回
-        List<Task> taskList = findTaskListByKey(findProcessInstanceByTaskId(
-                taskId).getId(), findTaskById(taskId).getTaskDefinitionKey());
-        for (Task task : taskList) {
-            commitProcess(task.getId(), null, activityId);
-        }
-    }
+//    public void callBackProcess(String taskId, String activityId)
+//            throws Exception {
+//        if (StringUtils.isEmpty(activityId)) {
+//            throw new Exception("目标节点ID为空！");
+//        }
+//
+//        // 查找所有并行任务节点，同时取回
+//        List<Task> taskList = findTaskListByKey(findProcessInstanceByTaskId(
+//                taskId).getId(), findTaskById(taskId).getTaskDefinitionKey());
+//        for (Task task : taskList) {
+//            commitProcess(task.getId(), null, activityId);
+//        }
+//    }
 
 
     /**
@@ -143,7 +152,7 @@ public class ReCallTaskServiceImpl implements ReCallTaskService {
      * @throws Exception
      */
     private void commitProcess(String taskId, Map<String, Object> variables,
-                               String activityId) throws Exception {
+                               String activityId, boolean isLastOne) throws Exception {
         if (variables == null) {
             variables = new HashMap<String, Object>();
         }
@@ -151,7 +160,7 @@ public class ReCallTaskServiceImpl implements ReCallTaskService {
         if (StringUtils.isEmpty(activityId)) {
             taskService.complete(taskId, variables);
         } else {// 流程转向操作
-            turnTransition(taskId, activityId, variables);
+            turnTransition(taskId, activityId, variables, isLastOne);
         }
     }
 
@@ -161,10 +170,10 @@ public class ReCallTaskServiceImpl implements ReCallTaskService {
      *
      * @param taskId
      */
-    public void endProcess(String taskId) throws Exception {
-        ActivityImpl endActivity = findActivitiImpl(taskId, "end");
-        commitProcess(taskId, null, endActivity.getId());
-    }
+//    public void endProcess(String taskId) throws Exception {
+//        ActivityImpl endActivity = findActivitiImpl(taskId, "end");
+//        commitProcess(taskId, null, endActivity.getId());
+//    }
 
 
     /**
@@ -527,11 +536,21 @@ public class ReCallTaskServiceImpl implements ReCallTaskService {
      * @throws Exception
      */
     private void turnTransition(String taskId, String activityId,
-                                Map<String, Object> variables) throws Exception {
+                                Map<String, Object> variables, boolean isLastOne) throws Exception {
         // 当前节点
         ActivityImpl currActivity = findActivitiImpl(taskId, null);
         // 清空当前流向
         List<PvmTransition> oriPvmTransitionList = clearTransition(currActivity);
+        if (!isLastOne) {
+            try {
+
+                taskService.complete(taskId, variables);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+            return;
+        }
+
 
         // 创建新流向
         TransitionImpl newTransition = currActivity.createOutgoingTransition();
