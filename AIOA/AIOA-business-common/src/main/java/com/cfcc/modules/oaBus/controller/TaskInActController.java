@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.cfcc.common.api.vo.Result;
 import com.cfcc.common.constant.workflow.RoleScope;
 import com.cfcc.common.exception.AIOAException;
+import com.cfcc.common.util.norepeat.NoRepeatSubmit;
 import com.cfcc.common.util.workflow.VarsWithBus;
 import com.cfcc.modules.oaBus.entity.BusFunction;
 import com.cfcc.modules.oaBus.service.IBusFunctionPermitService;
@@ -297,6 +298,7 @@ public class TaskInActController {
 
     @PostMapping("doAddUsers")
     @ApiOperation("追加办理人")
+    @NoRepeatSubmit
     public Result doAddUser(@RequestBody Map<String, Object> map, HttpServletRequest request) {
         try {
             LoginInfo loginInfo = sysUserService.getLoginInfo(request);
@@ -678,6 +680,7 @@ public class TaskInActController {
 
     @PostMapping("doTask")
     @ApiOperation("任务办理")
+    @NoRepeatSubmit
     public Result doTask(@RequestBody TaskInfoVO taskInfoVO, HttpServletRequest request) {
         try {
             //流程与业务相关数据
@@ -761,6 +764,7 @@ public class TaskInActController {
 
     @PostMapping("doTaskMore")
     @ApiOperation("任务办理并行/包容网关")
+    @NoRepeatSubmit
     public Result doTaskMore(@RequestBody Map<String, Object> map, HttpServletRequest request) {
         try {
             LoginInfo loginInfo = sysUserService.getLoginInfo(request);
@@ -984,6 +988,7 @@ public class TaskInActController {
 
     @ApiOperation(value = "已读任务状态修改")
     @GetMapping("/changeStatus")
+    @NoRepeatSubmit
     public Result changeStatus(String table, String userId, String functionId, String dataId) {
 
         try {

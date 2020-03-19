@@ -3,6 +3,7 @@ package com.cfcc.modules.workflow.controller;
 
 import com.cfcc.common.api.vo.Result;
 import com.cfcc.common.exception.AIOAException;
+import com.cfcc.common.util.norepeat.NoRepeatSubmit;
 import com.cfcc.modules.system.entity.LoginInfo;
 import com.cfcc.modules.system.entity.SysRole;
 import com.cfcc.modules.system.entity.SysUser;
@@ -56,6 +57,7 @@ public class TaskCommonController {
 
 
     @GetMapping("finish")
+    @NoRepeatSubmit
     public Result finish(String taskId) {
         taskCommonService.finsh(taskId);
         return Result.ok("完成任务成功");
@@ -164,6 +166,7 @@ public class TaskCommonController {
 
     @ApiOperation("终止流程")
     @GetMapping("endProcess")
+    @NoRepeatSubmit
     public Result endProcess(TaskInfoVO taskInfoVO, HttpServletRequest request) {
         try {
             //查询当前用户，作为assignee
@@ -180,6 +183,7 @@ public class TaskCommonController {
 
     @ApiOperation("批量办结")
     @PostMapping("batchEnd")
+    @NoRepeatSubmit
     public Result batchEnd(@RequestBody Map<String, String[]> ids, HttpServletRequest request) {
         try {
             //查询当前用户，作为assignee
@@ -196,6 +200,7 @@ public class TaskCommonController {
 
     @ApiOperation("部门完成")
     @PostMapping("departFinish")
+    @NoRepeatSubmit
     public Result departFinish(@Param(value = "taskId") String taskId, String processInstanceId, HttpServletRequest request) {
         try {
             SysUser user = sysUserService.getCurrentUser(request);
@@ -210,6 +215,7 @@ public class TaskCommonController {
 
     @ApiOperation("批量办结/部门完成")
     @PostMapping("batchPiYue")
+    @NoRepeatSubmit
     public Result batchChuanYue(@RequestBody List<Map<String, Object>> data, HttpServletRequest request) {
         try {
             //查询当前用户，作为assignee
@@ -321,6 +327,7 @@ public class TaskCommonController {
 
     @ApiOperation("跳转")
     @PostMapping("jump")
+    @NoRepeatSubmit
     public Result jump(@RequestBody JumpMsg jumpMsg, HttpServletRequest request) {
         try {
             taskCommonService.jump(jumpMsg, request);
@@ -335,6 +342,7 @@ public class TaskCommonController {
 
     @ApiOperation("回退")
     @PostMapping("back")
+    @NoRepeatSubmit
     public Result back(@RequestBody JumpMsg jumpMsg, HttpServletRequest request) {
         try {
 
@@ -368,6 +376,7 @@ public class TaskCommonController {
 
     @ApiOperation("任务移交")
     @GetMapping("taskShift")
+    @NoRepeatSubmit
     public Result taskShift(String taskId, String sourceUserId, String destUserId) {
         try {
             String sourceUsername = sysUserService.getById(sourceUserId).getUsername();
@@ -419,8 +428,10 @@ public class TaskCommonController {
 
     @ApiOperation("撤回-当前环节撤回到指定环节")
     @GetMapping("reCallTask")
+    @NoRepeatSubmit
     public Result reCallTask(String taskId, HttpServletRequest request) {
 
+        System.out.println("--------------------------------");
         try {
             SysUser currentUser = sysUserService.getLoginInfo(request);
             //是否可撤回
@@ -433,8 +444,6 @@ public class TaskCommonController {
             log.error("撤回失败：" + e.toString());
             return Result.error("撤回失败");
         }
-
-
     }
 
 

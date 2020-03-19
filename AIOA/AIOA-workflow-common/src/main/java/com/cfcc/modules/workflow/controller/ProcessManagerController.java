@@ -3,6 +3,7 @@ package com.cfcc.modules.workflow.controller;
 import com.cfcc.common.api.vo.Result;
 import com.cfcc.common.exception.AIOAException;
 import com.cfcc.common.mycat.MycatSchema;
+import com.cfcc.common.util.norepeat.NoRepeatSubmit;
 import com.cfcc.modules.workflow.pojo.Activity;
 import com.cfcc.modules.workflow.service.ProcessManagerService;
 import io.swagger.annotations.Api;
@@ -30,6 +31,7 @@ public class ProcessManagerController {
 
     @PostMapping("deploy")
     @ApiOperation("发布流程")
+    @NoRepeatSubmit
     public Result deploy(@RequestParam(value = "file", required = false) MultipartFile[] files) {
 
 
@@ -80,6 +82,7 @@ public class ProcessManagerController {
 
     @DeleteMapping("processDel")
     @ApiOperation("流程删除")
+    @NoRepeatSubmit
     public Result processDel(String[] ids, @RequestParam(defaultValue = "false") boolean cascade) {
         String schema = MycatSchema.getSchema();
         return processManagerService.processDel(ids, cascade, schema);
@@ -88,6 +91,7 @@ public class ProcessManagerController {
 
     @GetMapping("activeProcess")
     @ApiOperation("激活流程")
+    @NoRepeatSubmit
     public Result activeProcess(ProcessDefinition vo) {
         String schema = MycatSchema.getSchema();
 
@@ -96,6 +100,7 @@ public class ProcessManagerController {
 
     @GetMapping("disactiveProcess")
     @ApiOperation("挂起流程")
+    @NoRepeatSubmit
     public Result disactiveProcess(ProcessDefinition vo) {
         String schema = MycatSchema.getSchema();
 
