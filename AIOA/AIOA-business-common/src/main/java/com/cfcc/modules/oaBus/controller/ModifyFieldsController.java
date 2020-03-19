@@ -185,7 +185,9 @@ public class ModifyFieldsController {
         BusModel busModelById=null;
         try {
             if (StringUtils.isEmpty(maps.get("function_id").toString())){
-                maps.put("function_id","35");
+                result.setSuccess(false);
+                result.setMessage("业务查询失败");
+                return result;
             }
             String functionId =  maps.get("function_id").toString();
             BusFunction oneByFunId = busFunctionService.getOneByFunId(functionId);
@@ -208,7 +210,23 @@ public class ModifyFieldsController {
             }
             //根据tableName查询列和表头名称
             List<Map<String, String>> listColumns = busPageDetailService.getConColums(Integer.valueOf(functionId),oneByFunId.getIPageId());
-            String s = listColumns(listColumns);
+            boolean b=false;
+            for (Map<String, String> mt : listColumns) {
+                if (mt.get("s_table_column").equals("s_title")){
+                    b=true;
+                }
+            }
+            Map<String, String> addtitel=new HashMap<>();
+            addtitel.put("s_table_column","s_title");
+            addtitel.put("s_column_name","标题");
+            List<Map<String, String>> listColumnsNew =new ArrayList<>();
+            if (b==false){
+                listColumnsNew.add(addtitel);
+            }
+            for (int i = 0; i < listColumns.size(); i++) {
+                listColumnsNew.add(listColumns.get(i));
+            }
+            String s = listColumns(listColumnsNew);
 //            List<BusPageDetail> listColumns = busPageDetailService.getListByFunID(functionId);
 //            String s = listColumnsBusPageDetail(listColumns);
             if (s==null){
@@ -216,7 +234,7 @@ public class ModifyFieldsController {
                 result.setMessage("查询失败");
                 return result;
             }
-            res.put("colList", listColumns);//表头及名称
+            res.put("colList", listColumnsNew);//表头及名称
             IPage<Map<String, Object>> list = oaBusdataService.getModifyFieldList(pageNo,pageSize , s, busModelById.getSBusdataTable(),maps);
             res.put("dataList",list);//表数据
             res.put("tableName",busModelById.getSBusdataTable());
