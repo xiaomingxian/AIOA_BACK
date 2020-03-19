@@ -36,6 +36,15 @@
                         <when test="key == 'i_is_state' and value != null and value != ''">
                             i_is_state = #{value}
                         </when>
+                        <when test="key == 's_title' and value != null and value != ''">
+                            s_title  like concat("%",#{value},"%")
+                        </when>
+                        <when test="key == 's_receive_num' and value != null and value != ''">
+                            s_receive_num like concat("%",#{value},"%")
+                        </when>
+                        <when test="key == 's_file_num' and value != null and value != ''">
+                            s_file_num like concat("%",#{value},"%")
+                        </when>
                         <otherwise>
                             <if test="value != null and value != ''">
                                 ${key} like concat(concat("%",#{value}),"%")
@@ -77,6 +86,7 @@
                     </choose>
                 </foreach>
             </if>
+            and i_is_display=0
         </where>
     </select>
 
