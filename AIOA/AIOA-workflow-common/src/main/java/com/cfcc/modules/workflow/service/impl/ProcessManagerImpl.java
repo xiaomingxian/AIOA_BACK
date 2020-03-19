@@ -56,6 +56,12 @@ public class ProcessManagerImpl implements ProcessManagerService {
     @Autowired
     private TaskMapper taskMapper;
 
+    static List<String> types;
+
+    static {
+        String[] ts = {"xml", "bpmn", "zip", "bar"};
+        types = Arrays.asList(ts);
+    }
 
     /**
      * 流程发布
@@ -74,6 +80,13 @@ public class ProcessManagerImpl implements ProcessManagerService {
 
                 //判断文件后缀
                 String originalFilename = multipartFile.getOriginalFilename();
+                if (originalFilename.contains(".")) {
+                    String type = originalFilename.split("\\.")[1];
+                    if (!types.contains(type)) throw new AIOAException("您上传的文件不合法,请上传bpmn/zip/xml格式的文件");
+                } else {
+                    throw new AIOAException("您上传的文件不合法,请上传bpmn/zip/xml格式的文件");
+                }
+
                 try {
                     if (originalFilename.endsWith(".zip") || originalFilename.endsWith(".bar")) {
                         //压缩格式
@@ -99,8 +112,11 @@ public class ProcessManagerImpl implements ProcessManagerService {
             result.setSuccess(true);
             result.setMessage("发布成功");
 
-        } catch (Exception e) {
-            throw  new AIOAException("发布失败,请检查流程图是否正确(建议按照手册操作)");
+        }catch (AIOAException e){
+            throw  new AIOAException(e.getMessage());
+        }
+        catch (Exception e) {
+            throw new AIOAException("发布失败,请检查流程图是否正确(建议按照手册操作)");
         }
     }
 
