@@ -2332,7 +2332,6 @@ public class TaskCommonServiceImpl implements TaskCommonService {
         if (!haveDone && !back && !jump) {
             if (taskDefs.size() == 0) throw new AIOAException("没有您发出的任务,不可撤回");
             taskInfoVOS = taskDefs;
-            //TODO 将任务不显示
         }
         if (back) {
             if (taskDefsBack.size() == 0) throw new AIOAException("没有您发出的[回退]任务,不可撤回");
@@ -2348,10 +2347,39 @@ public class TaskCommonServiceImpl implements TaskCommonService {
 
 
             //TODO 部门任务 更新
-
             TaskInfoVO next = taskInfoVOS.iterator().next();
+            String isDeptId = next.getTaskId();
+            String taskDefKey = next.getTaskDefKey();
+            boolean isDept = taskMapper.isDeptTask(isDeptId, taskDefKey);
+            String description = historicTaskInstance.getDescription();
+            if (StringUtils.isNotBlank(description) && isDept) {
+                TaskCommon taskCommon = new TaskCommon();
+                taskCommon.setBusMsg(description);
+                String table = taskCommon.getTable();
+                String tableId = taskCommon.getTableId();
+                //更新业务数据
+                if (StringUtils.isNotBlank(table) && StringUtils.isNotBlank(tableId)) {
+                    Map<String, Object> data = new HashMap<String, Object>();
+                    data.put("table", table);
+                    data.put("i_id", tableId);
+                    data.put("s_main_unit_names", "");
+                    data.put("s_cc_unit_names", "");
+                    data.put("s_inside_deptnames", "");
+                    dynamicTableMapper.updateData(data);
+                }
+
+                String[] split = description.split("@mainDept");
+                String s = split[0];
+                description = s + "@mainDept:@";
+            }
+            Map<String, Object> vars = new HashMap<>();
+            if (StringUtils.isNotBlank(description)) {
+                vars.put("busMsg", description);
+            }
+
+
             reCallTaskService.backProcess(next.getTaskId(), historicTaskInstance.getTaskDefinitionKey(),
-                    null, currentUser, "撤回", historicTaskInstance.getName());
+                    vars, currentUser, "撤回", historicTaskInstance.getName());
 
             historyService.deleteHistoricTaskInstance(taskId);
 
@@ -2370,6 +2398,9 @@ public class TaskCommonServiceImpl implements TaskCommonService {
                 taskInfoJsonAble.setName(task.getName());
                 result.setResult(taskInfoJsonAble);
             }
+
+            //更新流程描述
+            taskMapper.updateTaskDescript(processInstanceId, description);
 
             return result;
         } catch (Exception e) {

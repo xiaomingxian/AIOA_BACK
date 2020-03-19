@@ -100,7 +100,7 @@ public class ProcessManagerImpl implements ProcessManagerService {
             result.setMessage("发布成功");
 
         } catch (Exception e) {
-            throw  new AIOAException("发布失败,清检查流程图是否正确(建议按照手册操作)");
+            throw  new AIOAException("发布失败,请检查流程图是否正确(建议按照手册操作)");
         }
     }
 

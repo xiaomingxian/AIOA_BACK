@@ -251,4 +251,7 @@ public interface TaskMapper {
 
     @Delete("delete from oa_task_dept where proc_inst_id=#{v}")
     void deleteDeptByProcessInstceId(String processInstanceId);
+
+    @Select("SELECT COUNT(task_id)>0 FROM oa_task_dept  where task_id=#{taskId} and task_def_key=#{taskDefKey}")
+    boolean isDeptTask(@Param("taskId") String taskId,@Param("taskDefKey") String taskDefKey);
 }
