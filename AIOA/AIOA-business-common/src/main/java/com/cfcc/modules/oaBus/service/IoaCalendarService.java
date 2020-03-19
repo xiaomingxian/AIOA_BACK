@@ -55,7 +55,7 @@ public interface IoaCalendarService extends IService<oaCalendar> {
 
     void MostUserLink(HttpServletResponse response, HttpServletRequest request,String id, String resourceType) throws IOException;
 
-    List<Map<String, Object>>  LinkList() ;
+    List<Map<String, Object>>  LinkList(HttpServletRequest request) ;
 
 
 }

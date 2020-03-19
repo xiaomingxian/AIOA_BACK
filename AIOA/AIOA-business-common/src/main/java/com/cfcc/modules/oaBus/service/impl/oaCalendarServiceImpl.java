@@ -219,8 +219,10 @@ public class oaCalendarServiceImpl extends ServiceImpl<oaCalendarMapper, oaCalen
     }
 
     @Override
-    public List<Map<String, Object>>  LinkList()  {
-        List<Map<String, Object>> list = oaCalendarMapper.LinkList();
+    public List<Map<String, Object>>  LinkList(HttpServletRequest request)  {
+        LoginInfo loginInfo = userService.getLoginInfo(request);
+        String sCreateBy = loginInfo.getId();
+        List<Map<String, Object>> list = oaCalendarMapper.LinkList(sCreateBy);
         for(int i=0;i< list.size();i++){
             String id = list.get(i).get("i_id").toString();
             //String url = oaCalendarMapper.selectUrl(Integer.parseInt(id));

@@ -277,8 +277,8 @@ public class oaCalendarController implements Job {
 	 @AutoLog(value = "日程管理表-分页列表查询")
 	 @ApiOperation(value="日程管理表-分页列表查询", notes="日程管理表-分页列表查询")
 	 @PostMapping(value = "LinkList")
-	 public List<Map<String, Object>>  LinkList() {
-		 List<Map<String, Object>>  linklist = oaCalendarService.LinkList();
+	 public List<Map<String, Object>>  LinkList(HttpServletRequest request) {
+		 List<Map<String, Object>>  linklist = oaCalendarService.LinkList(request);
 		 return linklist;
 	 }
 
