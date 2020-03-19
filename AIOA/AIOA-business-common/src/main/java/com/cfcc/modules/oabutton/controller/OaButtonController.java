@@ -183,7 +183,7 @@ public class OaButtonController {
 									  @RequestParam(value = "orgSchema", required = false) String orgSchema,
 									  HttpServletRequest request) {
 		try {
-			if (!orgSchema.equals("")){
+			if (orgSchema!=null && !orgSchema.equals("")){
 				request.setAttribute("orgSchema",orgSchema);
 			}
 			Result<OaButton> result = new Result<>();
