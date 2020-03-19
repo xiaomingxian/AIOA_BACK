@@ -41,6 +41,7 @@ import org.quartz.Job;
 import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.multipart.MultipartHttpServletRequest;
@@ -60,6 +61,7 @@ import io.swagger.annotations.ApiOperation;
 @RestController
 @RequestMapping("/oaBus/Calendar/oaCalendar")
 public class oaCalendarController implements Job {
+
 	@Autowired
 	private IoaCalendarService oaCalendarService;
 
@@ -258,11 +260,11 @@ public class oaCalendarController implements Job {
 	  */
 	 @ApiOperation("查询图片数据")
 	 @GetMapping(value = "/MostUserLink")
-	 public boolean readPicture( HttpServletResponse response,@RequestParam(name="id",required=false) String id,
+	 public boolean readPicture( HttpServletResponse response,HttpServletRequest request,@RequestParam(name="id",required=false) String id,
 								@RequestParam("resourceType") String resourceType) {
 
 		 try {
-			 oaCalendarService.MostUserLink(response,id, resourceType);
+			 oaCalendarService.MostUserLink(response,request,id, resourceType);
 		 } catch (Exception e) {
 			 return false;
 		 }
@@ -275,8 +277,8 @@ public class oaCalendarController implements Job {
 	 @AutoLog(value = "日程管理表-分页列表查询")
 	 @ApiOperation(value="日程管理表-分页列表查询", notes="日程管理表-分页列表查询")
 	 @PostMapping(value = "LinkList")
-	 public List<Map<String, Object>>  LinkList() {
-		 List<Map<String, Object>>  linklist = oaCalendarService.LinkList();
+	 public List<Map<String, Object>>  LinkList(HttpServletRequest request) {
+		 List<Map<String, Object>>  linklist = oaCalendarService.LinkList(request);
 		 return linklist;
 	 }
 

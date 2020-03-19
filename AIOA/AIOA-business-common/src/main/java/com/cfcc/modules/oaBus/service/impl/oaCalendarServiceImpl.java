@@ -8,16 +8,21 @@ import com.cfcc.common.util.DateUtils;
 import com.cfcc.modules.oaBus.entity.*;
 import com.cfcc.modules.oaBus.mapper.oaCalendarMapper;
 import com.cfcc.modules.oaBus.service.IOaBusdataService;
+import com.cfcc.modules.oaBus.service.IOaFileService;
 import com.cfcc.modules.oaBus.service.IoaCalendarService;
 import com.cfcc.modules.shiro.vo.DefContants;
+import com.cfcc.modules.system.entity.LoginInfo;
 import com.cfcc.modules.system.entity.SysUser;
 import com.cfcc.modules.system.mapper.SysUserMapper;
 import com.cfcc.modules.system.model.TreeModel;
+import com.cfcc.modules.system.service.ISysUserService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.File;
 import java.io.FileInputStream;
@@ -34,8 +39,16 @@ import java.util.*;
 @Service
 public class oaCalendarServiceImpl extends ServiceImpl<oaCalendarMapper, oaCalendar> implements IoaCalendarService {
 
+    @Value(value = "${jeecg.path.upload}")
+    private String uploadpath;
+
     @Autowired
     private oaCalendarMapper oaCalendarMapper;
+    @Autowired
+    private ISysUserService userService;
+
+    @Autowired
+    IOaFileService iOaFileService;
 
     @Autowired
     private SysUserMapper sysUserMapper;
@@ -176,11 +189,21 @@ public class oaCalendarServiceImpl extends ServiceImpl<oaCalendarMapper, oaCalen
     }
 
     @Override
-        public void MostUserLink(HttpServletResponse response,String id,String resourceType)  {
+        public void MostUserLink(HttpServletResponse response, HttpServletRequest request, String id, String resourceType)  {
 
         try {
-            String path = oaCalendarMapper.selectPath(Integer.parseInt(id));
-            File file = new File(path);
+            String filePath = oaCalendarMapper.selectPath(Integer.parseInt(id));
+          //  String fileName =  oaCalendarMapper.selectName(Integer.parseInt(id));
+          //  filePath = uploadpath+"\\"+filePath.substring(0,filePath.lastIndexOf("\\")+1)+fileName;
+
+            LoginInfo loginInfo = userService.getLoginInfo(request);
+            if (loginInfo.getOrgSchema()!=null && !loginInfo.getOrgSchema().equals("")){
+                filePath = uploadpath + "\\"+ loginInfo.getOrgSchema()+ "\\" + filePath;
+            }else{
+                filePath = uploadpath + "\\" + filePath;
+            }
+            System.out.println(filePath+"------------------");
+            File file = new File(filePath);
             FileInputStream stream = new FileInputStream(file);
             byte[] b = new byte[1024];
             int len = -1;
@@ -196,8 +219,10 @@ public class oaCalendarServiceImpl extends ServiceImpl<oaCalendarMapper, oaCalen
     }
 
     @Override
-    public List<Map<String, Object>>  LinkList()  {
-        List<Map<String, Object>> list = oaCalendarMapper.LinkList();
+    public List<Map<String, Object>>  LinkList(HttpServletRequest request)  {
+        LoginInfo loginInfo = userService.getLoginInfo(request);
+        String sCreateBy = loginInfo.getId();
+        List<Map<String, Object>> list = oaCalendarMapper.LinkList(sCreateBy);
         for(int i=0;i< list.size();i++){
             String id = list.get(i).get("i_id").toString();
             //String url = oaCalendarMapper.selectUrl(Integer.parseInt(id));
