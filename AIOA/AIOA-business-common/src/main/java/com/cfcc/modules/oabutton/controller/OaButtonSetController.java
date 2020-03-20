@@ -152,6 +152,9 @@ public class OaButtonSetController {
         oaButtonSet.setIOrder((Integer) map.get("iorder"));
         try {
             String schema = MycatSchema.getSchema();
+//            if(oaButtonSet.getSRoles()!=null && oaButtonSet.getSRoles().trim().equals("")){
+//                oaButtonSet.setSRoles(null);
+//            }
             oaButtonSetService.insertoaButtonSet(oaButtonSet,schema);
             result.success("添加成功！");
         } catch (Exception e) {
@@ -176,6 +179,9 @@ public class OaButtonSetController {
         if (oaButtonSetEntity == null) {
             result.error500("未找到对应实体");
         } else {
+//            if(oaButtonSet.getSRoles()!=null && oaButtonSet.getSRoles().trim().equals("")){
+//                oaButtonSet.setSRoles(null);
+//            }
             String schema = MycatSchema.getSchema();
             boolean ok = oaButtonSetService.updateOaButtonSetById(oaButtonSet,schema);
             //TODO 返回false说明什么？
