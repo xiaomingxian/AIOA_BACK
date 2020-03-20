@@ -483,8 +483,7 @@ public class OaBusdataServiceImpl extends ServiceImpl<OaBusdataMapper, OaBusdata
                 UserTaskActivityBehavior activityBehavior = (UserTaskActivityBehavior) activity.getActivityBehavior();
                 taskDefName = ((UserTaskActivityBehavior) activity.getActivityBehavior())
                         .getTaskDefinition().getNameExpression().toString();
-            } else
-                {//已经产生流程
+            } else {//已经产生流程
                 Task task = null;
                 HistoricTaskInstance historicTaskInstance = null;
                 if (taskId != null) {//从待办已办等进来
@@ -496,8 +495,7 @@ public class OaBusdataServiceImpl extends ServiceImpl<OaBusdataMapper, OaBusdata
                         if (historicTaskInstance != null && StringUtils.isBlank(status)) status = "done";
                     }
 
-                } else
-                    {//从业务页面进来
+                } else {//从业务页面进来
 
                     String endTime= (String)oaBusdata.get("s_varchar9");
                     if (StringUtils.isBlank(endTime)){
