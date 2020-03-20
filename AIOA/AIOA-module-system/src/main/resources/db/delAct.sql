@@ -16,5 +16,6 @@ TRUNCATE act_hi_attachment;
 TRUNCATE act_hi_actinst;
  set foreign_key_checks = 1;
 
-DELETE FROM oa_task_dept;
-DELETE FROM oa_task_user_record;
+DELETE from oa_task_dept;
+DELETE from oa_task_user_record ;
+DELETE  FROM oa_bus_task_transfer ;

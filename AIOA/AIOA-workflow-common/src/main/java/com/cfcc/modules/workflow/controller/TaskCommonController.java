@@ -3,6 +3,7 @@ package com.cfcc.modules.workflow.controller;
 
 import com.cfcc.common.api.vo.Result;
 import com.cfcc.common.exception.AIOAException;
+import com.cfcc.common.util.FileUtils;
 import com.cfcc.common.util.norepeat.NoRepeatSubmit;
 import com.cfcc.modules.system.entity.LoginInfo;
 import com.cfcc.modules.system.entity.SysRole;
@@ -20,13 +21,17 @@ import com.cfcc.modules.workflow.vo.TaskInfoVO;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang.StringUtils;
 import org.apache.ibatis.annotations.Param;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -48,6 +53,10 @@ public class TaskCommonController {
 
     @Autowired
     private ActPicService actPicService;
+
+    @Value("${jeecg.path.upload}")
+    private String savePath;
+
 
     @GetMapping("taskStatus")
     public Result taskStatus(String taskid) {
@@ -360,11 +369,27 @@ public class TaskCommonController {
 
     @ApiOperation("回退/撤回记录查看")
     @GetMapping("backRecordQuery")
-    public Result backRecordQuery(String procInstId, @RequestParam(required = false) String table, HttpServletRequest request) {
+    public Result backRecordQuery(String procInstId, @RequestParam(required = false) String table, @RequestParam(required = false,defaultValue = "") String endTime, HttpServletRequest request) {
         try {
+            if (StringUtils.isBlank(endTime)){
+                List<BackRecord> list = taskCommonService.backRecord(procInstId, table);
+                return Result.ok(list);
+            }else {
+                SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+                String timePath = endTime.replaceAll("-", "/");
+                String fullPath = savePath + "/activiti/" + timePath + "/" + procInstId + "_back";
+                List<Map> maps = FileUtils.readJSONArrayOneLine(fullPath);
+                maps.stream().forEach(m -> {
+                    Long endTimeStemp = (Long) m.get("endTime");
+                    String format = simpleDateFormat.format(new Date(endTimeStemp));
+                    m.put("endTime", format);
 
-            List<BackRecord> list = taskCommonService.backRecord(procInstId, table);
-            return Result.ok(list);
+                });
+
+                return Result.ok(maps);
+            }
+
+
         } catch (AIOAException e) {
             return Result.error(e.getMessage());
         } catch (Exception e) {
@@ -448,10 +473,16 @@ public class TaskCommonController {
 
 
     @RequestMapping("queryProPlan")
-    public void queryProPlan(HttpServletRequest request, HttpServletResponse response) throws IOException {
+    public void queryProPlan(HttpServletRequest request, HttpServletResponse response, @RequestParam(required = false, defaultValue = "") String endTime) throws IOException {
         String processInstanceId = request.getParameter("ProcessInstanceId");
-        //获取历史流程实例
-        actPicService.queryProPlan(processInstanceId, response);
+        if (StringUtils.isBlank(endTime)){
+            actPicService.queryProPlan(processInstanceId, response);
+        }else {
+            //获取历史流程实例
+            actPicService.queryProPlanFromLocal(processInstanceId,endTime, response);
+        }
+
+
     }
 
 

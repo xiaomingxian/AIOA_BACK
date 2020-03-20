@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.cfcc.common.api.vo.Result;
 import com.cfcc.common.constant.workflow.RoleScope;
 import com.cfcc.common.exception.AIOAException;
+import com.cfcc.common.util.FileUtils;
 import com.cfcc.common.util.norepeat.NoRepeatSubmit;
 import com.cfcc.common.util.workflow.VarsWithBus;
 import com.cfcc.modules.oaBus.entity.BusFunction;
@@ -35,6 +36,8 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.text.SimpleDateFormat;
 import java.util.*;
 
 
@@ -72,11 +75,19 @@ public class TaskInActController {
     private RepositoryService repositoryService;
     @Autowired
     private OaBusDynamicTableService dynamicTableService;
+    @Value("${jeecg.path.upload}")
+    private String savePath;
 
 
     @GetMapping("deleteOaFile")
-    public  void  deleteOaFile(String table,String id ){
-        dynamicTableService.deleteOaFile(table,id,3);
+    public void deleteOaFile(String table, String id) {
+        dynamicTableService.deleteOaFile(table, id, 3);
+
+    }
+
+    @GetMapping("afterDoTask")
+    public void afterDoTask(String table, String id, HttpServletRequest request, HttpServletResponse response) {
+        taskCommonService.afterDoTask(table, id, request, response);
 
     }
 
@@ -199,7 +210,7 @@ public class TaskInActController {
                         continue;
                     }
 
-                    int count = taskCommonService.haveMainDept(firstSonKey,processInstanceId);//主办数量大于就排除主办
+                    int count = taskCommonService.haveMainDept(firstSonKey, processInstanceId);//主办数量大于就排除主办
                     if (count > 0) {
                         String depts = oaProcActinst.getDepts();
                         if (depts != null && depts.contains(",")) {
@@ -214,7 +225,7 @@ public class TaskInActController {
                         }
                     }
                     //查出所有用户,排除他们所在部门
-                    List<String> deptUsers = taskCommonService.deptUsers(firstSonKey,processInstanceId);
+                    List<String> deptUsers = taskCommonService.deptUsers(firstSonKey, processInstanceId);
                     if (deptUsers.size() > 0) {
 
                         List<String> deptIds = sysUserService.selectDeptsBysUsers(deptUsers);
@@ -365,8 +376,8 @@ public class TaskInActController {
 
     @ApiOperation("本部门用户选择")
     @GetMapping("nextUsersChoice")
-    public Result userChoice(String procDefkey,  String processDefinitionId,
-            @RequestParam(required = false) String taskId,  HttpServletRequest request) {
+    public Result userChoice(String procDefkey, String processDefinitionId,
+                             @RequestParam(required = false) String taskId, HttpServletRequest request) {
 
         try {
 
@@ -425,7 +436,7 @@ public class TaskInActController {
                     }
                     //查询具体数据
                     List<Map<String, Object>> nextUsers = new ArrayList<>();
-                    nextUsers=  sysUserService.deptUserChoice(id);
+                    nextUsers = sysUserService.deptUserChoice(id);
 
                     //3 办理人信息
                     oneAct.put("nextUsers", nextUsers);
@@ -1003,14 +1014,29 @@ public class TaskInActController {
 
     @ApiOperation(value = "流程跟踪")
     @GetMapping("/workTrack")
-    public Result workTrack(String proInstId) {
+    public Result workTrack(String proInstId, @RequestParam(defaultValue = "", required = false) String endTime) {
         try {
-            List<Map<String, Object>> res = taskCommonService.workTrack(proInstId, true);
-            if (res == null) return Result.error("流程环节配置不完善请检查");
+            if (StringUtils.isBlank(endTime)) {
+                List<Map<String, Object>> res = taskCommonService.workTrack(proInstId, true);
+                if (res == null) return Result.error("流程环节配置不完善请检查");
 
-            Result<Object> result = Result.ok("查询成功");
-            result.setResult(res);
-            return result;
+                Result<Object> result = Result.ok("查询成功");
+                result.setResult(res);
+                return result;
+            } else {
+                String timePath = endTime.replaceAll("-", "/");
+                String fullPath = savePath + "/activiti/" + timePath + "/" + proInstId + "_trace";
+                List<Map> maps = FileUtils.readJSONArrayOneLine(fullPath);
+                SimpleDateFormat sf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+                maps.stream().forEach(m -> {
+                    Long endTimeStemp = (Long) m.get("endTime");
+                    String format = sf.format(new Date(endTimeStemp));
+                    m.put("endTime", format);
+
+                });
+
+                return Result.ok(maps);
+            }
         } catch (Exception e) {
             e.printStackTrace();
             log.error(e.toString());

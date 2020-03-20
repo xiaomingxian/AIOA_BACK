@@ -8,6 +8,7 @@ import com.cfcc.common.api.vo.Result;
 import com.cfcc.common.constant.workflow.TaskActType;
 import com.cfcc.common.exception.AIOAException;
 import com.cfcc.common.system.service.CommonDynamicTableService;
+import com.cfcc.common.util.FileUtils;
 import com.cfcc.common.util.workflow.VarsWithBus;
 import com.cfcc.modules.system.entity.LoginInfo;
 import com.cfcc.modules.system.entity.SysDepart;
@@ -53,11 +54,14 @@ import org.activiti.engine.task.Task;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.io.File;
 import java.util.*;
 
 @Service
@@ -118,6 +122,11 @@ public class TaskCommonServiceImpl implements TaskCommonService {
 
     @Autowired
     private ISysUserService userService;
+    @Autowired
+    private ActPicService actPicService;
+
+    @Value("${jeecg.path.upload}")
+    private String savePath;
 
 
     @Override
@@ -1078,6 +1087,58 @@ public class TaskCommonServiceImpl implements TaskCommonService {
         }
         return flag;
     }
+
+    @Override
+    public void afterDoTask(String table, String id, HttpServletRequest request, HttpServletResponse response) {
+        Map<String, Object> data = dynamicTableMapper.queryBusDataById(table, id);
+        if (data == null) return;
+        String procInstId = (String) data.get("s_varchar10");
+        if (StringUtils.isBlank(procInstId)) return;
+        //去代办里查
+        long count = taskService.createTaskQuery().processInstanceId(procInstId).count();
+        if (count<=0){
+            Calendar now = Calendar.getInstance();
+            int year = now.get(Calendar.YEAR);
+            int mounth = now.get(Calendar.MONTH) + 1;
+            int day = now.get(Calendar.DAY_OF_MONTH);
+            HashMap<String, Object> upData = new HashMap<>();
+            upData.put("table",table);
+            upData.put("i_id",id);
+            //按年月日划分
+            upData.put("s_varchar9", year + "-" + mounth + "-" + day);
+            dynamicTableMapper.updateData(upData);
+
+            String rootPath = savePath + "/activiti/" + year + "/" + mounth + "/" + day + "/";
+            String pic = rootPath + procInstId + ".png";
+            String workTrace = rootPath + procInstId + "_trace";
+            String backData = rootPath + procInstId + "_back";
+            try {
+                File file = new File(rootPath);
+                if (!file.exists()) {
+                    file.mkdirs();// 创建文件根目录
+                }
+                //1 生成图片
+                actPicService.savePic(procInstId, response, pic);
+                //2 办理信息
+                List<Map<String, Object>> all = workTrack(procInstId, true);
+                FileUtils.writeJSONOneLine(workTrace,all);
+                //3 撤回/退回记录
+                List<BackRecord> backRecords = backRecord(procInstId, table + "_opinion");
+                FileUtils.writeJSONOneLine(backData,backRecords);
+                //4 删除流程相关信息
+                taskMapper.deleteByprocessInstanceId(procInstId);
+
+            } catch (Exception e) {
+                log.error("-->" + e.getMessage());
+            }
+
+        }
+
+    }
+
+
+
+
 
 
     private String nextActMore(List<TaskInfoVO> taskInfoVOs, Task task) {
@@ -2396,6 +2457,7 @@ public class TaskCommonServiceImpl implements TaskCommonService {
                 taskInfoJsonAble.setProcessInstanceId(task.getProcessInstanceId());
                 taskInfoJsonAble.setTaskDefinitionKey(task.getTaskDefinitionKey());
                 taskInfoJsonAble.setName(task.getName());
+                taskInfoJsonAble.setProcessDefinitionId(task.getProcessDefinitionId());
                 result.setResult(taskInfoJsonAble);
             }
 
