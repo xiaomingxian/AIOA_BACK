@@ -305,7 +305,7 @@ public class ButtonPermissionServiceImpl implements ButtonPermissionService {
             canAddUser = true;
         }
 
-        if (!isLastsender&&isTransactors)isReader=true;
+        if (!isLastsender&&!isTransactors)isReader=true;
         //参与者
         currentUserPermission.put("isReader", isReader);
         currentUserPermission.put("isLastsender", isLastsender);

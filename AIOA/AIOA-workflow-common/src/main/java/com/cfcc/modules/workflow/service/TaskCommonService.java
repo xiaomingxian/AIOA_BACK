@@ -9,6 +9,7 @@ import org.activiti.engine.impl.pvm.process.ActivityImpl;
 import org.activiti.engine.task.Task;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -106,4 +107,6 @@ public interface TaskCommonService {
     String taskStatus(String taskid);
 
     boolean someActFore(JumpMsg jumpMsg);
+
+    void afterDoTask(String table, String id, HttpServletRequest request, HttpServletResponse response);
 }

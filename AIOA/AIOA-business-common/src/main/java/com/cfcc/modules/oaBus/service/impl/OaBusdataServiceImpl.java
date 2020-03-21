@@ -496,29 +496,40 @@ public class OaBusdataServiceImpl extends ServiceImpl<OaBusdataMapper, OaBusdata
                     }
 
                 } else {//从业务页面进来
-                    TaskQuery taskQuery = taskService.createTaskQuery().processDefinitionKey(proKey)
-                            .processInstanceBusinessKey(busdataId).taskCandidateOrAssigned(userId);
-                    if (StringUtils.isNotBlank(processInstanceId)) taskQuery.processInstanceId(processInstanceId);
 
-                    List<Task> list = taskQuery.list();
-                    if (list.size() > 0) {
-                        //最新待办
-                        task = list.get(list.size() - 1);
-                        if (task != null && StringUtils.isBlank(status)) status = "todo";
+                    String endTime= (String)oaBusdata.get("s_varchar9");
+                    if (StringUtils.isBlank(endTime)){
 
-                    } else {
-                        //最新已办\
-                        HistoricTaskInstanceQuery historicTaskInstanceQuery = historyService.createHistoricTaskInstanceQuery().processDefinitionKey(proKey)
-                                .processInstanceBusinessKey(busdataId).taskAssignee(userId);
-                        if (StringUtils.isNotBlank(processInstanceId))
-                            historicTaskInstanceQuery.processInstanceId(processInstanceId);
+                        TaskQuery taskQuery = taskService.createTaskQuery().processDefinitionKey(proKey)
+                                .processInstanceBusinessKey(busdataId).taskCandidateOrAssigned(userId);
+                        if (StringUtils.isNotBlank(processInstanceId)) taskQuery.processInstanceId(processInstanceId);
 
-                        List<HistoricTaskInstance> hiList = historicTaskInstanceQuery.list();
-                        if (hiList.size() > 0) {
-                            historicTaskInstance = hiList.get(hiList.size() - 1);
-                            if (historicTaskInstance != null && StringUtils.isBlank(status)) status = "done";
+
+                        List<Task> list = taskQuery.list();
+                        if (list.size() > 0) {
+                            //最新待办
+                            task = list.get(list.size() - 1);
+                            if (task != null && StringUtils.isBlank(status)) status = "todo";
+
                         }
+                        else {
+                            //最新已办\
+                            HistoricTaskInstanceQuery historicTaskInstanceQuery = historyService.createHistoricTaskInstanceQuery().processDefinitionKey(proKey)
+                                    .processInstanceBusinessKey(busdataId).taskAssignee(userId);
+                            if (StringUtils.isNotBlank(processInstanceId))
+                                historicTaskInstanceQuery.processInstanceId(processInstanceId);
+
+                            List<HistoricTaskInstance> hiList = historicTaskInstanceQuery.list();
+                            if (hiList.size() > 0) {
+                                historicTaskInstance = hiList.get(hiList.size() - 1);
+                                if (historicTaskInstance != null && StringUtils.isBlank(status)) status = "done";
+                            }
+                        }
+
+
+
                     }
+
                 }
                 if (task != null) {
                     taskId = task.getId();

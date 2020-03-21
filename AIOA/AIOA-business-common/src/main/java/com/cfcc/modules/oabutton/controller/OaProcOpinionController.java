@@ -157,6 +157,7 @@ public class OaProcOpinionController {
 		try {
 			oaProcOpinionService.insertOaProcOpinion(oaProcOpinion);
 			result.success("添加成功！");
+			result.setSuccess(true);
 		} catch (Exception e) {
 			log.error(e.getMessage(),e);
 			result.error500("操作失败");
@@ -191,6 +192,7 @@ public class OaProcOpinionController {
 			//TODO 返回false说明什么？
 			if(ok) {
 				result.success("修改成功!");
+				result.setSuccess(true);
 			}
 		}
 		

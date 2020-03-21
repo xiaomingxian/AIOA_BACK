@@ -10,6 +10,10 @@ public interface CommonDynamicTableMapper {
     @Select("select i_proc_button_id bth,i_proc_opinion_id opt,PROC_DEF_KEY_  pkey  from oa_bus_proc_set where i_id=#{iprocSetId}")
     Map<String, Object> getBusProcSet(@Param("iprocSetId") String iprocSetId);
 
+
+    @Select("select * from ${table} where i_id=#{id}")
+    Map<String, Object> queryBusDataById(@Param("table") String table, @Param("id") String id);
+
     @Select("SELECT i_button_id FROM `oa_button_set`  where  PROC_DEF_KEY_=#{key} and TASK_DEF_KEY_=#{taskDefKey} and i_proc_button_id=#{btn}")
     List<String> queryButtonId(String key, String taskDefKey, String btn);
 
@@ -18,7 +22,6 @@ public interface CommonDynamicTableMapper {
     /**
      * 批量写入
      *
-     * @param map
      * @return
      */
     int insertDataBatch(@Param("list") List<Map<String,Object>> list);
