@@ -217,6 +217,10 @@ public class SearchServiceImpl implements SearchService {
             while (iterator.hasNext()){
                 Map map = iterator.next();
 
+
+
+
+
                 Iterator<Map.Entry<String, Object>> it = map.entrySet().iterator();
                 while(it.hasNext()){
                     Map.Entry<String, Object> entry = it.next();
