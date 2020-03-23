@@ -537,7 +537,7 @@ public class ModifyFieldsController {
 //            c.setEntity(oaFile);
 //            OaFile ad = oaFileService.getOne(c);        //查询刚刚插入的那条数据的id
 //            result.setResult(ad);
-            result.setMessage(oldSavefile.toString());
+            result.setMessage(oldSavefile.getName().toString());
             result.setSuccess(true);
         } catch (Exception e) {
             result.setSuccess(false);

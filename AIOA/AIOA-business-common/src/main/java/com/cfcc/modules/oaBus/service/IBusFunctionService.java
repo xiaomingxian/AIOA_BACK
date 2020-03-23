@@ -21,8 +21,8 @@ public interface IBusFunctionService extends IService<BusFunction> {
 
     int removeBusFunctionById(String id,String schema);
 
-    void saveMain(BusFunction busFunction, List<BusPageDetail> busPageDetailList);
-
+    /*void saveMain(BusFunction busFunction, List<BusPageDetail> busPageDetailList);
+*/
 
     /**
      * 根据id查询出业务对应的可以显示的查询条件

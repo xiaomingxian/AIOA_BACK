@@ -141,8 +141,10 @@ public class BusFunctionPermitServiceImpl extends ServiceImpl<BusFunctionPermitM
         return busFunctionPermit;
     }
     @CacheEvict(value=CacheConstant.FUNCTION_PERMIT_CACHE, allEntries=true)
-    public boolean save(BusFunctionPermit busFunctionPermit,String schema) {
-        return super.save(busFunctionPermit);
+    @Override
+    public int save1(BusFunctionPermit busFunctionPermit,String schema) {
+        int insert = busFunctionPermitMapper.insert(busFunctionPermit);
+        return insert;
     }
     @Override
     public IPage<BusFunctionPermit> findAllList(BusFunctionPermit busFunctionPermit, Integer pageNo, Integer pageSize) {

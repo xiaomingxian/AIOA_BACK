@@ -57,11 +57,6 @@ public class BusModelPermitServiceImpl extends ServiceImpl<BusModelPermitMapper,
         }
     }
 
-    @CacheEvict(value=CacheConstant.MODEL_PERMIT_CACHE, allEntries=true)
-    public boolean save(BusModelPermit busModelPermit,String schema) {
-        return super.save(busModelPermit);
-    }
-
     @Override
     @CacheEvict(value=CacheConstant.MODEL_PERMIT_CACHE, allEntries=true)
     public boolean deleteById(String id,String schema) {
@@ -172,6 +167,12 @@ public class BusModelPermitServiceImpl extends ServiceImpl<BusModelPermitMapper,
     @Override
     public List<BusFunction> findByModelId(String id) {
         return busModelPermitMapper.findByModelId(id);
+    }
+
+    @Override
+    @CacheEvict(value=CacheConstant.MODEL_PERMIT_CACHE, allEntries=true)
+    public int save1(BusModelPermit busModelPermit,String schema) {
+      return  busModelPermitMapper.insert(busModelPermit);
     }
 
 
