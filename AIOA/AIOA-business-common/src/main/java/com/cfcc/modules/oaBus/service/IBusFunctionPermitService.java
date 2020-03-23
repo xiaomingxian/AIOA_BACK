@@ -51,4 +51,5 @@ public interface IBusFunctionPermitService extends IService<BusFunctionPermit> {
 
     List<SysRole> findRoleByCode();
 
+    int save1(BusFunctionPermit busFunctionPermit,String schema);
 }
