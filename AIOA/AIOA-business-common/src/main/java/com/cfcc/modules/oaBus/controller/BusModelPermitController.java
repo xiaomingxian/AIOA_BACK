@@ -98,14 +98,14 @@ public class BusModelPermitController {
             switch (sPermitType) {
                 case "0":
                     busModelPermit.setITypeId("");
-                    busModelPermitService.save(busModelPermit);
+                    busModelPermitService.save1(busModelPermit,schema);
                     break;
                 case "1":
                     if (typeIdList.contains(busModelPermit.getITypeId())) {
                         result.error500("该角色已选择");
                         return result;
                     }
-                    busModelPermitService.save(busModelPermit);
+                    busModelPermitService.save1(busModelPermit,schema);
                     break;
                 case "2":
                     String[] typeidList = busModelPermit.getITypeId().split(",");
@@ -118,7 +118,7 @@ public class BusModelPermitController {
                     for (int j = 0; j < typeidList.length; j++) {
                         if (!typeIdList.contains(typeidList[j])) {
                             busModelPermit.setITypeId(typeidList[j]);
-                            busModelPermitService.save(busModelPermit);
+                            busModelPermitService.save1(busModelPermit,schema);
                         }
                     }
                     break;
@@ -134,7 +134,7 @@ public class BusModelPermitController {
                     for (int j = 0; j <userList.length; j++) {
                         if( !typeIdList.contains(userList[j])){
                             busModelPermit.setITypeId(userList[j]);
-                            busModelPermitService.save(busModelPermit);
+                            busModelPermitService.save1(busModelPermit,schema);
                         }
                     }
                     break;

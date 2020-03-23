@@ -98,14 +98,14 @@ public class BusFunctionPermitController {
             {
                 case "0":
                     busFunctionPermit.setITypeId("");
-                    iBusFunctionPermitService.save(busFunctionPermit);
+                    iBusFunctionPermitService.save1(busFunctionPermit,schema);
                     break;
                 case "1":
                     if(typeIdList.contains(busFunctionPermit.getITypeId())){
                         result.error500("该角色已选择");
                         return result;
                     }
-                    iBusFunctionPermitService.save(busFunctionPermit);
+                    iBusFunctionPermitService.save1(busFunctionPermit,schema);
                     break;
                 case "2":
                     String[] typeidList = busFunctionPermit.getITypeId().split(",");
@@ -120,7 +120,7 @@ public class BusFunctionPermitController {
                     for (int j = 0; j <typeidList.length; j++) {
                         if( !typeIdList.contains(typeidList[j])){
                             busFunctionPermit.setITypeId(typeidList[j]);
-                            iBusFunctionPermitService.save(busFunctionPermit);
+                            iBusFunctionPermitService.save1(busFunctionPermit,schema);
                         }
                     }
                     break;
@@ -136,7 +136,7 @@ public class BusFunctionPermitController {
                     for (int j = 0; j <userList.length; j++) {
                         if( !typeIdList.contains(userList[j])){
                             busFunctionPermit.setITypeId(userList[j]);
-                            iBusFunctionPermitService.save(busFunctionPermit);
+                            iBusFunctionPermitService.save1(busFunctionPermit,schema);
                         }
                     }
                     break;

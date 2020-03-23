@@ -35,4 +35,7 @@ public interface IBusModelPermitService extends IService<BusModelPermit> {
 
 
     List<BusFunction> findByModelId(String id);
+
+    int save1(BusModelPermit busModelPermit,String schema);
+
 }
