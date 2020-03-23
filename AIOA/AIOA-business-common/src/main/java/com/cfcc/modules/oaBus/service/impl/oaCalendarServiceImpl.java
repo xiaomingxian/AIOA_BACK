@@ -3,6 +3,7 @@ package com.cfcc.modules.oaBus.service.impl;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.cfcc.common.api.vo.Result;
+import com.cfcc.common.mycat.MycatSchema;
 import com.cfcc.common.system.util.JwtUtil;
 import com.cfcc.common.util.DateUtils;
 import com.cfcc.modules.oaBus.entity.*;
@@ -16,6 +17,7 @@ import com.cfcc.modules.system.entity.SysUser;
 import com.cfcc.modules.system.mapper.SysUserMapper;
 import com.cfcc.modules.system.model.TreeModel;
 import com.cfcc.modules.system.service.ISysUserService;
+import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -196,11 +198,12 @@ public class oaCalendarServiceImpl extends ServiceImpl<oaCalendarMapper, oaCalen
           //  String fileName =  oaCalendarMapper.selectName(Integer.parseInt(id));
           //  filePath = uploadpath+"\\"+filePath.substring(0,filePath.lastIndexOf("\\")+1)+fileName;
 
-            LoginInfo loginInfo = userService.getLoginInfo(request);
-            if (loginInfo.getOrgSchema()!=null && !loginInfo.getOrgSchema().equals("")){
-                filePath = uploadpath + "\\"+ loginInfo.getOrgSchema()+ "\\" + filePath;
-            }else{
-                filePath = uploadpath + "\\" + filePath;
+//            LoginInfo loginInfo = userService.getLoginInfo(request);
+            String orgSchema = MycatSchema.getSchema();
+            if (StringUtils.isNotBlank(orgSchema)) {
+                filePath = uploadpath + File.separator + orgSchema + File.separator + filePath;
+            } else {
+                filePath = uploadpath + File.separator + filePath;
             }
             System.out.println(filePath+"------------------");
             File file = new File(filePath);
