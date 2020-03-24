@@ -61,7 +61,12 @@ public class oaCalendar {
 	@Excel(name = "消息提示", width = 15)
 	@TableField(exist = false)
 	private java.lang.String message;
-
+	@Excel(name = "公开类型", width = 15)
+	@TableField(exist = false)
+	private java.lang.String taskId;
+	@Excel(name = "消息提示", width = 15)
+	@TableField(exist = false)
+	private java.lang.String taskUserId;
 
 	/**是否置顶*/
     @ApiModelProperty(value = "是否置顶")

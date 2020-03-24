@@ -358,5 +358,8 @@
     <select id="selectName" resultType="java.lang.String">
          select s_file_name from oa_file where s_table = 'oa_busdata30' and  i_table_id = #{id}
     </select>
+    <select id="findByTaskUserId" resultType="com.cfcc.modules.oaBus.entity.oaCalendar">
+        select * from oa_calendar where task_user_id = #{taskUserId}
+    </select>
 
 </mapper>

@@ -314,6 +314,7 @@ public class oaCalendarController implements Job {
             }
             oaCalendar.setSUserNames(str);
             oaCalendar.setSCreateBy(username);
+
             if (oaCalendar.getIIsTop() == null) {
                 oaCalendar.setIIsTop(0);
             }
@@ -562,7 +563,7 @@ public class oaCalendarController implements Job {
 
             String assignee = taskInfo.getAssignee();
             SysUser sysUser = allUserMsg.get(assignee);
-            oaCalendar.setSUserNames(sysUser.getUsername()); //用户id
+            oaCalendar.setSUserNames(sysUser.getUsername()); //用户名字
             oaCalendar.setSTitle(taskInfo.getTitle()); //标题
             oaCalendar.setDStartTime(taskInfo.getCreateTime());//开始时间
             oaCalendar.setDEndTime(taskInfo.getEndTime());//结束时间
@@ -572,7 +573,16 @@ public class oaCalendarController implements Job {
             oaCalendar.setSCreateBy(sysUser.getUsername());
             oaCalendar.setIBusFunctionId(Integer.valueOf(taskInfo.getFunctionId()));//业务功能
             oaCalendar.setIBusModelId(Integer.valueOf(taskInfo.getModelId()));//业务模块
-            oaCalendars.add(oaCalendar);
+			String taskUserId=taskInfo.getParentTaskId()+assignee;
+			oaCalendar.setTaskUserId(taskUserId);
+			oaCalendar.setTaskId(taskInfo.getParentTaskId());
+			oaCalendar oaCalendar1 = oaCalendarService.findByTaskUserId(taskUserId);
+			if(oaCalendar1 == null){ //数据库没有该条数据
+				oaCalendars.add(oaCalendar);
+			}else{//数据库已经存在该条数据
+				oaCalendarService.updateByIid(oaCalendar);
+			}
+
 //            }
         }
         oaCalendarService.saveBatch(oaCalendars);//批量写入

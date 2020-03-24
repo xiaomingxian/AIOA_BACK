@@ -58,4 +58,6 @@ public interface IoaCalendarService extends IService<oaCalendar> {
     List<Map<String, Object>>  LinkList(HttpServletRequest request) ;
 
 
+    oaCalendar findByTaskUserId(String taskUserId);
+
 }

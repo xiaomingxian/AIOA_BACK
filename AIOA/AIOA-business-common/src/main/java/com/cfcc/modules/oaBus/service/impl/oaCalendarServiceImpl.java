@@ -231,6 +231,10 @@ public class oaCalendarServiceImpl extends ServiceImpl<oaCalendarMapper, oaCalen
         return list;
     }
 
+    @Override
+    public oaCalendar findByTaskUserId(String taskUserId) {
+        return oaCalendarMapper.findByTaskUserId(taskUserId);
+    }
 
 
 }
