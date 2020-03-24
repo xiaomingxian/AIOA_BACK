@@ -20,7 +20,9 @@ import com.cfcc.common.system.util.JwtUtil;
 import com.cfcc.common.util.oConvertUtils;
 
 import com.cfcc.modules.oabutton.entity.OaButton;
+import com.cfcc.modules.oabutton.entity.OaButtonSet;
 import com.cfcc.modules.oabutton.service.IOaButtonService;
+import com.cfcc.modules.oabutton.service.IOaButtonSetService;
 import com.sun.org.apache.regexp.internal.RE;
 import lombok.extern.slf4j.Slf4j;
 
@@ -53,6 +55,8 @@ import io.swagger.annotations.ApiOperation;
 public class OaButtonController {
 	@Autowired
 	private IOaButtonService oaButtonService;
+	 @Autowired
+	 private IOaButtonSetService oaButtonSetService;
 	
 	/**
 	  * 分页列表查询
@@ -129,7 +133,8 @@ public class OaButtonController {
 		
 		return result;
 	}
-	
+
+
 	/**
 	  *   通过id删除
 	 * @param id
@@ -140,6 +145,10 @@ public class OaButtonController {
 	@DeleteMapping(value = "/delete")
 	public Result<?> delete(@RequestParam(name="id",required=true) String id) {
 		try {
+			List<OaButtonSet> oaButtonSets = oaButtonSetService.queryByButtonId(Integer.valueOf(id));
+			if (oaButtonSets!=null && oaButtonSets.size()>0){
+				return Result.ok("删除失败，请先删除按钮权限中与当前按钮相关的配置!");
+			}
 			oaButtonService.deleteOaButtonByID(id);
 		} catch (Exception e) {
 			log.error("删除失败",e.getMessage());
