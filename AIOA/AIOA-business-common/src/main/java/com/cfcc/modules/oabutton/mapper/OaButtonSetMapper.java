@@ -39,6 +39,8 @@ public interface OaButtonSetMapper extends BaseMapper<OaButtonSet> {
 
     List<OaButtonSet> queryByProcButtonId(@Param("id") Integer id);
 
+    List<OaButtonSet> queryByButtonId(@Param("id") Integer id);
+
     List<OaButtonSet> findList();
 
     List<OaButtonSet> queryByProcButtonIdAndProcDefKey(@Param("id") Integer id, @Param("procDefKey") String procDefKey);
