@@ -573,9 +573,9 @@ public class oaCalendarController implements Job {
             oaCalendar.setIBusFunctionId(Integer.valueOf(taskInfo.getFunctionId()));//业务功能
             oaCalendar.setIBusModelId(Integer.valueOf(taskInfo.getModelId()));//业务模块
 
-			String taskUserId=taskInfo.getParentTaskId()+assignee;
+			String taskUserId=taskInfo.getId()+assignee;
 			oaCalendar.setTaskUserId(taskUserId);
-			oaCalendar.setTaskId(taskInfo.getParentTaskId());
+			oaCalendar.setTaskId(taskInfo.getId());
 			oaCalendar oaCalendar1 = oaCalendarService.findByTaskUserId(taskUserId);
 			if(oaCalendar1 == null){ //数据库没有该条数据
 				oaCalendars.add(oaCalendar);
