@@ -1,15 +1,12 @@
 package com.cfcc.modules.oaBus.mapper;
 
+import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.cfcc.modules.oaBus.entity.BusFunction;
 import com.cfcc.modules.oaBus.entity.oaCalendar;
-import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.cfcc.modules.system.entity.SysUser;
 import org.apache.ibatis.annotations.Param;
-import org.apache.ibatis.annotations.Select;
-import org.springframework.security.core.parameters.P;
+import org.apache.ibatis.annotations.Update;
 
-import javax.xml.crypto.Data;
-import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
@@ -70,4 +67,7 @@ public interface oaCalendarMapper extends BaseMapper<oaCalendar> {
     List<Map<String, Object>> findMostUser1(String sCreateBy);
 
     String selectName(int parseInt);
+
+    @Update(" UPDATE oa_calendar set i_is_state=2 where task_user_id=#{v} ")
+    void updateByTaskUserId(String s);
 }

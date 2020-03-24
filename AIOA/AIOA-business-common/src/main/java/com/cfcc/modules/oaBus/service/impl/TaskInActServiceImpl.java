@@ -1,38 +1,29 @@
 package com.cfcc.modules.oaBus.service.impl;
 
 import com.cfcc.common.constant.workflow.TaskConstant;
-import com.cfcc.common.util.workflow.VarsWithBus;
-import com.cfcc.modules.oaBus.entity.BusFunction;
 import com.cfcc.modules.oaBus.mapper.OaBusDynamicTableMapper;
-import com.cfcc.modules.oaBus.service.IBusFunctionService;
 import com.cfcc.modules.oaBus.service.TaskInActService;
 import com.cfcc.modules.system.entity.LoginInfo;
 import com.cfcc.modules.system.service.ISysUserService;
 import com.cfcc.modules.utils.AddUserCmd;
-import com.cfcc.modules.utils.JumpTaskCmd;
 import com.cfcc.modules.workflow.mapper.DepartWithTaskMapper;
 import com.cfcc.modules.workflow.pojo.TaskWithDepts;
 import com.cfcc.modules.workflow.service.OaBusDataPermitService;
 import com.cfcc.modules.workflow.service.TaskCommonService;
 import com.cfcc.modules.workflow.vo.TaskInfoVO;
 import lombok.extern.slf4j.Slf4j;
-import org.activiti.engine.RuntimeService;
 import org.activiti.engine.TaskService;
 import org.activiti.engine.impl.TaskServiceImpl;
-import org.activiti.engine.impl.cfg.IdGenerator;
 import org.activiti.engine.impl.interceptor.CommandExecutor;
 import org.activiti.engine.impl.persistence.entity.TaskEntity;
-import org.activiti.engine.runtime.Execution;
 import org.activiti.engine.task.Task;
 import org.apache.commons.lang.StringUtils;
-import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
-import java.text.SimpleDateFormat;
 import java.util.*;
 
 @Service
@@ -58,6 +49,9 @@ public class TaskInActServiceImpl implements TaskInActService {
     @Autowired
     private TaskService taskService;
 
+    @Autowired
+    private com.cfcc.modules.oaBus.mapper.oaCalendarMapper oaCalendarMapper;
+
 
     @Override
     public void doTask(TaskInfoVO taskInfoVO, HttpServletRequest request) {
@@ -71,7 +65,8 @@ public class TaskInActServiceImpl implements TaskInActService {
         }
         //1 流程办理
         String nextTaskMsg = taskCommonService.doTask(taskInfoVO);
-
+        //2 更新日程信息
+        oaCalendarMapper.updateByTaskUserId(taskInfoVO.getTaskId()+userId);
 
         if (nextTaskMsg.endsWith("  ")) {
             busData.put("s_signer", loginInfo.getUsername());
@@ -83,6 +78,7 @@ public class TaskInActServiceImpl implements TaskInActService {
         busAbout(taskInfoVO, nextTaskMsg);
 
     }
+
 
     private void busAbout(TaskInfoVO taskInfoVO, String nextTaskMsg) {
         //2 更新流程对应的业务数据......
