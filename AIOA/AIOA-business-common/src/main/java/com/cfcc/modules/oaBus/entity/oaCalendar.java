@@ -61,9 +61,11 @@ public class oaCalendar {
 	@Excel(name = "消息提示", width = 15)
 	@TableField(exist = false)
 	private java.lang.String message;
+	@TableId(value = "task_id")
 	@Excel(name = "公开类型", width = 15)
 	@TableField(exist = false)
 	private java.lang.String taskId;
+	@TableId(value = "task_user_id")
 	@Excel(name = "消息提示", width = 15)
 	@TableField(exist = false)
 	private java.lang.String taskUserId;
