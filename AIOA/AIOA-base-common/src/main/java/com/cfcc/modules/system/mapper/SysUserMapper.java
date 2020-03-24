@@ -236,6 +236,16 @@ public interface SysUserMapper extends BaseMapper<SysUser> {
             "</script>")
     Map<String, SysUser> queryUserMsgByIds(@Param("ids") ArrayList<String> userIds);
 
+    @MapKey("id")
+    @Select("<script> " +
+            "select id,username FROM sys_user  where id in " +
+            "<foreach collection='ids' item='id' open='(' close=')' separator=','>" +
+            "#{id}" +
+            "</foreach>" +
+            "</script>")
+    Map<String, SysUser> selectUsersByUids(@Param("ids") List<String> allUserIds);
+
+
     List<SysUser> queryAllUser();
 
 
@@ -296,4 +306,7 @@ public interface SysUserMapper extends BaseMapper<SysUser> {
     Map<String,Object> getdeptIdByUser(@Param("username") String username);
 
     void deleteUserById(@Param("id") String id);
+
+
+
 }

@@ -966,9 +966,9 @@
               LEFT JOIN act_ru_variable v ON v.PROC_INST_ID_ = i.PROC_INST_ID_
               WHERE
                v.name_ = 'endTime'
-              AND abs(
-               timestampdiff(SECOND, now(), v.TEXT_) / 3600 / 24
-              ) > u.i_calendar_day
+              AND  (
+               timestampdiff(SECOND, v.TEXT_, now()) / 3600 / 24
+              ) &lt;=   u.i_calendar_day
             )s on t.PROC_INST_ID_=s.proc_inst_id_
             WHERE
              t.PROC_INST_ID_ IN (
@@ -980,11 +980,12 @@
               LEFT JOIN act_ru_variable v ON v.PROC_INST_ID_ = i.PROC_INST_ID_
               WHERE
                v.name_ = 'endTime'
-              AND abs(
-               timestampdiff(SECOND, now(), v.TEXT_) / 3600 / 24
-              ) > u.i_calendar_day
+              AND (
+               timestampdiff(SECOND, v.TEXT_, now()) / 3600 / 24
+              ) &lt;=   u.i_calendar_day
              )
             and  v.name_ = 'busMsg'
+            GROUP BY id,ASSIGNEE_
     </select>
 
 

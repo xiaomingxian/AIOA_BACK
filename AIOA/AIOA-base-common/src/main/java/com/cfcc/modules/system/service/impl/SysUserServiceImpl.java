@@ -400,6 +400,11 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser> impl
     }
 
     @Override
+    public Map<String, SysUser> selectUsersByUids(List<String> allUserIds) {
+        return userMapper.selectUsersByUids(allUserIds);
+    }
+
+    @Override
     public Map<String, Object> getAllUserMsg(String username) {
 
 
