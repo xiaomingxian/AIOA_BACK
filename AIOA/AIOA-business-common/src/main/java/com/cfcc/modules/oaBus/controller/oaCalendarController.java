@@ -314,7 +314,6 @@ public class oaCalendarController implements Job {
             }
             oaCalendar.setSUserNames(str);
             oaCalendar.setSCreateBy(username);
-
             if (oaCalendar.getIIsTop() == null) {
                 oaCalendar.setIIsTop(0);
             }
@@ -573,6 +572,7 @@ public class oaCalendarController implements Job {
             oaCalendar.setSCreateBy(sysUser.getUsername());
             oaCalendar.setIBusFunctionId(Integer.valueOf(taskInfo.getFunctionId()));//业务功能
             oaCalendar.setIBusModelId(Integer.valueOf(taskInfo.getModelId()));//业务模块
+
 			String taskUserId=taskInfo.getParentTaskId()+assignee;
 			oaCalendar.setTaskUserId(taskUserId);
 			oaCalendar.setTaskId(taskInfo.getParentTaskId());
