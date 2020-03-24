@@ -293,28 +293,30 @@
             <if test="oaCalendar.username != '' and oaCalendar.username != null">
                 and s_create_by = #{oaCalendar.username}
             </if>
+            <if test="oaCalendar.iOpenType != '' and oaCalendar.iOpenType != null">
+                and i_open_type = #{oaCalendar.iOpenType}
+            </if>
             <if test="oaCalendar.date != '' and oaCalendar.date != null">
-                and  (d_start_time &lt;= #{oaCalendar.date} and d_end_time &gt;= #{oaCalendar.date})
+                and  (d_start_time &lt;= #{oaCalendar.date} and  d_end_time &gt;= #{oaCalendar.date})
+            </if>
+            <if test="oaCalendar.Strdate != '' and oaCalendar.Strdate != null">
+                and ((  d_start_time &lt;= #{oaCalendar.Strdate}
+            </if>
+            <if test="oaCalendar.Enddate != '' and oaCalendar.Enddate != null">
+                and d_end_time &gt;= #{oaCalendar.Enddate}
+                )
+            </if>
+
+            <if test="oaCalendar.Strdate != '' and oaCalendar.Strdate != null">
+                or ( d_start_time &lt;=  #{oaCalendar.Strdate}
+            </if>
+            <if test="oaCalendar.Enddate != '' and oaCalendar.Enddate != null">
+                and d_end_time &gt;= #{oaCalendar.Enddate}))
             </if>
             and SUBSTRING_INDEX(s_user_names,',',1) = s.username
         </where>
         order by i_is_top desc ,s.show_order  desc limit
         ${pageNo},${pageSize}
-    </select>
-    <!--待办-->
-    <select id="findWaitLimit" resultType="com.cfcc.modules.oaBus.entity.oaCalendar">
-        select * from oa_calendar INNER  JOIN  sys_user s
-        <where>
-            ISNULL(i_fun_data_id)
-            <if test="oaCalendar.username != '' and oaCalendar.username != null">
-                and s_create_by = #{oaCalendar.username}
-            </if>
-            <if test="oaCalendar.date != '' and oaCalendar.date != null">
-                and  (d_start_time&lt;= #{oaCalendar.date} and d_end_time &gt;= #{oaCalendar.date})
-            </if>
-            and SUBSTRING_INDEX(s_user_names,',',1) = s.username
-        </where>
-        order by i_is_top desc ,s.show_order  desc limit 0,6
     </select>
     <select id="getByIid" resultType="com.cfcc.modules.oaBus.entity.oaCalendar" parameterType="String">
          select * from oa_calendar where i_id = #{id}

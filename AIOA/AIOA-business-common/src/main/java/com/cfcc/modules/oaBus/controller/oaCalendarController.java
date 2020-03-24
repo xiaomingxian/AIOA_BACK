@@ -539,13 +539,14 @@ public class oaCalendarController implements Job {
          for (TaskInfoJsonAble taskInfo:taskInfoJsonAbles) {
              boolean b = taskInfoJsonAbles.stream().anyMatch(u -> u.getId().equals(taskInfo.getId()));
              if(!b){
-             oaCalendar.setSUserNames(taskInfo.getDrafterId()); //用户id
+             SysUser sysUser = sysUserService.getById(taskInfo.getDrafterId());
+             oaCalendar.setSUserNames(sysUser.getUsername()); //用户id
              oaCalendar.setSTitle(taskInfo.getTitle()); //标题
              oaCalendar.setDStartTime(taskInfo.getCreateTime());//开始时间
 			 oaCalendar.setDEndTime(taskInfo.getEndTime());//结束时间
              Integer FunDataId = Integer.valueOf(taskInfo.getTableId());
              oaCalendar.setIFunDataId(FunDataId); //实例数据id
-             SysUser sysUser = sysUserService.getById(taskInfo.getDrafterId());
+             //SysUser sysUser = sysUserService.getById(taskInfo.getDrafterId());
              oaCalendar.setSCreateBy(sysUser.getUsername());
 			 oaCalendar.setIBusFunctionId( Integer.valueOf(taskInfo.getFunctionId()));//业务功能
 			 oaCalendar.setIBusModelId(Integer.valueOf(taskInfo.getModelId()));//业务模块

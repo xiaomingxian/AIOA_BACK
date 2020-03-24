@@ -47,8 +47,6 @@ public interface oaCalendarMapper extends BaseMapper<oaCalendar> {
 
     List<SysUser> getByShowOrder(int showOrder);
 
-    List<oaCalendar> findWaitLimit(@Param(value = "oaCalendar")oaCalendar oaCalendar);
-
     int countIsWait(oaCalendar oaCalendar);
 
     List<oaCalendar> findWait(@Param(value = "pageNo") int pageNo, @Param(value = "pageSize")Integer pageSize, @Param(value = "oaCalendar")  oaCalendar oaCalendar);

@@ -158,7 +158,7 @@ public class oaCalendarServiceImpl extends ServiceImpl<oaCalendarMapper, oaCalen
     @Override
     public IPage<oaCalendar> findWait(Integer pageNo, Integer pageSize, oaCalendar oaCalendar) {
         int total = oaCalendarMapper.countIsWait(oaCalendar);
-        List<oaCalendar> CalendarList=oaCalendarMapper.findWaitLimit(oaCalendar);
+        List<oaCalendar> CalendarList=oaCalendarMapper.findWait((pageNo - 1) * pageSize,pageSize,oaCalendar);
         IPage<oaCalendar> pageList = new Page<oaCalendar>();
         pageList.setRecords(CalendarList);
         pageList.setTotal(total);
