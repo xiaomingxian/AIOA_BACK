@@ -661,7 +661,8 @@ public class OaBusDynamicTableServiceImpl implements OaBusDynamicTableService {
             paramMap.put("s_inside_deptnames", jsonParam.get("s_inside_deptnames")); //内部传送单位
             paramMap.put("table", result.getResult().get("tableName"));
             paramMap.put("i_id", result.getResult().get("busdataId"));
-
+            paramMap.put("i_is_display","0");
+            paramMap.put("i_is_es", 3);
             //查询收文管理员角色用户（编码710）
             List<Map<String, Object>> userList = dynamicTableMapper.queryUsersByUnit(unitId);
             if (userList.size() < 1) {
@@ -832,6 +833,7 @@ public class OaBusDynamicTableServiceImpl implements OaBusDynamicTableService {
             updateMap.put("i_create_year", nowDate.getYear());
             updateMap.put("i_create_month", nowDate.getMonthValue());
             updateMap.put("i_create_day", nowDate.getDayOfMonth());
+            updateMap.put("d_create_time", new Date());
             updateMap.put("s_create_unitid", unitId);
             BusProcSet busProcSet = iBusProcSetService.getById(functionData.get("i_proc_set_id") + "");
             if (busProcSet == null) return Result.error("无此类数据配置");
