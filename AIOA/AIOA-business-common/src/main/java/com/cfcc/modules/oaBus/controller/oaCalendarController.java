@@ -558,34 +558,38 @@ public class oaCalendarController implements Job {
 //            if (!b) {
 //            SysUser sysUser = sysUserService.getById(assignee);
 
-            oaCalendar oaCalendar = new oaCalendar();
+            oaCalendar oaCalendarInstance = new oaCalendar();
 
             String assignee = taskInfo.getAssignee();
             SysUser sysUser = allUserMsg.get(assignee);
-            oaCalendar.setSUserNames(sysUser.getUsername()); //用户名字
-            oaCalendar.setSTitle(taskInfo.getTitle()); //标题
-            oaCalendar.setDStartTime(taskInfo.getCreateTime());//开始时间
-            oaCalendar.setDEndTime(taskInfo.getEndTime());//结束时间
             Integer FunDataId = Integer.valueOf(taskInfo.getTableId());
-            oaCalendar.setIFunDataId(FunDataId); //实例数据id
+
+            oaCalendarInstance.setSUserNames(sysUser.getUsername()); //用户名字
+            oaCalendarInstance.setSTitle(taskInfo.getTitle()); //标题
+            oaCalendarInstance.setDStartTime(taskInfo.getCreateTime());//开始时间
+            oaCalendarInstance.setDEndTime(null);//结束时间 taskInfo.getEndTime()
+            oaCalendarInstance.setIFunDataId(FunDataId); //实例数据id
             //SysUser sysUser = sysUserService.getById(taskInfo.getDrafterId());
-            oaCalendar.setSCreateBy(sysUser.getUsername());
-            oaCalendar.setIBusFunctionId(Integer.valueOf(taskInfo.getFunctionId()));//业务功能
-            oaCalendar.setIBusModelId(Integer.valueOf(taskInfo.getModelId()));//业务模块
+            oaCalendarInstance.setSCreateBy(sysUser.getUsername());
+            oaCalendarInstance.setIBusFunctionId(Integer.valueOf(taskInfo.getFunctionId()));//业务功能
+            oaCalendarInstance.setIBusModelId(Integer.valueOf(taskInfo.getModelId()));//业务模块
 
 			String taskUserId=taskInfo.getId()+assignee;
-			oaCalendar.setTaskUserId(taskUserId);
-			oaCalendar.setTaskId(taskInfo.getId());
+            oaCalendarInstance.setTaskUserId(taskUserId);
+            oaCalendarInstance.setTaskId(taskInfo.getId());
+            oaCalendarInstance.setState("1");
 			oaCalendar oaCalendar1 = oaCalendarService.findByTaskUserId(taskUserId);
 			if(oaCalendar1 == null){ //数据库没有该条数据
-				oaCalendars.add(oaCalendar);
+				oaCalendars.add(oaCalendarInstance);
 			}else{//数据库已经存在该条数据
-				oaCalendarService.updateByIid(oaCalendar);
+//				oaCalendarService.updateByIid(oaCalendarInstance);
 			}
 
 //            }
         }
-        oaCalendarService.saveBatch(oaCalendars);//批量写入
+        if (oaCalendars.size()>0){
+            oaCalendarService.saveBatch(oaCalendars);//批量写入
+        }
 //        oaCalendarService.saveCalendar(oaCalendars);
     }
 
