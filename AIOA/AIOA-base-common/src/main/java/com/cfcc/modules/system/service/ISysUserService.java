@@ -176,4 +176,6 @@ public interface ISysUserService extends IService<SysUser> {
     void deleteUserById(String id);
 
 	List<Map<String, Object>> deptUserChoice(String id);
+
+    Map<String, SysUser> selectUsersByUids(List<String> allUserIds);
 }

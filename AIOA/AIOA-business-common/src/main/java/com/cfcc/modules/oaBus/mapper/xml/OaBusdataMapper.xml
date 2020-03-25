@@ -39,7 +39,6 @@
             ,${columnLists}
         </if>
         from ${busFunction.sBusdataTable}
-
         <where>
             <if test="busFunction.iId != null">
                 i_bus_model_id = #{busFunction.iBusModelId}

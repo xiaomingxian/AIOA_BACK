@@ -184,7 +184,6 @@ public class BusModelController {
     @AutoLog(value = "业务模块表（业务分类表）-通过id删除")
     @ApiOperation(value = "业务模块表（业务分类表）-通过id删除", notes = "业务模块表（业务分类表）-通过id删除")
     @DeleteMapping(value = "/delete")
-    @CacheEvict(value = CacheConstant.MODEL_CACHE,allEntries=true)
     public Result<?> delete(@RequestParam(name = "id", required = true) String id) {
         String schema = MycatSchema.getSchema();
         try {

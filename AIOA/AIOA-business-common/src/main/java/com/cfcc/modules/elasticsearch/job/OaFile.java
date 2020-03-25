@@ -26,6 +26,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
+import java.text.SimpleDateFormat;
 import java.util.*;
 
 @Slf4j
@@ -129,33 +130,53 @@ public class OaFile implements Job {
             if (oaBusdataList.size() != 0){
                 try {
                     //索引名 = 库名+银行id+1
+
                     String indexName = "elasticsearch"+DBvalue+departId+1;
                     String indexType = "oaBusdate";
                     if (!searchService.existsIndex(indexName)){
                         logger.info(indexName+"索引开始创建！！！！");
                         searchService.createIndex(indexName,indexType);
                     }
-                    for (Map<String, Object> map : oaBusdataList) {
+
+                    Iterator<Map<String, Object>> iterator = oaBusdataList.iterator();
+                    while (iterator.hasNext()) {
+                        Map<String, Object> map = iterator.next();
+
+                        if (map.get("d_create_time") != null) {
+                            SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+                            long lt = new Long(map.get("d_create_time") + "");
+                            Date date = new Date(lt);
+                            String res = simpleDateFormat.format(date);
+                            map.put("d_create_time", "创建时间：" + res);
+                        }
+                        if (map.get("d_update_time") != null) {
+                            SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+                            long lt = new Long(map.get("d_update_time") + "");
+                            Date date = new Date(lt);
+                            String res = simpleDateFormat.format(date);
+                            map.put("d_update_time", "修改时间：" + res);
+                        }
                         String json = JSON.toJSONString(map);
-                        RestStatus restStatus = searchService.saveOrUpdate(json, map.get("table_name").toString() + map.get("i_id").toString() , indexName, indexType);
+                        RestStatus restStatus = searchService.saveOrUpdate(json, map.get("table_name").toString() + map.get("i_id").toString(), indexName, indexType);
                         Integer res = restStatus.getStatus();
-                        System.out.println("----是否添加成功----"+restStatus);
-                        if (res == 200){
+                        System.out.println("----是否添加成功----" + restStatus);
+                        if (res == 200) {
                             log.info("-----------------oa_busdata添加数据成功-------------------");
-                        }else {
+                        } else {
                             log.info("-----------------oa_busdata添加数据失败-------------------");
-                            while (res != 200){
-                                restStatus = searchService.saveOrUpdate(json, map.get("table_name").toString() + map.get("i_id").toString() , indexName, indexType);
+                            while (res != 200) {
+                                restStatus = searchService.saveOrUpdate(json, map.get("table_name").toString() + map.get("i_id").toString(), indexName, indexType);
                                 res = restStatus.getStatus();
                             }
                             log.info("-----------------oa_busdata添加数据成功-------------------");
                         }
-                        //将数据库中修改为已添加ES库成功
                     }
+                    //将数据库中修改为已添加ES库成功
                     iOaBusdataService.updateIsES(oaBusdataList,DBvalue);
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
+
             }
 
             //====================================
@@ -250,35 +271,75 @@ public class OaFile implements Job {
                     oaBusdataList.addAll(oaBusdataCan);
                 }
                 if (oaBusdataList.size() != 0){
+
                     try {
                         //索引名 = 库名+银行id+1
-                        String DBvalue1 = DBvalue.substring(DBvalue.indexOf("=")+1,DBvalue.lastIndexOf("*"));
-                        String indexName = "elasticsearch"+DBvalue1+departId+1;
-                        String indexType = "oaBusdata";
-                        if (!searchService.existsIndex(indexName)){
-                            logger.info(indexName+"索引开始创建！！！！");
-                            searchService.createIndex(indexName,indexType);
+                        String DBvalue1 = DBvalue.substring(DBvalue.lastIndexOf("=") + 1, DBvalue.lastIndexOf("*"));
+                        String indexName = "elasticsearch" + DBvalue1 + departId + 1;
+                        String indexType = "oaBusdate";
+                        if (!searchService.existsIndex(indexName)) {
+                            logger.info(indexName + "索引开始创建！！！！");
+                            searchService.createIndex(indexName, indexType);
                         }
+                        Iterator<Map<String, Object>> iterator = oaBusdataList.iterator();
+                        while (iterator.hasNext()) {
+                            Map<String, Object> map = iterator.next();
+                            if (map.get("d_create_time") != null) {
+//                                SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+//                                long lt = new Long(map.get("d_create_time") + "");
+//                                Date date = new Date(lt);
+//                                String res = simpleDateFormat.format(date);
+                                String dCreateTime = map.get("d_create_time")+"";
+                                String time = dCreateTime.substring(0,dCreateTime.lastIndexOf("."));
+                                map.put("d_create_time", time);
+                            }
+                            if (map.get("d_update_time") != null) {
+//                                SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+//                                long lt = new Long(map.get("d_update_time") + "");
+//                                Date date = new Date(lt);
+//                                String res = simpleDateFormat.format(date);
+                                String dCreateTime = map.get("d_update_time")+"";
+                                String time = dCreateTime.substring(0,dCreateTime.lastIndexOf("."));
+                                map.put("d_update_time", time);
+                            }
+                            if (map.get("d_datetime1") != null) {
+//                                SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+//                                long lt = new Long(map.get("d_update_time") + "");
+//                                Date date = new Date(lt);
+//                                String res = simpleDateFormat.format(date);
+                                String dCreateTime = map.get("d_datetime1")+"";
+                                String time = dCreateTime.substring(0,dCreateTime.lastIndexOf("."));
+                                map.put("d_datetime1", time);
+                            }
+                            if (map.get("d_datetime2") != null) {
+//                                SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+//                                long lt = new Long(map.get("d_update_time") + "");
+//                                Date date = new Date(lt);
+//                                String res = simpleDateFormat.format(date);
+                                String dCreateTime = map.get("d_datetime2")+"";
+                                String time = dCreateTime.substring(0,dCreateTime.lastIndexOf("."));
+                                map.put("d_datetime2", time);
+                            }
+                        }
+
+
                         for (Map<String, Object> map : oaBusdataList) {
                             String json = JSON.toJSONString(map);
                             RestStatus restStatus = searchService.saveOrUpdate(json, map.get("table_name").toString() + map.get("i_id").toString() , indexName, indexType);
                             int res = restStatus.getStatus();
-                            System.out.println("----是否添加成功----"+restStatus);
-                            if (res == 200){
+                            if (res == 200) {
                                 log.info("-----------------oa_busdata添加数据成功-------------------");
-                            }else {
+                            } else {
                                 log.info("-----------------oa_busdata添加数据失败-------------------");
-                                while (res != 200){
-                                    restStatus = searchService.saveOrUpdate(json, map.get("table_name").toString() + map.get("i_id").toString() , indexName, indexType);
+                                while (res != 200) {
+                                    restStatus = searchService.saveOrUpdate(json, map.get("table_name").toString() + map.get("i_id").toString(), indexName, indexType);
                                     res = restStatus.getStatus();
-//                                    if(res == 200){
-//                                        break;
-//                                    }
                                 }
                                 log.info("-----------------oa_busdata添加数据成功-------------------");
                             }
                         }
-//                        iOaBusdataService.updateIsES(oaBusdataList,DBvalue);
+                        //将数据库中修改为已添加ES库成功
+                        iOaBusdataService.updateIsES(oaBusdataList,DBvalue);
                     } catch (Exception e) {
                         e.printStackTrace();
                     }

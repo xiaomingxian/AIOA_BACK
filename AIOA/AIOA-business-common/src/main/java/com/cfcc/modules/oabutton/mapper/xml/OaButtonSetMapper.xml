@@ -231,6 +231,13 @@
         i_TASK_DEF_KEY_,s_manager_role_id from oa_button_set
          where i_proc_button_id = #{id} and PROC_DEF_KEY_ = #{procDefKey}
     </select>
+     <!--根据按钮id查询-->
+    <select id="queryByButtonId" resultType="com.cfcc.modules.oabutton.entity.OaButtonSet">
+        select i_id,s_roles,PROC_DEF_KEY_,TASK_DEF_KEY_,i_proc_button_id,i_button_id,i_order,
+        i_permit_type,i_is_creater,i_is_reader,i_is_lastsender,i_is_transactors,i_is_default,
+        i_TASK_DEF_KEY_,s_manager_role_id from oa_button_set
+        where i_button_id = #{id}
+    </select>
     <select id="findList" resultType="com.cfcc.modules.oabutton.entity.OaButtonSet">
         select * from oa_button_set order by i_order
     </select>

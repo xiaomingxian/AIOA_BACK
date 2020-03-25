@@ -91,7 +91,7 @@ public class BusFunctionServiceImpl extends ServiceImpl<BusFunctionMapper, BusFu
      * @param busFunction
      * @param busPageDetailList
      */
-    @Transactional
+   /* @Transactional
     @Override
     public void saveMain(BusFunction busFunction, List<BusPageDetail> busPageDetailList) {
         busFunction.setDCreateTime(new Date());
@@ -105,7 +105,7 @@ public class BusFunctionServiceImpl extends ServiceImpl<BusFunctionMapper, BusFu
             busPageDetailMapper.insertBusPageDetailBatch(busPageDetailList, queryBusFunction.getIId(), queryBusFunction.getIPageId(), tableName);
         }
     }
-
+*/
 
     /**
      * 查询业务要显示的查询条件

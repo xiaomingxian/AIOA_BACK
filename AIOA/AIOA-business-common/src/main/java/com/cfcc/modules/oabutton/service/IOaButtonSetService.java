@@ -47,6 +47,8 @@ public interface IOaButtonSetService extends IService<OaButtonSet> {
 
     List<OaButtonSet> queryByProcButtonId(Integer id);
 
+    List<OaButtonSet> queryByButtonId(Integer id);
+
     List<OaButtonSet> findList(String schemal);
 
     List<OaButtonSet> queryByProcButtonIdAndProcDefKey(Integer id, String procDefKey);

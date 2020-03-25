@@ -95,6 +95,11 @@ public class OaButtonSetServiceImpl extends ServiceImpl<OaButtonSetMapper, OaBut
     }
 
     @Override
+    public List<OaButtonSet> queryByButtonId(Integer id) {
+        return oaButtonSetMapper.queryByButtonId(id);
+    }
+
+    @Override
     @Cacheable(value = CacheConstant.BUTTON_SET_CACHE)
     public List<OaButtonSet> findList(String schemal) {
         return oaButtonSetMapper.findList();
