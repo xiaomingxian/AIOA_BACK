@@ -9,6 +9,8 @@ import com.cfcc.common.api.vo.Result;
 import com.cfcc.common.aspect.annotation.AutoLog;
 import com.cfcc.common.system.query.QueryGenerator;
 import com.cfcc.common.system.util.JwtUtil;
+import com.cfcc.common.util.DateUtils;
+import com.cfcc.common.util.RedisUtil;
 import com.cfcc.common.util.oConvertUtils;
 import com.cfcc.modules.oaBus.entity.BusFunction;
 import com.cfcc.modules.oaBus.entity.oaCalendar;
@@ -573,7 +575,7 @@ public class oaCalendarController implements Job {
             oaCalendarInstance.setSCreateBy(sysUser.getUsername());
             oaCalendarInstance.setIBusFunctionId(Integer.valueOf(taskInfo.getFunctionId()));//业务功能
             oaCalendarInstance.setIBusModelId(Integer.valueOf(taskInfo.getModelId()));//业务模块
-
+            oaCalendarInstance.setDCreateTime(DateUtils.getDate());
 			String taskUserId=taskInfo.getId()+assignee;
             oaCalendarInstance.setTaskUserId(taskUserId);
             oaCalendarInstance.setTaskId(taskInfo.getId());
