@@ -49,8 +49,6 @@ public class FileNtkoController {
     @Autowired
     private WebSocket webSocket;
     @Autowired
-    private IOaBusdataService oaBusdataService;
-    @Autowired
     private RedisTemplate<String, Object> redisTemplate;
     @Autowired
     private OaBusDynamicTableMapper dynamicTableMapper;
@@ -76,7 +74,6 @@ public class FileNtkoController {
             String ctxPath = uploadpath;
             Map<String, Object> map = FileUtils.Upload(orgSchema,ctxPath, request);
             String fileName = (String) map.get("fileName");
-//            String savePath = (String) map.get("savePath");
             String newSavePath = (String) map.get("newSavePath");
             OaFile oaFile = new OaFile();
             oaFile.setSTable(stable);
@@ -86,7 +83,7 @@ public class FileNtkoController {
             oaFile.setSFilePath(newSavePath);
             oaFile.setDCreateTime(new Date());
             Boolean flag = oaFileService.save(oaFile);
-            String message = "kongjian";
+//            String message = "kongjian";
             if (flag) {
                 Map<String,Object> busdataMap=new HashMap<>();
                 busdataMap.put("table",stable);
@@ -101,9 +98,7 @@ public class FileNtkoController {
                     busdataMap.put("i_is_approve",1);
                 }
                 dynamicTableMapper.updateData(busdataMap);
-//                oaBusdataService.updateFileStatus(busdataMap);
             }
-            //System.out.println("---------------->>>>>>>>>>>>>>>创建保存成功");
             //现在已经不使用websocket
             // ----开启webSocket，起草底稿后向前端发一个请求，表明已经保存成功。
             //sendWebSocketMessage(tableid,message) ;
@@ -158,9 +153,8 @@ public class FileNtkoController {
             c.setEntity(oaFile);
 
             OaFile ad = oaFileService.getOne(c);
-            String filePath=null;
             //上传附件进行编辑查文件名
-            filePath=ad.getSFilePath();
+            String filePath=ad.getSFilePath();
             if ("4".equals(fileType)){
                 filePath=filePath.substring(ad.getSFilePath().lastIndexOf(File.separator)+1);
             }
@@ -174,7 +168,6 @@ public class FileNtkoController {
             e.printStackTrace();
             result.setMessage("文件控件系统出现问题，请联系管理");
         }
-
         return result;
     }
     /**
@@ -202,7 +195,6 @@ public class FileNtkoController {
             e.printStackTrace();
             result.setMessage("文件控件系统出现问题，请联系管理");
         }
-
         return result;
     }
 
@@ -225,9 +217,7 @@ public class FileNtkoController {
         }
         String ctxPath = uploadpath;
         Map<String, Object> map = FileUtils.Upload(orgSchema,ctxPath,request);
-
         String fileName = (String) map.get("fileName");
-//        String savePath = (String) map.get("savePath");
         String newSavePath = (String) map.get("newSavePath");
         OaFile oaFile = new OaFile();
         oaFile.setSTable(stable);
@@ -282,7 +272,6 @@ public class FileNtkoController {
                     File.separator + (calendar.get(Calendar.MONTH) + 1) +
                     File.separator + calendar.get(Calendar.DATE) + File.separator;
         }
-
         File parent = new File(path);
         if (!parent.exists()){
             parent.mkdirs();
@@ -336,10 +325,6 @@ public class FileNtkoController {
                                  @RequestParam(value = "orgSchema", required = false) String orgSchema,HttpServletRequest request) {
 
         Result<String> result = new Result< String >();
-        Map<String,Object> map=new HashMap<>();
-//        map.put("sFilePath",filepath);
-//        OaFile oa = oaFileService.singleCopyFile(map,request);
-//        String fileName=oa.getSFileName();
         OaFile file = new OaFile();
         String initFile = "";
         if (!orgSchema.equals("")){
@@ -378,7 +363,12 @@ public class FileNtkoController {
         }
         return result;
     }
-
+    /**
+     * 获取随机码
+     *
+     * @param
+     * @return
+     */
     @PostMapping(value = "/getPasswordCode")
     public Result<String> getPasswordCode() {
         Result<String> result = new Result<>();
@@ -397,6 +387,12 @@ public class FileNtkoController {
         return result;
     }
 
+    /**
+     * 验证随机码
+     *
+     * @param
+     * @return
+     */
     @PostMapping(value = "/checkPasswordCode")
     public Result<String> checkPasswordCode(@RequestParam(value = "password", required = true) String password) {
         Result<String> result = new Result<>();
@@ -418,6 +414,12 @@ public class FileNtkoController {
         return result;
     }
 
+    /**
+     * 创建模板文件夹
+     *
+     * @param
+     * @return
+     */
     @PostMapping(value = "/creatPath")
     public Result<String> creatPath() {
         Result<String> result = new Result<>();

@@ -57,9 +57,6 @@ public class FormalFileController {
     private IBusPageDetailService busPageDetailService;
 
     @Autowired
-    private IOaBusdataService oaBusdataService;
-
-    @Autowired
     private OaBusDynamicTableService oaBusDynamicTableService;
 
     /**
@@ -71,7 +68,6 @@ public class FormalFileController {
      * @param fileType 文件类型
      * @return
      */
-
     @GetMapping(value = "/queryFormalFileById")
     public Result<Map> queryFormalFileById(@RequestParam(name = "id", required = true) String id,
                                            @RequestParam(name = "stable", required = true) String stable,
@@ -104,7 +100,6 @@ public class FormalFileController {
             Map<String, Object> map = iOaBusdataService.getBusDataById(stable, Integer.parseInt(tableid));
             //根据业务功能id查业务含义数据
             Integer funcationid = (Integer) map.get("i_bus_function_id");
-            //修改是否排版--
             List<BusPageDetail> busPageDetails = busPageDetailService.getListByFunID(funcationid + "");
             //遍历业务含义对象
             for (int i = 0; i < busPageDetails.size(); i++) {
@@ -168,7 +163,6 @@ public class FormalFileController {
             //获取路径
             String fileName = oaFile.getSFilePath();
             Map<String, Object> map = iOaBusdataService.getBusDataById(stable, tableid);
-            //修改是否保存办文单---
             //查询附件列表中的文件名
             List<OaFile> oaFileList = iOaFileService.getOaFileList(stable, Integer.toString(tableid));
             String AccessoryFileName = "";
@@ -223,7 +217,6 @@ public class FormalFileController {
         return result;
     }
 
-
     /**
      * 查询业务数据中办文单，排版状态
      *
@@ -243,6 +236,5 @@ public class FormalFileController {
             result.setResult(map);
         }
         return result;
-
     }
 }

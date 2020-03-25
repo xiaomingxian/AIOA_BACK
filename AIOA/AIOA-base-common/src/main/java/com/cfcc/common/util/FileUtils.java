@@ -81,7 +81,6 @@ public class FileUtils {
         }
         return dst;
     }
-
     /**
      * 文件上传
      */
@@ -119,11 +118,10 @@ public class FileUtils {
             String newSavePath = savePath1 + numName;
             File savefile = new File(savePath);
             FileCopyUtils.copy(mf.getBytes(), savefile);
-            map.put("fileName", numName);
-            map.put("savePath", savePath);
-            map.put("newSavePath", newSavePath);
-            log.info("文件保存成功！！");
-            System.out.println("AAAAA文件保存成功！！");
+            map.put("fileName",numName);
+            map.put("savePath",savePath);
+            map.put("newSavePath",newSavePath);
+            log.info("=========================>>文件保存成功！！") ;
         } catch (IOException e) {
             e.printStackTrace();
             log.error(e.toString());
@@ -131,7 +129,7 @@ public class FileUtils {
         return map;
     }
 
-    public static String generatePassword(int length) {
+    public static String generatePassword (int length) {
         // 最终生成的密码
         String password = "";
         Random random = new Random();
