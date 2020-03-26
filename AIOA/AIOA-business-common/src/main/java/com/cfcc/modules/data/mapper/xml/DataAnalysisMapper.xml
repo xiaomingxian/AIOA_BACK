@@ -7,8 +7,8 @@
     select 
     (select count(i_is_state)  as num  from ${table}
       <where>
-         i_is_display =0
-      <if test="bdata.sCreateBy != null and bdata.sCreateBy != ''">
+         i_is_display =0 and  i_is_state = 0
+          <if test="bdata.sCreateBy != null and bdata.sCreateBy != ''">
           and  s_create_by = #{bdata.sCreateBy}
       </if>
       <if test="bdata.iBusFunctionId != null and bdata.iBusFunctionId != ''">
@@ -49,7 +49,7 @@
     <select id="PeerNum"  resultType="java.util.Map">
         select 
          (select count(i_is_state)  as num  from ${table} <where>
-         i_is_display =0
+         i_is_display =0 and  i_is_state = 0
         <if test="bdata.sCreateBy != null and bdata.sCreateBy != ''">
             AND  s_create_by = #{bdata.sCreateBy}
         </if>
@@ -68,8 +68,8 @@
     </where> )/
         ( SELECT count(i_is_state)  as num1  from ${table}
         <where>
-        i_is_display =0
-        <if test="bdata.sCreateBy != null and bdata.sCreateBy != ''">
+        i_is_display =0 and  i_is_state = 0
+            <if test="bdata.sCreateBy != null and bdata.sCreateBy != ''">
             AND  s_create_by = #{bdata.sCreateBy}
         </if>
         <if test="bdata.iCreateYear != null and bdata.iCreateYear != ''">
