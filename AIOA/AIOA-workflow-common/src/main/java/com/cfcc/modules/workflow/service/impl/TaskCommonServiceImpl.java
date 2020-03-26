@@ -434,6 +434,7 @@ public class TaskCommonServiceImpl implements TaskCommonService {
                     }
                 }
                 next.put("userName", userName);
+                deptName = deptName == null ? "暂无部门" : deptName;
                 next.put("deptName", deptName);
             }
         }
@@ -1096,14 +1097,14 @@ public class TaskCommonServiceImpl implements TaskCommonService {
         if (StringUtils.isBlank(procInstId)) return;
         //去代办里查
         long count = taskService.createTaskQuery().processInstanceId(procInstId).count();
-        if (count<=0){
+        if (count <= 0) {
             Calendar now = Calendar.getInstance();
             int year = now.get(Calendar.YEAR);
             int mounth = now.get(Calendar.MONTH) + 1;
             int day = now.get(Calendar.DAY_OF_MONTH);
             HashMap<String, Object> upData = new HashMap<>();
-            upData.put("table",table);
-            upData.put("i_id",id);
+            upData.put("table", table);
+            upData.put("i_id", id);
             //按年月日划分
             upData.put("s_varchar9", year + "-" + mounth + "-" + day);
             dynamicTableMapper.updateData(upData);
@@ -1121,10 +1122,10 @@ public class TaskCommonServiceImpl implements TaskCommonService {
                 actPicService.savePic(procInstId, response, pic);
                 //2 办理信息
                 List<Map<String, Object>> all = workTrack(procInstId, true);
-                FileUtils.writeJSONOneLine(workTrace,all);
+                FileUtils.writeJSONOneLine(workTrace, all);
                 //3 撤回/退回记录
                 List<BackRecord> backRecords = backRecord(procInstId, table + "_opinion");
-                FileUtils.writeJSONOneLine(backData,backRecords);
+                FileUtils.writeJSONOneLine(backData, backRecords);
                 //4 删除流程相关信息
                 taskMapper.deleteByprocessInstanceId(procInstId);
 
@@ -1135,10 +1136,6 @@ public class TaskCommonServiceImpl implements TaskCommonService {
         }
 
     }
-
-
-
-
 
 
     private String nextActMore(List<TaskInfoVO> taskInfoVOs, Task task) {
