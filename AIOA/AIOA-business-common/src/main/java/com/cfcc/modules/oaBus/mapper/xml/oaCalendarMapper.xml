@@ -64,7 +64,7 @@
     <select id="countIsLeader" resultType="java.lang.Integer">
         select count(*) from oa_calendar
         <where>
-            ISNULL(i_fun_data_id)="" and i_is_leader = 1
+            ISNULL(i_fun_data_id)="" and i_is_leader = 1 and task_id is null
             <if test="sAddress != '' and sAddress != null">
                 and s_address = #{sAddress}
             </if>
@@ -78,20 +78,20 @@
                 and s_create_by = #{username}
             </if>
             <if test="date != '' and date != null">
-                and  (d_start_time &lt;= #{date} and  d_end_time &gt;= #{date})
+                and  (DATE_FORMAT(d_start_time,'%Y-%m-%d') &lt;= #{date} and  DATE_FORMAT(d_end_time,'%Y-%m-%d') &gt;= #{date})
             </if>
             <if test="Strdate != '' and Strdate != null">
-                and d_start_time &lt;= #{Strdate}
+                and DATE_FORMAT(d_end_time,'%Y-%m-%d') &gt;= #{Strdate}
             </if>
             <if test="Enddate != '' and Enddate != null">
-                and d_end_time &gt;= #{Enddate}
+                and DATE_FORMAT(d_end_time,'%Y-%m-%d') &lt;= #{Enddate}
             </if>
         </where>
     </select>
     <select id="countIsNoLeader" resultType="java.lang.Integer">
         select count(*) from oa_calendar
         <where>
-            ISNULL(i_fun_data_id)="" and i_is_leader = 0
+            ISNULL(i_fun_data_id)="" and i_is_leader = 0 and task_id is null
             <if test="sAddress != '' and sAddress != null">
                 and s_address = #{sAddress}
             </if>
@@ -106,13 +106,13 @@
                 and s_create_by = #{username}
             </if>
             <if test="date != '' and date != null">
-                and  (d_start_time &lt;= #{date} and  d_end_time &gt;= #{date})
+                and  (DATE_FORMAT(d_start_time,'%Y-%m-%d') &lt;= #{date} and  DATE_FORMAT(d_end_time,'%Y-%m-%d') &gt;= #{date})
             </if>
             <if test="Strdate != '' and Strdate != null">
-                and d_start_time &gt;= #{Strdate}
+                and DATE_FORMAT(d_end_time,'%Y-%m-%d') &gt;= #{Strdate}
             </if>
             <if test="Enddate != '' and Enddate != null">
-                and d_end_time &lt;= #{Enddate}
+                and DATE_FORMAT(d_end_time,'%Y-%m-%d') &lt;= #{Enddate}
             </if>
         </where>
     </select>
@@ -120,7 +120,7 @@
     <select id="count" resultType="java.lang.Integer">
         select count(*) from oa_calendar
         <where>
-            ISNULL(i_fun_data_id)=""
+            ISNULL(i_fun_data_id)="" and task_id is null
             <if test="sAddress != '' and sAddress != null">
                 and s_address = #{sAddress}
             </if>
@@ -134,13 +134,13 @@
                 and s_create_by = #{username}
             </if>
             <if test="date != '' and date != null">
-                and  (d_start_time &lt;= #{date} and  d_end_time &gt;= #{date})
+                and  (DATE_FORMAT(d_start_time,'%Y-%m-%d') &lt;= #{date} and  DATE_FORMAT(d_end_time,'%Y-%m-%d') &gt;= #{date})
             </if>
             <if test="Strdate != '' and Strdate != null">
-                and d_start_time &gt;= #{Strdate}
+                and DATE_FORMAT(d_end_time,'%Y-%m-%d') &gt;= #{Strdate}
             </if>
             <if test="Enddate != '' and Enddate != null">
-                and d_end_time &lt;= #{Enddate}
+                and DATE_FORMAT(d_end_time,'%Y-%m-%d') &lt;= #{Enddate}
             </if>
         </where>
     </select>
@@ -148,7 +148,7 @@
     <select id="findPage" resultType="com.cfcc.modules.oaBus.entity.oaCalendar">
         select * from oa_calendar INNER  JOIN  sys_user s
         <where>
-            ISNULL(i_fun_data_id)=""
+            ISNULL(i_fun_data_id)=""  and task_id is null
             <if test="oaCalendar.username != '' and oaCalendar.username != null">
                 and s_create_by = #{oaCalendar.username}
             </if>
@@ -162,21 +162,21 @@
                 and i_open_type = #{oaCalendar.iOpenType}
             </if>
             <if test="oaCalendar.date != '' and oaCalendar.date != null">
-                and  (d_start_time  &lt;=  #{oaCalendar.date} and  d_end_time &gt;= #{oaCalendar.date})
+                and  (DATE_FORMAT(d_start_time,'%Y-%m-%d')  &lt;=  #{oaCalendar.date} and DATE_FORMAT(d_end_time,'%Y-%m-%d') &gt;= #{oaCalendar.date})
             </if>
             <if test="oaCalendar.Strdate != '' and oaCalendar.Strdate != null">
-                and ((  d_start_time &lt;= #{oaCalendar.Strdate}
+                and ((DATE_FORMAT(d_start_time,'%Y-%m-%d') &lt;= #{oaCalendar.Strdate}
             </if>
             <if test="oaCalendar.Enddate != '' and oaCalendar.Enddate != null">
-                and d_end_time &gt;= #{oaCalendar.Enddate}
+                and DATE_FORMAT(d_end_time,'%Y-%m-%d') &gt;= #{oaCalendar.Enddate}
                 )
             </if>
 
             <if test="oaCalendar.Strdate != '' and oaCalendar.Strdate != null">
-                or ( d_start_time &lt;=  #{oaCalendar.Strdate}
+                or ( DATE_FORMAT(d_start_time,'%Y-%m-%d') &lt;=  #{oaCalendar.Strdate}
             </if>
             <if test="oaCalendar.Enddate != '' and oaCalendar.Enddate != null">
-                and d_end_time &gt;= #{oaCalendar.Enddate}))
+                and DATE_FORMAT(d_end_time,'%Y-%m-%d') &gt;= #{oaCalendar.Enddate}))
             </if>
              and SUBSTRING_INDEX(s_user_names,',',1) = s.username
         </where>
@@ -186,7 +186,7 @@
     <select id="countIsWait" resultType="java.lang.Integer">
         select count(*) from oa_calendar
         <where>
-            i_fun_data_id is not NULL and i_is_state = 1
+            i_fun_data_id is not NULL and i_is_state = 1 and task_id is null
             <if test="sAddress != '' and sAddress != null">
                 and s_address = #{sAddress}
             </if>
@@ -215,7 +215,7 @@
     <select id="findByLeader" resultType="com.cfcc.modules.oaBus.entity.oaCalendar">
         select * from oa_calendar INNER  JOIN  sys_user s
         <where>
-            ISNULL(i_fun_data_id)="" and i_is_leader = 1
+            ISNULL(i_fun_data_id)="" and i_is_leader = 1 and task_id is null
 
             <if test="oaCalendar.sAddress != '' and oaCalendar.sAddress != null">
                 and s_address = #{oaCalendar.sAddress}
@@ -229,21 +229,21 @@
                 and i_open_type = #{oaCalendar.iOpenType}
             </if>
             <if test="oaCalendar.date != '' and oaCalendar.date != null">
-                and  (d_start_time &lt;= #{oaCalendar.date} and  d_end_time &gt;= #{oaCalendar.date})
+                and  (DATE_FORMAT(d_start_time,'%Y-%m-%d')  &lt;=  #{oaCalendar.date} and DATE_FORMAT(d_end_time,'%Y-%m-%d') &gt;= #{oaCalendar.date})
             </if>
             <if test="oaCalendar.Strdate != '' and oaCalendar.Strdate != null">
-                and ((  d_start_time &lt;= #{oaCalendar.Strdate}
+                and ((DATE_FORMAT(d_start_time,'%Y-%m-%d') &lt;= #{oaCalendar.Strdate}
             </if>
             <if test="oaCalendar.Enddate != '' and oaCalendar.Enddate != null">
-                and d_end_time &gt;= #{oaCalendar.Enddate}
+                and DATE_FORMAT(d_end_time,'%Y-%m-%d') &gt;= #{oaCalendar.Enddate}
                 )
             </if>
 
             <if test="oaCalendar.Strdate != '' and oaCalendar.Strdate != null">
-                or ( d_start_time &lt;=  #{oaCalendar.Strdate}
+                or ( DATE_FORMAT(d_start_time,'%Y-%m-%d') &lt;=  #{oaCalendar.Strdate}
             </if>
             <if test="oaCalendar.Enddate != '' and oaCalendar.Enddate != null">
-                and d_end_time &gt;= #{oaCalendar.Enddate}))
+                and DATE_FORMAT(d_end_time,'%Y-%m-%d') &gt;= #{oaCalendar.Enddate}))
             </if>
             and SUBSTRING_INDEX(s_user_names,',',1) = s.username
         </where>
@@ -254,7 +254,7 @@
     <select id="queryPageList" resultType="com.cfcc.modules.oaBus.entity.oaCalendar">
         select * from oa_calendar INNER  JOIN  sys_user s
         <where>
-            ISNULL(i_fun_data_id)="" and i_is_leader = 0
+            ISNULL(i_fun_data_id)="" and i_is_leader = 0 and task_id is null
             <if test="oaCalendar.sAddress != '' and oaCalendar.sAddress != null">
                 and s_address = #{oaCalendar.sAddress}
             </if>
@@ -265,21 +265,21 @@
                 and i_open_type = #{oaCalendar.iOpenType}
             </if>
             <if test="oaCalendar.date != '' and oaCalendar.date != null">
-                and  (d_start_time &lt;= #{oaCalendar.date} and  d_end_time &gt;= #{oaCalendar.date})
+                and  (DATE_FORMAT(d_start_time,'%Y-%m-%d')  &lt;=  #{oaCalendar.date} and DATE_FORMAT(d_end_time,'%Y-%m-%d') &gt;= #{oaCalendar.date})
             </if>
             <if test="oaCalendar.Strdate != '' and oaCalendar.Strdate != null">
-                and ((  d_start_time &lt;= #{oaCalendar.Strdate}
+                and ((DATE_FORMAT(d_start_time,'%Y-%m-%d') &lt;= #{oaCalendar.Strdate}
             </if>
             <if test="oaCalendar.Enddate != '' and oaCalendar.Enddate != null">
-                and d_end_time &gt;= #{oaCalendar.Enddate}
+                and DATE_FORMAT(d_end_time,'%Y-%m-%d') &gt;= #{oaCalendar.Enddate}
                 )
             </if>
 
             <if test="oaCalendar.Strdate != '' and oaCalendar.Strdate != null">
-                or ( d_start_time &lt;=  #{oaCalendar.Strdate}
+                or ( DATE_FORMAT(d_start_time,'%Y-%m-%d') &lt;=  #{oaCalendar.Strdate}
             </if>
             <if test="oaCalendar.Enddate != '' and oaCalendar.Enddate != null">
-                and d_end_time &gt;= #{oaCalendar.Enddate}))
+                and DATE_FORMAT(d_end_time,'%Y-%m-%d') &gt;= #{oaCalendar.Enddate}))
             </if>
             and SUBSTRING_INDEX(s_user_names,',',1) = s.username
         </where>
@@ -297,21 +297,21 @@
                 and i_open_type = #{oaCalendar.iOpenType}
             </if>
             <if test="oaCalendar.date != '' and oaCalendar.date != null">
-                and  (d_start_time &lt;= #{oaCalendar.date} and  d_end_time &gt;= #{oaCalendar.date})
+                and  (DATE_FORMAT(d_start_time,'%Y-%m-%d')  &lt;=  #{oaCalendar.date} and DATE_FORMAT(d_end_time,'%Y-%m-%d') &gt;= #{oaCalendar.date})
             </if>
             <if test="oaCalendar.Strdate != '' and oaCalendar.Strdate != null">
-                and ((  d_start_time &lt;= #{oaCalendar.Strdate}
+                and ((DATE_FORMAT(d_start_time,'%Y-%m-%d') &lt;= #{oaCalendar.Strdate}
             </if>
             <if test="oaCalendar.Enddate != '' and oaCalendar.Enddate != null">
-                and d_end_time &gt;= #{oaCalendar.Enddate}
+                and DATE_FORMAT(d_end_time,'%Y-%m-%d') &gt;= #{oaCalendar.Enddate}
                 )
             </if>
 
             <if test="oaCalendar.Strdate != '' and oaCalendar.Strdate != null">
-                or ( d_start_time &lt;=  #{oaCalendar.Strdate}
+                or ( DATE_FORMAT(d_start_time,'%Y-%m-%d') &lt;=  #{oaCalendar.Strdate}
             </if>
             <if test="oaCalendar.Enddate != '' and oaCalendar.Enddate != null">
-                and d_end_time &gt;= #{oaCalendar.Enddate}))
+                and DATE_FORMAT(d_end_time,'%Y-%m-%d') &gt;= #{oaCalendar.Enddate}))
             </if>
             and SUBSTRING_INDEX(s_user_names,',',1) = s.username
         </where>
