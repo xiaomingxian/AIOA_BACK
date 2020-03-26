@@ -510,8 +510,9 @@ public class ModifyFieldsController {
 //            fileName = orgName.substring(0, orgName.lastIndexOf(".")) + "_" + System.currentTimeMillis() + orgName.substring(orgName.indexOf("."));
 //            String savePath = file.getPath() + File.separator + fileName;
 //            File savefile = new File(savePath);
+            String oldSave= uploadpath+File.separator+oaFile1.getSFilePath();
             //读取老文件
-            File oldSavefile = new File(oaFile1.getSFilePath());
+            File oldSavefile = new File(oldSave);
 //            if (oldSavefile.exists() && oldSavefile.isFile()){
                 //将savefile改名为oldSavefile
 //            savefile.renameTo(oldSavefile);
