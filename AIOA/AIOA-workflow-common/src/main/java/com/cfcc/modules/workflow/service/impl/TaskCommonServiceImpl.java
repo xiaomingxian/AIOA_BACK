@@ -132,10 +132,26 @@ public class TaskCommonServiceImpl implements TaskCommonService {
     @Override
     public void del(String processInstanceId) {
         //删除表中的数据
-        if (StringUtils.isNotBlank(processInstanceId)) {
+//        if (StringUtils.isNotBlank(processInstanceId)) {
+//        }
+        List<HistoricTaskInstance> list = historyService.createHistoricTaskInstanceQuery().processInstanceId(processInstanceId).list();
+        if (list.size() > 0) {
+            boolean delFlag = false;
+            for (HistoricTaskInstance historicTaskInstance : list) {
+                String deleteReason = historicTaskInstance.getDeleteReason();
+                if (deleteReason == null) {
+                    delFlag = true;
+                    break;
+                }
+            }
+            if (delFlag) {
+                runtimeService.deleteProcessInstance(processInstanceId, "删除流程实例");
+            }
+            historyService.deleteHistoricProcessInstance(processInstanceId);
+            //删除移交/部门等记录
             taskMapper.deleteByprocessInstanceId(processInstanceId);
+
         }
-//        runtimeService.deleteProcessInstance(id, "删除流程实例");
     }
 
     /**
@@ -1127,8 +1143,8 @@ public class TaskCommonServiceImpl implements TaskCommonService {
                 List<BackRecord> backRecords = backRecord(procInstId, table + "_opinion");
                 FileUtils.writeJSONOneLine(backData, backRecords);
                 //4 删除流程相关信息
-                taskMapper.deleteByprocessInstanceId(procInstId);
-
+//                taskMapper.deleteByprocessInstanceId(procInstId);
+                del(procInstId);
             } catch (Exception e) {
                 log.error("-->" + e.getMessage());
             }
