@@ -49,7 +49,7 @@ public class HomeAnalysis {
     private IBusFunctionService iBusFunctionService;
 
     @Autowired
-    private IOaBusdataService oaBusdataService;;
+    private IOaBusdataService oaBusdataService;
 
     @Autowired
     private IBusFunctionPermitService iBusFunctionPermitService;
@@ -69,6 +69,7 @@ public class HomeAnalysis {
         SysUser sysUser = iSysUserService.getById(userId);
         String schema= MycatSchema.getSchema();
         String username = sysUser.getUsername();
+        String realname = sysUser.getRealname();
         SysUserSet sysUserSet = sysUserSetService.findByUserId(sysUser.getId());
         List<BusFunction> busFunctionlList = iBusFunctionService.findList(schema);
         Map<String,Map<String,Object>> map =new HashMap<String,Map<String,Object>>();
@@ -80,17 +81,17 @@ public class HomeAnalysis {
             for (BusFunction busFunction:busFunctionlList) {
                 if( iBus1Id == null ?(modellist.length >0 && StringUtils.equals(busFunction.getIId().toString(),modellist[0])) : busFunction.getIId().equals( iBus1Id ))
                 {
-                    getIdAndSname(busFunction,map,"model1",username,createTime);
+                    getIdAndSname(busFunction,map,"model1",realname,username,createTime);
                 }
                 if( iBus2Id == null ?(modellist.length >1 && StringUtils.equals(busFunction.getIId().toString(),modellist[1])) : busFunction.getIId().equals(iBus2Id))
                 {
-                    getIdAndSname(busFunction,map,"model2",username,createTime);
+                    getIdAndSname(busFunction,map,"model2",realname,username,createTime);
                 }if( iBus3Id == null ?(modellist.length >2 && StringUtils.equals(busFunction.getIId().toString(),modellist[2])) : busFunction.getIId().equals( iBus3Id))
                 {
-                    getIdAndSname(busFunction,map,"model3",username,createTime);
+                    getIdAndSname(busFunction,map,"model3",realname,username,createTime);
                 }if( iBus4Id == null ?(modellist.length >3 && StringUtils.equals(busFunction.getIId().toString(),modellist[3])) : busFunction.getIId().equals(iBus4Id))
                 {
-                    getIdAndSname(busFunction,map,"model4",username,createTime);
+                    getIdAndSname(busFunction,map,"model4",realname,username,createTime);
                 }
             }
         }else{
@@ -101,17 +102,17 @@ public class HomeAnalysis {
           for (BusFunction busFunction:busFunctionlList) {
               if( iBus1Id == null ?(modellist.length >0 && StringUtils.equals(busFunction.getIId().toString(),modellist[0])) : busFunction.getIId().equals( iBus1Id ))
               {
-                  getIdAndSname(busFunction,map,"model1",username,createTime);
+                  getIdAndSname(busFunction,map,"model1",realname,username,createTime);
               }
               if( iBus2Id == null ?(modellist.length >1 && StringUtils.equals(busFunction.getIId().toString(),modellist[1])) : busFunction.getIId().equals(iBus2Id))
               {
-                  getIdAndSname(busFunction,map,"model2",username,createTime);
+                  getIdAndSname(busFunction,map,"model2",realname,username,createTime);
               }if( iBus3Id == null ?(modellist.length >2 && StringUtils.equals(busFunction.getIId().toString(),modellist[2])) : busFunction.getIId().equals( iBus3Id))
               {
-                  getIdAndSname(busFunction,map,"model3",username,createTime);
+                  getIdAndSname(busFunction,map,"model3",realname,username,createTime);
               }if( iBus4Id == null ?(modellist.length >3 && StringUtils.equals(busFunction.getIId().toString(),modellist[3])) : busFunction.getIId().equals(iBus4Id))
               {
-                  getIdAndSname(busFunction,map,"model4",username,createTime);
+                  getIdAndSname(busFunction,map,"model4",realname,username,createTime);
               }
         }
     }
@@ -119,7 +120,7 @@ public class HomeAnalysis {
         return map;
     }
     //获取
-    private void getIdAndSname(BusFunction busFunction , Map<String,Map<String,Object>> map , String str ,String username,String createTime){
+    private void getIdAndSname(BusFunction busFunction , Map<String,Map<String,Object>> map , String str ,String realname,String username,String createTime){
         Map<String,Object> busMap = new HashMap<>();
         BusFunction function = iBusFunctionService.getById(busFunction.getIId());
             List<Map<String, Object>> oaList = new ArrayList<>() ;
@@ -137,7 +138,7 @@ public class HomeAnalysis {
             strBuf.append(busFunction.getIId()) ;
             strBuf.append(",\"d_create_time\":\"" + createTime + "\"") ;
             strBuf.append("}} ") ;
-            Result<IPage<Map<String, Object>>> byModelId = oaBusdataService.getByModelId(strBuf.toString(), username, username);
+            Result<IPage<Map<String, Object>>> byModelId = oaBusdataService.getByModelId(strBuf.toString(), realname, username);
             log.info(byModelId.toString());
             if (byModelId!=null && byModelId.getResult()!=null) {
             List<Map<String, Object>> oaList1 = byModelId.getResult().getRecords() ;
