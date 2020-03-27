@@ -15,6 +15,8 @@
         <version>1.0.0</version>
     </parent>
     <!--打包流程-->
+    <!--#    active: prod-->
+
     <!--如果要部署到tomcat下注释掉WebSocketConfig下的Bean生成方式-->
     <!--1放开或打开本页提示注释-->
     <!--2maven视图下AIOA下clean-->

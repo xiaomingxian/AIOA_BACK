@@ -471,8 +471,8 @@ public class SysUserController {
     /**
      * 导出excel
      *
+     * @param sysUser
      * @param request
-     * @param response
      */
     @RequestMapping(value = "/exportXls")
     public ModelAndView exportXls(SysUser sysUser, HttpServletRequest request) {
