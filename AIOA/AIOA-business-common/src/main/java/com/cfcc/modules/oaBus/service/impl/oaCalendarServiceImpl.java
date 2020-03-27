@@ -62,12 +62,12 @@ public class oaCalendarServiceImpl extends ServiceImpl<oaCalendarMapper, oaCalen
     public oaCalendar findById(Integer iId) {
         oaCalendar oaCalendar = oaCalendarMapper.findById(iId);
         String[] UserIdList = oaCalendar.getSUserNames().split(",");
-        Set<Integer> set = new HashSet<>() ;
+        Set<String> set = new HashSet<>() ;
         for (int j = 0; j <UserIdList.length; j++) {
             SysUser sysUser =  sysUserMapper.getUserByName(UserIdList[j]);
             if(! (sysUser == null)){
                 String Id = sysUser.getId(); //取id
-                set.add(Integer.valueOf(Id));
+                set.add(Id);
             }
         }
         oaCalendar.setSUserNameid(set);
