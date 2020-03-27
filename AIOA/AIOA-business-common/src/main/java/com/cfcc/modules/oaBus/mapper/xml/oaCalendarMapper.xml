@@ -64,7 +64,7 @@
     <select id="countIsLeader" resultType="java.lang.Integer">
         select count(*) from oa_calendar
         <where>
-            ISNULL(i_fun_data_id)="" and i_is_leader = 1 and task_id is null
+            ISNULL(i_fun_data_id)="" and i_is_leader = 1 and i_is_state = 0
             <if test="sAddress != '' and sAddress != null">
                 and s_address = #{sAddress}
             </if>
@@ -91,7 +91,7 @@
     <select id="countIsNoLeader" resultType="java.lang.Integer">
         select count(*) from oa_calendar
         <where>
-            ISNULL(i_fun_data_id)="" and i_is_leader = 0 and task_id is null
+            ISNULL(i_fun_data_id)="" and i_is_leader = 0 and i_is_state = 0
             <if test="sAddress != '' and sAddress != null">
                 and s_address = #{sAddress}
             </if>
@@ -120,7 +120,7 @@
     <select id="count" resultType="java.lang.Integer">
         select count(*) from oa_calendar
         <where>
-            ISNULL(i_fun_data_id)="" and task_id is null
+            ISNULL(i_fun_data_id)="" and i_is_state = 0
             <if test="sAddress != '' and sAddress != null">
                 and s_address = #{sAddress}
             </if>
@@ -148,7 +148,7 @@
     <select id="findPage" resultType="com.cfcc.modules.oaBus.entity.oaCalendar">
         select * from oa_calendar INNER  JOIN  sys_user s
         <where>
-            ISNULL(i_fun_data_id)=""  and task_id is null
+            ISNULL(i_fun_data_id)=""  and i_is_state = 0
             <if test="oaCalendar.username != '' and oaCalendar.username != null">
                 and s_create_by = #{oaCalendar.username}
             </if>
@@ -186,7 +186,7 @@
     <select id="countIsWait" resultType="java.lang.Integer">
         select count(*) from oa_calendar
         <where>
-            i_fun_data_id is not NULL and i_is_state = 1 and task_id is null
+            i_fun_data_id is not NULL and i_is_state = 1 and i_is_state = 0
             <if test="sAddress != '' and sAddress != null">
                 and s_address = #{sAddress}
             </if>
@@ -215,7 +215,7 @@
     <select id="findByLeader" resultType="com.cfcc.modules.oaBus.entity.oaCalendar">
         select * from oa_calendar INNER  JOIN  sys_user s
         <where>
-            ISNULL(i_fun_data_id)="" and i_is_leader = 1 and task_id is null
+            ISNULL(i_fun_data_id)="" and i_is_leader = 1 and i_is_state = 0
 
             <if test="oaCalendar.sAddress != '' and oaCalendar.sAddress != null">
                 and s_address = #{oaCalendar.sAddress}
