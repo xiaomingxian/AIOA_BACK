@@ -16,6 +16,7 @@ import com.cfcc.modules.system.service.ISysUserService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
+import org.activiti.engine.form.FormData;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -28,6 +29,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.File;
 import java.io.IOException;
+import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.util.*;
 
@@ -291,6 +293,13 @@ public class ModifyFieldsController {
                 return result.error("请确实数据的完整性！！！");
             }
             Map<String, Object> formData =(Map<String, Object>) map.get("formData");
+
+
+            SimpleDateFormat formatter=new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+            if(map.containsKey("d_sealdate") &&map.get("d_sealdate")!=null){
+                Date date=formatter.parse(map.get("d_sealdate").toString());
+                formData.put("d_sealdate",date);
+            }
             if(map.containsKey("tableName") && formData.containsKey("i_id")){
                 formData.put("tableName",map.get("tableName"));
                 int data = oaBusdataService.updateAllOaData(formData);
