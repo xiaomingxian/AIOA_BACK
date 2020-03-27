@@ -26,12 +26,7 @@
     <dependencies>
         <dependency>
             <groupId>org.cfcc.framework.boot</groupId>
-            <artifactId>AIOA-template-common</artifactId>
-            <version>1.0.0</version>
-        </dependency>
-        <dependency>
-            <groupId>org.cfcc.framework.boot</groupId>
-            <artifactId>AIOA-workflow-common</artifactId>
+            <artifactId>AIOA-app-common</artifactId>
             <version>1.0.0</version>
         </dependency>
     </dependencies>
