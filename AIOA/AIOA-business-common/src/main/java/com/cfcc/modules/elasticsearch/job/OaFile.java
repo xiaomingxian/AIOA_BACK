@@ -26,7 +26,6 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
-import java.text.SimpleDateFormat;
 import java.util.*;
 
 @Slf4j
@@ -141,21 +140,30 @@ public class OaFile implements Job {
                     Iterator<Map<String, Object>> iterator = oaBusdataList.iterator();
                     while (iterator.hasNext()) {
                         Map<String, Object> map = iterator.next();
-
                         if (map.get("d_create_time") != null) {
-                            SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-                            long lt = new Long(map.get("d_create_time") + "");
-                            Date date = new Date(lt);
-                            String res = simpleDateFormat.format(date);
-                            map.put("d_create_time", "创建时间：" + res);
+                            String dCreateTime = map.get("d_create_time")+"";
+                            String time = dCreateTime.substring(0,dCreateTime.lastIndexOf("."));
+                            map.put("d_create_time",  time);
                         }
                         if (map.get("d_update_time") != null) {
-                            SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-                            long lt = new Long(map.get("d_update_time") + "");
-                            Date date = new Date(lt);
-                            String res = simpleDateFormat.format(date);
-                            map.put("d_update_time", "修改时间：" + res);
+                            String dCreateTime = map.get("d_update_time")+"";
+                            String time = dCreateTime.substring(0,dCreateTime.lastIndexOf("."));
+                            map.put("d_update_time", time);
                         }
+                        if (map.get("d_datetime1") != null) {
+                            String dCreateTime = map.get("d_datetime1")+"";
+                            String time = dCreateTime.substring(0,dCreateTime.lastIndexOf("."));
+                            map.put("d_datetime1", time);
+                        }
+                        if (map.get("d_datetime2") != null) {
+                            String dCreateTime = map.get("d_datetime2")+"";
+                            String time = dCreateTime.substring(0,dCreateTime.lastIndexOf("."));
+                            map.put("d_datetime2", time);
+                        }
+                    }
+
+                    for (Map<String, Object> map : oaBusdataList) {
+
                         String json = JSON.toJSONString(map);
                         RestStatus restStatus = searchService.saveOrUpdate(json, map.get("table_name").toString() + map.get("i_id").toString(), indexName, indexType);
                         Integer res = restStatus.getStatus();
@@ -291,7 +299,7 @@ public class OaFile implements Job {
 //                                String res = simpleDateFormat.format(date);
                                 String dCreateTime = map.get("d_create_time")+"";
                                 String time = dCreateTime.substring(0,dCreateTime.lastIndexOf("."));
-                                map.put("d_create_time", time);
+                                map.put("d_create_time", "创建时间：" + time);
                             }
                             if (map.get("d_update_time") != null) {
 //                                SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
