@@ -16,10 +16,11 @@
 
     <modules>
         <module>AIOA-base-common</module>
-        <module>AIOA-module-system</module>
         <module>AIOA-workflow-common</module>
-        <module>AIOA-template-common</module>
         <module>AIOA-business-common</module>
+        <module>AIOA-template-common</module>
+        <module>AIOA-app-common</module>
+        <module>AIOA-module-system</module>
     </modules>
 
     <properties>
