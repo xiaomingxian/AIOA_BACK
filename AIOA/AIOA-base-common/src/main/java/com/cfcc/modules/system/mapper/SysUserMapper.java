@@ -308,5 +308,5 @@ public interface SysUserMapper extends BaseMapper<SysUser> {
     void deleteUserById(@Param("id") String id);
 
 
-
+    SysUser getUserById(@Param("id") String id);
 }
