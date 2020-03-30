@@ -178,4 +178,6 @@ public interface ISysUserService extends IService<SysUser> {
 	List<Map<String, Object>> deptUserChoice(String id);
 
     Map<String, SysUser> selectUsersByUids(List<String> allUserIds);
+
+	SysUser getUserById(String id);
 }

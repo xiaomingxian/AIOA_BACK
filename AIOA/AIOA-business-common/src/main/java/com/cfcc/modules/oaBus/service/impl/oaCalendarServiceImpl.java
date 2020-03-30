@@ -152,11 +152,11 @@ public class oaCalendarServiceImpl extends ServiceImpl<oaCalendarMapper, oaCalen
 
 
 
-    @Override
+   /* @Override
     public List<SysUser> getByShowOrder(int showOrder) {
         return oaCalendarMapper.getByShowOrder(showOrder);
     }
-
+*/
     @Override
     public IPage<oaCalendar> findWait(Integer pageNo, Integer pageSize, oaCalendar oaCalendar) {
         int total = oaCalendarMapper.countIsWait(oaCalendar);
@@ -221,19 +221,14 @@ public class oaCalendarServiceImpl extends ServiceImpl<oaCalendarMapper, oaCalen
 
     }
 
-    @Override
+  /*  @Override
     public List<Map<String, Object>>  LinkList(HttpServletRequest request)  {
         LoginInfo loginInfo = userService.getLoginInfo(request);
         String sCreateBy = loginInfo.getId();
         List<Map<String, Object>> list = oaCalendarMapper.LinkList(sCreateBy);
-        for(int i=0;i< list.size();i++){
-            String id = list.get(i).get("i_id").toString();
-            //String url = oaCalendarMapper.selectUrl(Integer.parseInt(id));
-            //list.get(i).put("url",url);
-        }
         return list;
     }
-
+*/
     @Override
     public oaCalendar findByTaskUserId(String taskUserId) {
         return oaCalendarMapper.findByTaskUserId(taskUserId);

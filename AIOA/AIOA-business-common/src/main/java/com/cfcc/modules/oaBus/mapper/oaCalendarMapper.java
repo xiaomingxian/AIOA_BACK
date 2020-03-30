@@ -6,6 +6,7 @@ import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.cfcc.modules.system.entity.SysUser;
 import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Select;
+import org.apache.ibatis.annotations.Update;
 import org.springframework.security.core.parameters.P;
 
 import javax.xml.crypto.Data;
@@ -61,8 +62,6 @@ public interface oaCalendarMapper extends BaseMapper<oaCalendar> {
 
     Map<String, Object> findMostUser(String id);
 
-
-
     String selectPath(int id);
 
     List<Map<String, Object>>  LinkList(String sCreateBy);
@@ -72,5 +71,8 @@ public interface oaCalendarMapper extends BaseMapper<oaCalendar> {
     String selectName(int parseInt);
 
     oaCalendar findByTaskUserId(String taskUserId);
+
+    @Update(" UPDATE oa_calendar set i_is_state=2 where task_user_id=#{v} ")
+    void updateByTaskUserId(String s);
 
 }

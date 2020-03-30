@@ -10,12 +10,13 @@ import com.cfcc.common.aspect.annotation.AutoLog;
 import com.cfcc.common.system.query.QueryGenerator;
 import com.cfcc.common.system.util.JwtUtil;
 import com.cfcc.common.util.DateUtils;
-import com.cfcc.common.util.RedisUtil;
 import com.cfcc.common.util.oConvertUtils;
 import com.cfcc.modules.oaBus.entity.BusFunction;
 import com.cfcc.modules.oaBus.entity.oaCalendar;
+import com.cfcc.modules.oaBus.service.IOaBusdataService;
 import com.cfcc.modules.oaBus.service.IoaCalendarService;
 import com.cfcc.modules.shiro.vo.DefContants;
+import com.cfcc.modules.system.entity.LoginInfo;
 import com.cfcc.modules.system.entity.SysUser;
 import com.cfcc.modules.system.service.ISysUserService;
 import com.cfcc.modules.workflow.pojo.TaskInfoJsonAble;
@@ -66,6 +67,9 @@ public class oaCalendarController implements Job {
 
     @Autowired
     private TaskCommonService taskCommonService;
+
+    @Autowired
+    private IOaBusdataService oaBusdataService;;
 
 
     /**
@@ -274,12 +278,35 @@ public class oaCalendarController implements Job {
      * 查出常用链接
      *
      */
-    @AutoLog(value = "日程管理表-分页列表查询")
+    @AutoLog(value = "常用链接")
     @ApiOperation(value = "日程管理表-分页列表查询", notes = "日程管理表-分页列表查询")
     @PostMapping(value = "LinkList")
     public List<Map<String, Object>> LinkList(HttpServletRequest request) {
-        List<Map<String, Object>> linklist = oaCalendarService.LinkList(request);
-        return linklist;
+        List<Map<String, Object>> oaList1 = new ArrayList<>();
+        StringBuffer strBuf = new StringBuffer("") ;
+        //查询当前用户，作为assignee
+        LoginInfo loginInfo = sysUserService.getLoginInfo(request);
+        String realname = loginInfo.getRealname();
+        String username = loginInfo.getUsername();
+
+        /*{"modelId":"1","condition":{"function_id":"","i_is_state":"","selType":1,"s_create_name":"","d_create_time":""}}*/
+        strBuf.append("{\"modelId\":");
+        strBuf.append(49) ;
+        strBuf.append(",\"pageSize\":");
+        strBuf.append(10);
+        strBuf.append(",\"pageNo\":");
+        strBuf.append(1);
+        strBuf.append(",\"condition\":{") ;
+        strBuf.append("\"function_id\":") ;
+        strBuf.append(107) ;
+        strBuf.append("}} ") ;
+        Result<IPage<Map<String, Object>>> byModelId = oaBusdataService.getByModelId(strBuf.toString(), realname, username);
+        log.info(byModelId.toString());
+        if (byModelId!=null && byModelId.getResult()!=null) {
+            oaList1 = byModelId.getResult().getRecords() ;
+
+        }
+        return oaList1;
     }
 
     /**
@@ -329,6 +356,8 @@ public class oaCalendarController implements Job {
                 oaCalendar.setIOpenType(0);
             }
             oaCalendar.setIFunDataId(1);
+            String s = UUID.randomUUID().toString().replace("-", "");
+            oaCalendar.setTaskUserId(s);
             oaCalendarService.saveCalendar(oaCalendar);
             result.success("添加成功！");
         } catch (Exception e) {

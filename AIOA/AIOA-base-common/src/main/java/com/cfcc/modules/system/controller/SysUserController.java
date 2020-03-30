@@ -188,18 +188,20 @@ public class SysUserController {
         Result<SysUser> result = new Result<SysUser>();
         // 定义SysUserDepart实体类的数据库查询LambdaQueryWrapper
         LambdaQueryWrapper<SysUserDepart> query = new LambdaQueryWrapper<SysUserDepart>();
-        SysUser sysUser = sysUserService.getById(id);
+        SysUser sysUser = sysUserService.getUserById(id);
+//        SysUser sysUser = sysUserService.getById(id);
         sysBaseAPI.addLog("删除用户，id： " + id, CommonConstant.LOG_TYPE_2, 3);
         if (sysUser == null) {
             result.error500("未找到对应实体");
         } else {
             // 当某个用户被删除时,删除其ID下对应的部门数据
             query.eq(SysUserDepart::getUserId, id);
-            boolean ok = sysUserService.removeById(id);
+            sysUserService.deleteUserById(id);
+//            boolean ok = sysUserService.removeById(id);
             sysUserDepartService.remove(query);
-            if (ok) {
+//            if (ok) {
                 result.success("删除成功!");
-            }
+//            }
         }
 
         return result;

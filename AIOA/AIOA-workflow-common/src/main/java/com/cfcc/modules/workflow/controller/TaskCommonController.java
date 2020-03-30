@@ -73,6 +73,13 @@ public class TaskCommonController {
     }
 
 
+    @GetMapping("updateTaskStatus")
+    @NoRepeatSubmit
+    public void updateTaskStatus(String taskId) {
+        taskCommonService.updateTaskStatus(taskId,"done");
+    }
+
+
     @GetMapping("currentUserTodos")
     public Result currentUserTodos(String processInstanceId, HttpServletRequest request) {
 

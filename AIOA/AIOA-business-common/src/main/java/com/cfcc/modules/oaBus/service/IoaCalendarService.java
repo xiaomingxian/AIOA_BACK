@@ -39,8 +39,7 @@ public interface IoaCalendarService extends IService<oaCalendar> {
 
     oaCalendar getByIid(String id);
 
-
-    List<SysUser> getByShowOrder(int showOrder);
+    //List<SysUser> getByShowOrder(int showOrder);
 
     IPage<oaCalendar> findWait(Integer pageNo, Integer pageSize, oaCalendar oaCalendar);
 
@@ -48,15 +47,13 @@ public interface IoaCalendarService extends IService<oaCalendar> {
 
     String getDepartId(String id);
 
-
     List<String> getDepartIdList(String userNameId);
 
     List<BusFunction> busFunctionList();
 
     void MostUserLink(HttpServletResponse response, HttpServletRequest request,String id, String resourceType) throws IOException;
 
-    List<Map<String, Object>>  LinkList(HttpServletRequest request) ;
-
+   // List<Map<String, Object>>  LinkList(HttpServletRequest request) ;
 
     oaCalendar findByTaskUserId(String taskUserId);
 

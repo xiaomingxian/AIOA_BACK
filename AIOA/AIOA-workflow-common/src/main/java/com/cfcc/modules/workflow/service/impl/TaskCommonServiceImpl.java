@@ -58,6 +58,8 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.context.request.RequestContextHolder;
+import org.springframework.web.context.request.ServletRequestAttributes;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -1153,6 +1155,11 @@ public class TaskCommonServiceImpl implements TaskCommonService {
 
     }
 
+    @Override
+    public void updateTaskStatus(String taskId,String desc) {
+        taskMapper.updateTaskStatus(taskId,desc);
+    }
+
 
     private String nextActMore(List<TaskInfoVO> taskInfoVOs, Task task) {
         String processInstanceId = task.getProcessInstanceId();
@@ -1161,6 +1168,14 @@ public class TaskCommonServiceImpl implements TaskCommonService {
         if (list.size() == 0) {
             //任务已经完成
             nextTaskMsg.append("end").append("-'").append("已结束");
+            HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder.getRequestAttributes()).getRequest();
+            HttpServletResponse response = ((ServletRequestAttributes) RequestContextHolder.getRequestAttributes()).getResponse();
+            Map<String, Object> busData = taskInfoVOs.get(0).getBusData();
+            String table = busData.get("table") == null ? null : busData.get("table").toString();
+            String id = busData.get("i_id") == null ? null : busData.get("i_id").toString();
+            if (StringUtils.isNotBlank(table)&&StringUtils.isNotBlank(id)){
+                afterDoTask(table,id,request,response);
+            }
         } else {
 
             ArrayList<String> next = new ArrayList<>();
@@ -1349,6 +1364,16 @@ public class TaskCommonServiceImpl implements TaskCommonService {
             nextTaskMsg.append("end").append("-'").append("已结束");
             //清空此流程的部门记录信息
 //            taskMapper.deleteDeptByProcessInstceId(processInstanceId);
+            //办结后写信息
+            HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder.getRequestAttributes()).getRequest();
+            HttpServletResponse response = ((ServletRequestAttributes) RequestContextHolder.getRequestAttributes()).getResponse();
+            Map<String, Object> busData = taskInfoVO.getBusData();
+            String table = busData.get("table") == null ? null : busData.get("table").toString();
+            String id = busData.get("i_id") == null ? null : busData.get("i_id").toString();
+            if (StringUtils.isNotBlank(table)&&StringUtils.isNotBlank(id)){
+                afterDoTask(table,id,request,response);
+            }
+
         } else {
             //
             String taskKey = list.get(0).getTaskDefinitionKey();
