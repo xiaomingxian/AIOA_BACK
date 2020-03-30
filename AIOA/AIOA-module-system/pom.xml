@@ -19,8 +19,8 @@
     <!--1放开或打开本页提示注释-->
     <!--2maven视图下AIOA下clean-->
     <!--3maven视图下AIOA下install-->
-    <!--4maven视图下AIOA-module-system下package-->
-    <!--5activit包需要替换 详情参考 AIOA-module-system/src/main/resources/doc/activiti部署替换包-->
+    <!--4替换maven仓库中的activiti包 详情参考 AIOA-module-system/src/main/resources/doc/activiti部署替换包-->
+    <!--5maven视图下AIOA-module-system下package-->
     <dependencies>
         <dependency>
             <groupId>org.cfcc.framework.boot</groupId>
