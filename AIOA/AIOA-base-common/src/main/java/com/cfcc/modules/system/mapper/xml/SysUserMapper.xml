@@ -200,5 +200,8 @@
         WHERE
             username = #{username}
     </select>
+    <select id="getUserById" resultType="com.cfcc.modules.system.entity.SysUser">
+        SELECT * FROM sys_user WHERE id = #{id}
+    </select>
 
 </mapper>

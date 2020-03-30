@@ -405,6 +405,11 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser> impl
     }
 
     @Override
+    public SysUser getUserById(String id) {
+        return sysUserMapper.getUserById(id);
+    }
+
+    @Override
     public Map<String, Object> getAllUserMsg(String username) {
 
 
