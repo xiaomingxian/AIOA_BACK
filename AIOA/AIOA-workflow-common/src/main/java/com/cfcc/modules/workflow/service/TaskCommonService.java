@@ -109,4 +109,6 @@ public interface TaskCommonService {
     boolean someActFore(JumpMsg jumpMsg);
 
     void afterDoTask(String table, String id, HttpServletRequest request, HttpServletResponse response);
+
+    void updateTaskStatus(String taskId,String desc);
 }

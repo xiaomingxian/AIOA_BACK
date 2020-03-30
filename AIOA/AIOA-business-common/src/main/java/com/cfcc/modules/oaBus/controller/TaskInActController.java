@@ -693,6 +693,7 @@ public class TaskInActController {
     @ApiOperation("任务办理")
     @NoRepeatSubmit
     public Result doTask(@RequestBody TaskInfoVO taskInfoVO, HttpServletRequest request) {
+        String taskId = taskInfoVO.getTaskId();
         try {
             //流程与业务相关数据
             SysUser user = sysUserService.getCurrentUser(request);
@@ -703,8 +704,10 @@ public class TaskInActController {
             taskInActService.doTask(taskInfoVO, request);
             return Result.ok("任务办理成功");
         } catch (AIOAException e) {
+            taskCommonService.updateTaskStatus(taskId, null);
             return Result.error(e.getMessage());
         } catch (Exception e) {
+            taskCommonService.updateTaskStatus(taskId, null);
             e.printStackTrace();
             log.error("办理任务失败" + e.toString());
             return Result.error("办理任务失败");
@@ -777,6 +780,7 @@ public class TaskInActController {
     @ApiOperation("任务办理并行/包容网关")
     @NoRepeatSubmit
     public Result doTaskMore(@RequestBody Map<String, Object> map, HttpServletRequest request) {
+        String taskId = null;
         try {
             LoginInfo loginInfo = sysUserService.getLoginInfo(request);
             List<Map<String, Object>> taskInfoVOs = (List<Map<String, Object>>) map.get("list");
@@ -795,13 +799,20 @@ public class TaskInActController {
                 taskInfoVOS.get(0).setBusData(busData);
                 busDataSet(taskInfoVOS.get(0));
 
+                taskId = taskInfoVOS.get(0).getTaskId();
+
 
                 taskInActService.doTaskMore(taskInfoVOS, request);
             } else {
+                taskCommonService.updateTaskStatus(taskId, null);
                 return Result.error("信息不完善,拒绝办理");
             }
             return Result.ok("任务办理成功");
+        } catch (AIOAException e) {
+            taskCommonService.updateTaskStatus(taskId, null);
+            return Result.error(e.getMessage());
         } catch (Exception e) {
+            taskCommonService.updateTaskStatus(taskId, null);
             e.printStackTrace();
             log.error("办理任务失败" + e.toString());
             return Result.error("办理任务失败");

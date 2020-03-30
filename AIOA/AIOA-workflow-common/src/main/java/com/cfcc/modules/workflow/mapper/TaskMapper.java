@@ -254,4 +254,6 @@ public interface TaskMapper {
 
     @Select("SELECT COUNT(task_id)>0 FROM oa_task_dept  where task_id=#{taskId} and task_def_key=#{taskDefKey}")
     boolean isDeptTask(@Param("taskId") String taskId,@Param("taskDefKey") String taskDefKey);
+
+    void updateTaskStatus(@Param("id") String taskId ,@Param("desc") String desc);
 }
