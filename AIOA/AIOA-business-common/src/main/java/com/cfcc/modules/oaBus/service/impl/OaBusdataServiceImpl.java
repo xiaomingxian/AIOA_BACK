@@ -172,10 +172,10 @@ public class OaBusdataServiceImpl extends ServiceImpl<OaBusdataMapper, OaBusdata
     }
 
     @Override
-    public Map<String, Object> getSqlCodeDictAllSelect(List<BusPageDetail> busPageDetailList) {
+    public Map<String, Object> getSqlCodeDictAllSelect(List<BusPageDetail> busPageDetailList,LoginInfo loginInfo) {
         Map<String, Object> optionMap = new TreeMap<>();
         Map<String, String> map = new TreeMap<>();
-        return selOptionByDtailList(optionMap, map, busPageDetailList, null);
+        return selOptionByDtailList(optionMap, map, busPageDetailList, loginInfo.getDepart().getId(), loginInfo.getDepart().getId(), loginInfo.getId());
     }
 
     /**
@@ -430,7 +430,7 @@ public class OaBusdataServiceImpl extends ServiceImpl<OaBusdataMapper, OaBusdata
         Map<String, Object> optionMap = new HashMap<>();
         //存放校验规则,字典数据，detail数据
         long aaa = System.currentTimeMillis();
-        optionMap = selOptionByDtailList(optionMap, map, busPageDetailList, loginInfo.getDepart().getId());
+        optionMap = selOptionByDtailList(optionMap, map, busPageDetailList, loginInfo.getDepart().getId(),loginInfo.getId(),loginInfo.getDepart().getParentId());
         result.put("optionMap", optionMap);
         log.info(map.toString());
         long bbb = System.currentTimeMillis();
@@ -741,11 +741,13 @@ public class OaBusdataServiceImpl extends ServiceImpl<OaBusdataMapper, OaBusdata
      * @param optionMap
      * @param map
      * @param busPageDetailList
+     * @param unitId
+     * @param userId
      * @return
      */
     private Map<String, Object> selOptionByDtailList(Map<String, Object> optionMap,
                                                      Map<String, String> map,
-                                                     List<BusPageDetail> busPageDetailList, String departId) {
+                                                     List<BusPageDetail> busPageDetailList, String departId, String unitId, String userId) {
         List<BusPageDetail> checkList = new ArrayList<>();
         //查询出对应的下拉列表数据
         long aaa = System.currentTimeMillis();
@@ -763,7 +765,7 @@ public class OaBusdataServiceImpl extends ServiceImpl<OaBusdataMapper, OaBusdata
             else if (entry.getSDictSqlKey() != null && !"".equals(entry.getSDictSqlKey())) {
                 SysDictItem itemByCode = sysDictService.getDictItemByCode("sql", entry.getSDictSqlKey());
                 if (itemByCode != null || !"".equals(itemByCode)) {
-                    List<DictModel> dictMOdelList = sysDictService.getSqlValue(itemByCode.getDescription());
+                    List<DictModel> dictMOdelList = sysDictService.getSqlValue(itemByCode.getDescription(),unitId,departId,unitId);
                     optionMap.put(entry.getSTableColumn() + "_option", dictMOdelList);
                 }
             }
