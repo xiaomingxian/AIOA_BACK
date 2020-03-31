@@ -125,8 +125,16 @@ public class oaTeamworkSetController {
 			oaTeamworkSet.setSCreateBy(UserId);
 			oaTeamworkSet.setSCreateDeptid(DepartId);
 			oaTeamworkSet.setSCreateUnitid(parentId);
-			oaTeamworkSetService.insert(oaTeamworkSet);
-			result.success("添加成功！");
+			List<Integer> orderlist = oaTeamworkSetService.findorder();
+			if(orderlist != null){
+				if(orderlist.contains(oaTeamworkSet.getIOrder())){
+					result.error500("序号不能重复");
+				}else{
+					oaTeamworkSetService.insert(oaTeamworkSet);
+					result.success("添加成功！");
+				}
+			}
+
 		} catch (Exception e) {
 			log.error(e.getMessage(),e);
 			result.error500("操作失败");

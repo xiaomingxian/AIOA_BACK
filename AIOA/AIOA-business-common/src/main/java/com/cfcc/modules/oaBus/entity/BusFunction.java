@@ -152,4 +152,7 @@ public class BusFunction implements Serializable {
     @TableField(exist = false)
     private String unitId;
 
+    @TableField(exist = false)
+    private String busModelName;
+
 }
