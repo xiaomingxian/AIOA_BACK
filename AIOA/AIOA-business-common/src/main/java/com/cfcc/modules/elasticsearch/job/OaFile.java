@@ -141,25 +141,35 @@ public class OaFile implements Job {
                     Iterator<Map<String, Object>> iterator = oaBusdataList.iterator();
                     while (iterator.hasNext()) {
                         Map<String, Object> map = iterator.next();
-                        if (map.get("d_create_time") != null) {
+                        SimpleDateFormat dateFormat1 = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+                        SimpleDateFormat dateFormat2 = new SimpleDateFormat("yyyy年MM月dd日 HH时mm分ss秒");
+                        if (map.get("d_create_time") != null && map.get("d_create_time") != "") {
                             String dCreateTime = map.get("d_create_time")+"";
                             String time = dCreateTime.substring(0,dCreateTime.lastIndexOf("."));
-                            map.put("d_create_time",  time);
+                            Date parse = dateFormat1.parse(time);
+                            String format = dateFormat2.format(parse);
+                            map.put("d_create_time", format);
                         }
-                        if (map.get("d_update_time") != null) {
+                        if (map.get("d_update_time") != null && map.get("d_update_time") != "") {
                             String dCreateTime = map.get("d_update_time")+"";
                             String time = dCreateTime.substring(0,dCreateTime.lastIndexOf("."));
-                            map.put("d_update_time", time);
+                            Date parse = dateFormat1.parse(time);
+                            String format = dateFormat2.format(parse);
+                            map.put("d_update_time", format);
                         }
-                        if (map.get("d_datetime1") != null) {
+                        if (map.get("d_datetime1") != null && map.get("d_datetime1") != "") {
                             String dCreateTime = map.get("d_datetime1")+"";
                             String time = dCreateTime.substring(0,dCreateTime.lastIndexOf("."));
-                            map.put("d_datetime1", time);
+                            Date parse = dateFormat1.parse(time);
+                            String format = dateFormat2.format(parse);
+                            map.put("d_datetime1", format);
                         }
-                        if (map.get("d_datetime2") != null) {
+                        if (map.get("d_datetime2") != null && map.get("d_datetime2") != "") {
                             String dCreateTime = map.get("d_datetime2")+"";
                             String time = dCreateTime.substring(0,dCreateTime.lastIndexOf("."));
-                            map.put("d_datetime2", time);
+                            Date parse = dateFormat1.parse(time);
+                            String format = dateFormat2.format(parse);
+                            map.put("d_datetime2", format);
                         }
                     }
 
