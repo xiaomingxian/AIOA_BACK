@@ -293,37 +293,21 @@ public class OaFile implements Job {
                         while (iterator.hasNext()) {
                             Map<String, Object> map = iterator.next();
                             if (map.get("d_create_time") != null) {
-//                                SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-//                                long lt = new Long(map.get("d_create_time") + "");
-//                                Date date = new Date(lt);
-//                                String res = simpleDateFormat.format(date);
                                 String dCreateTime = map.get("d_create_time")+"";
                                 String time = dCreateTime.substring(0,dCreateTime.lastIndexOf("."));
                                 map.put("d_create_time", "创建时间：" + time);
                             }
                             if (map.get("d_update_time") != null) {
-//                                SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-//                                long lt = new Long(map.get("d_update_time") + "");
-//                                Date date = new Date(lt);
-//                                String res = simpleDateFormat.format(date);
                                 String dCreateTime = map.get("d_update_time")+"";
                                 String time = dCreateTime.substring(0,dCreateTime.lastIndexOf("."));
                                 map.put("d_update_time", time);
                             }
                             if (map.get("d_datetime1") != null) {
-//                                SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-//                                long lt = new Long(map.get("d_update_time") + "");
-//                                Date date = new Date(lt);
-//                                String res = simpleDateFormat.format(date);
                                 String dCreateTime = map.get("d_datetime1")+"";
                                 String time = dCreateTime.substring(0,dCreateTime.lastIndexOf("."));
                                 map.put("d_datetime1", time);
                             }
                             if (map.get("d_datetime2") != null) {
-//                                SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-//                                long lt = new Long(map.get("d_update_time") + "");
-//                                Date date = new Date(lt);
-//                                String res = simpleDateFormat.format(date);
                                 String dCreateTime = map.get("d_datetime2")+"";
                                 String time = dCreateTime.substring(0,dCreateTime.lastIndexOf("."));
                                 map.put("d_datetime2", time);
@@ -399,7 +383,6 @@ public class OaFile implements Job {
                         e.printStackTrace();
                     }
                 }
-//                System.out.println("------------------------------------------");
             }
         }
     }
