@@ -36,7 +36,7 @@ public interface IOaBusdataService  extends  IService<OaBusdata>{
 
     List<Map> selectByTable(String table, String cols);
     //获取数据字典，sql字典所有数据
-    Map<String, Object> getSqlCodeDictAllSelect(List<BusPageDetail> busPageDetailList);
+    Map<String, Object> getSqlCodeDictAllSelect(List<BusPageDetail> busPageDetailList,LoginInfo loginInfo);
     /**
      * 通过model_id，进行简单的查询，返回map
      *
