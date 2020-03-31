@@ -7,7 +7,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import com.cfcc.common.mycat.MycatSchema;
-import com.cfcc.modules.system.entity.SysDepart;
 import com.cfcc.modules.system.entity.SysUser;
 import com.cfcc.modules.system.service.ISysDepartService;
 import com.cfcc.modules.system.service.ISysDictItemService;
@@ -43,7 +42,6 @@ import org.springframework.web.servlet.ModelAndView;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
-import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -120,7 +118,7 @@ public class SysDictController {
             SysDictItem itemByCode = sysDictService.getDictItemByCode("sql", dictValue);
             List<DictModel> dictMOdelList = new ArrayList<>();
             if (itemByCode != null || !"".equals(itemByCode)) {
-                dictMOdelList = sysDictService.getSqlValue(itemByCode.getDescription());
+                //dictMOdelList = sysDictService.getSqlValue(itemByCode.getDescription(), userId, departId, itemByCode.getDescription());
             }
             return Result.ok(dictMOdelList);
         }
@@ -362,7 +360,6 @@ public class SysDictController {
      * 导出excel
      *
      * @param request
-     * @param response
      */
     @RequestMapping(value = "/exportXls")
     public ModelAndView exportXls(SysDict sysDict, HttpServletRequest request) {
