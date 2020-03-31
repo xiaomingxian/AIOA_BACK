@@ -302,7 +302,7 @@ public class SysDictServiceImpl extends ServiceImpl<SysDictMapper, SysDict> impl
                 description += str[i] ;
             }
         }
-
+        System.out.println("数据字典sql：" + departId);
         return sysDictMapper.getSqlValueDao(description);
     }
 
