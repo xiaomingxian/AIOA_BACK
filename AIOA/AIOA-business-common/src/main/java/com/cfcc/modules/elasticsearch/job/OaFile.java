@@ -67,6 +67,10 @@ public class OaFile implements Job {
     @Autowired
     private IBusFunctionService busFunctionService;
 
+    //上传文件地址
+    @Value(value = "${jeecg.path.upload}")
+    private String uploadpath;
+
     @Autowired
     private IOaBusdataService iOaBusdataService;
 
@@ -109,7 +113,9 @@ public class OaFile implements Job {
                     System.out.println("-----------无数据存入ES库！！！！！-----------");
                     continue;
                 }
-                for (Map<String, Object> map : oaBusdata) {
+
+                List<Map<String,Object>> oaBusdataCan = oaFileService.getOaBusdata(sBusdataTable,oaBusdata,busFunction,DBvalue);
+                for (Map<String, Object> map : oaBusdataCan) {
                     Map map1 = new HashedMap();
                     if (map.get("i_is_file") == null){
                         continue;
@@ -121,10 +127,9 @@ public class OaFile implements Job {
                     }
                     oaBusdata1.add(map1);
                 }
-                for (Map<String, Object> map : oaBusdata) {
+                for (Map<String, Object> map : oaBusdataCan) {
                     map.remove("i_is_file");
                 }
-                List<Map<String,Object>> oaBusdataCan = oaFileService.getOaBusdata(sBusdataTable,oaBusdata,busFunction,DBvalue);
                 oaBusdataList.addAll(oaBusdataCan);
             }
             if (oaBusdataList.size() != 0){
@@ -210,7 +215,7 @@ public class OaFile implements Job {
                     iterator.remove();
                     continue;
                 }
-                List<Map<String,Object>> oaFileList = oaFileService.getOaFileByTableAndTableId(oaBusdatum.get("i_id")+"",sBusdataTable,DBvalue);
+                List<Map<String,Object>> oaFileList = oaFileService.getOaFileByTableAndTableId(uploadpath,null,oaBusdatum.get("i_id")+"",oaBusdatum.get("table_name")+"",DBvalue);
                 oaFileListAll.addAll(oaFileList);
             }
             if (oaFileListAll.size() != 0){
@@ -261,7 +266,7 @@ public class OaFile implements Job {
                 String sBusdataTable = null;
                 for (BusFunction busFunction : busFunctionList) {
                     sBusdataTable = busFunction.getSBusdataTable();
-                    String columnLists = oaFileService.getColumList(sBusdataTable, busFunction.getIId(),DBvalue);
+                    String columnLists = oaFileService.getColumList(busFunction.getSBusdataTable(), busFunction.getIId(),DBvalue);
                     if (columnLists.equals("")){
                         continue;
                     }
@@ -271,7 +276,9 @@ public class OaFile implements Job {
                         System.out.println("-----------无数据存入ES库！！！！！-----------");
                         continue;
                     }
-                    for (Map<String, Object> map : oaBusdata) {
+
+                    List<Map<String,Object>> oaBusdataCan = oaFileService.getOaBusdata(sBusdataTable,oaBusdata,busFunction,DBvalue);
+                    for (Map<String, Object> map : oaBusdataCan) {
                         Map map1 = new HashedMap();
                         if (map.get("i_is_file") == null){
                             continue;
@@ -283,10 +290,9 @@ public class OaFile implements Job {
                         }
                         oaBusdata1.add(map1);
                     }
-                    for (Map<String, Object> map : oaBusdata) {
+                    for (Map<String, Object> map : oaBusdataCan) {
                         map.remove("i_is_file");
                     }
-                    List<Map<String,Object>> oaBusdataCan = oaFileService.getOaBusdata(sBusdataTable,oaBusdata,busFunction,DBvalue);
                     oaBusdataList.addAll(oaBusdataCan);
                 }
                 if (oaBusdataList.size() != 0){
@@ -364,21 +370,23 @@ public class OaFile implements Job {
                 }
                 List<Map<String,Object>> oaFileListAll = new ArrayList<>();
                 Iterator<Map<String, Object>> iterator = oaBusdata1.iterator();
+                String DBvalue2 = DBvalue.substring(DBvalue.indexOf("=")+1,DBvalue.lastIndexOf("*"));
                 while (iterator.hasNext()){
                     Map<String, Object> oaBusdatum = iterator.next();
                     if (oaBusdatum.get("i_is_file") == null){
                         iterator.remove();
                         continue;
                     }
-                    List<Map<String,Object>> oaFileList = oaFileService.getOaFileByTableAndTableId(oaBusdatum.get("i_id")+"",sBusdataTable,DBvalue);
+                    List<Map<String,Object>> oaFileList = oaFileService.getOaFileByTableAndTableId(uploadpath,DBvalue2,oaBusdatum.get("i_id")+"",oaBusdatum.get("table_name")+"",DBvalue);
                     oaFileListAll.addAll(oaFileList);
                 }
                 if (oaFileListAll.size() != 0){
                     try {
                         //索引名 = 库名+银行id+2
-                        String DBvalue2 = DBvalue.substring(DBvalue.indexOf("=")+1,DBvalue.lastIndexOf("*"));
+
                         String indexName = "elasticsearch"+DBvalue2+departId+2;
                         String indexType = "oaFile";
+
                         if (!searchService.existsIndex(indexName)){
                             logger.info(indexName+"索引开始创建！！！！");
                             searchService.createIndex(indexName,indexType);
