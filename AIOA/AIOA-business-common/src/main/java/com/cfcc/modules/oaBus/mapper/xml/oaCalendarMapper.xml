@@ -120,7 +120,7 @@
     <select id="count" resultType="java.lang.Integer">
         select count(*) from oa_calendar
         <where>
-            s_create_by = #{oaCalendar.username}
+            s_create_by = #{username}
             <if test="sAddress != '' and sAddress != null">
                 and s_address = #{sAddress}
             </if>
@@ -148,6 +148,9 @@
              c.s_create_by = #{oaCalendar.username}
             <if test="oaCalendar.sAddress != '' and oaCalendar.sAddress != null">
                 and c.s_address = #{oaCalendar.sAddress}
+            </if>
+            <if test="oaCalendar.username != '' and oaCalendar.username != null">
+                and c.s_create_by = #{oaCalendar.username}
             </if>
             <if test="oaCalendar.sTitle != '' and oaCalendar.sTitle != null">
                 and c.s_title like CONCAT(CONCAT('%', #{oaCalendar.sTitle}), '%')
