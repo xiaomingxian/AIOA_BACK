@@ -94,6 +94,21 @@
     <update id="updateAllOaData" parameterType="map">
         UPDATE ${tableName}
         <set>
+            <if test="i_safetylevel !=null and i_safetylevel !=''">
+                i_safetylevel=#{i_safetylevel},
+            </if>
+            <if test="i_urgency !=null and i_urgency !=''">
+                i_urgency=#{i_urgency},
+            </if>
+            <if test="s_signer !=null and s_signer !=''">
+                s_signer=#{s_signer},
+            </if>
+            <if test="i_phone !=null and i_phone !=''">
+                i_phone=#{i_phone},
+            </if>
+            <if test="d_sealdate !=null and d_sealdate !=''">
+                d_sealdate=#{d_sealdate},
+            </if>
             <if test="i_bus_model_id !=null and i_bus_model_id !=''">
                 i_bus_model_id=#{i_bus_model_id},
             </if>
@@ -192,9 +207,6 @@
             </if>
             <if test="s_create_dept !=null and s_create_dept !=''">
                 s_create_dept=#{s_create_dept},
-            </if>
-            <if test="d_create_time !=null and d_create_time !=''">
-                d_create_time=#{d_create_time},
             </if>
             <if test="d_create_time !=null and d_create_time !=''">
                 d_create_time=#{d_create_time},
@@ -303,6 +315,15 @@
             </if>
             <if test="i_is_5 !=null and i_is_5 !=''">
                 i_is_5=#{i_is_5},
+            </if>
+            <if test="s_create_deptid !=null and s_create_deptid !=''">
+                s_create_deptid=#{s_create_deptid},
+            </if>
+            <if test="s_create_unitid !=null and s_create_unitid !=''">
+                s_create_unitid=#{s_create_unitid},
+            </if>
+            <if test="s_cc_dept_names !=null and s_cc_dept_names !=''">
+                s_cc_dept_names=#{s_cc_dept_names},
             </if>
         </set>
         WHERE i_id = #{i_id}
