@@ -99,12 +99,22 @@ public class BusPageDetailController {
     @AutoLog(value = "业务页面详情表（实际业务字段含义说明）-分页列表查询")
     @ApiOperation(value = "业务页面详情表（实际业务字段含义说明）-分页列表查询", notes = "业务页面详情表（实际业务字段含义说明）-分页列表查询")
     @GetMapping(value = "/queryListByFunctionId")
-    public Result<List<BusPageDetail>> queryListByFunctionId(int ibusFunctionId,int ibusPageId ,
+    public Result<List<BusPageDetail>> queryListByFunctionId(Integer ibusFunctionId,Integer ibusPageId ,
                                                       HttpServletRequest req) {
+        Result<List<BusPageDetail>> result = new Result<List<BusPageDetail>>();
+        if(ibusFunctionId == null ){
+            result.setSuccess(false);
+            result.setMessage("functionId为空！！！");
+            return result;
+        }
+        if(ibusPageId == null ){
+            result.setSuccess(false);
+            result.setMessage("iPageId为空！！！");
+            return result;
+        }
         BusPageDetail busPageDetail = new BusPageDetail();
         busPageDetail.setIBusPageId(ibusPageId) ;
         busPageDetail.setIBusFunctionId(ibusFunctionId) ;
-        Result<List<BusPageDetail>> result = new Result<List<BusPageDetail>>();
 		QueryWrapper<BusPageDetail> queryWrapper = new QueryWrapper<>();
 		queryWrapper.setEntity(busPageDetail) ;
 		List<BusPageDetail> list = busPageDetailService.list(queryWrapper);
