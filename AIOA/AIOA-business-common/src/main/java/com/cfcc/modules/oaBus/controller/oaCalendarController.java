@@ -113,8 +113,12 @@ public class oaCalendarController implements Job {
                                                    HttpServletRequest request) {
         Result<IPage<oaCalendar>> result = new Result<IPage<oaCalendar>>();
         SysUser currentUser = sysUserService.getCurrentUser(request);
-        String username = currentUser.getUsername();
-        oaCalendar.setSCreateBy(username);
+        if(currentUser == null){
+            result.error500("未找到对应实体");
+        }else{
+            String username = currentUser.getUsername();
+            oaCalendar.setSCreateBy(username);
+        }
         IPage<oaCalendar> pageList = oaCalendarService.findPage(pageNo, pageSize, oaCalendar);
         result.setSuccess(true);
         result.setResult(pageList);
@@ -139,6 +143,9 @@ public class oaCalendarController implements Job {
         //查询当前用户，作为assignee
         String token = request.getHeader(DefContants.X_ACCESS_TOKEN);
         SysUser currentUser = sysUserService.getCurrentUser(request);
+        if(currentUser == null){
+            result.error500("未找到对应实体");
+        }
         String id = currentUser.getId();
         Integer departId = currentUser.getDepartId();
         List<String> manageIdList = oaCalendarService.getUserId(id);
@@ -199,6 +206,9 @@ public class oaCalendarController implements Job {
         String token = request.getHeader(DefContants.X_ACCESS_TOKEN);
         String username = JwtUtil.getUsername(token);
         SysUser user = sysUserService.getUserByName(username);
+        if(user == null){
+            result.error500("未找到对应实体");
+        }
         String id = user.getId();//查出当前用户的id
         String departId = oaCalendarService.getDepartId(user.getId()); //查出当前登陆用户的部门id
         List<String> manageIdList = oaCalendarService.getUserId(id);
