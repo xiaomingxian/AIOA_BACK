@@ -155,6 +155,20 @@ public class oaCalendarServiceImpl extends ServiceImpl<oaCalendarMapper, oaCalen
     @Override
     public oaCalendar getByIid(String id) {
         oaCalendar oaCalendar = oaCalendarMapper.getByIid(id);
+
+            String state = oaCalendar.getState();
+            if(state.equals("0")){//0,普通日程、1,办件（未办）、2，办件（已办），3，阅件\\抄送（未阅），4，阅件阅件\\抄送（已阅）',
+                oaCalendar.setStateName("");
+            }else if(state.equals("1")){
+                oaCalendar.setStateName("【待办】");
+            }else if(state.equals("2")){
+                oaCalendar.setStateName("【已办】");
+            }else if(state.equals("3")){
+                oaCalendar.setStateName("【未阅】");
+            }else if(state.equals("4")){
+                oaCalendar.setStateName("【已阅】");
+            }
+
         String[] UserIdList = oaCalendar.getSUserNames().split(",");
         Set<String> set = new HashSet<>() ;
         for (int j = 0; j <UserIdList.length; j++) {

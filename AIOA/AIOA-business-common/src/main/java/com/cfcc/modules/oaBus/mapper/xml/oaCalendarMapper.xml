@@ -316,7 +316,7 @@
         ${pageNo},${pageSize}
     </select>
     <select id="getByIid" resultType="com.cfcc.modules.oaBus.entity.oaCalendar" parameterType="String">
-         select * from oa_calendar where i_id = #{id}
+         select c.* ,c.i_is_state as state from oa_calendar c where c.i_id = #{id}
     </select>
     <!--根据部门id查出他是什么角色-->
     <select id="findLeader" resultType="java.lang.String">
