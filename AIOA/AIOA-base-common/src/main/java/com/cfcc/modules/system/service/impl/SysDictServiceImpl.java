@@ -22,6 +22,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -265,8 +266,43 @@ public class SysDictServiceImpl extends ServiceImpl<SysDictMapper, SysDict> impl
         return ls;
     }
 
+
+    /**
+     * 查询对应的sql数据字典
+     *
+     * @param description
+     * @param userId
+     * @param departId
+     * @param description
+     * @return
+     */
     @Override
-    public List<DictModel> getSqlValue(String description) {
+    public List<DictModel> getSqlValue(String description, String userId, String departId, String unitId) {
+        String str[] = description.split("#") ;
+        if(str.length > 1 ){
+            for(int i = 1 ; i < str.length ; i ++){
+                if(str[i].indexOf(" ") != -1){
+                    String head = str[i].substring(0,str[i].indexOf(" ")) ;
+                    if("userId".equals(head)){
+                        str[i] = str[i].replace(head,"'"+userId+"'") ;
+                    }else if("departId".equals(head)){
+                        str[i] = str[i].replace(head,"'"+departId+"'") ;
+                    }else if("unitId".equals(head)){
+                        str[i] = str[i].replace(head,"'"+unitId+"'") ;
+                    }
+                }else{
+                    if("userId".equals(str[i])){
+                        str[i] = str[i].replace(str[i],"'"+userId+"'") ;
+                    }else if("departId".equals(str[i])){
+                        str[i] = str[i].replace(str[i],"'"+departId+"'") ;
+                    }else if("unitId".equals(str[i])){
+                        str[i] = str[i].replace(str[i],"'"+unitId+"'") ;
+                    }
+                }
+                description += str[i] ;
+            }
+        }
+        System.out.println("数据字典sql：" + departId);
         return sysDictMapper.getSqlValueDao(description);
     }
 

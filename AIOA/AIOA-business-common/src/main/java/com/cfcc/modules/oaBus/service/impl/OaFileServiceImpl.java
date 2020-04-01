@@ -194,7 +194,7 @@ public class OaFileServiceImpl extends ServiceImpl<OaFileMapper, OaFile> impleme
     }
 
     @Override
-    public List<Map<String, Object>> getOaFileByTableAndTableId(String id, String sBusdataTable, String DBvalue) {
+    public List<Map<String, Object>> getOaFileByTableAndTableId(String uploadpath, String DBvalue2, String id, String sBusdataTable, String DBvalue) {
         List<Map<String, Object>> oaFileList = oaFileMapper.getOaFileByTableAndTableId(id, sBusdataTable, DBvalue);
         Iterator<Map<String, Object>> iterator = oaFileList.iterator();
         while (iterator.hasNext()) {
@@ -208,7 +208,13 @@ public class OaFileServiceImpl extends ServiceImpl<OaFileMapper, OaFile> impleme
                 iterator.remove();
                 continue;
             }
-            String sFilePath = map.get("s_file_path") + "";
+            String sFilePath = "";
+            if (DBvalue2 != null){
+                sFilePath = uploadpath +File.separator+ DBvalue2 +File.separator + map.get("s_file_path") + "";
+            } else {
+                sFilePath = uploadpath + File.separator + map.get("s_file_path") + "";
+            }
+
             File file = new File(sFilePath);
             String sContent = null;
             if (file.exists()) { //文件存在返回true
@@ -599,7 +605,7 @@ public class OaFileServiceImpl extends ServiceImpl<OaFileMapper, OaFile> impleme
                 if (key.equals("s_title")) {
                     oaBusdatum.put(key, "【" + busFunction.getSName() + "】" + value);
                 }
-                List<String> sDictIdlist = busPageDetailMapper.getSDictIdByKey(functionId, sBusdataTable, key, DBvalue);
+                List<String> sDictIdlist = busPageDetailMapper.getSDictIdByKey(functionId, busFunction.getSBusdataTable(), key, DBvalue);
                 System.out.println("................." + sDictIdlist + ".................");
                 String aa = null;
                 if (sDictIdlist.size() == 0) {
@@ -630,7 +636,7 @@ public class OaFileServiceImpl extends ServiceImpl<OaFileMapper, OaFile> impleme
                 }
 
             }
-            oaBusdatum.put("table_name", sBusdataTable);
+            oaBusdatum.put("table_name", busFunction.getSBusdataTable());
         }
 
 

@@ -17,6 +17,7 @@ import com.cfcc.modules.oaBus.service.IOaBusdataService;
 import com.cfcc.modules.oaBus.service.IoaCalendarService;
 import com.cfcc.modules.shiro.vo.DefContants;
 import com.cfcc.modules.system.entity.LoginInfo;
+import com.cfcc.modules.system.entity.SysDepart;
 import com.cfcc.modules.system.entity.SysUser;
 import com.cfcc.modules.system.service.ISysUserService;
 import com.cfcc.modules.workflow.pojo.TaskInfoJsonAble;
@@ -632,9 +633,14 @@ public class oaCalendarController implements Job {
     @AutoLog(value = "权限设置-查询功能模块")
     @ApiOperation(value = "权限设置-查询功能模块", notes = "权限设置-查询功能模块")
     @GetMapping(value = "/getFunctionName")
-    public Result<List<BusFunction>> getFunctionName() {
+    public Result<List<BusFunction>> getFunctionName(HttpServletRequest request) {
         Result<List<BusFunction>> result = new Result<>();
+        //查询当前用户，作为assignee
+        LoginInfo loginInfo = sysUserService.getLoginInfo(request);
+        SysDepart depart = loginInfo.getDepart();
         List<BusFunction> busModelList = oaCalendarService.busFunctionList();
+        //权限过滤，有些fun只能特定的部门能看到
+        busModelList = oaBusdataService.getFunListByFunUnit(busModelList, depart);
         if (busModelList.size() == 0) {
             result.error500("未找到对应实体");
         } else {

@@ -41,7 +41,7 @@
         from ${busFunction.sBusdataTable}
         <where>
             <if test="busFunction.iId != null">
-                i_bus_model_id = #{busFunction.iBusModelId}
+                i_bus_function_id = #{busFunction.iId}
             </if>
             and i_is_es in (1,3)
             and i_is_display != 1

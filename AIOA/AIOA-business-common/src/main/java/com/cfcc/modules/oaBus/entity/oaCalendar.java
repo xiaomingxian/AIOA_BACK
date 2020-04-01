@@ -73,6 +73,7 @@ public class oaCalendar {
     private java.lang.String taskUserId;
 
     @TableField(value = "i_is_state")
+    @ApiModelProperty(value = "日程发生地点")
     private java.lang.String state;
 
     /**
@@ -164,6 +165,12 @@ public class oaCalendar {
 
     @TableField(exist = false)
     private java.lang.Integer more;
+
+    @TableField(exist = false)
+    private java.lang.String stateName;
+
+    @TableField(exist = false)
+    private java.lang.String tableName;
 
 
 }

@@ -8,6 +8,7 @@ import com.cfcc.common.system.util.JwtUtil;
 import com.cfcc.common.util.DateUtils;
 import com.cfcc.modules.oaBus.entity.*;
 import com.cfcc.modules.oaBus.mapper.oaCalendarMapper;
+import com.cfcc.modules.oaBus.service.IBusModelService;
 import com.cfcc.modules.oaBus.service.IOaBusdataService;
 import com.cfcc.modules.oaBus.service.IOaFileService;
 import com.cfcc.modules.oaBus.service.IoaCalendarService;
@@ -56,7 +57,10 @@ public class oaCalendarServiceImpl extends ServiceImpl<oaCalendarMapper, oaCalen
     private SysUserMapper sysUserMapper;
 
     @Autowired
-    private IOaBusdataService oaBusdataService;;
+    private IOaBusdataService oaBusdataService;
+    
+    @Autowired
+    private IBusModelService iBusModelService;
 
     @Override
     public oaCalendar findById(Integer iId) {
@@ -100,6 +104,20 @@ public class oaCalendarServiceImpl extends ServiceImpl<oaCalendarMapper, oaCalen
     public IPage<oaCalendar> findPage(Integer pageNo, Integer pageSize, oaCalendar oaCalendar) {
         int total = oaCalendarMapper.count(oaCalendar);
         List<oaCalendar> CalendarList = oaCalendarMapper.findPage((pageNo - 1) * pageSize,pageSize,oaCalendar);
+        for (oaCalendar   calendar :CalendarList) {
+            String state = calendar.getState();
+            if(state.equals("0")){//0,普通日程、1,办件（未办）、2，办件（已办），3，阅件\\抄送（未阅），4，阅件阅件\\抄送（已阅）',
+                calendar.setStateName("");
+            }else if(state.equals("1")){
+                calendar.setStateName("【待办】");
+            }else if(state.equals("2")){
+                calendar.setStateName("【已办】");
+            }else if(state.equals("3")){
+                calendar.setStateName("【未阅】");
+            }else if(state.equals("4")){
+                calendar.setStateName("【已阅】");
+            }
+        }
         IPage<oaCalendar> pageList = new Page<oaCalendar>();
         pageList.setRecords(CalendarList);
         pageList.setSize(pageSize);
@@ -146,6 +164,13 @@ public class oaCalendarServiceImpl extends ServiceImpl<oaCalendarMapper, oaCalen
                 set.add(Id);
             }
         }
+        Integer iBusModelId = oaCalendar.getIBusModelId();
+        if(iBusModelId!=null){
+            BusModel busModel = iBusModelService.getBusModelById(iBusModelId);
+            String sBusdataTable = busModel.getSBusdataTable();
+            oaCalendar.setTableName(sBusdataTable);
+        }
+
         oaCalendar.setSUserNameid(set);
         return oaCalendar;
     }
@@ -187,7 +212,14 @@ public class oaCalendarServiceImpl extends ServiceImpl<oaCalendarMapper, oaCalen
 
     @Override
     public List<BusFunction> busFunctionList() {
-        return oaCalendarMapper.busFunctionList();
+        List<BusFunction> busFunctions = oaCalendarMapper.busFunctionList();
+        for (BusFunction busFunction: busFunctions) {
+            Integer iBusModelId = busFunction.getIBusModelId();
+            BusModel busModelById = iBusModelService.getBusModelById(iBusModelId);
+            String sName = busModelById.getSName();
+            busFunction.setBusModelName(sName);
+        }
+        return busFunctions;
     }
 
     @Override
