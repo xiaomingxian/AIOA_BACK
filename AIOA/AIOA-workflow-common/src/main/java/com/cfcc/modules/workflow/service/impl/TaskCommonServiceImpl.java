@@ -549,6 +549,7 @@ public class TaskCommonServiceImpl implements TaskCommonService {
         //查询出代理人的起止时间
         HashMap<String, Object> map = new HashMap<>();
         map.put("user_name", taskInfoVO.getUserName());
+        map.put("status", 1);
         List<SysUserAgent> sysUserAgents = userAgentMapper.selectByMap(map);
         SysUserAgent agent = sysUserAgents.get(0);
         Date startTimeAgent = agent.getStartTime();

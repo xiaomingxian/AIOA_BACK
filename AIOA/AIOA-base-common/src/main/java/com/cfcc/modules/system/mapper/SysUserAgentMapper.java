@@ -15,7 +15,7 @@ import java.util.List;
  */
 public interface SysUserAgentMapper extends BaseMapper<SysUserAgent> {
 
-    @Select("select * from sys_user_agent where agent_user_name=#{value} and start_time<=NOW() and end_time>=NOW()")
+    @Select("select * from sys_user_agent where agent_user_name=#{value} and start_time<=NOW() and end_time>=NOW() and status=1")
     List<SysUserAgent> agentIsMe(String userName);
 
     @Select("select u.* from sys_user_agent a LEFT JOIN sys_user u on a.agent_user_name=u.username where user_name=#{v} limit 1")
