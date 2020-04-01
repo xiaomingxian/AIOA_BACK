@@ -122,7 +122,8 @@ spring:
         master:
 #          &allowMultiQueries=true
 #          url: jdbc:mysql://10.1.15.201:3306/aioa_activiti_test?characterEncoding=UTF-8&useUnicode=true&useSSL=false&tinyInt1isBit=false
-#          url: jdbc:mysql://49.234.25.12:3306/aioa_activiti_test?characterEncoding=UTF-8&useUnicode=true&useSSL=false&tinyInt1isBit=false&allowMultiQueries=true
+#          url: jdbc:mysql://49.234.25.12:3306/aioa_demo?characterEncoding=UTF-8&useUnicode=true&useSSL=false&tinyInt1isBit=false&allowMultiQueries=true
+#          url: jdbc:mysql://127.0.0.1:3306/oa_demo?characterEncoding=UTF-8&useUnicode=true&useSSL=false&tinyInt1isBit=false
           url: jdbc:mysql://49.234.25.12:3306/aioa_test?characterEncoding=UTF-8&useUnicode=true&useSSL=false&tinyInt1isBit=false&allowMultiQueries=true
           username: root
           password: Mysql_root_123456
@@ -167,6 +168,8 @@ jeecg:
   path:
     #文件上传根目录
     upload: D://upFiles
+#    部署环境配置路径
+#    upload: /usr/local/upFiles
     #底稿临时路径
     uploadfile: AIOA_VUE//public//ntko//files
     #附件临时路径

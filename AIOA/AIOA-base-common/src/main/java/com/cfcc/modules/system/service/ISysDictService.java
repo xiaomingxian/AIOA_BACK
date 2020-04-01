@@ -99,7 +99,7 @@ public interface ISysDictService extends IService<SysDict> {
 
     List<DictModel> getDictByCode(String dictCode) ;
 
-	List<DictModel> getSqlValue(String description);
+	List<DictModel> getSqlValue(String itemByCodeDescription, String userId, String departId, String unitId);
 
     IPage<SysDict> getDictByAll(SysDict sysDict, Integer pageNo, Integer pageSize);
 

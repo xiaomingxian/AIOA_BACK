@@ -323,7 +323,6 @@ public class FileNtkoController {
     public Result singleCopyFile(@RequestParam(value = "filepath", required = false) String filepath,
                                  @RequestParam(value = "fileType", required = false) String fileType,
                                  @RequestParam(value = "orgSchema", required = false) String orgSchema,HttpServletRequest request) {
-
         Result<String> result = new Result< String >();
         OaFile file = new OaFile();
         String initFile = "";
@@ -437,5 +436,4 @@ public class FileNtkoController {
         }
         return result;
     }
-
 }

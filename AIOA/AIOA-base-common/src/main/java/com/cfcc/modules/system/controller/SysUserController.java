@@ -23,7 +23,6 @@ import com.cfcc.modules.system.entity.*;
 import com.cfcc.modules.system.model.DepartIdModel;
 import com.cfcc.modules.system.service.*;
 import com.cfcc.modules.system.vo.SysDepartUsersVO;
-import com.cfcc.modules.system.vo.SysUserRoleVO;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
@@ -78,6 +77,10 @@ public class SysUserController {
 
     @Autowired
     private ISysUserManagedeptsService sysUserManagedeptsService;
+
+    @Autowired
+    private ISysUserFunService iSysUserFunService;
+
 
     @Autowired
     private RedisUtil redisUtil;
@@ -473,8 +476,8 @@ public class SysUserController {
     /**
      * 导出excel
      *
+     * @param sysUser
      * @param request
-     * @param response
      */
     @RequestMapping(value = "/exportXls")
     public ModelAndView exportXls(SysUser sysUser, HttpServletRequest request) {
@@ -1019,7 +1022,9 @@ public class SysUserController {
         List<SysUser> users = sysUserService.queryUserByDepts(data.get("ids"));
         return Result.ok(users);
     }
-
+    /**
+     * 根据id查询用户
+     */
     @GetMapping(value = "/queryUserNameById")
     public Result<String> queryUserNameById(@RequestParam(name = "userId",required=true) String userId,
                                             @RequestParam(value = "orgSchema", required = false) String orgSchema,
@@ -1029,4 +1034,33 @@ public class SysUserController {
         result.setResult(userName);
         return result;
     }
+
+    @PostMapping(value = "/addUserFun")
+    public Result<String> addUserFun(@RequestParam(name = "userId",required=true) String userId,
+                                     @RequestParam(name = "modelId",required=true) Integer modelId,
+                                     @RequestParam(name = "functionId",required=true) Integer functionId,
+                                     @RequestParam(name = "status",required=false) Integer status){
+        Result<String> result = new Result<>();
+        int num=iSysUserFunService.addUserFun(userId,modelId,functionId,status);
+        if (num!=1){
+            result.setSuccess(false);
+        }else if (num == 1){
+            result.setSuccess(true);
+        }
+        return result;
+    }
+
+    @GetMapping(value = "/showUserFun")
+    public Result<List<String>> showUserFun(@RequestParam(name = "userId",required=true) String userId){
+        Result<List<String>> result = new Result<>();
+        List<String> list=iSysUserFunService.showUserFun(userId);
+        if (list.size()==0){
+            result.setSuccess(false);
+        }else {
+            result.setSuccess(true);
+        }
+        result.setResult(list);
+        return result;
+    }
+
 }

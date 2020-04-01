@@ -1,12 +1,9 @@
 package com.cfcc.modules.system.controller;
 
-import java.net.HttpURLConnection;
-import java.net.MalformedURLException;
-import java.net.URL;
+import java.net.*;
 import java.util.*;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
-import java.net.URLDecoder;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -58,6 +55,11 @@ public class SysUserSetController {
 
     @Autowired
     private ISysUserService sysUserService;
+    @Value(value = "${RTX.hostIp}")
+    private String hostIp ;
+    @Value(value = "${RTX.port}")
+    private int port ;
+
 
     /**
      * 分页列表查询
@@ -181,7 +183,7 @@ public class SysUserSetController {
 
     /**
      * 查询下一任务时对应的人是否设置了代办消息提醒
-     *
+     *  然后由rtx发送消息
      * @return
      */
     @AutoLog(value = "查询是否设置了代办消息提醒")
@@ -191,51 +193,49 @@ public class SysUserSetController {
         Result<List<String>> result = new Result<List<String>>();
         Map<String, Object> map = (Map) JSONObject.parse(json);
         List<String> list = (List<String>) map.get("ids");
+        String tableName = (String) map.get("tableName");
+        String busdataId = (String) map.get("busdataId");
         System.out.println(list);
         String nameStr = String.join(",", list);
-        sendMegToRtx("张杰,chen") ;
         System.out.println(nameStr);
-        List<String> userName = sysUserSetService.queryUserSetByIds(nameStr);
-        result.setResult(userName);
+        List<String> userNameList = sysUserSetService.queryUserSetByIds(nameStr);
+        if(userNameList != null && userNameList.size()>0){
+            nameStr = String.join(",",userNameList) ;
+            sendMegToRtx(nameStr,tableName,busdataId) ;
+        }
         return result;
     }
 
-    public void sendMegToRtx(String userName) {
+    public void sendMegToRtx(String userName,String tableName, String busdataId ) {
         try {
-            userName = new String(userName.getBytes("GBK"), "GBK") ;
+            userName = URLEncoder.encode(userName,"gbk") ;
             String sendImg = "/SendNotify.cgi?";  //  RTX发送消息接口
-            String host = "169.254.189.218";  //  RTX服务器地址
+            //String host = "192.168.199.108";  //  RTX服务器地址
             String getSessionkey = "/getsessionkey.cgi?";  //  RTX获取会话接口
-            int port = 8012;  //  RTX服务器监听端口
+            //int port = 8012;  //  RTX服务器监听端口
             //String[] receiverss  =  {  " woailuo "  };  //  接收人，RTX帐号
             //String sender = "";  //  发送人
-            String content = "有代办消息";  //  内容
+            String content = "您有代办，请及时处理[点我跳转|http://192.168.199.108:8080/RtxTest2_war_exploded/openDetail.jsp?tableName="
+                    +tableName+"&busdataId="+busdataId+"]";  //  内容
+//            String content = "您有代办，请及时处理[点我跳转|http://192.168.199.108:8080/RtxTest2_war_exploded/openDetail.jsp?tableName=oabusdata30" ;
             StringBuffer sendMsgParams = new StringBuffer(sendImg);
             StringBuffer receiveUrlStr = new StringBuffer(userName);
 
-        /*for  ( int  i  =   0 ; i  <  receiverss.length;  ++ i) {
-            if  (receiveUrlStr.length()  ==   0 ) {
-                receiveUrlStr.append(receiverss[i]);
-            }  else  {
-                receiveUrlStr.append( " , "   +  receiverss[i]);
-            }
-        }*/
             sendMsgParams.append("&receiver=" + receiveUrlStr);
             if (content != null) {
-                sendMsgParams.append("&msg=" + new String(content.getBytes("utf-8"), "utf-8"));
+//                sendMsgParams.append("&msg=" + new String(content.getBytes("UTF-8"), "GBK"));
+                sendMsgParams.append("&msg=" + URLEncoder.encode(content,"gbk"));
+//                sendMsgParams.append("&msg=" + content);
             }
-
-            /*if (sender != null ) {
-                sendMsgParams.append(" &sender= " + sender);
-            }*/
             URL url = null;
 
-            url = new URL("HTTP", host, port, sendMsgParams.toString());
+            url = new URL("HTTP", hostIp, port, sendMsgParams.toString());
             System.out.println(url);
             HttpURLConnection httpconn = (HttpURLConnection) url.openConnection();
             String ret = httpconn.getHeaderField(3);
             System.out.println(ret);
         } catch (Exception e) {
+            System.out.println(e);
             e.printStackTrace();
         }
 

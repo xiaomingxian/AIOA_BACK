@@ -11,6 +11,7 @@ import com.cfcc.modules.oaBus.entity.*;
 import com.cfcc.modules.oaBus.service.*;
 import com.cfcc.modules.oaBus.service.impl.OaFileServiceImpl;
 import com.cfcc.modules.shiro.vo.DefContants;
+import com.cfcc.modules.system.entity.LoginInfo;
 import com.cfcc.modules.system.service.ISysUserService;
 
 import io.swagger.annotations.Api;
@@ -53,7 +54,6 @@ public class ModifyFieldsController {
     private IBusFunctionService busFunctionService;
     @Autowired
     private ISysUserService sysUserService;
-
     @Autowired
     private IOaFileService oaFileService;
     @Autowired
@@ -113,7 +113,9 @@ public class ModifyFieldsController {
     @ApiOperation(value = "业务数据表-根据条件查询业务数据列表", notes = "业务数据表-根据条件查询业务数据列表")
     @PostMapping(value = "/queryOaBusPageDetailColumns")
     @ResponseBody
-    public Result<Map<String,Object>> queryOaBusPageDetailColumns(@RequestBody Map<String,Object> map) {
+    public Result<Map<String,Object>> queryOaBusPageDetailColumns(@RequestBody Map<String,Object> map, HttpServletRequest request) {
+        // 查询当前用户，作为assignee
+        LoginInfo loginInfo = sysUserService.getLoginInfo(request);
         Result<Map<String,Object>> result = new Result<Map<String,Object>>();
         Map<String,Object> objectMap=new TreeMap<>();
         if (map.get("functionId")==null){
@@ -131,7 +133,7 @@ public class ModifyFieldsController {
             result.error500("无数据");
             return result;
         }
-        Map<String, Object> sqlCodeDictAllSelect = oaBusdataService.getSqlCodeDictAllSelect(allColumsListPageDtail);
+        Map<String, Object> sqlCodeDictAllSelect = oaBusdataService.getSqlCodeDictAllSelect(allColumsListPageDtail,loginInfo);
         if (sqlCodeDictAllSelect==null){
             result.error500("数据查询失败");
             return result;
@@ -556,5 +558,7 @@ public class ModifyFieldsController {
         }
         return result;
     }
+
+
 
 }

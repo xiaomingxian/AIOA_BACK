@@ -15,6 +15,11 @@ management:
     include: metrics,httptrace
     
 spring:
+  http:
+    encoding:
+      charset: UTF-8
+      enabled: true
+      force: true
   servlet:
      multipart: 
         max-file-size: 10MB

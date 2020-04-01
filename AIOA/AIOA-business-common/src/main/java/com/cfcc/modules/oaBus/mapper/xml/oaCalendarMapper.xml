@@ -64,7 +64,7 @@
     <select id="countIsLeader" resultType="java.lang.Integer">
         select count(*) from oa_calendar
         <where>
-            ISNULL(i_fun_data_id)="" and i_is_leader = 1 and i_is_state = 0
+            i_is_leader = 1 and i_is_state = 0
             <if test="sAddress != '' and sAddress != null">
                 and s_address = #{sAddress}
             </if>
@@ -91,7 +91,7 @@
     <select id="countIsNoLeader" resultType="java.lang.Integer">
         select count(*) from oa_calendar
         <where>
-            ISNULL(i_fun_data_id)="" and i_is_leader = 0 and i_is_state = 0
+            i_is_leader = 0 and i_is_state = 0
             <if test="sAddress != '' and sAddress != null">
                 and s_address = #{sAddress}
             </if>
@@ -120,7 +120,7 @@
     <select id="count" resultType="java.lang.Integer">
         select count(*) from oa_calendar
         <where>
-            ISNULL(i_fun_data_id)="" and i_is_state = 0
+            s_create_by = #{username}
             <if test="sAddress != '' and sAddress != null">
                 and s_address = #{sAddress}
             </if>
@@ -129,9 +129,6 @@
             </if>
             <if test="iOpenType != '' and iOpenType != null">
                 and i_open_type = #{iOpenType}
-            </if>
-            <if test="username != '' and username != null">
-                and s_create_by = #{username}
             </if>
             <if test="date != '' and date != null">
                 and  (DATE_FORMAT(d_start_time,'%Y-%m-%d') &lt;= #{date} and  DATE_FORMAT(d_end_time,'%Y-%m-%d') &gt;= #{date})
@@ -146,47 +143,47 @@
     </select>
     <!--我的日程-->
     <select id="findPage" resultType="com.cfcc.modules.oaBus.entity.oaCalendar">
-        select * from oa_calendar INNER  JOIN  sys_user s
+        select c.* ,c.i_is_state as state from oa_calendar c INNER  JOIN  sys_user s
         <where>
-            ISNULL(i_fun_data_id)=""  and i_is_state = 0
-            <if test="oaCalendar.username != '' and oaCalendar.username != null">
-                and s_create_by = #{oaCalendar.username}
-            </if>
+             c.s_create_by = #{oaCalendar.username}
             <if test="oaCalendar.sAddress != '' and oaCalendar.sAddress != null">
-                and s_address = #{oaCalendar.sAddress}
+                and c.s_address = #{oaCalendar.sAddress}
+            </if>
+            <if test="oaCalendar.username != '' and oaCalendar.username != null">
+                and c.s_create_by = #{oaCalendar.username}
             </if>
             <if test="oaCalendar.sTitle != '' and oaCalendar.sTitle != null">
-                and s_title like CONCAT(CONCAT('%', #{oaCalendar.sTitle}), '%')
+                and c.s_title like CONCAT(CONCAT('%', #{oaCalendar.sTitle}), '%')
             </if>
             <if test="oaCalendar.iOpenType != '' and oaCalendar.iOpenType != null">
-                and i_open_type = #{oaCalendar.iOpenType}
+                and c.i_open_type = #{oaCalendar.iOpenType}
             </if>
             <if test="oaCalendar.date != '' and oaCalendar.date != null">
-                and  (DATE_FORMAT(d_start_time,'%Y-%m-%d')  &lt;=  #{oaCalendar.date} and DATE_FORMAT(d_end_time,'%Y-%m-%d') &gt;= #{oaCalendar.date})
+                and  (DATE_FORMAT(c.d_start_time,'%Y-%m-%d')  &lt;=  #{oaCalendar.date} and DATE_FORMAT(c.d_end_time,'%Y-%m-%d') &gt;= #{oaCalendar.date})
             </if>
             <if test="oaCalendar.Strdate != '' and oaCalendar.Strdate != null">
-                and ((DATE_FORMAT(d_start_time,'%Y-%m-%d') &lt;= #{oaCalendar.Strdate}
+                and ((DATE_FORMAT(c.d_start_time,'%Y-%m-%d') &lt;= #{oaCalendar.Strdate}
             </if>
             <if test="oaCalendar.Enddate != '' and oaCalendar.Enddate != null">
-                and DATE_FORMAT(d_end_time,'%Y-%m-%d') &gt;= #{oaCalendar.Enddate}
+                and DATE_FORMAT(c.d_end_time,'%Y-%m-%d') &gt;= #{oaCalendar.Enddate}
                 )
             </if>
 
             <if test="oaCalendar.Strdate != '' and oaCalendar.Strdate != null">
-                or ( DATE_FORMAT(d_start_time,'%Y-%m-%d') &lt;=  #{oaCalendar.Strdate}
+                or ( DATE_FORMAT(c.d_start_time,'%Y-%m-%d') &lt;=  #{oaCalendar.Strdate}
             </if>
             <if test="oaCalendar.Enddate != '' and oaCalendar.Enddate != null">
-                and DATE_FORMAT(d_end_time,'%Y-%m-%d') &gt;= #{oaCalendar.Enddate}))
+                and DATE_FORMAT(c.d_end_time,'%Y-%m-%d') &gt;= #{oaCalendar.Enddate}))
             </if>
-             and SUBSTRING_INDEX(s_user_names,',',1) = s.username
+             and SUBSTRING_INDEX(c.s_user_names,',',1) = s.username
         </where>
-        order by i_is_top desc ,s.show_order desc  limit
+        order by c.i_is_top desc ,s.show_order desc  limit
         ${pageNo},${pageSize}
     </select>
     <select id="countIsWait" resultType="java.lang.Integer">
         select count(*) from oa_calendar
         <where>
-            i_fun_data_id is not NULL and i_is_state = 1 and i_is_state = 0
+            i_is_state = 1 and i_is_state = 0
             <if test="sAddress != '' and sAddress != null">
                 and s_address = #{sAddress}
             </if>
@@ -215,7 +212,7 @@
     <select id="findByLeader" resultType="com.cfcc.modules.oaBus.entity.oaCalendar">
         select * from oa_calendar INNER  JOIN  sys_user s
         <where>
-            ISNULL(i_fun_data_id)="" and i_is_leader = 1 and i_is_state = 0
+             i_is_leader = 1 and i_is_state = 0
 
             <if test="oaCalendar.sAddress != '' and oaCalendar.sAddress != null">
                 and s_address = #{oaCalendar.sAddress}
@@ -254,7 +251,7 @@
     <select id="queryPageList" resultType="com.cfcc.modules.oaBus.entity.oaCalendar">
         select * from oa_calendar INNER  JOIN  sys_user s
         <where>
-            ISNULL(i_fun_data_id)="" and i_is_leader = 0 and task_id is null
+            i_is_leader = 0 and  i_is_state = 0
             <if test="oaCalendar.sAddress != '' and oaCalendar.sAddress != null">
                 and s_address = #{oaCalendar.sAddress}
             </if>
@@ -289,7 +286,7 @@
     <select id="findWait" resultType="com.cfcc.modules.oaBus.entity.oaCalendar">
         select * from oa_calendar INNER  JOIN  sys_user s
         <where>
-            i_fun_data_id is not NULL and  i_is_state = 1
+            i_is_state = 1
             <if test="oaCalendar.username != '' and oaCalendar.username != null">
                 and s_create_by = #{oaCalendar.username}
             </if>
@@ -319,7 +316,7 @@
         ${pageNo},${pageSize}
     </select>
     <select id="getByIid" resultType="com.cfcc.modules.oaBus.entity.oaCalendar" parameterType="String">
-         select * from oa_calendar where i_id = #{id}
+         select c.* ,c.i_is_state as state from oa_calendar c where c.i_id = #{id}
     </select>
     <!--根据部门id查出他是什么角色-->
     <select id="findLeader" resultType="java.lang.String">

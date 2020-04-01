@@ -138,7 +138,10 @@ public class BusModelServiceImpl extends ServiceImpl<BusModelMapper, BusModel> i
         QueryWrapper<BusModel> queryWrapper = new QueryWrapper<>();
         queryWrapper.setEntity(busModel);
         busModel = busModelMapper.selectOne(queryWrapper);
-        String res = busModel.getIId() + "";
+        String res =  "";
+        if(busModel.getIId() != null){
+            res = busModel.getIId() + "";
+        }
         return res;
     }
 

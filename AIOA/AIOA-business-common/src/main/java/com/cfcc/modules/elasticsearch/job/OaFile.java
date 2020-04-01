@@ -67,6 +67,10 @@ public class OaFile implements Job {
     @Autowired
     private IBusFunctionService busFunctionService;
 
+    //上传文件地址
+    @Value(value = "${jeecg.path.upload}")
+    private String uploadpath;
+
     @Autowired
     private IOaBusdataService iOaBusdataService;
 
@@ -109,7 +113,9 @@ public class OaFile implements Job {
                     System.out.println("-----------无数据存入ES库！！！！！-----------");
                     continue;
                 }
-                for (Map<String, Object> map : oaBusdata) {
+
+                List<Map<String,Object>> oaBusdataCan = oaFileService.getOaBusdata(sBusdataTable,oaBusdata,busFunction,DBvalue);
+                for (Map<String, Object> map : oaBusdataCan) {
                     Map map1 = new HashedMap();
                     if (map.get("i_is_file") == null){
                         continue;
@@ -121,10 +127,9 @@ public class OaFile implements Job {
                     }
                     oaBusdata1.add(map1);
                 }
-                for (Map<String, Object> map : oaBusdata) {
+                for (Map<String, Object> map : oaBusdataCan) {
                     map.remove("i_is_file");
                 }
-                List<Map<String,Object>> oaBusdataCan = oaFileService.getOaBusdata(sBusdataTable,oaBusdata,busFunction,DBvalue);
                 oaBusdataList.addAll(oaBusdataCan);
             }
             if (oaBusdataList.size() != 0){
@@ -141,21 +146,40 @@ public class OaFile implements Job {
                     Iterator<Map<String, Object>> iterator = oaBusdataList.iterator();
                     while (iterator.hasNext()) {
                         Map<String, Object> map = iterator.next();
+                        SimpleDateFormat dateFormat1 = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+                        SimpleDateFormat dateFormat2 = new SimpleDateFormat("yyyy年MM月dd日 HH时mm分ss秒");
+                        if (map.get("d_create_time") != null && map.get("d_create_time") != "") {
+                            String dCreateTime = map.get("d_create_time")+"";
+                            String time = dCreateTime.substring(0,dCreateTime.lastIndexOf("."));
+                            Date parse = dateFormat1.parse(time);
+                            String format = dateFormat2.format(parse);
+                            map.put("d_create_time", format);
+                        }
+                        if (map.get("d_update_time") != null && map.get("d_update_time") != "") {
+                            String dCreateTime = map.get("d_update_time")+"";
+                            String time = dCreateTime.substring(0,dCreateTime.lastIndexOf("."));
+                            Date parse = dateFormat1.parse(time);
+                            String format = dateFormat2.format(parse);
+                            map.put("d_update_time", format);
+                        }
+                        if (map.get("d_datetime1") != null && map.get("d_datetime1") != "") {
+                            String dCreateTime = map.get("d_datetime1")+"";
+                            String time = dCreateTime.substring(0,dCreateTime.lastIndexOf("."));
+                            Date parse = dateFormat1.parse(time);
+                            String format = dateFormat2.format(parse);
+                            map.put("d_datetime1", format);
+                        }
+                        if (map.get("d_datetime2") != null && map.get("d_datetime2") != "") {
+                            String dCreateTime = map.get("d_datetime2")+"";
+                            String time = dCreateTime.substring(0,dCreateTime.lastIndexOf("."));
+                            Date parse = dateFormat1.parse(time);
+                            String format = dateFormat2.format(parse);
+                            map.put("d_datetime2", format);
+                        }
+                    }
 
-                        if (map.get("d_create_time") != null) {
-                            SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-                            long lt = new Long(map.get("d_create_time") + "");
-                            Date date = new Date(lt);
-                            String res = simpleDateFormat.format(date);
-                            map.put("d_create_time", "创建时间：" + res);
-                        }
-                        if (map.get("d_update_time") != null) {
-                            SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-                            long lt = new Long(map.get("d_update_time") + "");
-                            Date date = new Date(lt);
-                            String res = simpleDateFormat.format(date);
-                            map.put("d_update_time", "修改时间：" + res);
-                        }
+                    for (Map<String, Object> map : oaBusdataList) {
+
                         String json = JSON.toJSONString(map);
                         RestStatus restStatus = searchService.saveOrUpdate(json, map.get("table_name").toString() + map.get("i_id").toString(), indexName, indexType);
                         Integer res = restStatus.getStatus();
@@ -191,7 +215,7 @@ public class OaFile implements Job {
                     iterator.remove();
                     continue;
                 }
-                List<Map<String,Object>> oaFileList = oaFileService.getOaFileByTableAndTableId(oaBusdatum.get("i_id")+"",sBusdataTable,DBvalue);
+                List<Map<String,Object>> oaFileList = oaFileService.getOaFileByTableAndTableId(uploadpath,null,oaBusdatum.get("i_id")+"",oaBusdatum.get("table_name")+"",DBvalue);
                 oaFileListAll.addAll(oaFileList);
             }
             if (oaFileListAll.size() != 0){
@@ -242,7 +266,7 @@ public class OaFile implements Job {
                 String sBusdataTable = null;
                 for (BusFunction busFunction : busFunctionList) {
                     sBusdataTable = busFunction.getSBusdataTable();
-                    String columnLists = oaFileService.getColumList(sBusdataTable, busFunction.getIId(),DBvalue);
+                    String columnLists = oaFileService.getColumList(busFunction.getSBusdataTable(), busFunction.getIId(),DBvalue);
                     if (columnLists.equals("")){
                         continue;
                     }
@@ -252,7 +276,9 @@ public class OaFile implements Job {
                         System.out.println("-----------无数据存入ES库！！！！！-----------");
                         continue;
                     }
-                    for (Map<String, Object> map : oaBusdata) {
+
+                    List<Map<String,Object>> oaBusdataCan = oaFileService.getOaBusdata(sBusdataTable,oaBusdata,busFunction,DBvalue);
+                    for (Map<String, Object> map : oaBusdataCan) {
                         Map map1 = new HashedMap();
                         if (map.get("i_is_file") == null){
                             continue;
@@ -264,10 +290,9 @@ public class OaFile implements Job {
                         }
                         oaBusdata1.add(map1);
                     }
-                    for (Map<String, Object> map : oaBusdata) {
+                    for (Map<String, Object> map : oaBusdataCan) {
                         map.remove("i_is_file");
                     }
-                    List<Map<String,Object>> oaBusdataCan = oaFileService.getOaBusdata(sBusdataTable,oaBusdata,busFunction,DBvalue);
                     oaBusdataList.addAll(oaBusdataCan);
                 }
                 if (oaBusdataList.size() != 0){
@@ -284,41 +309,35 @@ public class OaFile implements Job {
                         Iterator<Map<String, Object>> iterator = oaBusdataList.iterator();
                         while (iterator.hasNext()) {
                             Map<String, Object> map = iterator.next();
-                            if (map.get("d_create_time") != null) {
-//                                SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-//                                long lt = new Long(map.get("d_create_time") + "");
-//                                Date date = new Date(lt);
-//                                String res = simpleDateFormat.format(date);
+                            SimpleDateFormat dateFormat1 = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+                            SimpleDateFormat dateFormat2 = new SimpleDateFormat("yyyy年MM月dd日 HH时mm分ss秒");
+                            if (map.get("d_create_time") != null && map.get("d_create_time") != "") {
                                 String dCreateTime = map.get("d_create_time")+"";
                                 String time = dCreateTime.substring(0,dCreateTime.lastIndexOf("."));
-                                map.put("d_create_time", time);
+                                Date parse = dateFormat1.parse(time);
+                                String format = dateFormat2.format(parse);
+                                map.put("d_create_time", format);
                             }
-                            if (map.get("d_update_time") != null) {
-//                                SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-//                                long lt = new Long(map.get("d_update_time") + "");
-//                                Date date = new Date(lt);
-//                                String res = simpleDateFormat.format(date);
+                            if (map.get("d_update_time") != null && map.get("d_update_time") != "") {
                                 String dCreateTime = map.get("d_update_time")+"";
                                 String time = dCreateTime.substring(0,dCreateTime.lastIndexOf("."));
-                                map.put("d_update_time", time);
+                                Date parse = dateFormat1.parse(time);
+                                String format = dateFormat2.format(parse);
+                                map.put("d_update_time", format);
                             }
-                            if (map.get("d_datetime1") != null) {
-//                                SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-//                                long lt = new Long(map.get("d_update_time") + "");
-//                                Date date = new Date(lt);
-//                                String res = simpleDateFormat.format(date);
+                            if (map.get("d_datetime1") != null && map.get("d_datetime1") != "") {
                                 String dCreateTime = map.get("d_datetime1")+"";
                                 String time = dCreateTime.substring(0,dCreateTime.lastIndexOf("."));
-                                map.put("d_datetime1", time);
+                                Date parse = dateFormat1.parse(time);
+                                String format = dateFormat2.format(parse);
+                                map.put("d_datetime1", format);
                             }
-                            if (map.get("d_datetime2") != null) {
-//                                SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-//                                long lt = new Long(map.get("d_update_time") + "");
-//                                Date date = new Date(lt);
-//                                String res = simpleDateFormat.format(date);
+                            if (map.get("d_datetime2") != null && map.get("d_datetime2") != "") {
                                 String dCreateTime = map.get("d_datetime2")+"";
                                 String time = dCreateTime.substring(0,dCreateTime.lastIndexOf("."));
-                                map.put("d_datetime2", time);
+                                Date parse = dateFormat1.parse(time);
+                                String format = dateFormat2.format(parse);
+                                map.put("d_datetime2", format);
                             }
                         }
 
@@ -351,21 +370,23 @@ public class OaFile implements Job {
                 }
                 List<Map<String,Object>> oaFileListAll = new ArrayList<>();
                 Iterator<Map<String, Object>> iterator = oaBusdata1.iterator();
+                String DBvalue2 = DBvalue.substring(DBvalue.indexOf("=")+1,DBvalue.lastIndexOf("*"));
                 while (iterator.hasNext()){
                     Map<String, Object> oaBusdatum = iterator.next();
                     if (oaBusdatum.get("i_is_file") == null){
                         iterator.remove();
                         continue;
                     }
-                    List<Map<String,Object>> oaFileList = oaFileService.getOaFileByTableAndTableId(oaBusdatum.get("i_id")+"",sBusdataTable,DBvalue);
+                    List<Map<String,Object>> oaFileList = oaFileService.getOaFileByTableAndTableId(uploadpath,DBvalue2,oaBusdatum.get("i_id")+"",oaBusdatum.get("table_name")+"",DBvalue);
                     oaFileListAll.addAll(oaFileList);
                 }
                 if (oaFileListAll.size() != 0){
                     try {
                         //索引名 = 库名+银行id+2
-                        String DBvalue2 = DBvalue.substring(DBvalue.indexOf("=")+1,DBvalue.lastIndexOf("*"));
+
                         String indexName = "elasticsearch"+DBvalue2+departId+2;
                         String indexType = "oaFile";
+
                         if (!searchService.existsIndex(indexName)){
                             logger.info(indexName+"索引开始创建！！！！");
                             searchService.createIndex(indexName,indexType);
@@ -391,7 +412,6 @@ public class OaFile implements Job {
                         e.printStackTrace();
                     }
                 }
-//                System.out.println("------------------------------------------");
             }
         }
     }

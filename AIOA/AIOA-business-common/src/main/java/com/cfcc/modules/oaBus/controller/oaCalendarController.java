@@ -17,6 +17,7 @@ import com.cfcc.modules.oaBus.service.IOaBusdataService;
 import com.cfcc.modules.oaBus.service.IoaCalendarService;
 import com.cfcc.modules.shiro.vo.DefContants;
 import com.cfcc.modules.system.entity.LoginInfo;
+import com.cfcc.modules.system.entity.SysDepart;
 import com.cfcc.modules.system.entity.SysUser;
 import com.cfcc.modules.system.service.ISysUserService;
 import com.cfcc.modules.workflow.pojo.TaskInfoJsonAble;
@@ -112,8 +113,12 @@ public class oaCalendarController implements Job {
                                                    HttpServletRequest request) {
         Result<IPage<oaCalendar>> result = new Result<IPage<oaCalendar>>();
         SysUser currentUser = sysUserService.getCurrentUser(request);
-        String username = currentUser.getUsername();
-        oaCalendar.setSCreateBy(username);
+        if(currentUser == null){
+            result.error500("未找到对应实体");
+        }else{
+            String username = currentUser.getUsername();
+            oaCalendar.setSCreateBy(username);
+        }
         IPage<oaCalendar> pageList = oaCalendarService.findPage(pageNo, pageSize, oaCalendar);
         result.setSuccess(true);
         result.setResult(pageList);
@@ -138,6 +143,9 @@ public class oaCalendarController implements Job {
         //查询当前用户，作为assignee
         String token = request.getHeader(DefContants.X_ACCESS_TOKEN);
         SysUser currentUser = sysUserService.getCurrentUser(request);
+        if(currentUser == null){
+            result.error500("未找到对应实体");
+        }
         String id = currentUser.getId();
         Integer departId = currentUser.getDepartId();
         List<String> manageIdList = oaCalendarService.getUserId(id);
@@ -198,6 +206,9 @@ public class oaCalendarController implements Job {
         String token = request.getHeader(DefContants.X_ACCESS_TOKEN);
         String username = JwtUtil.getUsername(token);
         SysUser user = sysUserService.getUserByName(username);
+        if(user == null){
+            result.error500("未找到对应实体");
+        }
         String id = user.getId();//查出当前用户的id
         String departId = oaCalendarService.getDepartId(user.getId()); //查出当前登陆用户的部门id
         List<String> manageIdList = oaCalendarService.getUserId(id);
@@ -632,9 +643,14 @@ public class oaCalendarController implements Job {
     @AutoLog(value = "权限设置-查询功能模块")
     @ApiOperation(value = "权限设置-查询功能模块", notes = "权限设置-查询功能模块")
     @GetMapping(value = "/getFunctionName")
-    public Result<List<BusFunction>> getFunctionName() {
+    public Result<List<BusFunction>> getFunctionName(HttpServletRequest request) {
         Result<List<BusFunction>> result = new Result<>();
+        //查询当前用户，作为assignee
+        LoginInfo loginInfo = sysUserService.getLoginInfo(request);
+        SysDepart depart = loginInfo.getDepart();
         List<BusFunction> busModelList = oaCalendarService.busFunctionList();
+        //权限过滤，有些fun只能特定的部门能看到
+        busModelList = oaBusdataService.getFunListByFunUnit(busModelList, depart);
         if (busModelList.size() == 0) {
             result.error500("未找到对应实体");
         } else {

@@ -61,8 +61,8 @@ public class BusFunctionPermitServiceImpl extends ServiceImpl<BusFunctionPermitM
 
     @Override
     public IPage<BusFunctionPermit> findPage(Integer ibusId,Integer pageNo, Integer pageSize) {
-        BusFunctionPermit busFunctionPermit=new BusFunctionPermit();
-        BeanUtils.copyProperties(busFunctionPermit,busFunctionPermit);
+        /*BusFunctionPermit busFunctionPermit=new BusFunctionPermit();
+        BeanUtils.copyProperties(busFunctionPermit,busFunctionPermit);*/
         int total = busFunctionPermitMapper.count(ibusId);
         List<BusFunctionPermit> functionPermitList =  busFunctionPermitMapper.findPage((pageNo-1)*pageSize,pageSize,ibusId);
         for(int i = 0; i < functionPermitList.size() ; i ++){

@@ -116,17 +116,28 @@ public class oaTeamworkSetController {
 	@PostMapping(value = "/add")
 	public Result<oaTeamworkSet> add(@RequestBody oaTeamworkSet oaTeamworkSet,HttpServletRequest request) {
 		LoginInfo loginInfo = iSysUserService.getLoginInfo(request);
+		Result<oaTeamworkSet> result = new Result<oaTeamworkSet>();
 		String UserId = loginInfo.getId();//创建者id
 		String  DepartId= loginInfo.getDepart().getId();//创建者部门id
 		SysDepart unit = iSysDepartService.getUnitByDeptId(DepartId);
+		if(unit == null){
+			result.error500("未找到对应实体");
+		}
 		String parentId = unit.getId();//机构id
-		Result<oaTeamworkSet> result = new Result<oaTeamworkSet>();
 		try {
 			oaTeamworkSet.setSCreateBy(UserId);
 			oaTeamworkSet.setSCreateDeptid(DepartId);
 			oaTeamworkSet.setSCreateUnitid(parentId);
-			oaTeamworkSetService.insert(oaTeamworkSet);
-			result.success("添加成功！");
+			List<Integer> orderlist = oaTeamworkSetService.findorder();
+			if(orderlist != null){
+				if(orderlist.contains(oaTeamworkSet.getIOrder())){
+					result.error500("序号不能重复");
+				}else{
+					oaTeamworkSetService.insert(oaTeamworkSet);
+					result.success("添加成功！");
+				}
+			}
+
 		} catch (Exception e) {
 			log.error(e.getMessage(),e);
 			result.error500("操作失败");
@@ -193,8 +204,6 @@ public class oaTeamworkSetController {
 	@GetMapping(value = "/findListByteamworkId")
 	public List<oaTeamworkSet> findListByteamworkId(@RequestParam(name="TeamworkName",required=false) String TeamworkName) {
 			List<oaTeamworkSet> list = oaTeamworkSetService.findListByteamworkId(TeamworkName);
-
-
 			return list;
 	}
 	/**
@@ -208,7 +217,9 @@ public class oaTeamworkSetController {
 	public String findTableName(@RequestParam(name="ibusModelId",required=false) Integer ibusModelId) {
 
 		String tableName = iOaBusdataService.queryTableName(ibusModelId);
-
+		if(tableName.equals("")){
+			tableName = "";
+		}
 		return tableName;
 	}
 	 /**
