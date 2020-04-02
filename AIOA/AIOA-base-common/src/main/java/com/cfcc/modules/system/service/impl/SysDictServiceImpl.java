@@ -324,5 +324,10 @@ public class SysDictServiceImpl extends ServiceImpl<SysDictMapper, SysDict> impl
         return dictItemList;
     }
 
+    @Override
+    public boolean deleteDictByDictId(String id) {
+        return sysDictMapper.deleteDictByDictId(id);
+    }
+
 
 }

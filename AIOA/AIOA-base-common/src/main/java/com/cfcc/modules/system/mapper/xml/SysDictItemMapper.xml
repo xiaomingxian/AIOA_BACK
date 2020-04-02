@@ -1,6 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.cfcc.modules.system.mapper.SysDictItemMapper">
+    <delete id="deleteDictItemByDictID">
+        DELETE FROM sys_dict_item WHERE dict_id = #{id}
+    </delete>
 
     <select id="getItemTextById" resultType="java.lang.String">
         <if test="DBvalue != null and DBvalue != ''">
