@@ -280,6 +280,7 @@ public class SysDictServiceImpl extends ServiceImpl<SysDictMapper, SysDict> impl
     public List<DictModel> getSqlValue(String description, String userId, String departId, String unitId) {
         String str[] = description.split("#") ;
         if(str.length > 1 ){
+            description = str[0] ;
             for(int i = 1 ; i < str.length ; i ++){
                 if(str[i].indexOf(" ") != -1){
                     String head = str[i].substring(0,str[i].indexOf(" ")) ;
@@ -302,7 +303,7 @@ public class SysDictServiceImpl extends ServiceImpl<SysDictMapper, SysDict> impl
                 description += str[i] ;
             }
         }
-        System.out.println("数据字典sql：" + departId);
+        System.out.println("数据字典sql：" + description);
         return sysDictMapper.getSqlValueDao(description);
     }
 
