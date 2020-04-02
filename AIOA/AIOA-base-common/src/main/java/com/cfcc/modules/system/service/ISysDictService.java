@@ -104,4 +104,6 @@ public interface ISysDictService extends IService<SysDict> {
     IPage<SysDict> getDictByAll(SysDict sysDict, Integer pageNo, Integer pageSize);
 
     List<SysDictItem> getEsIpAndHost(String orgCode);
+
+    boolean deleteDictByDictId(String id);
 }

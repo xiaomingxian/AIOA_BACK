@@ -1,21 +1,13 @@
 package com.cfcc.modules.system.controller;
 
 
-import java.util.*;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
-import com.cfcc.common.mycat.MycatSchema;
-import com.cfcc.modules.system.entity.SysUser;
-import com.cfcc.modules.system.service.ISysDepartService;
-import com.cfcc.modules.system.service.ISysDictItemService;
-import com.cfcc.modules.system.service.ISysDictService;
-import com.cfcc.modules.system.service.ISysUserService;
-import org.apache.shiro.SecurityUtils;
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.cfcc.common.api.vo.Result;
 import com.cfcc.common.constant.CacheConstant;
 import com.cfcc.common.constant.CommonConstant;
+import com.cfcc.common.mycat.MycatSchema;
 import com.cfcc.common.system.query.QueryGenerator;
 import com.cfcc.common.system.vo.DictModel;
 import com.cfcc.common.system.vo.LoginUser;
@@ -23,9 +15,16 @@ import com.cfcc.common.util.SqlInjectionUtil;
 import com.cfcc.common.util.oConvertUtils;
 import com.cfcc.modules.system.entity.SysDict;
 import com.cfcc.modules.system.entity.SysDictItem;
+import com.cfcc.modules.system.entity.SysUser;
 import com.cfcc.modules.system.model.SysDictTree;
 import com.cfcc.modules.system.model.TreeSelectModel;
+import com.cfcc.modules.system.service.ISysDepartService;
+import com.cfcc.modules.system.service.ISysDictItemService;
+import com.cfcc.modules.system.service.ISysDictService;
+import com.cfcc.modules.system.service.ISysUserService;
 import com.cfcc.modules.system.vo.SysDictPage;
+import lombok.extern.slf4j.Slf4j;
+import org.apache.shiro.SecurityUtils;
 import org.jeecgframework.poi.excel.ExcelImportUtil;
 import org.jeecgframework.poi.excel.def.NormalExcelConstants;
 import org.jeecgframework.poi.excel.entity.ExportParams;
@@ -39,11 +38,9 @@ import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.multipart.MultipartHttpServletRequest;
 import org.springframework.web.servlet.ModelAndView;
 
-import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
-import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
-import com.baomidou.mybatisplus.core.metadata.IPage;
-
-import lombok.extern.slf4j.Slf4j;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.util.*;
 
 /**
  * <p>
@@ -329,8 +326,10 @@ public class SysDictController {
     @CacheEvict(value = CacheConstant.DICT_CACHE, allEntries = true)
     public Result<SysDict> delete(@RequestParam(name = "id", required = true) String id) {
         Result<SysDict> result = new Result<SysDict>();
-        boolean ok = sysDictService.removeById(id);
+//        boolean ok = sysDictService.removeById(id);
+        boolean ok = sysDictService.deleteDictByDictId(id);
         if (ok) {
+            Boolean res = sysDictItemService.deleteDictItemByDictID(id);
             result.success("删除成功!");
         } else {
             result.error500("删除失败!");
