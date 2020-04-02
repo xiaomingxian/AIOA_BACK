@@ -133,7 +133,7 @@ public class OaElasticsearchController {
         }
         //存入频繁搜索数据
         if (sourceList != null){
-            esSearchService.addSearchfrequency(keyWord);
+            esSearchService.addSearchfrequency(keyWord1);
         }
         result.setResult(sourceList);
         result.setSuccess(true);

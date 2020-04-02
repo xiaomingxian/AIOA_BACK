@@ -44,4 +44,10 @@ public class SysUserFunServiceImpl extends ServiceImpl<SysUserFunMapper, SysUser
         List<String> list=sysUserFunMapper.selecUserFuntList(userId);
         return list;
     }
+
+    @Override
+    public List<SysUserFun> showUserFunStatus(String userId) {
+        List<SysUserFun> list=sysUserFunMapper.selectUserFunStatus(userId);
+        return list;
+    }
 }

@@ -52,4 +52,6 @@ public interface SysDictItemMapper extends BaseMapper<SysDictItem> {
     @Select("select d.item_text from sys_dict_item d where d.dict_id = " +
             "(select c.id from sys_dict c where c.dict_code = #{sDictId})  and d.item_value = #{itemValue};")
     String queryItemTextByDicIdAndValue(@Param("sDictId") String sDictId, @Param("itemValue") String itemValue);
+
+    Boolean deleteDictItemByDictID(@Param("id") String id);
 }

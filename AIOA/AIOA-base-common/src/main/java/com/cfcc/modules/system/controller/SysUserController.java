@@ -1063,4 +1063,16 @@ public class SysUserController {
         return result;
     }
 
+    @GetMapping(value = "/showUserFunStatus")
+    public Result<List<SysUserFun>> showUserFunStatus(@RequestParam(name = "userId",required=true) String userId){
+        Result<List<SysUserFun>> result = new Result<>();
+        List<SysUserFun> list=iSysUserFunService.showUserFunStatus(userId);
+        if (list.size()==0){
+            result.setSuccess(false);
+        }else {
+            result.setSuccess(true);
+        }
+        result.setResult(list);
+        return result;
+    }
 }

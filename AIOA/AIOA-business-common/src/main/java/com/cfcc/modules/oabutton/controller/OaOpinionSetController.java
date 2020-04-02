@@ -316,7 +316,7 @@ public class OaOpinionSetController {
 	 public Result<List<OaOpinionSet>> queryByOrderAndKey(@RequestBody Map<String,Object> map) {
 		 Result<List<OaOpinionSet>> result = new Result<>();
 		 if (map.get("itaskOpinionOrder")==null
-				 ||map.get("procDefKey")==null){
+				 ||map.get("procDefKey")==null ||map.get("iProcOpinionId")==null){
 			 result.error500("未找到对应实体");
 			 return result;
 		 }
