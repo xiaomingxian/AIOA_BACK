@@ -81,6 +81,9 @@ public class oaTeamworkController {
 
 		Result<IPage<oaTeamwork>> result = new Result<IPage<oaTeamwork>>();
 		SysUser currentUser = iSysUserService.getCurrentUser(request);
+		if(currentUser == null){
+			result.error500("未找到对应实体");
+		}
 		String id = currentUser.getId();
 		oaTeamwork.setSCreateBy(id);
 		IPage<oaTeamwork> pageList = oaTeamworkService.findPage(pageNo, pageSize, oaTeamwork);
@@ -100,11 +103,14 @@ public class oaTeamworkController {
 	@PostMapping(value = "/add")
 	public Result<oaTeamwork> add(@RequestBody oaTeamwork oaTeamwork,HttpServletRequest request) {
 		LoginInfo loginInfo = iSysUserService.getLoginInfo(request);
+		Result<oaTeamwork> result = new Result<oaTeamwork>();
 		String UserId = loginInfo.getId();//创建者id
 		String  DepartId= loginInfo.getDepart().getId();//创建者部门id
 		SysDepart unit = iSysDepartService.getUnitByDeptId(DepartId);
+		if (unit == null){
+			result.error500("未找到对应实体");
+		}
 		String parentId = unit.getId();//机构id
-		Result<oaTeamwork> result = new Result<oaTeamwork>();
 		try {
 			oaTeamwork.setSCreateBy(UserId);
 			oaTeamwork.setSCreateDeptid(DepartId);

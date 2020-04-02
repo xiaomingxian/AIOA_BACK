@@ -155,6 +155,20 @@ public class oaCalendarServiceImpl extends ServiceImpl<oaCalendarMapper, oaCalen
     @Override
     public oaCalendar getByIid(String id) {
         oaCalendar oaCalendar = oaCalendarMapper.getByIid(id);
+
+            String state = oaCalendar.getState();
+            if(state.equals("0")){//0,普通日程、1,办件（未办）、2，办件（已办），3，阅件\\抄送（未阅），4，阅件阅件\\抄送（已阅）',
+                oaCalendar.setStateName("");
+            }else if(state.equals("1")){
+                oaCalendar.setStateName("【待办】");
+            }else if(state.equals("2")){
+                oaCalendar.setStateName("【已办】");
+            }else if(state.equals("3")){
+                oaCalendar.setStateName("【未阅】");
+            }else if(state.equals("4")){
+                oaCalendar.setStateName("【已阅】");
+            }
+
         String[] UserIdList = oaCalendar.getSUserNames().split(",");
         Set<String> set = new HashSet<>() ;
         for (int j = 0; j <UserIdList.length; j++) {
@@ -167,9 +181,14 @@ public class oaCalendarServiceImpl extends ServiceImpl<oaCalendarMapper, oaCalen
         Integer iBusModelId = oaCalendar.getIBusModelId();
         if(iBusModelId!=null){
             BusModel busModel = iBusModelService.getBusModelById(iBusModelId);
-            String sBusdataTable = busModel.getSBusdataTable();
-            oaCalendar.setTableName(sBusdataTable);
-        }
+            if(busModel == null){
+                oaCalendar.setTableName("");
+            }else{
+                String sBusdataTable = busModel.getSBusdataTable();
+                oaCalendar.setTableName(sBusdataTable);
+            }
+            }
+
 
         oaCalendar.setSUserNameid(set);
         return oaCalendar;
@@ -215,9 +234,16 @@ public class oaCalendarServiceImpl extends ServiceImpl<oaCalendarMapper, oaCalen
         List<BusFunction> busFunctions = oaCalendarMapper.busFunctionList();
         for (BusFunction busFunction: busFunctions) {
             Integer iBusModelId = busFunction.getIBusModelId();
-            BusModel busModelById = iBusModelService.getBusModelById(iBusModelId);
-            String sName = busModelById.getSName();
-            busFunction.setBusModelName(sName);
+            if(iBusModelId == null){
+                BusModel busModelById = iBusModelService.getBusModelById(iBusModelId);
+                  if(busModelById == null){
+                      log.error("未找到对应得业务模块");
+                  }else{
+                      String sName = busModelById.getSName();
+                      busFunction.setBusModelName(sName);
+                  }
+
+            }
         }
         return busFunctions;
     }
@@ -231,20 +257,23 @@ public class oaCalendarServiceImpl extends ServiceImpl<oaCalendarMapper, oaCalen
           //  filePath = uploadpath+"\\"+filePath.substring(0,filePath.lastIndexOf("\\")+1)+fileName;
 
 //            LoginInfo loginInfo = userService.getLoginInfo(request);
-            String orgSchema = MycatSchema.getSchema();
-            if (StringUtils.isNotBlank(orgSchema)) {
-                filePath = uploadpath + File.separator + orgSchema + File.separator + filePath;
-            } else {
-                filePath = uploadpath + File.separator + filePath;
-            }
-            System.out.println(filePath+"------------------");
-            File file = new File(filePath);
-            FileInputStream stream = new FileInputStream(file);
-            byte[] b = new byte[1024];
-            int len = -1;
-            while ((len = stream.read(b, 0, 1024)) != -1) {
-                response.getOutputStream().write(b, 0, len);
-            }
+
+                String orgSchema = MycatSchema.getSchema();
+                if (StringUtils.isNotBlank(orgSchema)) {
+                    filePath = uploadpath + File.separator + orgSchema + File.separator + filePath;
+                } else {
+                    filePath = uploadpath + File.separator + filePath;
+                }
+                System.out.println(filePath+"------------------");
+                File file = new File(filePath);
+                FileInputStream stream = new FileInputStream(file);
+                byte[] b = new byte[1024];
+                int len = -1;
+                while ((len = stream.read(b, 0, 1024)) != -1) {
+                    response.getOutputStream().write(b, 0, len);
+                }
+
+
         } catch (FileNotFoundException e) {
             e.printStackTrace();
         } catch (IOException e) {
