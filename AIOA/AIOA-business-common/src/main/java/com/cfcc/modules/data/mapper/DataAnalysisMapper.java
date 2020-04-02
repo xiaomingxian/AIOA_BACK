@@ -21,7 +21,7 @@ public interface DataAnalysisMapper extends BaseMapper<OaBusdata> {
     String getDepartId(String sCreateBy);
 
     //查询表里面的表字段
-    List<Map<String, Object>> selectColums(@Param("table")String table);
+    List<Map<String, Object>> selectColums(@Param("table")String table,@Param("bdata") OaBusdata oaBusdata);
 
     List<Map<String, Object>> selectDeptNames(@Param("table")String table, @Param("bdata") OaBusdata oaBusdata);
 
