@@ -17,7 +17,7 @@
     <!--条件查询统计条数-->
     <select id="queryButtonCount" resultType="java.lang.Integer"
             parameterType="com.cfcc.modules.oabutton.entity.OaOpinionSet">
-        select count(i_id) as total from oa_opinion_set
+        select count(1) as total from oa_opinion_set
         <where>
             <if test="iTaskOpinionName != null and iTaskOpinionName != ''">
                 i_task_opinion_name=#{iTaskOpinionName}
@@ -103,6 +103,7 @@
         select * from oa_opinion_set
          where PROC_DEF_KEY_ = #{procDefKey}
          and i_task_opinion_order=#{itaskOpinionOrder}
+         and i_proc_opinion_id=#{iProcOpinionId}
     </select>
 
     <!--添加流程意见-->

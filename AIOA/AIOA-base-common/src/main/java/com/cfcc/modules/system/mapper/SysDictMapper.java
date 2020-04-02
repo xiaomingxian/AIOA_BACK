@@ -128,4 +128,6 @@ public interface SysDictMapper extends BaseMapper<SysDict> {
     List<SysDict> getDictByAll(@Param("sysDict") SysDict sysDict,@Param("start") Integer start,@Param("pageSize") Integer pageSize);
 
     List<SysDictItem> getEsIpAndHost(@Param("orgCode") String orgCode);
+
+    Boolean deleteDictByDictId(@Param("id") String id);
 }

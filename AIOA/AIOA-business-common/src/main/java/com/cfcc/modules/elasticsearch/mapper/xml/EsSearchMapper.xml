@@ -16,7 +16,7 @@
     <select id="selectEsSearch" resultType="com.cfcc.modules.elasticsearch.entity.EsSearch" >
         select * from oa_es_search
         <if test="keyWord != null and keyWord != ''">
-            where key_word like concat(#{keyWord},'%')
+            where key_word like '%'#{keyWord}'%'
         </if>
         order by frequency desc limit 0,5
     </select>

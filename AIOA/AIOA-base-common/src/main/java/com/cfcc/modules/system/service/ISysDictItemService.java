@@ -27,4 +27,6 @@ public interface ISysDictItemService extends IService<SysDictItem> {
     boolean updateByIdAndDeparts(SysDictItem sysDictItem);
 
     String getDictItemText(String dictKey, String itemValue);
+
+    Boolean deleteDictItemByDictID(String id);
 }

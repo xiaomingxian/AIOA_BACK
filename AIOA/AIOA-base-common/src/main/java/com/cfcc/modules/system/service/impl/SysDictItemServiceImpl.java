@@ -111,4 +111,9 @@ public class SysDictItemServiceImpl extends ServiceImpl<SysDictItemMapper, SysDi
 
         return sysDictItemMapper.getDictItemText(dictKey, itemValue);
     }
+
+    @Override
+    public Boolean deleteDictItemByDictID(String id) {
+        return sysDictItemMapper.deleteDictItemByDictID(id);
+    }
 }
