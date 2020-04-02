@@ -284,6 +284,9 @@ public class SysDictServiceImpl extends ServiceImpl<SysDictMapper, SysDict> impl
             for(int i = 1 ; i < str.length ; i ++){
                 if(str[i].indexOf(" ") != -1){
                     String head = str[i].substring(0,str[i].indexOf(" ")) ;
+                    if(head.indexOf(")") != -1){
+                        head = head.replace(")"," )") ;
+                    }
                     if("userId".equals(head)){
                         str[i] = str[i].replace(head,"'"+userId+"'") ;
                     }else if("departId".equals(head)){
@@ -292,6 +295,9 @@ public class SysDictServiceImpl extends ServiceImpl<SysDictMapper, SysDict> impl
                         str[i] = str[i].replace(head,"'"+unitId+"'") ;
                     }
                 }else{
+                    if(str[i].indexOf(")") != -1){
+                        str[i] = str[i].replace(")"," )") ;
+                    }
                     if("userId".equals(str[i])){
                         str[i] = str[i].replace(str[i],"'"+userId+"'") ;
                     }else if("departId".equals(str[i])){
