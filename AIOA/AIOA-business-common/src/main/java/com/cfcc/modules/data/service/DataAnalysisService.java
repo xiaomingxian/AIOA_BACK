@@ -16,7 +16,7 @@ public interface DataAnalysisService extends IService<OaBusdata> {
     String getDepartId(String sCreateBy);
 
     //查询表里面的表字段
-    List<Map<String, Object>> selectColums(String table);
+    List<Map<String, Object>> selectColums(String table,OaBusdata oaBusdata);
 
     List<Map<String, Object>> selectDeptNames(String table,OaBusdata oaBusdata);
 
