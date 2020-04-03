@@ -235,14 +235,16 @@ public class oaCalendarServiceImpl extends ServiceImpl<oaCalendarMapper, oaCalen
         for (BusFunction busFunction: busFunctions) {
             Integer iBusModelId = busFunction.getIBusModelId();
             if(iBusModelId == null){
-                BusModel busModelById = iBusModelService.getBusModelById(iBusModelId);
-                  if(busModelById == null){
-                      log.error("未找到对应得业务模块");
-                  }else{
-                      String sName = busModelById.getSName();
-                      busFunction.setBusModelName(sName);
-                  }
+                log.error("未找到对应得业务模块");
 
+            }else{
+                BusModel busModelById = iBusModelService.getBusModelById(iBusModelId);
+                if(busModelById == null){
+                    log.error("未找到对应得业务模块");
+                }else{
+                    String sName = busModelById.getSName();
+                    busFunction.setBusModelName(sName);
+                }
             }
         }
         return busFunctions;
