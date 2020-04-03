@@ -43,7 +43,7 @@ import java.util.Map;
 @Slf4j
 @Api(tags="用户收藏功能表")
 @RestController
-@RequestMapping("/oaBus/SysUserFun")
+@RequestMapping("/sys/SysUserFun")
 public class SysUserFunController {
    @Autowired
    private ISysUserFunService sysUserFunService;
@@ -75,7 +75,7 @@ public class SysUserFunController {
     @AutoLog(value = "用户收藏功能表-分页列表查询")
     @ApiOperation(value="用户收藏功能表-分页列表查询", notes="用户收藏功能表-分页列表查询")
     @GetMapping(value = "/queryListByUserId")
-    public Result<List<SysUserFun>> queryListByUserId(Integer userId) {
+    public Result<List<SysUserFun>> queryListByUserId(String userId) {
         Result<List<SysUserFun>> result = new Result<List<SysUserFun>>();
         List<SysUserFun> pageList = sysUserFunService.queryListByUserIdSer(userId) ;
         result.setSuccess(true);

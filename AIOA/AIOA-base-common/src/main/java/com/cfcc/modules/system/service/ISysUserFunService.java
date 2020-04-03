@@ -1,7 +1,6 @@
 package com.cfcc.modules.system.service;
 
 import com.baomidou.mybatisplus.extension.service.IService;
-import com.cfcc.modules.system.entity.SysUserDepart;
 import com.cfcc.modules.system.entity.SysUserFun;
 
 import java.util.List;
@@ -22,4 +21,5 @@ public interface ISysUserFunService extends IService<SysUserFun> {
 
     List<SysUserFun> showUserFunStatus(String userId);
 
+    List<SysUserFun> queryListByUserIdSer(String userId);
 }

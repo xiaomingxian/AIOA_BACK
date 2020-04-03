@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cfcc.modules.system.mapper.SysUserFunMapper">
+
+    <select id="queryAllList" resultType="java.util.Map">
+
+    </select>
+    <!--查询用户的收藏-->
+    <select id="queryListByUserIdDao" resultType="com.cfcc.modules.system.entity.SysUserFun">
+        select * from sys_user_fun c where c.s_user_id = #{userId}
+    </select>
+</mapper>
