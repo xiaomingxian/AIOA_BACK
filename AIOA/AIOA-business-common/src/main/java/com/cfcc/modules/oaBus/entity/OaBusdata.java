@@ -376,4 +376,9 @@ public class OaBusdata {
 	@Excel(name = "是否起草底稿", width = 15)
 	@ApiModelProperty(value = "是否起草底稿")
 	private java.lang.Integer iIsdraft;
+	/**是否冲突*/
+	@ApiModelProperty(value = "是否冲突")
+	@TableField(exist = false)
+	private java.lang.Integer conflict;
+
 }

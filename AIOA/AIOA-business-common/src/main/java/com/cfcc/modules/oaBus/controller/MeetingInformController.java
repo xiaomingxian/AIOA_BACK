@@ -56,10 +56,12 @@ public class MeetingInformController {
      */
     @GetMapping(value = "/getMeetingRoom")
     public Result<IPage<OaBusdata>> getMeetingRoom(@RequestParam(name = "s_varchar1") String s_varchar1,
-                                                     @RequestParam(name = "pageNo", defaultValue = "1") Integer pageNo,
-                                                     @RequestParam(name = "pageSize", defaultValue = "5") Integer pageSize){
+                                                   @RequestParam(name = "sTime") String sTime,
+                                                   @RequestParam(name = "eTime") String eTime,
+                                                   @RequestParam(name = "pageNo", defaultValue = "1") Integer pageNo,
+                                                   @RequestParam(name = "pageSize", defaultValue = "5") Integer pageSize){
         Result<IPage<OaBusdata>> result = new Result<>();
-        IPage<OaBusdata> roomList=meetingInformService.queryMeetingList(s_varchar1,pageNo,pageSize);
+        IPage<OaBusdata> roomList=meetingInformService.queryMeetingList(s_varchar1,pageNo,pageSize,sTime,eTime);
         result.setSuccess(true);
         result.setResult(roomList);
         return result;
