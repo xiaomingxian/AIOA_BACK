@@ -341,7 +341,7 @@
         select * from oa_busdata30 where i_bus_function_id = 107  and  s_title  is  not null  and s_title &lt;&gt; "" and i_id = #{id}
     </select>
     <select id="busFunctionList" resultType="com.cfcc.modules.oaBus.entity.BusFunction">
-        SELECT i_id,i_bus_model_id,s_name  FROM oa_bus_function
+        SELECT i_id,i_bus_model_id,s_name  FROM oa_bus_function ORDER BY i_bus_model_id
     </select>
     <select id="selectPath" resultType="java.lang.String">
           select s_file_path from oa_file where s_table = 'oa_busdata30' and  i_table_id = #{id}
