@@ -8,6 +8,7 @@ import org.apache.ibatis.annotations.Select;
 import org.apache.ibatis.annotations.Update;
 
 import java.util.List;
+import java.util.Map;
 
 
 /**
@@ -34,4 +35,7 @@ public interface SysUserFunMapper extends BaseMapper<SysUserFun> {
 
     @Select("SELECT i_bus_model_id,i_bus_function_id,status FROM sys_user_fun WHERE s_user_id=#{usrId}")
     List<SysUserFun> selectUserFunStatus(String userId);
+    List<Map<String,Object>> queryAllList();
+
+    List<SysUserFun> queryListByUserIdDao(Integer userId);
 }
