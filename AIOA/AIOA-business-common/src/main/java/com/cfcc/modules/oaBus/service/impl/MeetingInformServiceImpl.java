@@ -4,6 +4,7 @@ import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.cfcc.common.util.DatesUtils;
 import com.cfcc.modules.oaBus.entity.OaBusdata;
 import com.cfcc.modules.oaBus.entity.oaCalendar;
 import com.cfcc.modules.oaBus.mapper.BusdataPermitMapper;
@@ -20,6 +21,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -56,9 +58,20 @@ public class MeetingInformServiceImpl extends ServiceImpl<MeetingInformMapper, O
     }
 
     @Override
-    public IPage<OaBusdata> queryMeetingList(String s_varchar1, Integer pageNo, Integer pageSize) {
+    public IPage<OaBusdata> queryMeetingList(String s_varchar1, Integer pageNo, Integer pageSize,String sTime,String eTime) {
         int total=meetingInformMapper.queryMeetingTotal(s_varchar1);
+        Date sDate= DatesUtils.stringToDate(sTime);
+        Date eDate=DatesUtils.stringToDate(eTime);
         List<OaBusdata> MeetingList = meetingInformMapper.queryMeeting(s_varchar1,(pageNo-1)*pageSize,pageSize);
+        MeetingList.forEach(funcation ->{
+            Date dDatetime1 = funcation.getDDatetime1();
+            Date dDatetime2 = funcation.getDDatetime2();
+            if (DatesUtils.getDayCoincidence(sDate,dDatetime1,dDatetime2,eDate) == 0){
+                funcation.setConflict(1);
+            }else {
+                funcation.setConflict(0);
+            }
+        });
         IPage<OaBusdata> oaBusdataIPage=new Page<>();
         oaBusdataIPage.setTotal(total);
         oaBusdataIPage.setRecords(MeetingList);

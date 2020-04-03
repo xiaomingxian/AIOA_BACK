@@ -39,11 +39,11 @@
 
     <select id="queryMeeting" resultType="com.cfcc.modules.oaBus.entity.OaBusdata">
         SELECT
-	    s_varchar2,d_datetime1,d_datetime2,i_is_state
+	    s_title,d_datetime1,d_datetime2,i_is_state,s_create_name,s_create_dept
         FROM
 	    oa_busdata40
         WHERE
-	    s_varchar1 = #{s_varchar1}
+	    s_varchar4 = #{s_varchar1}
         limit #{pageNo},#{pageSize}
     </select>
 
