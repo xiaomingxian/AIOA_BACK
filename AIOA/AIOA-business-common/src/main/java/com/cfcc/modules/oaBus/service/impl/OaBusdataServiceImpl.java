@@ -213,7 +213,7 @@ public class OaBusdataServiceImpl extends ServiceImpl<OaBusdataMapper, OaBusdata
      * @throws Exception
      */
     @Override
-    public Result<IPage<Map<String, Object>>> getByModelId(String json, String realName, String username) {
+    public Result<IPage<Map<String, Object>>>  getByModelId(String json, String realName, String username) {
         log.info(json);
         Result<IPage<Map<String, Object>>> result = new Result<>();
         Map maps = (Map) JSONObject.parse(json);
@@ -821,6 +821,7 @@ public class OaBusdataServiceImpl extends ServiceImpl<OaBusdataMapper, OaBusdata
      * @param funid
      * @return
      */
+    @Override
     public Map<String, String> permit(int funid, String tableName, String userName) {
 
         Map<String, String> result = new HashMap<>();
