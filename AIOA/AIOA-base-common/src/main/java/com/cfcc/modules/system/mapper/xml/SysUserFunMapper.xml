@@ -9,4 +9,19 @@
     <select id="queryListByUserIdDao" resultType="com.cfcc.modules.system.entity.SysUserFun">
         select * from sys_user_fun c where c.s_user_id = #{userId}
     </select>
+    <select id="queryListMapByUserIdDao" resultType="java.util.Map">
+        SELECT
+            c.i_bus_function_id,
+            c.i_bus_model_id,
+            f.s_name AS funName,
+            m.s_name AS modelName
+        FROM
+            sys_user_fun c,
+            oa_bus_model m,
+            oa_bus_function f
+        WHERE
+            c.s_user_id = #{userId}
+        AND c.i_bus_function_id = f.i_id
+        AND c.i_bus_model_id = m.i_id
+    </select>
 </mapper>

@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.extension.service.IService;
 import com.cfcc.modules.system.entity.SysUserFun;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * ClassName:ISysUserFunService
@@ -22,4 +23,6 @@ public interface ISysUserFunService extends IService<SysUserFun> {
     List<SysUserFun> showUserFunStatus(String userId);
 
     List<SysUserFun> queryListByUserIdSer(String userId);
+
+    List<Map<String, Object>> queryListMapByUserIdSer(String userId);
 }

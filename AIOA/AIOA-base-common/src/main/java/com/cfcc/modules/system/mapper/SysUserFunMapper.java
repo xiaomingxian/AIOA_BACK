@@ -38,4 +38,6 @@ public interface SysUserFunMapper extends BaseMapper<SysUserFun> {
     List<Map<String,Object>> queryAllList();
 
     List<SysUserFun> queryListByUserIdDao(String userId);
+
+    List<Map<String, Object>> queryListMapByUserIdDao(String userId);
 }
