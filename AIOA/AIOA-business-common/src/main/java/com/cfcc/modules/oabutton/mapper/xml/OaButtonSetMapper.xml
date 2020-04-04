@@ -16,7 +16,7 @@
             <if test="iButtonId!=null and iButtonId!=''">
                 i_button_id,
             </if>
-            <if test="iOrder!=null and iOrder!=''">
+            <if test="iOrder!=null">
                 i_order,
             </if>
             <if test="iPermitType==0 or iPermitType!=null and iPermitType!=''">
@@ -60,7 +60,7 @@
             <if test="iButtonId!=null and iButtonId!=''">
                 #{iButtonId},
             </if>
-            <if test="iOrder!=null and iOrder!=''">
+            <if test="iOrder!=null">
                 #{iOrder},
             </if>
             <if test="iPermitType==0 or iPermitType!=null and iPermitType!=''">
