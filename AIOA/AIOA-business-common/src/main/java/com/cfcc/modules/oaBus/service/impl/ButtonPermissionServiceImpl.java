@@ -72,6 +72,7 @@ public class ButtonPermissionServiceImpl implements ButtonPermissionService {
         List<BusProcSet> busProcSets = iBusProcSetService.findList(schema);
         List<BusModel> busModels = iBusModelService.findList(schema);
         List<OaButtonSet> oaButtonSets = iOaButtonSetService.findList(schema);
+
         List<OaButton> oaButtons = iOaButtonService.findList();
         // 获取当前业务需要的数据
         BusProcSet busProcSet = null;

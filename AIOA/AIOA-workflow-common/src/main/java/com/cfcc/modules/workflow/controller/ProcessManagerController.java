@@ -149,13 +149,13 @@ public class ProcessManagerController {
             , @RequestParam(value = "key", required = false) String key) {
         try {
             List<Activity> acts = processManagerService.actsListPic(processDefinitionId, key, true);//展示所有节点
-            //加一个结束节点
-            //Activity activity = new Activity();
-            //activity.setId("end");
-            //activity.setName("结束");
-            //activity.setProcDefKey(acts.get(0).getProcDefKey());
-            //activity.setType("endEvent");
-            //acts.add(activity);
+            //加一个结束节点 与流程无关 用于展示半截后的按钮配置
+            Activity activity = new Activity();
+            activity.setId("end");
+            activity.setName("办结");
+            activity.setProcDefKey(acts.get(0).getProcDefKey());
+            activity.setType("AIOATYPE");
+            acts.add(activity);
 
 
             return Result.ok(acts);

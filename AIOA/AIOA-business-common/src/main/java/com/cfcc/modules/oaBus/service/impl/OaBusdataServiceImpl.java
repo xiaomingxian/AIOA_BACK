@@ -455,6 +455,7 @@ public class OaBusdataServiceImpl extends ServiceImpl<OaBusdataMapper, OaBusdata
         String userId = user.getId();
 
         System.out.println("================>>>业务详情查询时间::" + (l2 - l1));
+        String endTime= (String)oaBusdata.get("s_varchar9");
         //********************************************************************* 流程信息查询
         //读取该流程的第一个环节
         String proKey = busProcSet1.getProcDefKey();
@@ -467,7 +468,6 @@ public class OaBusdataServiceImpl extends ServiceImpl<OaBusdataMapper, OaBusdata
         if (StringUtils.isBlank(proKey)) {//没有流程
             result.put("optionTable", null);
         } else {//有流程
-            //TODO 优化成一条sql
             processInstanceId = oaBusdata.get("s_varchar10") == null ? null : oaBusdata.get("s_varchar10").toString();
             String taskDefData = oaBusdata.get("s_cur_task_name") == null ? null : oaBusdata.get("s_cur_task_name").toString();
             if (StringUtils.isNotBlank(status) && status.equalsIgnoreCase("newtask")
@@ -497,7 +497,7 @@ public class OaBusdataServiceImpl extends ServiceImpl<OaBusdataMapper, OaBusdata
 
                 } else {//从业务页面进来
 
-                    String endTime= (String)oaBusdata.get("s_varchar9");
+
                     if (StringUtils.isBlank(endTime)){
 
                         TaskQuery taskQuery = taskService.createTaskQuery().processDefinitionKey(proKey)
@@ -525,8 +525,6 @@ public class OaBusdataServiceImpl extends ServiceImpl<OaBusdataMapper, OaBusdata
                                 if (historicTaskInstance != null && StringUtils.isBlank(status)) status = "done";
                             }
                         }
-
-
 
                     }
 
@@ -574,6 +572,7 @@ public class OaBusdataServiceImpl extends ServiceImpl<OaBusdataMapper, OaBusdata
         String optionTable = tableName + "_opinion";
         Integer busProcSetIId = busProcSet1.getIId();
         result.put("proSetId", busProcSetIId);
+        if (StringUtils.isNotBlank(endTime))taskDef="end";
         result.put("taskDefKey", taskDef);
         result.put("optionTable", optionTable);
         result.put("taskId", taskId);
@@ -591,7 +590,6 @@ public class OaBusdataServiceImpl extends ServiceImpl<OaBusdataMapper, OaBusdata
         if (StringUtils.isNotBlank(status) && "todo".equalsIgnoreCase(status)) {
             iBusFunctionPermitService.updateReade(tableName + "_permit", loginInfo.getId(), functionId, busdataId);
         }
-        long lstatus = System.currentTimeMillis();
 
         //******************************************   按钮/意见
         Map<String, Boolean> currentUserPermission =
