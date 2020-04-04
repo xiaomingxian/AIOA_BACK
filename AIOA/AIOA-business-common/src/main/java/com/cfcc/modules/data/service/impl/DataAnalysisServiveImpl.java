@@ -59,8 +59,8 @@ public class DataAnalysisServiveImpl extends ServiceImpl<DataAnalysisMapper, OaB
 
     //查询所有的字段名  ——LYJ
     @Override
-    public List<Map<String, Object>> selectColums(String table) {
-        return dataAnalisisMapper.selectColums(table);
+    public List<Map<String, Object>> selectColums(String table,OaBusdata oaBusdata) {
+        return dataAnalisisMapper.selectColums(table,oaBusdata);
     }
 
     //统计根据主办部门查询  ——LYJ

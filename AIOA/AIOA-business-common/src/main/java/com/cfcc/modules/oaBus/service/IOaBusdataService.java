@@ -77,6 +77,7 @@ public interface IOaBusdataService  extends  IService<OaBusdata>{
     Map<String, Object> getBusDataUserDepartSer();
 
     boolean updateMiddleById(String table, OaBusdata oaBusdata);
+    Map<String, String> permit(int funid, String tableName, String userName) ;
 
     IPage<OaBusdata> selectDocList(OaBusdata oaBusdata, String sBusdataTable, Integer pageNo, Integer pageSize);
 

@@ -10,7 +10,9 @@ import com.cfcc.modules.oaBus.entity.*;
 import com.cfcc.modules.oaBus.service.*;
 import com.cfcc.modules.system.entity.SysDepart;
 import com.cfcc.modules.system.entity.SysUser;
+import com.cfcc.modules.system.entity.SysUserFun;
 import com.cfcc.modules.system.service.ISysDepartService;
+import com.cfcc.modules.system.service.ISysUserFunService;
 import com.cfcc.modules.system.service.ISysUserService;
 import com.cfcc.modules.utils.IWfConstant;
 import io.swagger.annotations.Api;
@@ -54,6 +56,8 @@ public class NewTaskController {
     @Autowired
     private IoaCalendarService ioaCalendarService;
 
+    @Autowired
+    private ISysUserFunService iSysUserFunService;
 
 
     //
@@ -419,7 +423,7 @@ public class NewTaskController {
             if (FunctionList == null) {
                 result.error500("未找到对应实体");
             }
-            List<Map<String, String>> listAll = new ArrayList<>();
+            List<Map<String, Object>> listAll = new ArrayList<>();
             /*for (BusFunction function : FunctionList) {
                 Map<String, String> map = new HashMap<>();
                 if (modelId == function.getIBusModelId()) {
@@ -432,18 +436,31 @@ public class NewTaskController {
                     }
                 }
             }*/
+            List<SysUserFun> list=iSysUserFunService.showUserFunStatus(sysUserId);
             FunctionList.forEach(function -> {
-                Map<String, String> map = new HashMap<>();
+                Map<String, Object> map = new HashMap<>();
                 if (modelId == function.getIBusModelId()) {
                     String functionid = function.getIId().toString();
                     String functionSName = function.getSName();
                     if (list1.contains(functionid)) {
                         map.put("functionid", functionid);
                         map.put("functionSName", functionSName);
+                        map.put("status",0);
+                        list.forEach(function1 -> {
+                            int status=function1.getStatus();
+                            String funcation=function1.getIBusFunctionId()+"";
+                            if (modelId == function1.getIBusModelId()){
+                                if (functionid.equals(funcation)){
+                                    map.put("status",status);
+                                }
+                            }
+                        });
                         listAll.add(map);
                     }
+
                 }
             });
+
             result.setResult(listAll);
         }
 

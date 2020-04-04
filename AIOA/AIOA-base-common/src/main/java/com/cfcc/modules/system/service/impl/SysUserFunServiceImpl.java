@@ -1,7 +1,6 @@
 package com.cfcc.modules.system.service.impl;
 
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
-import com.cfcc.modules.system.entity.SysUserDepart;
 import com.cfcc.modules.system.entity.SysUserFun;
 import com.cfcc.modules.system.mapper.SysUserFunMapper;
 import com.cfcc.modules.system.service.ISysUserFunService;
@@ -10,6 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * ClassName:SysUserFunServiceImpl
@@ -49,5 +49,16 @@ public class SysUserFunServiceImpl extends ServiceImpl<SysUserFunMapper, SysUser
     public List<SysUserFun> showUserFunStatus(String userId) {
         List<SysUserFun> list=sysUserFunMapper.selectUserFunStatus(userId);
         return list;
+    }
+
+    @Override
+    public List<SysUserFun> queryListByUserIdSer(String userId) {
+
+        return sysUserFunMapper.queryListByUserIdDao(userId);
+    }
+
+    @Override
+    public List<Map<String, Object>> queryListMapByUserIdSer(String userId) {
+        return sysUserFunMapper.queryListMapByUserIdDao(userId);
     }
 }

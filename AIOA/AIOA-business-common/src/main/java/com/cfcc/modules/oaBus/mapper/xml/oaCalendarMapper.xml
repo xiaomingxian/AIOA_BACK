@@ -17,7 +17,8 @@
             d_create_time,
             i_bus_model_id,
             i_bus_function_id,
-            i_fun_data_id
+            i_fun_data_id,
+            i_is_state
         )VALUES(
                 NULL,
                 #{sTitle},
@@ -33,7 +34,8 @@
                 #{dCreateTime},
                 #{iBusModelId},
                 #{iBusFunctionId},
-                #{iFunDataId}
+                #{iFunDataId},
+                #{state}
             )
     </insert>
     <update id="updateByIid" parameterType="com.cfcc.modules.oaBus.entity.oaCalendar">
@@ -51,7 +53,8 @@
          c.d_create_time = #{dCreateTime},
          c.i_bus_model_id = #{iBusModelId},
          c.i_bus_function_id = #{iBusFunctionId},
-         c.i_fun_data_id  = #{iFunDataId}
+         c.i_fun_data_id  = #{iFunDataId},
+         c.i_is_state  = #{state}
          where c.i_id = #{iId};
     </update>
     <delete id="deleteByIid" parameterType="String">
@@ -130,6 +133,9 @@
             <if test="iOpenType != '' and iOpenType != null">
                 and i_open_type = #{iOpenType}
             </if>
+            <if test="stte != '' and stte != null">
+                and i_is_state = #{stte}
+            </if>
             <if test="date != '' and date != null">
                 and  (DATE_FORMAT(d_start_time,'%Y-%m-%d') &lt;= #{date} and  DATE_FORMAT(d_end_time,'%Y-%m-%d') &gt;= #{date})
             </if>
@@ -151,6 +157,9 @@
             </if>
             <if test="oaCalendar.username != '' and oaCalendar.username != null">
                 and c.s_create_by = #{oaCalendar.username}
+            </if>
+            <if test="oaCalendar.state != '' and oaCalendar.state != null">
+                and c.i_is_state = #{oaCalendar.state}
             </if>
             <if test="oaCalendar.sTitle != '' and oaCalendar.sTitle != null">
                 and c.s_title like CONCAT(CONCAT('%', #{oaCalendar.sTitle}), '%')
@@ -341,7 +350,7 @@
         select * from oa_busdata30 where i_bus_function_id = 107  and  s_title  is  not null  and s_title &lt;&gt; "" and i_id = #{id}
     </select>
     <select id="busFunctionList" resultType="com.cfcc.modules.oaBus.entity.BusFunction">
-        SELECT i_id,i_bus_model_id,s_name  FROM oa_bus_function
+        SELECT i_id,i_bus_model_id,s_name  FROM oa_bus_function ORDER BY i_bus_model_id
     </select>
     <select id="selectPath" resultType="java.lang.String">
           select s_file_path from oa_file where s_table = 'oa_busdata30' and  i_table_id = #{id}

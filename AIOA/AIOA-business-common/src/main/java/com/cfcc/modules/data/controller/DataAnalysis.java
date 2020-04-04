@@ -107,7 +107,7 @@ public class DataAnalysis {
         return sortList;
     }
 
-    @AutoLog(value = "办结率")
+    @AutoLog(value = "办结率---办结数量/总共公文数量(同一个所属模块的)")
     @GetMapping(value = "/Rate")
     @ResponseBody
     public List<Map<String, Object>> MyRate(OaBusdata oaBusdata, @RequestParam(name = "modelId", required = false) Integer modelId) {
@@ -170,7 +170,7 @@ public class DataAnalysis {
 
         return tableList;
     }
-    @AutoLog(value = "同行办理数量的百分比")
+    @AutoLog(value = "同行办理数量的百分比---功能办理的数量/总公文的数量（不管办结没办结、所属业务）")
     @GetMapping(value = "/PeerNum")
     @ResponseBody
     public List<Map<String, Object>> PeerNum(OaBusdata oaBusdata, @RequestParam(name = "modelId", required = false) Integer modelId) {
@@ -188,7 +188,7 @@ public class DataAnalysis {
         }
         return rate;
     }
-    @AutoLog(value = "办理率")
+    @AutoLog(value = "办理率-----功能办结的数量/总公文的数量（同一个所属模块）")
     @GetMapping(value = "/HandlingRate")
     @ResponseBody
     public List<Map<String, Object>> HandlingRate(OaBusdata oaBusdata, @RequestParam(name = "modelId", required = false) Integer modelId) {
@@ -226,7 +226,7 @@ public class DataAnalysis {
     @GetMapping(value = "/MyDepart")
     public List<Map<String, Object>> MyDepart(OaBusdata oaBusdata, @RequestParam(name = "modelId", required = false) Integer modelId) {
         String table = iOaBusdataService.queryTableName(modelId);
-        List<Map<String, Object>> selectColums = dataAnalysisService.selectColums(table);
+        List<Map<String, Object>> selectColums = dataAnalysisService.selectColums(table,oaBusdata);
         List<Map<String, Object>> DepartList = null;
         for (Map<String, Object> map : selectColums) {
             Set set = map.keySet();//所有字段的名

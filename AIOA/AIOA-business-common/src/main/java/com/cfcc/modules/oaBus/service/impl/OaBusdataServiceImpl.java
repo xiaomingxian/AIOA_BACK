@@ -213,7 +213,7 @@ public class OaBusdataServiceImpl extends ServiceImpl<OaBusdataMapper, OaBusdata
      * @throws Exception
      */
     @Override
-    public Result<IPage<Map<String, Object>>> getByModelId(String json, String realName, String username) {
+    public Result<IPage<Map<String, Object>>>  getByModelId(String json, String realName, String username) {
         log.info(json);
         Result<IPage<Map<String, Object>>> result = new Result<>();
         Map maps = (Map) JSONObject.parse(json);
@@ -636,9 +636,13 @@ public class OaBusdataServiceImpl extends ServiceImpl<OaBusdataMapper, OaBusdata
         // 查询意见
         if (busProcSet1 != null) {
             String opt = busProcSet1.getIProcOpinionId() == null ? null : busProcSet1.getIProcOpinionId().toString();
-            List<Map<String, Object>> optList = dynamicTableMapper.queryOptions(opt, busProcSet1.getIId().toString(), proKey,
-                    (String) result.get("taskDefKey"), (String) result.get("optionTable"), (String) result.get("busdataId"));
-            btnAndOpt.put("opt", optList);
+            if(opt != null){
+                List<Map<String, Object>> optList = dynamicTableMapper.queryOptions(opt, busProcSet1.getIId().toString(), proKey,
+                        (String) result.get("taskDefKey"), (String) result.get("optionTable"), (String) result.get("busdataId"));
+                btnAndOpt.put("opt", optList);
+            }else{
+                btnAndOpt.put("opt", new ArrayList<String>() );
+            }
         } else {
             log.error("===================>>>>流程配置信息为空,可能是redis数据错误");
             result.put("opt", new ArrayList<>());
@@ -647,7 +651,6 @@ public class OaBusdataServiceImpl extends ServiceImpl<OaBusdataMapper, OaBusdata
 
         long l4 = System.currentTimeMillis();
         System.out.println("================>>>总共查询时间：" + (l4 - l1));
-
 
         return result;
     }
@@ -816,6 +819,7 @@ public class OaBusdataServiceImpl extends ServiceImpl<OaBusdataMapper, OaBusdata
      * @param funid
      * @return
      */
+    @Override
     public Map<String, String> permit(int funid, String tableName, String userName) {
 
         Map<String, String> result = new HashMap<>();
