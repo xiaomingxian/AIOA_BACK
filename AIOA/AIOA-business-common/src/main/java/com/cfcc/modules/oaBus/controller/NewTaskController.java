@@ -445,7 +445,9 @@ public class NewTaskController {
                     if (list1.contains(functionid)) {
                         map.put("functionid", functionid);
                         map.put("functionSName", functionSName);
+                        map.put("modelId",function.getIBusModelId());
                         map.put("status",0);
+
                         list.forEach(function1 -> {
                             int status=function1.getStatus();
                             String funcation=function1.getIBusFunctionId()+"";
@@ -457,10 +459,8 @@ public class NewTaskController {
                         });
                         listAll.add(map);
                     }
-
                 }
             });
-
             result.setResult(listAll);
         }
 
