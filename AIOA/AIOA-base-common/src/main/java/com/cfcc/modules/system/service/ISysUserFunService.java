@@ -26,5 +26,5 @@ public interface ISysUserFunService extends IService<SysUserFun> {
 
     List<Map<String, Object>> queryListMapByUserIdSer(String userId);
 
-    List<SysUserFun> showUserFunMF(String userId);
+
 }

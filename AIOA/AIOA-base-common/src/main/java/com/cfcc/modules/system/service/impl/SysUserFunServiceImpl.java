@@ -68,8 +68,5 @@ public class SysUserFunServiceImpl extends ServiceImpl<SysUserFunMapper, SysUser
         return sysUserFunMapper.queryListMapByUserIdDao(userId);
     }
 
-    @Override
-    public List<SysUserFun> showUserFunMF(String userId) {
-        return sysUserFunMapper.selectUserFunStatus(userId);
-    }
+
 }

@@ -1050,12 +1050,6 @@ public class SysUserController {
         return result;
     }
 
-    @PostMapping(value = "/jumpUserFun")
-    public Result<String> jumpUserFun(@RequestParam(name = "userId",required=true) String userId){
-        Result<String> result = new Result<>();
-        List<SysUserFun> list=iSysUserFunService.showUserFunMF(userId);
-        return result;
-    }
 
     @GetMapping(value = "/showUserFun")
     public Result<List<Map<String,Object>>> showUserFun(@RequestParam(name = "userId",required=true) String userId){
