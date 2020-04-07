@@ -117,13 +117,13 @@ public class OaBusDynamicTableServiceImpl implements OaBusDynamicTableService {
 
     @Override
     public Map<String, Object> queryDataById(Map<String, Object> map) {
-        String tableName = (String) map.get("tableName");
+        String tableName = (String) map.get("table");
         if(tableName == null || "".equals(tableName)){
             log.error("表名为空！！！");
             return null ;
         }
         if(map.containsKey("i_id")){
-            String i_id = (String) map.get("i_id");
+            String i_id =  map.get("i_id") +"";
             if (i_id == null ||"".equals(i_id)) {
                 log.error("i_id为空！！！");
                 return null ;

@@ -1050,10 +1050,11 @@ public class SysUserController {
         return result;
     }
 
+
     @GetMapping(value = "/showUserFun")
-    public Result<List<String>> showUserFun(@RequestParam(name = "userId",required=true) String userId){
-        Result<List<String>> result = new Result<>();
-        List<String> list=iSysUserFunService.showUserFun(userId);
+    public Result<List<Map<String,Object>>> showUserFun(@RequestParam(name = "userId",required=true) String userId){
+        Result<List<Map<String,Object>>> result = new Result<>();
+        List<Map<String,Object>> list=iSysUserFunService.showUserFun(userId);
         if (list.size()==0){
             result.setSuccess(false);
         }else {

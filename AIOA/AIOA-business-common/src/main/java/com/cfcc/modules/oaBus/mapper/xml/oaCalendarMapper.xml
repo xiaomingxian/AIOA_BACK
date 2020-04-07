@@ -77,8 +77,8 @@
             <if test="iOpenType != '' and iOpenType != null">
                 and i_open_type = #{iOpenType}
             </if>
-            <if test="username != '' and username != null">
-                and s_create_by = #{username}
+            <if test="sCreateBy != '' and sCreateBy != null">
+                and s_create_by = #{sCreateBy}
             </if>
             <if test="date != '' and date != null">
                 and  (DATE_FORMAT(d_start_time,'%Y-%m-%d') &lt;= #{date} and  DATE_FORMAT(d_end_time,'%Y-%m-%d') &gt;= #{date})
@@ -105,8 +105,8 @@
             <if test="iOpenType != '' and iOpenType != null">
                 and i_open_type = #{iOpenType}
             </if>
-            <if test="username != '' and username != null">
-                and s_create_by = #{username}
+            <if test="sCreateBy != '' and sCreateBy != null">
+                and s_create_by = #{sCreateBy}
             </if>
             <if test="date != '' and date != null">
                 and  (DATE_FORMAT(d_start_time,'%Y-%m-%d') &lt;= #{date} and  DATE_FORMAT(d_end_time,'%Y-%m-%d') &gt;= #{date})
@@ -123,18 +123,21 @@
     <select id="count" resultType="java.lang.Integer">
         select count(*) from oa_calendar
         <where>
-            s_create_by = #{username}
+
             <if test="sAddress != '' and sAddress != null">
-                and s_address = #{sAddress}
+                s_address = #{sAddress}
             </if>
             <if test="sTitle != '' and sTitle != null">
                 and s_title like CONCAT(CONCAT('%', #{sTitle}), '%')
             </if>
+             <if test="sCreateBy != '' and sCreateBy != null">
+                and s_create_by = #{sCreateBy}
+            </if>
             <if test="iOpenType != '' and iOpenType != null">
                 and i_open_type = #{iOpenType}
             </if>
-            <if test="stte != '' and stte != null">
-                and i_is_state = #{stte}
+            <if test="state != '' and state != null">
+                and i_is_state = #{state}
             </if>
             <if test="date != '' and date != null">
                 and  (DATE_FORMAT(d_start_time,'%Y-%m-%d') &lt;= #{date} and  DATE_FORMAT(d_end_time,'%Y-%m-%d') &gt;= #{date})
@@ -151,12 +154,12 @@
     <select id="findPage" resultType="com.cfcc.modules.oaBus.entity.oaCalendar">
         select c.* ,c.i_is_state as state from oa_calendar c INNER  JOIN  sys_user s
         <where>
-             c.s_create_by = #{oaCalendar.username}
+
             <if test="oaCalendar.sAddress != '' and oaCalendar.sAddress != null">
-                and c.s_address = #{oaCalendar.sAddress}
+                c.s_address = #{oaCalendar.sAddress}
             </if>
-            <if test="oaCalendar.username != '' and oaCalendar.username != null">
-                and c.s_create_by = #{oaCalendar.username}
+            <if test="oaCalendar.sCreateBy != '' and oaCalendar.sCreateBy != null">
+                and c.s_create_by = #{oaCalendar.sCreateBy}
             </if>
             <if test="oaCalendar.state != '' and oaCalendar.state != null">
                 and c.i_is_state = #{oaCalendar.state}
@@ -202,8 +205,8 @@
             <if test="iOpenType != '' and iOpenType != null">
                 and i_open_type = #{iOpenType}
             </if>
-            <if test="username != '' and username != null">
-                and s_create_by = #{username}
+            <if test="sCreateBy != '' and sCreateBy != null">
+                and s_create_by = #{sCreateBy}
             </if>
             <if test="date != '' and date != null">
                 and  (d_start_time &lt;= #{date} and  d_end_time &gt;= #{date})
@@ -296,8 +299,8 @@
         select * from oa_calendar INNER  JOIN  sys_user s
         <where>
             i_is_state = 1
-            <if test="oaCalendar.username != '' and oaCalendar.username != null">
-                and s_create_by = #{oaCalendar.username}
+            <if test="oaCalendar.sCreateBy != '' and oaCalendar.sCreateBy != null">
+                and s_create_by = #{oaCalendar.sCreateBy}
             </if>
             <if test="oaCalendar.iOpenType != '' and oaCalendar.iOpenType != null">
                 and i_open_type = #{oaCalendar.iOpenType}

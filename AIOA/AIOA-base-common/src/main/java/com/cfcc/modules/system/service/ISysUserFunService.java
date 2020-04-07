@@ -18,11 +18,13 @@ public interface ISysUserFunService extends IService<SysUserFun> {
 
     int addUserFun(String userId, Integer modelId, Integer functionId, Integer status);
 
-    List<String> showUserFun(String userId);
+    List<Map<String,Object>> showUserFun(String userId);
 
     List<SysUserFun> showUserFunStatus(String userId);
 
     List<SysUserFun> queryListByUserIdSer(String userId);
 
     List<Map<String, Object>> queryListMapByUserIdSer(String userId);
+
+
 }

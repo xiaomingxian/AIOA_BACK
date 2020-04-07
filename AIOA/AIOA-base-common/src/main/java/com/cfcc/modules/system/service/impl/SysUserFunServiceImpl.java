@@ -31,17 +31,23 @@ public class SysUserFunServiceImpl extends ServiceImpl<SysUserFunMapper, SysUser
         int num =0;
         if (status==0){
             statuss=1;
-            sysUserFunMapper.addUserFun(userId,modelId,functionId,statuss);
+            SysUserFun sysUserFun=sysUserFunMapper.selectUserFun(userId,modelId,functionId);
+            if (sysUserFun == null){
+                num=sysUserFunMapper.addUserFun(userId,modelId,functionId,statuss);
+            }else {
+                num=1;
+                sysUserFunMapper.updateByUserId(userId,functionId,modelId,statuss);
+            }
         }else if (status==1){
             statuss=0;
-            sysUserFunMapper.updateByUserId(userId,functionId,statuss);
+            sysUserFunMapper.updateByUserId(userId,functionId,modelId,statuss);
         }
         return num;
     }
 
     @Override
-    public List<String> showUserFun(String userId) {
-        List<String> list=sysUserFunMapper.selecUserFuntList(userId);
+    public List<Map<String,Object>> showUserFun(String userId) {
+        List<Map<String,Object>> list=sysUserFunMapper.selecUserFuntList(userId);
         return list;
     }
 
@@ -61,4 +67,6 @@ public class SysUserFunServiceImpl extends ServiceImpl<SysUserFunMapper, SysUser
     public List<Map<String, Object>> queryListMapByUserIdSer(String userId) {
         return sysUserFunMapper.queryListMapByUserIdDao(userId);
     }
+
+
 }

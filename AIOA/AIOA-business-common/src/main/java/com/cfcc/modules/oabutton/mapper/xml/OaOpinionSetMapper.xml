@@ -125,7 +125,7 @@
             <if test="iTaskOpinionName!=null and iTaskOpinionName!=''">
                 i_task_opinion_name,
             </if>
-            <if test="iTaskOpinionOrder!=null and iTaskOpinionOrder!=''">
+            <if test="iTaskOpinionOrder!=null">
                 i_task_opinion_order,
             </if>
             <if test="type!=null and type!=''">
@@ -148,7 +148,7 @@
             <if test="iTaskOpinionName!=null and iTaskOpinionName!=''">
                 #{iTaskOpinionName},
             </if>
-            <if test="iTaskOpinionOrder!=null and iTaskOpinionOrder!=''">
+            <if test="iTaskOpinionOrder!=null">
                 #{iTaskOpinionOrder},
             </if>
             <if test="type!=null and type!=''">
