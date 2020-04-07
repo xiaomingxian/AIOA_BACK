@@ -112,13 +112,13 @@ public class oaCalendarController implements Job {
                                                    @RequestParam(name = "pageSize", defaultValue = "10") Integer pageSize,
                                                    HttpServletRequest request) {
         Result<IPage<oaCalendar>> result = new Result<IPage<oaCalendar>>();
-        SysUser currentUser = sysUserService.getCurrentUser(request);
+        /*SysUser currentUser = sysUserService.getCurrentUser(request);
         if(currentUser == null){
             result.error500("未找到对应实体");
         }else{
             String username = currentUser.getUsername();
             oaCalendar.setSCreateBy(username);
-        }
+        }*/
         IPage<oaCalendar> pageList = oaCalendarService.findPage(pageNo, pageSize, oaCalendar);
         result.setSuccess(true);
         result.setResult(pageList);
