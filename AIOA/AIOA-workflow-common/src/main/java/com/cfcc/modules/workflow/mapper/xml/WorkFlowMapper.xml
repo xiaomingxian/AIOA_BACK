@@ -13,7 +13,8 @@
         t.CREATE_TIME_ createTime,t.DUE_DATE_ dueDate,t.CATEGORY_ category,t.SUSPENSION_STATE_
         suspensionState,t.TENANT_ID_ tenantId,t.FORM_KEY_ formKey,v.text_ busMsg
         FROM `act_ru_task` t left JOIN act_hi_varinst v on t.PROC_INST_ID_ = v.PROC_INST_ID_ and v.name_='busMsg' where
-        t.DESCRIPTION_ != 'done'
+
+        (t.DESCRIPTION_ is null or (t.DESCRIPTION_  is not null and   t.DESCRIPTION_ != 'done'))
 
         <if test="ids.size()>0">
             and ASSIGNEE_ in
@@ -68,7 +69,7 @@
         where v.name_='busMsg'
         and i.TYPE_='candidate'
         and t.ASSIGNEE_ is null
-        and t.DESCRIPTION_ != 'done'
+        and (t.DESCRIPTION_ is null or (t.DESCRIPTION_  is not null and   t.DESCRIPTION_ != 'done'))
 
         <if test="ids.size()>0">
             and i.user_id_ in
@@ -139,7 +140,7 @@
         t.CREATE_TIME_ createTime,t.DUE_DATE_ dueDate,t.CATEGORY_ category,t.SUSPENSION_STATE_
         suspensionState,t.TENANT_ID_ tenantId,t.FORM_KEY_ formKey,v.text_ busMsg
         FROM `act_ru_task` t left JOIN act_hi_varinst v on t.PROC_INST_ID_ = v.PROC_INST_ID_ and v.name_='busMsg' where
-        t.DESCRIPTION_ != 'done'
+        (t.DESCRIPTION_ is null or (t.DESCRIPTION_  is not null and   t.DESCRIPTION_ != 'done'))
 
         <if test="ids.size()>0">
             and ASSIGNEE_ in
@@ -194,7 +195,8 @@
         where v.name_='busMsg'
         and i.TYPE_='candidate'
         and t.ASSIGNEE_ is null
-        and t.DESCRIPTION_ != 'done'
+        and
+        ( t.DESCRIPTION_ is null or (t.DESCRIPTION_  is not null and   t.DESCRIPTION_ != 'done'))
 
         <if test="ids.size()>0">
             and i.user_id_ in
@@ -1022,7 +1024,8 @@
         LEFT JOIN act_hi_varinst v ON t.PROC_INST_ID_ = v.PROC_INST_ID_
         AND v.name_ = 'busMsg'
         WHERE
-        ASSIGNEE_=#{pojo.userId} and  t.DESCRIPTION_ != 'done'
+        ASSIGNEE_=#{pojo.userId} and
+        ( t.DESCRIPTION_ is null or (t.DESCRIPTION_  is not null and   t.DESCRIPTION_ != 'done'))
         <if test="pojo.startQueryTime!=null ">
             and t.CREATE_TIME_ &gt;= #{pojo.startQueryTime}
         </if>
@@ -1077,7 +1080,7 @@
         AND i.user_id_=#{pojo.userId}
         AND i.TYPE_ = 'candidate'
         and t.ASSIGNEE_ is null
-        and  t.DESCRIPTION_ != 'done'
+        and  (t.DESCRIPTION_ is null or (t.DESCRIPTION_  is not null and   t.DESCRIPTION_ != 'done'))
 
         <if test="pojo.startQueryTime!=null ">
             and t.CREATE_TIME_ &gt;= #{pojo.startQueryTime}
@@ -1161,7 +1164,7 @@
         FROM
         `act_ru_task` t
         LEFT JOIN act_hi_varinst v ON t.PROC_INST_ID_ = v.PROC_INST_ID_
-        AND v.name_ = 'busMsg'  and  t.DESCRIPTION_ != 'done'
+        AND v.name_ = 'busMsg'  and  (t.DESCRIPTION_ is null or (t.DESCRIPTION_  is not null and   t.DESCRIPTION_ != 'done'))
         WHERE
         ASSIGNEE_=#{pojo.userId}
         <if test="pojo.startQueryTime!=null ">
@@ -1213,7 +1216,7 @@
         LEFT JOIN act_ru_task t ON t.id_ = i.task_id_
         LEFT JOIN act_hi_varinst v ON t.PROC_INST_ID_ = v.PROC_INST_ID_
         WHERE
-        v.name_ = 'busMsg' and  t.DESCRIPTION_ != 'done'
+        v.name_ = 'busMsg' and  (t.DESCRIPTION_ is null or (t.DESCRIPTION_  is not null and   t.DESCRIPTION_ != 'done'))
         AND i.user_id_=#{pojo.userId}
         AND i.TYPE_ = 'candidate'
         and t.ASSIGNEE_ is null

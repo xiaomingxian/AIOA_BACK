@@ -2121,11 +2121,17 @@ public class TaskCommonServiceImpl implements TaskCommonService {
     public Result departFinish(String taskId, String processInstanceId, SysUser user) {
 
         HistoricTaskInstance currentTask = null;
+        String description=null;
+        String procInstId=null;
         List<HistoricTaskInstance> allTAsk = historyService.createHistoricTaskInstanceQuery().processInstanceId(processInstanceId).list();
         for (HistoricTaskInstance historicTaskInstance : allTAsk) {
+            String description1 = historicTaskInstance.getDescription();
+            if (StringUtils.isNotBlank(description1))description=description1;
+            procInstId=historicTaskInstance.getProcessInstanceId();
+
             if (historicTaskInstance.getId().equals(taskId)) {
                 currentTask = historicTaskInstance;
-                break;
+//                break;
             }
         }
         if (currentTask == null) throw new AIOAException("未找到要完成的任务");
@@ -2213,7 +2219,6 @@ public class TaskCommonServiceImpl implements TaskCommonService {
                         taskService.claim(id, user.getId());
                     }
                     taskService.complete(id, vars);
-
                 }
             }
         }
@@ -2266,6 +2271,11 @@ public class TaskCommonServiceImpl implements TaskCommonService {
 //            }
 //
 //        }
+        //部门办结后追加描述
+        if (StringUtils.isNotBlank(processInstanceId)&& StringUtils.isNotBlank(description)){
+            taskMapper.updateTaskDescript(procInstId,description);
+        }
+
 
         return Result.ok("部门完成成功");
     }
