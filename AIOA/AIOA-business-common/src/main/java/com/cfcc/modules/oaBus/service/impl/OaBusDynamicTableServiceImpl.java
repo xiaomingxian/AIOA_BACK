@@ -123,7 +123,7 @@ public class OaBusDynamicTableServiceImpl implements OaBusDynamicTableService {
             return null ;
         }
         if(map.containsKey("i_id")){
-            String i_id = (String) map.get("i_id");
+            String i_id =  map.get("i_id") +"";
             if (i_id == null ||"".equals(i_id)) {
                 log.error("i_id为空！！！");
                 return null ;
