@@ -21,6 +21,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -107,7 +108,9 @@ public class MeetingInformServiceImpl extends ServiceImpl<MeetingInformMapper, O
         String dStartTime = map.get("dStartTime") + "";
         String dEndTime = map.get("dEndTime") + "";
 //        String sCreateBy = map.get("sCreateBy") + "";
-        String dCreateTime = map.get("dCreateTime") + "";
+//        String dCreateTime = map.get("dCreateTime") + "";
+        SimpleDateFormat dateFormat= new SimpleDateFormat("yyyy-MM-dd :HH:mm:ss");
+        String dCreateTime = dateFormat.format(new Date());
         String iBusModelId = map.get("iBusModelId") + "";
         if ("1".equals(iIsLimits)){
             SysDepart sysDepart = sysDepartService.queryUserDepartByOrgCode(currentUser.getOrgCode());
