@@ -109,7 +109,7 @@
           FROM oa_docnum as od
         LEFT JOIN oa_docnum_dept as op ON op.i_docnum_id = od.i_id
           WHERE od.i_bus_function_id = #{iBusFunctionId} and  od.i_bus_unit_id=#{iBusUnitId}
-          AND (op.s_dept_id = "" OR op.s_dept_id = #{sDeptId})
+          AND (op.s_dept_id = "" OR op.s_dept_id = '1' OR op.s_dept_id = #{sDeptId})
     </select>
 
     <!--新增文号配置-->
