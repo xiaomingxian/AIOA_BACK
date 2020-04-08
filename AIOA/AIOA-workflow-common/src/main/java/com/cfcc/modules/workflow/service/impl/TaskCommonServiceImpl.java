@@ -870,7 +870,34 @@ public class TaskCommonServiceImpl implements TaskCommonService {
 
 
         if (task == null) {
-            currentAct = activities.get(0);
+//            currentAct = activities.get(0);
+            //获取开始节点后的一个节点
+            String taskDefKey = null;
+            for (ActivityImpl activity : activities) {
+                String type = (String) activity.getProperty("type");
+                if ("startevent".equalsIgnoreCase(type)) {
+                    List<PvmTransition> outgoingTransitions = activity.getOutgoingTransitions();
+                    if (outgoingTransitions.size() < 0) throw new AIOAException("开始环节后没有连线,请参照手册修改流程图");
+                    PvmActivity destination = outgoingTransitions.get(0).getDestination();
+                    if (destination == null) throw new AIOAException("开始环节后没有连接环节,请参照手册修改流程图");
+                    ActivityBehavior activityBehavior = ((ActivityImpl) destination).getActivityBehavior();
+                    if (activityBehavior instanceof UserTaskActivityBehavior) {
+                        taskDefKey = destination.getId();
+                        break;
+                    } else {
+                        throw new AIOAException("第一环节类型有误,请参照手册修改流程图");
+                    }
+
+                }
+            }
+            for (ActivityImpl activity : activities) {
+                String id = activity.getId();
+                if (id.equals(taskDefKey)) {
+                    currentAct = activity;
+                    break;
+                }
+            }
+
         }
         Integer count = 0;
         for (ActivityImpl activity : actsAll) {
@@ -1157,8 +1184,8 @@ public class TaskCommonServiceImpl implements TaskCommonService {
     }
 
     @Override
-    public void updateTaskStatus(String taskId,String desc) {
-        taskMapper.updateTaskStatus(taskId,desc);
+    public void updateTaskStatus(String taskId, String desc) {
+        taskMapper.updateTaskStatus(taskId, desc);
     }
 
 
@@ -1174,8 +1201,8 @@ public class TaskCommonServiceImpl implements TaskCommonService {
             Map<String, Object> busData = taskInfoVOs.get(0).getBusData();
             String table = busData.get("table") == null ? null : busData.get("table").toString();
             String id = busData.get("i_id") == null ? null : busData.get("i_id").toString();
-            if (StringUtils.isNotBlank(table)&&StringUtils.isNotBlank(id)){
-                afterDoTask(table,id,request,response);
+            if (StringUtils.isNotBlank(table) && StringUtils.isNotBlank(id)) {
+                afterDoTask(table, id, request, response);
             }
         } else {
 
@@ -1371,8 +1398,8 @@ public class TaskCommonServiceImpl implements TaskCommonService {
             Map<String, Object> busData = taskInfoVO.getBusData();
             String table = busData.get("table") == null ? null : busData.get("table").toString();
             String id = busData.get("i_id") == null ? null : busData.get("i_id").toString();
-            if (StringUtils.isNotBlank(table)&&StringUtils.isNotBlank(id)){
-                afterDoTask(table,id,request,response);
+            if (StringUtils.isNotBlank(table) && StringUtils.isNotBlank(id)) {
+                afterDoTask(table, id, request, response);
             }
 
         } else {
@@ -2034,7 +2061,34 @@ public class TaskCommonServiceImpl implements TaskCommonService {
 
 
         if (task == null) {
-            currentAct = activities.get(0);
+//            currentAct = activities.get(0);
+            //获取开始节点后的一个节点
+            String taskDefKey = null;
+            for (ActivityImpl activity : activities) {
+                String type = (String) activity.getProperty("type");
+                if ("startevent".equalsIgnoreCase(type)) {
+                    List<PvmTransition> outgoingTransitions = activity.getOutgoingTransitions();
+                    if (outgoingTransitions.size() < 0) throw new AIOAException("开始环节后没有连线,请参照手册修改流程图");
+                    PvmActivity destination = outgoingTransitions.get(0).getDestination();
+                    if (destination == null) throw new AIOAException("开始环节后没有连接环节,请参照手册修改流程图");
+                    ActivityBehavior activityBehavior = ((ActivityImpl) destination).getActivityBehavior();
+                    if (activityBehavior instanceof UserTaskActivityBehavior) {
+                        taskDefKey = destination.getId();
+                        break;
+                    } else {
+                        throw new AIOAException("第一环节类型有误,请参照手册修改流程图");
+                    }
+
+                }
+            }
+            for (ActivityImpl activity : activities) {
+                String id = activity.getId();
+                if (id.equals(taskDefKey)) {
+                    currentAct = activity;
+                    break;
+                }
+            }
+
         }
         Integer count = 0;
         for (ActivityImpl activity : actsAll) {
@@ -2121,13 +2175,13 @@ public class TaskCommonServiceImpl implements TaskCommonService {
     public Result departFinish(String taskId, String processInstanceId, SysUser user) {
 
         HistoricTaskInstance currentTask = null;
-        String description=null;
-        String procInstId=null;
+        String description = null;
+        String procInstId = null;
         List<HistoricTaskInstance> allTAsk = historyService.createHistoricTaskInstanceQuery().processInstanceId(processInstanceId).list();
         for (HistoricTaskInstance historicTaskInstance : allTAsk) {
             String description1 = historicTaskInstance.getDescription();
-            if (StringUtils.isNotBlank(description1))description=description1;
-            procInstId=historicTaskInstance.getProcessInstanceId();
+            if (StringUtils.isNotBlank(description1)) description = description1;
+            procInstId = historicTaskInstance.getProcessInstanceId();
 
             if (historicTaskInstance.getId().equals(taskId)) {
                 currentTask = historicTaskInstance;
@@ -2272,8 +2326,8 @@ public class TaskCommonServiceImpl implements TaskCommonService {
 //
 //        }
         //部门办结后追加描述
-        if (StringUtils.isNotBlank(processInstanceId)&& StringUtils.isNotBlank(description)){
-            taskMapper.updateTaskDescript(procInstId,description);
+        if (StringUtils.isNotBlank(processInstanceId) && StringUtils.isNotBlank(description)) {
+            taskMapper.updateTaskDescript(procInstId, description);
         }
 
 

@@ -33,6 +33,9 @@ import org.activiti.engine.history.HistoricTaskInstance;
 import org.activiti.engine.history.HistoricTaskInstanceQuery;
 import org.activiti.engine.impl.bpmn.behavior.UserTaskActivityBehavior;
 import org.activiti.engine.impl.persistence.entity.ProcessDefinitionEntity;
+import org.activiti.engine.impl.pvm.PvmActivity;
+import org.activiti.engine.impl.pvm.PvmTransition;
+import org.activiti.engine.impl.pvm.delegate.ActivityBehavior;
 import org.activiti.engine.impl.pvm.process.ActivityImpl;
 import org.activiti.engine.repository.ProcessDefinition;
 import org.activiti.engine.task.Task;
@@ -172,7 +175,7 @@ public class OaBusdataServiceImpl extends ServiceImpl<OaBusdataMapper, OaBusdata
     }
 
     @Override
-    public Map<String, Object> getSqlCodeDictAllSelect(List<BusPageDetail> busPageDetailList,LoginInfo loginInfo) {
+    public Map<String, Object> getSqlCodeDictAllSelect(List<BusPageDetail> busPageDetailList, LoginInfo loginInfo) {
         Map<String, Object> optionMap = new TreeMap<>();
         Map<String, String> map = new TreeMap<>();
         return selOptionByDtailList(optionMap, map, busPageDetailList, loginInfo.getDepart().getId(), loginInfo.getDepart().getId(), loginInfo.getId());
@@ -213,7 +216,7 @@ public class OaBusdataServiceImpl extends ServiceImpl<OaBusdataMapper, OaBusdata
      * @throws Exception
      */
     @Override
-    public Result<IPage<Map<String, Object>>>  getByModelId(String json, String realName, String username) {
+    public Result<IPage<Map<String, Object>>> getByModelId(String json, String realName, String username) {
         log.info(json);
         Result<IPage<Map<String, Object>>> result = new Result<>();
         Map maps = (Map) JSONObject.parse(json);
@@ -430,7 +433,7 @@ public class OaBusdataServiceImpl extends ServiceImpl<OaBusdataMapper, OaBusdata
         Map<String, Object> optionMap = new HashMap<>();
         //存放校验规则,字典数据，detail数据
         long aaa = System.currentTimeMillis();
-        optionMap = selOptionByDtailList(optionMap, map, busPageDetailList, loginInfo.getDepart().getId(),loginInfo.getId(),loginInfo.getDepart().getParentId());
+        optionMap = selOptionByDtailList(optionMap, map, busPageDetailList, loginInfo.getDepart().getId(), loginInfo.getId(), loginInfo.getDepart().getParentId());
         result.put("optionMap", optionMap);
         log.info(map.toString());
         long bbb = System.currentTimeMillis();
@@ -455,7 +458,7 @@ public class OaBusdataServiceImpl extends ServiceImpl<OaBusdataMapper, OaBusdata
         String userId = user.getId();
 
         System.out.println("================>>>业务详情查询时间::" + (l2 - l1));
-        String endTime= (String)oaBusdata.get("s_varchar9");
+        String endTime = (String) oaBusdata.get("s_varchar9");
         //********************************************************************* 流程信息查询
         //读取该流程的第一个环节
         String proKey = busProcSet1.getProcDefKey();
@@ -478,11 +481,29 @@ public class OaBusdataServiceImpl extends ServiceImpl<OaBusdataMapper, OaBusdata
                 ProcessDefinitionEntity proc = (ProcessDefinitionEntity) repositoryService.getProcessDefinition(processDefinition.getId());
                 List<ActivityImpl> activities = proc.getActivities();
                 if (activities.size() == 0) throw new AIOAException("未找到流程环节,请检查流程图是否合法");
-                ActivityImpl activity = activities.get(0);
-                taskDef = activity.getId();
-                UserTaskActivityBehavior activityBehavior = (UserTaskActivityBehavior) activity.getActivityBehavior();
-                taskDefName = ((UserTaskActivityBehavior) activity.getActivityBehavior())
-                        .getTaskDefinition().getNameExpression().toString();
+                //获取开始事件的后一个节点
+                for (ActivityImpl activity : activities) {
+                    String type = (String) activity.getProperty("type");
+                    if ("startevent".equalsIgnoreCase(type)) {
+                        List<PvmTransition> outgoingTransitions = activity.getOutgoingTransitions();
+                        if (outgoingTransitions.size() < 0) throw new AIOAException("开始环节后没有连线,请参照手册修改流程图");
+                        PvmActivity destination = outgoingTransitions.get(0).getDestination();
+                        if (destination == null) throw new AIOAException("开始环节后没有连接环节,请参照手册修改流程图");
+                        ActivityBehavior activityBehavior = ((ActivityImpl) destination).getActivityBehavior();
+                        if (activityBehavior instanceof  UserTaskActivityBehavior){
+                            taskDef = destination.getId();
+                            taskDefName=(String)   destination.getProperty("name");
+                            break;
+                        }else {
+                            throw new AIOAException("第一环节类型有误,请参照手册修改流程图");
+                        }
+
+                    }
+                }
+                //循环完了还没有找到就报错
+//                if (StringUtils.isBlank(taskDef)&& StringUtils.isBlank(taskDefName))throw  new AIOAException("");
+
+
             } else {//已经产生流程
                 Task task = null;
                 HistoricTaskInstance historicTaskInstance = null;
@@ -498,7 +519,7 @@ public class OaBusdataServiceImpl extends ServiceImpl<OaBusdataMapper, OaBusdata
                 } else {//从业务页面进来
 
 
-                    if (StringUtils.isBlank(endTime)){
+                    if (StringUtils.isBlank(endTime)) {
 
                         TaskQuery taskQuery = taskService.createTaskQuery().processDefinitionKey(proKey)
                                 .processInstanceBusinessKey(busdataId).taskCandidateOrAssigned(userId);
@@ -511,8 +532,7 @@ public class OaBusdataServiceImpl extends ServiceImpl<OaBusdataMapper, OaBusdata
                             task = list.get(list.size() - 1);
                             if (task != null && StringUtils.isBlank(status)) status = "todo";
 
-                        }
-                        else {
+                        } else {
                             //最新已办\
                             HistoricTaskInstanceQuery historicTaskInstanceQuery = historyService.createHistoricTaskInstanceQuery().processDefinitionKey(proKey)
                                     .processInstanceBusinessKey(busdataId).taskAssignee(userId);
@@ -572,7 +592,7 @@ public class OaBusdataServiceImpl extends ServiceImpl<OaBusdataMapper, OaBusdata
         String optionTable = tableName + "_opinion";
         Integer busProcSetIId = busProcSet1.getIId();
         result.put("proSetId", busProcSetIId);
-        if (StringUtils.isNotBlank(endTime))taskDef="end";
+        if (StringUtils.isNotBlank(endTime)) taskDef = "end";
         result.put("taskDefKey", taskDef);
         result.put("optionTable", optionTable);
         result.put("taskId", taskId);
@@ -636,12 +656,12 @@ public class OaBusdataServiceImpl extends ServiceImpl<OaBusdataMapper, OaBusdata
         // 查询意见
         if (busProcSet1 != null) {
             String opt = busProcSet1.getIProcOpinionId() == null ? null : busProcSet1.getIProcOpinionId().toString();
-            if(opt != null){
+            if (opt != null) {
                 List<Map<String, Object>> optList = dynamicTableMapper.queryOptions(opt, busProcSet1.getIId().toString(), proKey,
                         (String) result.get("taskDefKey"), (String) result.get("optionTable"), (String) result.get("busdataId"));
                 btnAndOpt.put("opt", optList);
-            }else{
-                btnAndOpt.put("opt", new ArrayList<String>() );
+            } else {
+                btnAndOpt.put("opt", new ArrayList<String>());
             }
         } else {
             log.error("===================>>>>流程配置信息为空,可能是redis数据错误");
@@ -718,15 +738,14 @@ public class OaBusdataServiceImpl extends ServiceImpl<OaBusdataMapper, OaBusdata
 
     @Override
     public Boolean getFuncitionByBusdata(String tableId, String table) {
-        Integer aa = oaBusdataMapper.getOaBusFunctionIsEsByOaBusdata(tableId,table);
-        if (aa != null){
-            if (aa == 1){
+        Integer aa = oaBusdataMapper.getOaBusFunctionIsEsByOaBusdata(tableId, table);
+        if (aa != null) {
+            if (aa == 1) {
                 return true;
             }
         }
         return false;
     }
-
 
 
     @Override
@@ -766,7 +785,7 @@ public class OaBusdataServiceImpl extends ServiceImpl<OaBusdataMapper, OaBusdata
             else if (entry.getSDictSqlKey() != null && !"".equals(entry.getSDictSqlKey())) {
                 SysDictItem itemByCode = sysDictService.getDictItemByCode("sql", entry.getSDictSqlKey());
                 if (itemByCode != null || !"".equals(itemByCode)) {
-                    List<DictModel> dictMOdelList = sysDictService.getSqlValue(itemByCode.getDescription(),unitId,departId,unitId);
+                    List<DictModel> dictMOdelList = sysDictService.getSqlValue(itemByCode.getDescription(), unitId, departId, unitId);
                     optionMap.put(entry.getSTableColumn() + "_option", dictMOdelList);
                 }
             }
