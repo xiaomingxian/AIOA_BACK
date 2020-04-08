@@ -13,6 +13,8 @@ import com.cfcc.modules.oaBus.entity.BusPageDetail;
 import com.cfcc.modules.oaBus.entity.OaFile;
 import com.cfcc.modules.oaBus.mapper.*;
 import com.cfcc.modules.oaBus.service.IOaFileService;
+import com.cfcc.modules.oaBus.vo.Chunk;
+import com.cfcc.modules.oaBus.vo.FileInfo;
 import com.cfcc.modules.oabutton.entity.OaButton;
 import com.cfcc.modules.system.entity.LoginInfo;
 import com.cfcc.modules.system.mapper.SysDepartMapper;
@@ -29,6 +31,9 @@ import org.springframework.web.multipart.MultipartFile;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.*;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.nio.file.StandardOpenOption;
 import java.util.*;
 
 /**
@@ -209,8 +214,8 @@ public class OaFileServiceImpl extends ServiceImpl<OaFileMapper, OaFile> impleme
                 continue;
             }
             String sFilePath = "";
-            if (DBvalue2 != null){
-                sFilePath = uploadpath +File.separator+ DBvalue2 +File.separator + map.get("s_file_path") + "";
+            if (DBvalue2 != null) {
+                sFilePath = uploadpath + File.separator + DBvalue2 + File.separator + map.get("s_file_path") + "";
             } else {
                 sFilePath = uploadpath + File.separator + map.get("s_file_path") + "";
             }
@@ -265,6 +270,99 @@ public class OaFileServiceImpl extends ServiceImpl<OaFileMapper, OaFile> impleme
             }
         }
         return oaFileList;
+    }
+
+    @Override
+    public OaFile mergeFiles(FileInfo fileInfo, HttpServletRequest request) {
+        LoginInfo loginInfo = sysUserService.getLoginInfo(request);
+        String ctxPath = uploadpath + File.separator + "videos";
+        Calendar calendar = Calendar.getInstance();
+        String calendarPath = calendar.get(Calendar.YEAR) +
+                File.separator + (calendar.get(Calendar.MONTH) + 1) +
+                File.separator + calendar.get(Calendar.DATE);
+        String initPath = "";
+        if (loginInfo.getOrgSchema() != null && !loginInfo.getOrgSchema().equals("")) {
+            initPath = ctxPath.replace("//", "/" +
+                    "") + File.separator + loginInfo.getOrgSchema() + File.separator + calendarPath;
+        } else {
+            initPath = ctxPath.replace("//", "/" +
+                    "") + File.separator + calendarPath;
+        }
+//        String filePath = path + File.separator + fileInfo.getFilename().substring(0, fileInfo.getFilename().lastIndexOf(".")) + ".mp4";
+//        String folder = path + File.separator + fileInfo.getIdentifier();
+        String randomPath = System.currentTimeMillis() + com.cfcc.common.util.FileUtils.generatePassword(5) + fileInfo.getFilename().substring(fileInfo.getFilename().lastIndexOf("."));
+        String filePath = initPath + File.separator + randomPath;
+        String folder = initPath + File.separator + fileInfo.getIdentifier();
+
+        File mergeFile = new File(filePath);
+        if (mergeFile.exists()) {
+            mergeFile.delete();
+        }
+        OaFile oaFile = new OaFile();
+        try {
+            Files.createFile(Paths.get(filePath));
+            Files.list(Paths.get(folder))
+                    .filter(path -> path.getFileName().toString().contains("-"))
+                    .sorted((o1, o2) -> {
+                        String p1 = o1.getFileName().toString();
+                        String p2 = o2.getFileName().toString();
+                        int i1 = p1.lastIndexOf("-");
+                        int i2 = p2.lastIndexOf("-");
+                        return Integer.valueOf(p1.substring(i1 + 1, p1.lastIndexOf("."))).compareTo(Integer.valueOf(p2.substring(i2 + 1, p2.lastIndexOf("."))));
+                    })
+                    .forEach(path -> {
+                        try {
+                            //以追加的形式写入文件
+                            Files.write(Paths.get(filePath), Files.readAllBytes(path), StandardOpenOption.APPEND);
+                            //合并后删除该块
+                            Files.delete(path);
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
+                    });
+            File file = new File(folder);
+            if (file.exists() && file.listFiles().length == 0) {
+                file.delete();
+            }
+            oaFile.setSFileName(fileInfo.getFilename());
+            oaFile.setSFilePath(calendarPath + File.separator + randomPath);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return oaFile;
+    }
+
+    @Override
+    public String chunkFiles(Chunk chunk, HttpServletRequest request) {
+        MultipartFile mf = chunk.getFile();
+        LoginInfo loginInfo = sysUserService.getLoginInfo(request);
+        String ctxPath = uploadpath + File.separator + "videos";
+        Calendar calendar = Calendar.getInstance();
+        String calendarPath = calendar.get(Calendar.YEAR) +
+                File.separator + (calendar.get(Calendar.MONTH) + 1) +
+                File.separator + calendar.get(Calendar.DATE);
+        String path = "";
+        if (loginInfo.getOrgSchema() != null && !loginInfo.getOrgSchema().equals("")) {
+            path = ctxPath.replace("//", "/" +
+                    "") + File.separator + loginInfo.getOrgSchema() + File.separator + calendarPath;
+        } else {
+            path = ctxPath.replace("//", "/" +
+                    "") + File.separator + calendarPath;
+        }
+        try {
+            String initPath = path + File.separator + chunk.getIdentifier();
+            File initFile = new File(initPath);
+            if (!initFile.exists()) {
+                initFile.mkdirs();
+            }
+            String savePath = initPath + File.separator + chunk.getFilename().substring(0, chunk.getFilename().lastIndexOf(".")) + "-" + chunk.getChunkNumber() + chunk.getFilename().substring(chunk.getFilename().lastIndexOf("."));
+            File savefile = new File(savePath);
+            FileCopyUtils.copy(mf.getBytes(), savefile);
+            return "文件上传成功";
+        } catch (IOException e) {
+            e.printStackTrace();
+            return "后端异常...";
+        }
     }
 
     /**
@@ -366,7 +464,7 @@ public class OaFileServiceImpl extends ServiceImpl<OaFileMapper, OaFile> impleme
         initFile.setSFileName(newName);
 //        initFile.setSFilePath(sfilepath);
         boolean ok = false;
-        ok =  oaFileMapper.updateDocNameById(initFile);
+        ok = oaFileMapper.updateDocNameById(initFile);
 //        File file = new File(sfilepath);
 //        if (file.exists()) {
 //            String reNamePath = file.getParent() + File.separator + initFile.getSFileName();
@@ -502,7 +600,7 @@ public class OaFileServiceImpl extends ServiceImpl<OaFileMapper, OaFile> impleme
         try {
             String tempPaths = "";
             if (map.get("sFilePath") != null) {
-                if ((map.get("sFileType") != null) && (map.get("sFileType")+"").equals("7")) {
+                if ((map.get("sFileType") != null) && (map.get("sFileType") + "").equals("7")) {
                     tempPaths = uploadpath + File.separator + "templateFiles";
                 } else {
                     tempPaths = uploadpath + File.separator + "temporaryFiles";
@@ -812,7 +910,7 @@ public class OaFileServiceImpl extends ServiceImpl<OaFileMapper, OaFile> impleme
     }
 
     @Override
-    public List<OaFile> batchUploads(MultipartFile file,String filename, String sTable, Integer iTableId, String sFileType, HttpServletRequest request, HttpServletResponse response) {
+    public List<OaFile> batchUploads(MultipartFile file, String filename, String sTable, Integer iTableId, String sFileType, HttpServletRequest request, HttpServletResponse response) {
         List<OaFile> fileIds = new ArrayList<>();
         try {
             String ctxPath = uploadpath;
@@ -836,7 +934,7 @@ public class OaFileServiceImpl extends ServiceImpl<OaFileMapper, OaFile> impleme
                     parent.mkdirs();// 创建文件根目录
                 }
                 String orgName = filename;// 获取文件名
-                fileName = System.currentTimeMillis()+ com.cfcc.common.util.FileUtils.generatePassword(5)+orgName.substring(orgName.indexOf("."));
+                fileName = System.currentTimeMillis() + com.cfcc.common.util.FileUtils.generatePassword(5) + orgName.substring(orgName.indexOf("."));
 //                fileName = orgName.substring(0, orgName.lastIndexOf(".")) + "_" + System.currentTimeMillis() + orgName.substring(orgName.indexOf("."));
                 String savePath = parent.getPath() + File.separator + fileName;
                 File savefile = new File(savePath);

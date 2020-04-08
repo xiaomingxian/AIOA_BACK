@@ -4,6 +4,8 @@ import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.cfcc.modules.oaBus.entity.BusFunction;
 import com.cfcc.modules.oaBus.entity.OaFile;
+import com.cfcc.modules.oaBus.vo.Chunk;
+import com.cfcc.modules.oaBus.vo.FileInfo;
 import com.cfcc.modules.oabutton.entity.OaButton;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -92,4 +94,8 @@ public interface IOaFileService extends IService<OaFile> {
     List<Map<String, Object>> getOaFileByTableAndTableId(String uploadpath, String DBvalue2,String id, String sBusdataTable,String DBvalue);
 
     List<Map<String,Object>> getOaFileByIdAndTable(String tableId, String table);
+
+    OaFile mergeFiles(FileInfo fileInfo, HttpServletRequest request);
+
+    String chunkFiles(Chunk chunk, HttpServletRequest request);
 }
