@@ -369,6 +369,7 @@ public class oaCalendarController implements Job {
             oaCalendar.setIFunDataId(1);
             String s = UUID.randomUUID().toString().replace("-", "");
             oaCalendar.setTaskUserId(s);
+            oaCalendar.setState("0");
             oaCalendarService.saveCalendar(oaCalendar);
             result.success("添加成功！");
         } catch (Exception e) {
