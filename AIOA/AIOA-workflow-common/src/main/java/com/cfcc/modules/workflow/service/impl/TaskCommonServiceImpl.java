@@ -870,34 +870,7 @@ public class TaskCommonServiceImpl implements TaskCommonService {
 
 
         if (task == null) {
-//            currentAct = activities.get(0);
-            //获取开始节点后的一个节点
-            String taskDefKey = null;
-            for (ActivityImpl activity : activities) {
-                String type = (String) activity.getProperty("type");
-                if ("startevent".equalsIgnoreCase(type)) {
-                    List<PvmTransition> outgoingTransitions = activity.getOutgoingTransitions();
-                    if (outgoingTransitions.size() < 0) throw new AIOAException("开始环节后没有连线,请参照手册修改流程图");
-                    PvmActivity destination = outgoingTransitions.get(0).getDestination();
-                    if (destination == null) throw new AIOAException("开始环节后没有连接环节,请参照手册修改流程图");
-                    ActivityBehavior activityBehavior = ((ActivityImpl) destination).getActivityBehavior();
-                    if (activityBehavior instanceof UserTaskActivityBehavior) {
-                        taskDefKey = destination.getId();
-                        break;
-                    } else {
-                        throw new AIOAException("第一环节类型有误,请参照手册修改流程图");
-                    }
-
-                }
-            }
-            for (ActivityImpl activity : activities) {
-                String id = activity.getId();
-                if (id.equals(taskDefKey)) {
-                    currentAct = activity;
-                    break;
-                }
-            }
-
+            currentAct =  getFirstAct(activities);
         }
         Integer count = 0;
         for (ActivityImpl activity : actsAll) {
@@ -1501,7 +1474,9 @@ public class TaskCommonServiceImpl implements TaskCommonService {
         //获取输出
         List<ActivityImpl> activities = processDefinitionEntity.getActivities();
         //只允许有assignee或候选人表达式 其他为非法(自定义)
-        ActivityImpl activity = activities.get(0);
+        ActivityImpl activity = getFirstAct(activities);
+
+
         ActivityBehavior activityBehavior = activity.getActivityBehavior();
         if (!(activityBehavior instanceof UserTaskActivityBehavior)) return;//提示报错 第一环节只允许普通类型节点
         TaskDefinition taskDefinition = ((UserTaskActivityBehavior) activityBehavior).getTaskDefinition();
@@ -1522,6 +1497,37 @@ public class TaskCommonServiceImpl implements TaskCommonService {
             String expressionText = next.getExpressionText();
             vars.put(ElParse.parseNormal(expressionText), false);
         }
+    }
+
+    private ActivityImpl getFirstAct(List<ActivityImpl> activities) {
+        ActivityImpl activityFirst = null;
+        String taskDefKey = null;
+        for (ActivityImpl activity : activities) {
+            String type = (String) activity.getProperty("type");
+            if ("startevent".equalsIgnoreCase(type)) {
+                List<PvmTransition> outgoingTransitions = activity.getOutgoingTransitions();
+                if (outgoingTransitions.size() < 0) throw new AIOAException("开始环节后没有连线,请参照手册修改流程图");
+                PvmActivity destination = outgoingTransitions.get(0).getDestination();
+                if (destination == null) throw new AIOAException("开始环节后没有连接环节,请参照手册修改流程图");
+                ActivityBehavior activityBehavior = ((ActivityImpl) destination).getActivityBehavior();
+                if (activityBehavior instanceof UserTaskActivityBehavior) {
+                    taskDefKey = destination.getId();
+                    break;
+                } else {
+                    throw new AIOAException("第一环节类型有误,请参照手册修改流程图");
+                }
+
+            }
+        }
+        for (ActivityImpl activity : activities) {
+            String id = activity.getId();
+            if (id.equals(taskDefKey)) {
+                activityFirst = activity;
+                break;
+            }
+        }
+        return activityFirst;
+
     }
 
     private void recordKeyAndUse(TaskInfoVO taskInfoVO, String taskId, Task task) {
@@ -2061,34 +2067,7 @@ public class TaskCommonServiceImpl implements TaskCommonService {
 
 
         if (task == null) {
-//            currentAct = activities.get(0);
-            //获取开始节点后的一个节点
-            String taskDefKey = null;
-            for (ActivityImpl activity : activities) {
-                String type = (String) activity.getProperty("type");
-                if ("startevent".equalsIgnoreCase(type)) {
-                    List<PvmTransition> outgoingTransitions = activity.getOutgoingTransitions();
-                    if (outgoingTransitions.size() < 0) throw new AIOAException("开始环节后没有连线,请参照手册修改流程图");
-                    PvmActivity destination = outgoingTransitions.get(0).getDestination();
-                    if (destination == null) throw new AIOAException("开始环节后没有连接环节,请参照手册修改流程图");
-                    ActivityBehavior activityBehavior = ((ActivityImpl) destination).getActivityBehavior();
-                    if (activityBehavior instanceof UserTaskActivityBehavior) {
-                        taskDefKey = destination.getId();
-                        break;
-                    } else {
-                        throw new AIOAException("第一环节类型有误,请参照手册修改流程图");
-                    }
-
-                }
-            }
-            for (ActivityImpl activity : activities) {
-                String id = activity.getId();
-                if (id.equals(taskDefKey)) {
-                    currentAct = activity;
-                    break;
-                }
-            }
-
+            currentAct =  getFirstAct(activities);
         }
         Integer count = 0;
         for (ActivityImpl activity : actsAll) {
