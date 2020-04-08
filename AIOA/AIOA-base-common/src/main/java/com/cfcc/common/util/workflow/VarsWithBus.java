@@ -1,5 +1,8 @@
 package com.cfcc.common.util.workflow;
 
+import com.cfcc.common.exception.AIOAException;
+import org.apache.commons.lang.StringUtils;
+
 import java.util.Map;
 
 public class VarsWithBus {
@@ -20,6 +23,7 @@ public class VarsWithBus {
 
 
         String actShow = (String) map.get("act_show");
+        if (StringUtils.isBlank(actShow))throw  new AIOAException("前端页面缺少act_show配置");
         String[] cols = actShow.split(",");
         StringBuilder sb = new StringBuilder();
         for (int i = 0; i < cols.length; i++) {

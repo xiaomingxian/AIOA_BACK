@@ -704,10 +704,14 @@ public class TaskInActController {
             taskInActService.doTask(taskInfoVO, request);
             return Result.ok("任务办理成功");
         } catch (AIOAException e) {
-            taskCommonService.updateTaskStatus(taskId, null);
+            if (StringUtils.isNotBlank(taskId)){
+                taskCommonService.updateTaskStatus(taskId, null);
+            }
             return Result.error(e.getMessage());
         } catch (Exception e) {
-            taskCommonService.updateTaskStatus(taskId, null);
+            if (StringUtils.isNotBlank(taskId)){
+                taskCommonService.updateTaskStatus(taskId, null);
+            }
             e.printStackTrace();
             log.error("办理任务失败" + e.toString());
             return Result.error("办理任务失败");
