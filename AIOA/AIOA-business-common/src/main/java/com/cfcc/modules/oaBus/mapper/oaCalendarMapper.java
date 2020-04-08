@@ -75,4 +75,7 @@ public interface oaCalendarMapper extends BaseMapper<oaCalendar> {
     @Update(" UPDATE oa_calendar set i_is_state=2 where task_user_id=#{v} ")
     void updateByTaskUserId(String s);
 
+    List<Map<String, Object>> findList(@Param(value = "oaCalendar") oaCalendar oaCalendar,@Param(value = "pageNo") int pageNo, @Param(value = "pageSize")Integer pageSize);
+
+
 }
