@@ -6,10 +6,13 @@ import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.cfcc.common.api.vo.Result;
 import com.cfcc.common.aspect.annotation.AutoLog;
 import com.cfcc.common.system.query.QueryGenerator;
+import com.cfcc.common.util.FileUtils;
 import com.cfcc.common.util.ZipUtils;
 import com.cfcc.common.util.oConvertUtils;
 import com.cfcc.modules.oaBus.entity.OaFile;
 import com.cfcc.modules.oaBus.service.IOaFileService;
+import com.cfcc.modules.oaBus.vo.Chunk;
+import com.cfcc.modules.oaBus.vo.FileInfo;
 import com.cfcc.modules.oabutton.entity.OaButton;
 import com.cfcc.modules.system.entity.LoginInfo;
 import com.cfcc.modules.system.service.ISysUserService;
@@ -24,6 +27,7 @@ import org.jeecgframework.poi.excel.view.JeecgEntityExcelView;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Lazy;
+import org.springframework.util.FileCopyUtils;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.multipart.MultipartHttpServletRequest;
@@ -35,10 +39,10 @@ import java.io.File;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.*;
 
 
 /**
@@ -62,6 +66,7 @@ public class OaFileController {
     @Autowired
     @Lazy
     private ISysUserService sysUserService;
+
     /**
      * 下载所有附件
      *
@@ -69,17 +74,17 @@ public class OaFileController {
      * @param list
      */
     @RequestMapping("/downloadZipFile")
-    public void downloadZipFile(HttpServletRequest request, HttpServletResponse response, @RequestBody List<Map<String,Object>> list) { //获取的对象
-        if (list.size()== 0){
+    public void downloadZipFile(HttpServletRequest request, HttpServletResponse response, @RequestBody List<Map<String, Object>> list) { //获取的对象
+        if (list.size() == 0) {
             return;
         }
         LoginInfo loginInfo = sysUserService.getLoginInfo(request);
-        String orgSchema ="";
+        String orgSchema = "";
         if (loginInfo.getOrgSchema() != null && !loginInfo.getOrgSchema().equals("")) {
             orgSchema = loginInfo.getOrgSchema();
         }
-        for (Map map :list) {
-            map.put("sfilePath",uploadpath + File.separator + orgSchema + File.separator + map.get("sfilePath")+"");
+        for (Map map : list) {
+            map.put("sfilePath", uploadpath + File.separator + orgSchema + File.separator + map.get("sfilePath") + "");
         }
         ZipUtils.downFile(list, response);
     }
@@ -328,10 +333,10 @@ public class OaFileController {
     @AutoLog(value = "业务按钮-修改附件名称")
     @ApiOperation(value = "业务按钮-修改附件名称", notes = "业务按钮-修改附件名称")
     @PostMapping(value = "/updateFileName")
-    public Result updateFileName(@RequestBody Map<String, Object> param,HttpServletRequest request) {
+    public Result updateFileName(@RequestBody Map<String, Object> param, HttpServletRequest request) {
         Result result = new Result<>();
         try {
-            boolean ok = oaFileService.updateDocNameById(param,request);
+            boolean ok = oaFileService.updateDocNameById(param, request);
             if (ok) {
                 result.success("修改成功");
             } else {
@@ -353,9 +358,9 @@ public class OaFileController {
     @AutoLog(value = "复制附件")
     @ApiOperation(value = "复制附件", notes = "复制附件")
     @PostMapping(value = "/copyFile")
-    public Result copyFileList(@RequestBody String param,HttpServletRequest request) {
+    public Result copyFileList(@RequestBody String param, HttpServletRequest request) {
         Result<List<OaFile>> result = new Result<List<OaFile>>();
-        List<OaFile> oaFileList = oaFileService.copyFiles(param,request);
+        List<OaFile> oaFileList = oaFileService.copyFiles(param, request);
         try {
             result.success("复制附件成功！");
             result.setResult(oaFileList);
@@ -375,9 +380,9 @@ public class OaFileController {
     @AutoLog(value = "单文件复制")
     @ApiOperation(value = "单文件复制", notes = "单文件复制")
     @PostMapping(value = "/singleCopyFile")
-    public Result singleCopyFile(@RequestBody Map<String, Object> map,HttpServletRequest request) {
+    public Result singleCopyFile(@RequestBody Map<String, Object> map, HttpServletRequest request) {
         Result<OaFile> result = new Result<OaFile>();
-        OaFile oa = oaFileService.singleCopyFile(map,request);
+        OaFile oa = oaFileService.singleCopyFile(map, request);
         try {
             if (oa != null) {
                 result.success("复制成功！");
@@ -433,18 +438,18 @@ public class OaFileController {
     @AutoLog(value = "附件信息写入")
     @ApiOperation(value = "附件信息写入", notes = "附件信息写入")
     @PostMapping(value = "/addFiles")
-    public Result<OaFile> addFiles(@RequestBody List<Map<String,Object>> maps,HttpServletRequest request) {
+    public Result<OaFile> addFiles(@RequestBody List<Map<String, Object>> maps, HttpServletRequest request) {
         Result<OaFile> result = new Result<OaFile>();
         LoginInfo loginInfo = sysUserService.getLoginInfo(request);
         String username = loginInfo.getUsername();
         try {
-            for (Map map:maps){
+            for (Map map : maps) {
                 OaFile oaFile = new OaFile();
-                oaFile.setSFilePath(map.get("sFilePath")+"");
-                oaFile.setSFileName(map.get("sFileName")+"");
-                oaFile.setSTable(map.get("sTable")+"");
-                oaFile.setITableId(Integer.valueOf(map.get("iTableId")+""));
-                oaFile.setSFileType(map.get("sFileType")+"");
+                oaFile.setSFilePath(map.get("sFilePath") + "");
+                oaFile.setSFileName(map.get("sFileName") + "");
+                oaFile.setSTable(map.get("sTable") + "");
+                oaFile.setITableId(Integer.valueOf(map.get("iTableId") + ""));
+                oaFile.setSFileType(map.get("sFileType") + "");
                 oaFile.setSCreateBy(username);
                 oaFile.setDCreateTime(new Date());
                 oaFileService.save(oaFile);
@@ -456,6 +461,26 @@ public class OaFileController {
             log.error(e.getMessage(), e);
             result.error500("操作失败");
         }
+        return result;
+    }
+
+    @PostMapping("/chunk")
+    public String uploadChunk(Chunk chunk, HttpServletRequest request, HttpServletResponse response) {
+        String result = oaFileService.chunkFiles(chunk, request);
+        return  result;
+    }
+
+    @GetMapping("/chunk")
+    public Object checkChunk(Chunk chunk, HttpServletResponse response) {
+        response.setStatus(HttpServletResponse.SC_NOT_MODIFIED);
+        return chunk;
+    }
+
+    @PostMapping("/mergeFile")
+    public Result mergeFile(FileInfo fileInfo, HttpServletRequest request) {
+        Result result = new Result<>();
+        OaFile oaFile = oaFileService.mergeFiles(fileInfo, request);
+        result.setResult(oaFile);
         return result;
     }
 

@@ -95,6 +95,9 @@ public class ShiroConfig {
         filterChainDefinitionMap.put("/**/*.docx", "anon");
         filterChainDefinitionMap.put("/**/*.wps", "anon");
         filterChainDefinitionMap.put("/**/*.xlsx", "anon");
+        //视频文件
+        filterChainDefinitionMap.put("/**/*.mp4", "anon");
+        filterChainDefinitionMap.put("/**/*.mkv", "anon");
 
         // update-begin--Author:sunjianlei Date:20190813 for：排除字体格式的后缀
         filterChainDefinitionMap.put("/**/*.ttf", "anon");
