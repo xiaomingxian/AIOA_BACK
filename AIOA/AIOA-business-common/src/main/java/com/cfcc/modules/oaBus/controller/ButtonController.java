@@ -6,6 +6,7 @@ import com.cfcc.modules.oaBus.service.ButtonPermissionService;
 import com.cfcc.modules.oaBus.service.OaBusDynamicTableService;
 import com.cfcc.modules.system.entity.LoginInfo;
 import com.cfcc.modules.system.service.ISysUserService;
+import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -57,6 +58,7 @@ public class ButtonController {
 
 
             Map<String, Object> result = new HashMap<>();
+            if (StringUtils.isBlank(proSetId))return  Result.error("页面未初始化完成,proSetId没带过来");
             result.put("proSetId", Integer.parseInt(proSetId));
             result.put("loginInfo", loginInfo);
             result.put("taskDefKey", taskDef);

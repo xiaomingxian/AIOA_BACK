@@ -20,6 +20,7 @@ import com.cfcc.modules.system.mapper.SysUserMapper;
 import com.cfcc.modules.system.service.ISysUserService;
 import com.cfcc.modules.utils.*;
 import com.cfcc.modules.workflow.mapper.DepartWithTaskMapper;
+import com.cfcc.modules.workflow.mapper.OaProcActinstMapper;
 import com.cfcc.modules.workflow.mapper.TaskMapper;
 import com.cfcc.modules.workflow.mapper.TaskTransferMapper;
 import com.cfcc.modules.workflow.pojo.*;
@@ -71,6 +72,8 @@ import java.util.*;
 @Slf4j
 public class TaskCommonServiceImpl implements TaskCommonService {
 
+    @Autowired
+    private OaProcActinstMapper oaProcActinstMapper;
 
     @Autowired
     private CommonDynamicTableService dynamicTableService;
@@ -870,7 +873,7 @@ public class TaskCommonServiceImpl implements TaskCommonService {
 
 
         if (task == null) {
-            currentAct =  getFirstAct(activities);
+            currentAct = getFirstAct(activities);
         }
         Integer count = 0;
         for (ActivityImpl activity : actsAll) {
@@ -1071,6 +1074,7 @@ public class TaskCommonServiceImpl implements TaskCommonService {
 
     @Override
     public boolean someActFore(JumpMsg jumpMsg) {
+        //TODO 流程中已经走过这个环节 排版
         String juTiAct = jumpMsg.getJuTiAct();//排版
         String destActDefName = jumpMsg.getDestActDefName();
         String processDefinitionId = jumpMsg.getProcessDefinitionId();
@@ -1866,10 +1870,14 @@ public class TaskCommonServiceImpl implements TaskCommonService {
 
     }
 
+
+
     private String updateDeptMsg(JumpMsg jumpMsg, String dataTable, Integer tableId, Task task, String deleteReason, TaskWithDepts taskWithDepts, String description) {
         boolean needUpdateData = false;
 
         String destActDefKey = jumpMsg.getDestActDefKey();
+        String processDefinitionId = jumpMsg.getProcessDefinitionId();
+
 
 
         //跳转或者撤回 到 部门 或者到部门之前都需要 更新部门信息
@@ -1877,7 +1885,9 @@ public class TaskCommonServiceImpl implements TaskCommonService {
             String[] split = description.split("@mainDept");
             String s = split[0];
             description = s + "@mainDept:" + taskWithDepts.getMainDept() + "@";
-            needUpdateData = true;
+
+            boolean flag = oaProcActinstMapper.taskHaveMain(destActDefKey,processDefinitionId);
+            if (flag) needUpdateData = true;
         } else {
             //判断环节是否在子流程之前  之前就更新/之后就不更新
             ProcessDefinitionEntity proc = (ProcessDefinitionEntity) repositoryService.getProcessDefinition(task.getProcessDefinitionId());
@@ -1891,7 +1901,8 @@ public class TaskCommonServiceImpl implements TaskCommonService {
                 String type = (String) activity.getProperty("type");
                 foreTasks.add(id);
                 if (type.equalsIgnoreCase("subProcess") && foreTasks.contains(destActDefKey)) {
-                    needUpdateData = true;
+                    boolean flag = oaProcActinstMapper.taskHaveMain(destActDefKey,processDefinitionId);
+                    if (flag) needUpdateData = true;
                     break;
                 }
             }
@@ -2067,7 +2078,7 @@ public class TaskCommonServiceImpl implements TaskCommonService {
 
 
         if (task == null) {
-            currentAct =  getFirstAct(activities);
+            currentAct = getFirstAct(activities);
         }
         Integer count = 0;
         for (ActivityImpl activity : actsAll) {
@@ -2491,6 +2502,7 @@ public class TaskCommonServiceImpl implements TaskCommonService {
 
             //TODO 部门任务 更新
             TaskInfoVO next = taskInfoVOS.iterator().next();
+            String processDefinitionId = next.getProcessDefinitionId();
             String isDeptId = next.getTaskId();
             String taskDefKey = next.getTaskDefKey();
             boolean isDept = taskMapper.isDeptTask(isDeptId, taskDefKey);
@@ -2500,15 +2512,19 @@ public class TaskCommonServiceImpl implements TaskCommonService {
                 taskCommon.setBusMsg(description);
                 String table = taskCommon.getTable();
                 String tableId = taskCommon.getTableId();
+//                oaProcActinstMapper
                 //更新业务数据
                 if (StringUtils.isNotBlank(table) && StringUtils.isNotBlank(tableId)) {
-                    Map<String, Object> data = new HashMap<String, Object>();
-                    data.put("table", table);
-                    data.put("i_id", tableId);
-                    data.put("s_main_unit_names", "");
-                    data.put("s_cc_unit_names", "");
-                    data.put("s_inside_deptnames", "");
-                    dynamicTableMapper.updateData(data);
+                    boolean b = oaProcActinstMapper.taskHaveMain(taskDefKey, processDefinitionId);
+                    if (b){
+                        Map<String, Object> data = new HashMap<String, Object>();
+                        data.put("table", table);
+                        data.put("i_id", tableId);
+                        data.put("s_main_unit_names", "");
+                        data.put("s_cc_unit_names", "");
+                        data.put("s_inside_deptnames", "");
+                        dynamicTableMapper.updateData(data);
+                    }
                 }
 
                 String[] split = description.split("@mainDept");

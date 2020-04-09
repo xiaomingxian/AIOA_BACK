@@ -484,6 +484,7 @@ public class ProcessManagerImpl implements ProcessManagerService {
         //可退回节点
         actsAll.stream().forEach(act -> {
             String id = act.getId();
+            //会过滤掉子流程数据--actsAll只有主线的环节(子流程大环节不会在表中出现,不会被记录)
             if (hasTask.get(id) != null && hasTask.get(id)) {
                 actsBack.add(act);
                 taskDefKeys.add(id);
