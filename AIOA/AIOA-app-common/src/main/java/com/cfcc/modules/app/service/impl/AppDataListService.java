@@ -27,13 +27,13 @@ public class AppDataListService implements IAppDataListService {
 
 
     @Override
-    public Map<String, Object> queryBusDataByFunctionId(Integer functionId, Integer modelId, LoginInfo loginInfo, Integer pageNo, Integer pageSize) {
+    public Map<String, Object> queryBusDataByFunctionId(Integer functionId, Integer modelId, LoginInfo loginInfo, Integer pageNo, Integer pageSize,Map<String, Object> condition) {
 
         Map<String, Object> result = new HashMap<>() ;
         String col = "i_id,s_title,d_create_time" ;
         String orderFlag = "" ;
-        Map<String, Object> condition = new HashMap<>() ;
-        condition.put("function_id",functionId) ;
+        //Map<String, Object> condition = new HashMap<>() ;
+
         BusModel busModel =  iBusModelService.getById(modelId);
         String tableName = busModel.getSBusdataTable() ;
         Map<String, String> permitData = iOaBusdataService.permit(functionId, tableName, loginInfo.getUsername());       //根据权限，查询出对应的查询条件

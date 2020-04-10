@@ -153,8 +153,16 @@ public class BusPageController {
         String username = JwtUtil.getUsername(token);
         busPage.setSCreateBy(username);
         try {
-            busPageService.saveBusPage(busPage);
-            result.success("添加成功！");
+            QueryWrapper<BusPage> queryWrapper = new QueryWrapper<>() ;
+            queryWrapper.eq("s_page_path", busPage.getSPagePath());
+            List<BusPage> busPages = busPageService.list(queryWrapper);
+            if(null == busPages || busPages.size() ==0 ){
+                busPageService.saveBusPage(busPage);
+                result.success("添加成功！");
+            }else{
+                result.error500("页面路径不能重复！") ;
+            }
+
         } catch (Exception e) {
             log.error(e.getMessage(), e);
             result.error500("操作失败");

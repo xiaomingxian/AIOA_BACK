@@ -210,7 +210,6 @@ public class BusFunctionController {
 	
 	/**
 	  *  编辑
-	 * @param busFunction
 	 * @return
 	 */
 	@AutoLog(value = "业务配置表-编辑")
@@ -300,7 +299,6 @@ public class BusFunctionController {
 	}
 	/**
 	 * 通过id查询
-	 * @param id
 	 * @return
 	 */
 	@AutoLog(value = "业务配置表-通过id查询")
