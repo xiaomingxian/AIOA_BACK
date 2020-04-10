@@ -47,7 +47,7 @@ public class MissionCenterController {
         Result<List<Map<String,Object>>> result = new Result<>();
         oaCalendar.setSUserNames(loginInfo.getUsername());
         List<Map<String,Object>> CenterList = missionCenterService.queryListMap(oaCalendar,pageNo, pageSize) ;
-        if (CenterList.size()==0){
+        if (CenterList ==null){
             result.error500("未找到对应实体");
         }
         result.setResult(CenterList);
