@@ -29,16 +29,12 @@ public class DatesUtils {
         assert(b1<e1&&b2<e2);
         long coincidenceday;
         if(b1<=b2&&e1>=e2){//（b1---【b2-----e2】--e1）
-            //  System.out.println("1包含2");
             coincidenceday=getDayDifference(enddate2,begindate2);
         }else if(b1>=b2&&e1<=e2){//【b2---（b1-----e1）--e2】
-            //   System.out.println("2包含1");
             coincidenceday=getDayDifference(enddate1,begindate1);
         }else if(b1>=b2&&b1<=e2&&e2<=e1){//【b2---(b1---e2】----e1)
-            //    System.out.println("相交");
             coincidenceday=getDayDifference(enddate2,begindate1);
         }else if(b1<=b2&&e1<=e2&&e1>=b2){//（b1---【b2---e1）----e2】
-            //  System.out.println("相交");
             coincidenceday=getDayDifference(enddate1,begindate2);
         }else if(e1<=b2||b1>=e2){
             coincidenceday=0;
@@ -57,7 +53,6 @@ public class DatesUtils {
      * @return
      */
     public static long getDayDifference(Date d1,Date d2){
-
         long num = (d1.getTime()-d2.getTime())/1000;
         long days  = num/(3600*24);
         if(days<0)days=days*-1;
