@@ -15,6 +15,7 @@ import com.cfcc.modules.workflow.pojo.TaskWithDepts;
 import com.cfcc.modules.workflow.service.OaBusDataPermitService;
 import com.cfcc.modules.workflow.service.TaskCommonService;
 import com.cfcc.modules.workflow.vo.TaskInfoVO;
+import com.sun.mail.imap.protocol.UIDSet;
 import lombok.extern.slf4j.Slf4j;
 import org.activiti.engine.RuntimeService;
 import org.activiti.engine.TaskService;
@@ -260,12 +261,15 @@ public class TaskInActServiceImpl implements TaskInActService {
         if (null != isDept && isDept) {
             Map<String, List<String>> deptMsg = taskInfoVO.getTaskWithDepts().getDeptMsg();
 
-            for (Map.Entry<String, List<String>> entry : deptMsg.entrySet()) {
-                List<String> ids = entry.getValue();
-                ids.stream().forEach(id -> {
-                    uids.add(id);
-                });
+            if (deptMsg!=null){
+                for (Map.Entry<String, List<String>> entry : deptMsg.entrySet()) {
+                    List<String> ids = entry.getValue();
+                    ids.stream().forEach(id -> {
+                        uids.add(id);
+                    });
+                }
             }
+
 
         } else {
             List<String> assignee = (List<String>) taskInfoVO.getAssignee();
@@ -277,7 +281,10 @@ public class TaskInActServiceImpl implements TaskInActService {
         //5 构造业务数据权限表数据
         Integer functionId = taskInfoVO.getFunctionId();
         Integer busDataId = taskInfoVO.getBusDataId();
-        oaBusDataPermitService.save(table, uids, functionId, busDataId);
+        if (uids.size()>0){
+            oaBusDataPermitService.save(table, uids, functionId, busDataId);
+        }
+
     }
 
 }

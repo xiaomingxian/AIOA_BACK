@@ -1387,9 +1387,14 @@ public class TaskCommonServiceImpl implements TaskCommonService {
 
             //部门信息存储
             Boolean isDept = taskInfoVO.getIsDept();
-            if (null != isDept && isDept) {
+            TaskWithDepts taskWithDepts = taskInfoVO.getTaskWithDepts();
+            boolean readDept=true;
+            if (taskWithDepts==null)readDept=false;
+            if (taskWithDepts!=null && taskWithDepts.getDeptMsg()==null)readDept=false;
+
+            if (null != isDept && isDept && readDept) {
                 //存储部门相关信息
-                TaskWithDepts taskWithDepts = taskInfoVO.getTaskWithDepts();
+
                 //变量与任务的对应关系----如何区分主办/辐办/传阅
                 for (Task t : list) {
                     String id = t.getId();
