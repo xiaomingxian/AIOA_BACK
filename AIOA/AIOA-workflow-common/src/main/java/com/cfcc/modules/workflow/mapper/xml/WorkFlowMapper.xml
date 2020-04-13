@@ -539,27 +539,27 @@
 
         select
 
-        GROUP_CONCAT( l.id) id,
-        GROUP_CONCAT(DISTINCT l.NAME) name,
-        GROUP_CONCAT( l.NAME) allNames,
+               l.id id,
+        l. NAME NAME,
+        l. NAME allNames,
         l.executionId,
         l.processInstanceId,
         l.processDefinitionId,
         l.parentTaskId,
         l.description,
-        GROUP_CONCAT( l.taskDefinitionKey) taskDefinitionKey,
-        l.OWNER,
-        MAX(l.createTime) createTime,
+        l.taskDefinitionKey taskDefinitionKey,
+        l. OWNER,
+        l.createTime createTime,
         l.assignee,
         l.dueDate,
         l.category,
         l.tenantId,
         l.formKey,
-        l.busMsg,
-        GROUP_CONCAT(DISTINCT(CONCAT(l.id,':',l.del))) deleteReason
+        l.busMsg
 
         from
         (
+        SELECT * FROM (
         SELECT
         t.ID_ id,
         t.NAME_ NAME,
@@ -587,7 +587,10 @@
         AND v.name_ = 'busMsg'
 
         <if test="!isAdmin">
-            and t.ASSIGNEE_ = #{pojo.userId}
+            and  t.PROC_INST_ID_ in (
+            SELECT DISTINCT proc_inst_id_ FROM act_hi_taskinst  where
+            ASSIGNEE_ = #{pojo.userId}
+            )
 
         </if>
 
@@ -618,12 +621,13 @@
         v.name_ = 'busMsg'
 
         <if test="!isAdmin">
-            AND i.user_id_ = #{pojo.userId}
-
+            and t.proc_inst_id_ in (
+            SELECT DISTINCT proc_inst_id_ FROM act_ru_identitylink where  user_id_ = #{pojo.userId}
+            )
         </if>
         AND i.TYPE_ = 'candidate'
         AND t.ASSIGNEE_ IS NULL
-
+        )t ORDER BY CONVERT(t.id,SIGNED) desc limit 999999999
         )
 
         l where 1=1
@@ -1588,27 +1592,27 @@
 
         select
 
-        GROUP_CONCAT( l.id) id,
-        GROUP_CONCAT(DISTINCT l.NAME) name,
-        GROUP_CONCAT( l.NAME) allNames,
-        l.executionId,
-        l.processInstanceId,
-        l.processDefinitionId,
-        l.parentTaskId,
-        l.description,
-        GROUP_CONCAT( l.taskDefinitionKey) taskDefinitionKey,
-        l.OWNER,
-        MAX(l.createTime) createTime,
-        l.assignee,
-        l.dueDate,
-        l.category,
-        l.tenantId,
-        l.formKey,
-        l.busMsg,
-        GROUP_CONCAT(DISTINCT(CONCAT(l.id,':',l.del))) deleteReason
+        ht.id id,
+        ht.NAME NAME,
+        ht.NAME allNames,
+        ht.executionId,
+        ht.processInstanceId,
+        ht.processDefinitionId,
+        ht.parentTaskId,
+        ht.description,
+        ht.taskDefinitionKey taskDefinitionKey,
+        ht.OWNER,
+        ht.createTime createTime,
+        ht.assignee,
+        ht.dueDate,
+        ht.category,
+        ht.tenantId,
+        ht.formKey,
+        l.busMsg
 
         from
         (
+        SELECT * FROM (
         SELECT
         t.ID_ id,
         t.NAME_ NAME,
@@ -1635,7 +1639,11 @@
         EXISTS(select * from act_ru_execution where PROC_INST_ID_=t.PROC_INST_ID_)
         AND v.name_ = 'busMsg'
         <if test="!isAdmin">
-            and t.ASSIGNEE_ = #{pojo.userId}
+            and  t.PROC_INST_ID_ in (
+            SELECT DISTINCT proc_inst_id_ FROM act_hi_taskinst  where
+            ASSIGNEE_ = #{pojo.userId}
+            )
+
         </if>
         UNION
         SELECT
@@ -1663,20 +1671,49 @@
         WHERE
         v.name_ = 'busMsg'
         <if test="!isAdmin">
-            AND i.user_id_ = #{pojo.userId}
+            and t.proc_inst_id_ in (
+            SELECT DISTINCT proc_inst_id_ FROM act_ru_identitylink where  user_id_ = #{pojo.userId}
+            )
         </if>
         AND i.TYPE_ = 'candidate'
         AND t.ASSIGNEE_ IS NULL
-
+        )t ORDER BY CONVERT(t.id,SIGNED) desc limit 999999999
         ) l left JOIN
-        oa_task_dept td on td.proc_inst_id =l.processInstanceId and td.task_id = l.id and
+        oa_task_dept td on td.proc_inst_id =l.processInstanceId  LEFT  JOIN
+        (
+        SELECT * FROM (
+        SELECT
+        ID_ id,
+        NAME_ NAME,
+        EXECUTION_ID_ executionId,
+        PROC_INST_ID_ processInstanceId,
+        PROC_DEF_ID_ processDefinitionId,
+        PARENT_TASK_ID_ parentTaskId,
+        DESCRIPTION_ description,
+        TASK_DEF_KEY_ taskDefinitionKey,
+        OWNER_ OWNER,
+        start_time_ createTime,
+        ASSIGNEE_ assignee,
+        end_time_ dueDate,
+        CATEGORY_ category,
+        TENANT_ID_ tenantId,
+        FORM_KEY_ formKey
+
+        FROM act_hi_taskinst     order by CONVERT(id_,SIGNED) desc  limit 999999999
+        ) tt GROUP BY tt.processInstanceId
+
+        )
+        ht on ht.processInstanceId=l.processInstanceId and td.task_id = l.id and
         td.task_def_key=l.taskDefinitionKey
         and td.type= #{type}
         <if test="!isAdmin">
-            and td.user_id= #{pojo.userId}
+            and t.proc_inst_id_ in (
+            SELECT DISTINCT proc_inst_id_ FROM act_ru_identitylink where  user_id_ = #{pojo.userId}
+            )
         </if>
         where
         td.proc_inst_id =l.processInstanceId and td.task_id = l.id and td.task_def_key=l.taskDefinitionKey
+        and ht.processInstanceId=l.processInstanceId
         and td.type= #{type}
         <if test="!isAdmin">
             and td.user_id= #{pojo.userId}
