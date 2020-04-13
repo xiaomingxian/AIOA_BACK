@@ -151,7 +151,7 @@ public class FormalFileController {
                                  @RequestParam(value = "tableid", required = true) Integer tableid,
                                  @RequestParam(value = "orgSchema", required = false) String orgSchema,
                                  HttpServletRequest request) {
-        Result<Map> result = new Result<Map>();
+        Result<Map> result = new Result<>();
         try {
             if (!orgSchema.equals("")){
                 request.setAttribute("orgSchema",orgSchema);
@@ -166,11 +166,17 @@ public class FormalFileController {
             //查询附件列表中的文件名
             List<OaFile> oaFileList = iOaFileService.getOaFileList(stable, Integer.toString(tableid));
             String AccessoryFileName = "";
-            for (int i = 0; i < oaFileList.size(); i++) {
-                if ("7".equals(oaFileList.get(i))) {
-                    AccessoryFileName += oaFileList.get(i).getSFileName().lastIndexOf(".", 1) + "\n";
+            if (oaFileList.size()!=0){
+                for (int i = 0; i < oaFileList.size(); i++) {
+                    if ("7".equals(oaFileList.get(i))) {
+                        AccessoryFileName += oaFileList.get(i).getSFileName().lastIndexOf(".", 1) + "\n";
+                    }
                 }
+            }else {
+                result.setSuccess(false);
+                result.setMessage("意见类型不可设置为空");
             }
+
             map.put("TAttachment", AccessoryFileName);
             //根据业务功能id查业务含义数据
             Integer funcationid = (Integer) map.get("i_bus_function_id");
@@ -210,8 +216,10 @@ public class FormalFileController {
             map.put("CurDate", nowTime);
             map.put("fileName", fileName);
             result.setResult(map);
+            result.setSuccess(true);
         } catch (Exception e) {
             e.printStackTrace();
+            result.setSuccess(false);
             log.error("办文单业务文件名查询失败");
         }
         return result;
@@ -227,7 +235,7 @@ public class FormalFileController {
     @GetMapping(value = "/queryStateById")
     public Result<Map> queryStateById(@RequestParam(name = "stable", required = true) String stable,
                                       @RequestParam(value = "tableid", required = true) Integer tableid) {
-        Result<Map> result = new Result<Map>();
+        Result<Map> result = new Result<>();
         Map<String, Object> map = iOaBusdataService.queryStateById(stable, tableid);
         if (map.size() == 0) {
             result.setSuccess(false);

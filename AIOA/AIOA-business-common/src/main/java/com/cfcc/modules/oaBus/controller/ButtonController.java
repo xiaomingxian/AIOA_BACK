@@ -56,7 +56,6 @@ public class ButtonController {
                     buttonPermissionService.currentUserPermission(proKey, oaBusdata, loginInfo,
                     taskDef, proInstanId, taskId, status);
 
-
             Map<String, Object> result = new HashMap<>();
             if (StringUtils.isBlank(proSetId))return  Result.error("页面未初始化完成,proSetId没带过来");
             result.put("proSetId", Integer.parseInt(proSetId));

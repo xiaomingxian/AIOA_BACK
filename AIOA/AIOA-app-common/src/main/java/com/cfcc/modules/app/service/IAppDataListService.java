@@ -7,5 +7,5 @@ import java.util.Map;
 
 public interface IAppDataListService {
 
-    Map<String, Object> queryBusDataByFunctionId(Integer functionId, Integer modelId, LoginInfo loginInfo, Integer pageNo, Integer pageSize);
+    Map<String, Object> queryBusDataByFunctionId(Integer functionId, Integer modelId, LoginInfo loginInfo, Integer pageNo, Integer pageSize,Map<String,Object> condition);
 }

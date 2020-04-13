@@ -89,12 +89,12 @@ public class MeetingInformController {
      * @return
      */
     @PostMapping(value = "/sendMeetingInform")
-    public Result sendMeetingInform(@RequestBody Map<String, Object> map,HttpServletRequest request){
+    public Result<String> sendMeetingInform(@RequestBody Map<String, Object> map,HttpServletRequest request){
         SysUser currentUser = sysUserService.getCurrentUser(request);
 
-        String flag= meetingInformService.insertUserMeetingInform(map,currentUser);
+        Result<String> result= meetingInformService.insertUserMeetingInform(map,currentUser);
 
-        return Result.ok(flag);
+        return result;
 
     }
 }

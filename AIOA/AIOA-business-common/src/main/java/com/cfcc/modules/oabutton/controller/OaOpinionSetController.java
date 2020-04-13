@@ -296,7 +296,7 @@ public class OaOpinionSetController {
 		 }
 		 OaOpinionSet oaOpinionSet = oaOpinionSetService.queryByTaskKey(map);
 		 if (oaOpinionSet == null) {
-			 result.error500("未找到对应数据");
+			 result.error500("未找到对应数据4");
 		 } else {
 			 result.setResult(oaOpinionSet);
 			 result.setSuccess(true);
@@ -317,7 +317,7 @@ public class OaOpinionSetController {
 		 Result<List<OaOpinionSet>> result = new Result<>();
 		 if (map.get("itaskOpinionOrder")==null
 				 ||map.get("procDefKey")==null ||map.get("iProcOpinionId")==null){
-			 result.error500("未找到对应实体");
+//			 result.error500("未找到对应实体");
 			 return result;
 		 }
 		 List<OaOpinionSet> oaOpinionSet = oaOpinionSetService.queryByOrderAndKey(map);

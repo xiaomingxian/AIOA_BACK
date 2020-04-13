@@ -2,6 +2,7 @@ package com.cfcc.modules.oaBus.service;
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.service.IService;
+import com.cfcc.common.api.vo.Result;
 import com.cfcc.modules.oaBus.entity.OaBusdata;
 import com.cfcc.modules.system.entity.SysUser;
 
@@ -15,6 +16,5 @@ public interface MeetingInformService extends IService<OaBusdata> {
 
     List<OaBusdata> queryMeetingTime(String meetingRoom,String tableName);
 
-
-    String insertUserMeetingInform(Map<String, Object> map, SysUser currentUser);
+    Result<String>  insertUserMeetingInform(Map<String, Object> map, SysUser currentUser);
 }
