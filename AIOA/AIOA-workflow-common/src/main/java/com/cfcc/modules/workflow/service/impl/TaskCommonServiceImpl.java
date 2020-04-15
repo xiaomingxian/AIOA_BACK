@@ -134,6 +134,9 @@ public class TaskCommonServiceImpl implements TaskCommonService {
     private String savePath;
 
 
+    private static final ThreadLocal<String> haveEndProcess = new ThreadLocal<String>();
+
+
     @Override
     public void del(String processInstanceId) {
         //删除表中的数据
@@ -1120,7 +1123,8 @@ public class TaskCommonServiceImpl implements TaskCommonService {
         if (StringUtils.isBlank(procInstId)) return;
         //去代办里查
         long count = taskService.createTaskQuery().processInstanceId(procInstId).count();
-        if (count <= 0) {
+        String end = haveEndProcess.get();//当前线程存储是否强制办结标志
+        if (count <= 0|| ( "endProcess".equals(end))) {
             Calendar now = Calendar.getInstance();
             int year = now.get(Calendar.YEAR);
             int mounth = now.get(Calendar.MONTH) + 1;
@@ -1130,6 +1134,7 @@ public class TaskCommonServiceImpl implements TaskCommonService {
             upData.put("i_id", id);
             //按年月日划分
             upData.put("s_varchar9", year + "-" + mounth + "-" + day);
+            upData.put("s_cur_task_name", "end-已结束");
             dynamicTableMapper.updateData(upData);
 
             String rootPath = savePath + "/activiti/" + year + "/" + mounth + "/" + day + "/";
@@ -1153,6 +1158,7 @@ public class TaskCommonServiceImpl implements TaskCommonService {
 //                taskMapper.deleteByprocessInstanceId(procInstId);
                 del(procInstId);
             } catch (Exception e) {
+                e.printStackTrace();
                 log.error("-->" + e.getMessage());
             }
 
@@ -1388,9 +1394,9 @@ public class TaskCommonServiceImpl implements TaskCommonService {
             //部门信息存储
             Boolean isDept = taskInfoVO.getIsDept();
             TaskWithDepts taskWithDepts = taskInfoVO.getTaskWithDepts();
-            boolean readDept=true;
-            if (taskWithDepts==null)readDept=false;
-            if (taskWithDepts!=null && taskWithDepts.getDeptMsg()==null)readDept=false;
+            boolean readDept = true;
+            if (taskWithDepts == null) readDept = false;
+            if (taskWithDepts != null && taskWithDepts.getDeptMsg() == null) readDept = false;
 
             if (null != isDept && isDept && readDept) {
                 //存储部门相关信息
@@ -1640,13 +1646,26 @@ public class TaskCommonServiceImpl implements TaskCommonService {
         //}
     }
 
+
     /**
      * 人工终止流程
      */
     @Override
     public void endProcess(TaskInfoVO taskInfoVO) {
-        Authentication.setAuthenticatedUserId(taskInfoVO.getUserId());
-        runtimeService.deleteProcessInstance(taskInfoVO.getProcessId(), "人工终止");
+        //先存储一份到本地
+//        Authentication.setAuthenticatedUserId(taskInfoVO.getUserId());
+//
+//        runtimeService.deleteProcessInstance(taskInfoVO.getProcessId(), "人工终止");
+        haveEndProcess.set("endProcess");
+
+        HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder.getRequestAttributes()).getRequest();
+        HttpServletResponse response = ((ServletRequestAttributes) RequestContextHolder.getRequestAttributes()).getResponse();
+        String table = taskInfoVO.getTable();
+        String id = taskInfoVO.getBusDataId() == null ? "" : taskInfoVO.getBusDataId().toString();
+        if (StringUtils.isNotBlank(table) && StringUtils.isNotBlank(id)) {
+            afterDoTask(table, id, request, response);
+        }
+
     }
 
     @Override
@@ -1876,13 +1895,11 @@ public class TaskCommonServiceImpl implements TaskCommonService {
     }
 
 
-
     private String updateDeptMsg(JumpMsg jumpMsg, String dataTable, Integer tableId, Task task, String deleteReason, TaskWithDepts taskWithDepts, String description) {
         boolean needUpdateData = false;
 
         String destActDefKey = jumpMsg.getDestActDefKey();
         String processDefinitionId = jumpMsg.getProcessDefinitionId();
-
 
 
         //跳转或者撤回 到 部门 或者到部门之前都需要 更新部门信息
@@ -1891,7 +1908,7 @@ public class TaskCommonServiceImpl implements TaskCommonService {
             String s = split[0];
             description = s + "@mainDept:" + taskWithDepts.getMainDept() + "@";
 
-            boolean flag = oaProcActinstMapper.taskHaveMain(destActDefKey,processDefinitionId);
+            boolean flag = oaProcActinstMapper.taskHaveMain(destActDefKey, processDefinitionId);
             if (flag) needUpdateData = true;
         } else {
             //判断环节是否在子流程之前  之前就更新/之后就不更新
@@ -1906,7 +1923,7 @@ public class TaskCommonServiceImpl implements TaskCommonService {
                 String type = (String) activity.getProperty("type");
                 foreTasks.add(id);
                 if (type.equalsIgnoreCase("subProcess") && foreTasks.contains(destActDefKey)) {
-                    boolean flag = oaProcActinstMapper.taskHaveMain(destActDefKey,processDefinitionId);
+                    boolean flag = oaProcActinstMapper.taskHaveMain(destActDefKey, processDefinitionId);
                     if (flag) needUpdateData = true;
                     break;
                 }
@@ -2521,7 +2538,7 @@ public class TaskCommonServiceImpl implements TaskCommonService {
                 //更新业务数据
                 if (StringUtils.isNotBlank(table) && StringUtils.isNotBlank(tableId)) {
                     boolean b = oaProcActinstMapper.taskHaveMain(taskDefKey, processDefinitionId);
-                    if (b){
+                    if (b) {
                         Map<String, Object> data = new HashMap<String, Object>();
                         data.put("table", table);
                         data.put("i_id", tableId);

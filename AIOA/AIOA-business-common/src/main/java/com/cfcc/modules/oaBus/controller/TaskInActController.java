@@ -1045,8 +1045,10 @@ public class TaskInActController {
                 SimpleDateFormat sf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
                 maps.stream().forEach(m -> {
                     Long endTimeStemp = (Long) m.get("endTime");
-                    String format = sf.format(new Date(endTimeStemp));
-                    m.put("endTime", format);
+                    if (endTimeStemp!=null){
+                        String format = sf.format(new Date(endTimeStemp));
+                        m.put("endTime", format);
+                    }
 
                 });
 

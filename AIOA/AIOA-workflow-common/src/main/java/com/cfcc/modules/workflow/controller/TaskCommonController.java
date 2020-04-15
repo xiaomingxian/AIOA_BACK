@@ -388,8 +388,10 @@ public class TaskCommonController {
                 List<Map> maps = FileUtils.readJSONArrayOneLine(fullPath);
                 maps.stream().forEach(m -> {
                     Long endTimeStemp = (Long) m.get("endTime");
-                    String format = simpleDateFormat.format(new Date(endTimeStemp));
-                    m.put("endTime", format);
+                    if (null!=endTimeStemp){
+                        String format = simpleDateFormat.format(new Date(endTimeStemp));
+                        m.put("endTime", format);
+                    }
 
                 });
 

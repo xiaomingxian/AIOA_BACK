@@ -56,6 +56,7 @@ public class TaskInfoVO implements Serializable {
     private Object assignee;
     private Integer functionId;
     private Integer busDataId;//业务数据id
+    private String table;//table
 
 
     //***************************************** 查询条件 *****************************************
