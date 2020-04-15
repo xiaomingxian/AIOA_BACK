@@ -173,6 +173,7 @@ public class HomeAnalysis {
             busMap.put("url",url);
             busMap.put("sName",sName);
             busMap.put("tableName",TableName);
+            busMap.put("total",byModelId.getResult().getTotal());
             map.put(str,busMap);
     }
 }

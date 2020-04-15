@@ -179,8 +179,12 @@ public class oaTeamworkSetServiceImpl extends ServiceImpl<oaTeamworkSetMapper, o
     }
 
     @Override
-    public int findMax(Integer iTeamworkId) {
-        return oaTeamworkSetMapper.findMax(iTeamworkId);
+    public Integer findMax(Integer iTeamworkId) {
+        Integer max = oaTeamworkSetMapper.findMax(iTeamworkId);
+        if(max == null){
+            return 0;
+        }
+        return max;
     }
 
     @Override

@@ -7,8 +7,11 @@ import com.cfcc.modules.oaBus.entity.OaBusdata;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 @Service
 public class DataAnalysisServiveImpl extends ServiceImpl<DataAnalysisMapper, OaBusdata> implements DataAnalysisService {
@@ -25,25 +28,53 @@ public class DataAnalysisServiveImpl extends ServiceImpl<DataAnalysisMapper, OaB
     //统计我的数据的数据量  --LYJ
     @Override
     public List<Map<String, Object>> findByTableAndMy(String table, OaBusdata oaBusdata) {
-        List<Map<String, Object>> BusDatalist = dataAnalisisMapper.findByTableAndMy(table, oaBusdata);
-        return BusDatalist;
+        List<Map<String, Object>> byTableAndMy = dataAnalisisMapper.findByTableAndMy(table, oaBusdata);
+        List<Map<String, Object>> sortList = null;
+        List<Integer> list = new ArrayList<>();
+        for (int i = 1; i <= 12; i++) {
+            Boolean b = true;
+            for (int j = 0; j < byTableAndMy.size(); j++) {
+                if (i == (Integer) byTableAndMy.get(j).get("i_create_month")) {
+                    b = false;
+                }
+            }
+            if (b) {
+                list.add(i);
+            }
+        }
+        list.forEach(i -> {
+            Map<String, Object> map = new HashMap<>();
+            map.put("i_create_month", i);
+            map.put("num", 0);
+            byTableAndMy.add(map);
+        });
+        sortList = byTableAndMy.stream()
+                .sorted((m1, m2) -> {
+                    if ((Integer) m1.get("i_create_month") >= (Integer) m2.get("i_create_month")) {
+                        return 1;
+                    } else {
+                        return -1;
+                    }
+                })
+                .collect(Collectors.toList());
+        return sortList;
     }
     //统计办结率  --LYJ
 
     @Override
-    public List<Map<String, Object>> MyRate(String table, OaBusdata oaBusdata) {
-        List<Map<String, Object>> list = dataAnalisisMapper.MyRate(table, oaBusdata);
+    public Map<String, Object> MyRate(String table, OaBusdata oaBusdata) {
+        Map<String, Object> list = dataAnalisisMapper.MyRate(table, oaBusdata);
         return list;
     }
     @Override
-    public List<Map<String, Object>> PeerNum(String table, OaBusdata oaBusdata) {
-        List<Map<String, Object>> list = dataAnalisisMapper.PeerNum(table, oaBusdata);
+    public Map<String, Object> PeerNum(String table, OaBusdata oaBusdata) {
+        Map<String, Object> list = dataAnalisisMapper.PeerNum(table, oaBusdata);
         return list;
     }
 
     @Override
-    public List<Map<String, Object>> HandlingRate(String table, OaBusdata oaBusdata) {
-        List<Map<String, Object>> list = dataAnalisisMapper.HandlingRate(table, oaBusdata);
+    public Map<String, Object> HandlingRate(String table, OaBusdata oaBusdata) {
+        Map<String, Object> list = dataAnalisisMapper.HandlingRate(table, oaBusdata);
         return list;
     }
 
@@ -53,8 +84,8 @@ public class DataAnalysisServiveImpl extends ServiceImpl<DataAnalysisMapper, OaB
     }
 
     @Override
-    public double getAvg(String table) {
-        return dataAnalisisMapper.getAvg(table);
+    public double getAvg(String table,OaBusdata oaBusdata) {
+        return dataAnalisisMapper.getAvg(table,oaBusdata);
     }
 
     //查询所有的字段名  ——LYJ
