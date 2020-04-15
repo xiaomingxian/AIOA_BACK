@@ -98,4 +98,15 @@ public interface OaBusDynamicTableMapper {
 
     @Delete("DELETE FROM oa_file where  s_table=#{table} and i_table_id=#{id} and s_file_type=#{type}")
     void deleteOaFile(@Param("table") String table,@Param("id") String id,@Param("type") int i);
+
+    @Select("SELECT " +
+            " m.i_id mid," +
+            " f.i_id fid," +
+            " m.s_busdata_table " +
+            " FROM" +
+            " oa_bus_model m" +
+            " LEFT JOIN oa_bus_function f ON f.i_bus_model_id = m.i_id " +
+            " WHERE" +
+            " m.s_en_name = #{name};")
+    Map<String, Object> queryModelAndFunIdByEnName(@Param("name") String enName);
 }

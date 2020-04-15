@@ -1042,30 +1042,35 @@ public class OaBusdataServiceImpl extends ServiceImpl<OaBusdataMapper, OaBusdata
         map.put("i_urgency", 4);        //缓急    默认为4  一般
         map.put("s_left_parameter", function.getSBusLeftParameter());
 
-        if (function.getIIsDept() != null && function.getIIsDept() == 1) {     //插入部门
-            String departName = loginInfo.getDepart().getDepartName();
-            map.put("s_dept_name", departName);
-        }
-        if (function.getIIsUnit() != null && function.getIIsUnit() == 1) {     //插入机构
-            SysDepart depart = loginInfo.getDepart();
-            SysDepart unit = sysDepartService.getUnitByDeptId(depart.getId());
-            map.put("s_unit_name", unit.getDepartName());
-        }
+
         map.put("s_right_parameter", function.getSBusRightParameter());
         map.put("i_bus_model_id", modelId);
         LocalDate nowDate = LocalDate.now();
         map.put("i_create_year", nowDate.getYear());
         map.put("i_create_month", nowDate.getMonthValue());
         map.put("i_create_day", nowDate.getDayOfMonth());
-        map.put("s_create_name", loginInfo.getRealname());
-        map.put("s_create_by", loginInfo.getId());
-        if (loginInfo.getOrgCode() != null) {
-            SysDepart sysDepart = sysDepartService.queryUserDepartByOrgCode(loginInfo.getOrgCode());
-            SysDepart unit = sysDepartService.getUnitByDeptId(sysDepart.getId() + "");
-            map.put("s_create_dept", sysDepart.getDepartName());
-            map.put("s_create_deptid", sysDepart.getId());
-            map.put("s_create_unitid", unit.getId());
+        if (loginInfo!=null){
+
+            map.put("s_create_name", loginInfo.getRealname());
+            map.put("s_create_by", loginInfo.getId());
+            if (loginInfo.getOrgCode() != null) {
+                SysDepart sysDepart = sysDepartService.queryUserDepartByOrgCode(loginInfo.getOrgCode());
+                SysDepart unit = sysDepartService.getUnitByDeptId(sysDepart.getId() + "");
+                map.put("s_create_dept", sysDepart.getDepartName());
+                map.put("s_create_deptid", sysDepart.getId());
+                map.put("s_create_unitid", unit.getId());
+            }
+            if (function.getIIsDept() != null && function.getIIsDept() == 1) {     //插入部门
+                String departName = loginInfo.getDepart().getDepartName();
+                map.put("s_dept_name", departName);
+            }
+            if (function.getIIsUnit() != null && function.getIIsUnit() == 1) {     //插入机构
+                SysDepart depart = loginInfo.getDepart();
+                SysDepart unit = sysDepartService.getUnitByDeptId(depart.getId());
+                map.put("s_unit_name", unit.getDepartName());
+            }
         }
+
 
         LocalDateTime dateTime = LocalDateTime.now();
         map.put("d_create_time", dateTime);
