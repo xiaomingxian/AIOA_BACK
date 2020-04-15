@@ -28,7 +28,7 @@ public interface oaTeamworkSetMapper extends BaseMapper<oaTeamworkSet> {
 
     int Insert(oaTeamworkSet oaTeamworkSet);
 
-    int findMax(Integer iTeamworkId);
+    Integer findMax(Integer iTeamworkId);
 
     List<oaTeamworkSet> findTeamworkSet(@Param("iTeamworkId")Integer iTeamworkId);
 

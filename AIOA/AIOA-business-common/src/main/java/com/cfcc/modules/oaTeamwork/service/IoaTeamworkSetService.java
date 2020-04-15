@@ -28,7 +28,7 @@ public interface IoaTeamworkSetService extends IService<oaTeamworkSet> {
 
     int insert(oaTeamworkSet oaTeamworkSet);
 
-    int findMax(Integer iTeamworkId);
+    Integer findMax(Integer iTeamworkId);
 
     List<oaTeamworkSet> findTeamworkSet(Integer iTeamworkId);
 

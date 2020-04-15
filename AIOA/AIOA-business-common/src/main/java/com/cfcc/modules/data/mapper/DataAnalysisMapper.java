@@ -15,7 +15,7 @@ public interface DataAnalysisMapper extends BaseMapper<OaBusdata> {
     //统计我的数据的数据量  --LYJ
     List<Map<String, Object>> findByTableAndMy(@Param("table")String table, @Param("bdata")OaBusdata oaBusdata);
     //我的办结率   --LYJ
-    List<Map<String, Object>>  MyRate(@Param("table")String table, @Param("bdata") OaBusdata oaBusdata);
+    Map<String, Object> MyRate(@Param("table")String table, @Param("bdata") OaBusdata oaBusdata);
 
 
     String getDepartId(String sCreateBy);
@@ -27,11 +27,11 @@ public interface DataAnalysisMapper extends BaseMapper<OaBusdata> {
 
     List<Map<String, Object>> selectMyCreateDepart(@Param("table")String table, @Param("bdata")OaBusdata oaBusdata);
 
-    List<Map<String, Object>> PeerNum(@Param("table")String table, @Param("bdata") OaBusdata oaBusdata);
+    Map<String, Object> PeerNum(@Param("table")String table, @Param("bdata") OaBusdata oaBusdata);
 
-    List<Map<String, Object>> HandlingRate(@Param("table")String table, @Param("bdata") OaBusdata oaBusdata);
+    Map<String, Object> HandlingRate(@Param("table")String table, @Param("bdata") OaBusdata oaBusdata);
 
     Map<String, Object> Handling(@Param("table")String table, @Param("bdata") OaBusdata oaBusdata);
 
-    double getAvg(@Param("table")String table);
+    double getAvg(@Param("table")String table, @Param("bdata") OaBusdata oaBusdata);
 }

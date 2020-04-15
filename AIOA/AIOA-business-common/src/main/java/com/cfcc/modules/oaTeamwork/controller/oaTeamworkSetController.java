@@ -230,16 +230,9 @@ public class oaTeamworkSetController {
 	 @AutoLog(value = "个人协同办公业务配置明细")
 	 @ApiOperation(value="个人协同办公业务配置明细", notes="个人协同办公业务配置明细")
 	 @GetMapping(value = "/findMax")
-	 public Result<Integer> findMax(@RequestParam(name="TeamworkId",required=false) Integer TeamworkId) {
-		 Result<Integer> result = new Result<Integer>();
-		 int maxOrder = oaTeamworkSetService.findMax(TeamworkId);
-		 if(maxOrder == 0){
-			 return null;
-		 }else{
-			 result.setResult(maxOrder);
-		 }
-
-		 return result;
+	 public Integer findMax(@RequestParam(name="TeamworkId",required=false) Integer TeamworkId) {
+		 Integer maxOrder = oaTeamworkSetService.findMax(TeamworkId);
+		 return maxOrder;
 	 }
 
 	 /**

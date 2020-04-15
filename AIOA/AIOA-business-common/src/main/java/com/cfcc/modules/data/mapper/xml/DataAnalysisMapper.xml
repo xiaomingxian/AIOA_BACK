@@ -7,7 +7,7 @@
     select 
     (select count(i_is_state)  as num  from ${table}
       <where>
-         i_is_display =0 and  i_is_state = 0
+         i_is_display =0 and  i_is_state = 1
           <if test="bdata.sCreateBy != null and bdata.sCreateBy != ''">
           and  s_create_by = #{bdata.sCreateBy}
       </if>
@@ -24,7 +24,7 @@
               AND  s_create_deptid = #{bdata.sCreateDeptid}
           </if>
       </where> )/
-    (SELECT count(*)  as num1  from ${table}
+    (SELECT count(*)  as unm1  from ${table}
         <where>
             i_is_display =0
         <if test="bdata.sCreateBy != null and bdata.sCreateBy != ''">
@@ -83,13 +83,13 @@
                 AND  s_create_deptid = #{bdata.sCreateDeptid}
             </if>
 
-    </where> ) as reta   from dual
+    </where> ) as preeNum   from dual
     </select>
     <!--办理率-->
     <select id="HandlingRate" resultType="java.util.Map">
         	select
         	(select count(i_is_state)  as num  from ${table}  <where>
-        i_is_display =0 and  i_is_state =0
+        i_is_display =0 and  i_is_state =1
         <if test="bdata.sCreateBy != null and bdata.sCreateBy != ''">
             AND  s_create_by = #{bdata.sCreateBy}
         </if>
@@ -117,7 +117,7 @@
         <if test="bdata.sCreateDeptid != null and bdata.sCreateDeptid != ''">
             AND  s_create_deptid = #{bdata.sCreateDeptid}
         </if>
-    </where>) as reta from dual
+    </where>) as HandlingRate from dual
 
     </select>
 
@@ -215,7 +215,7 @@
         GROUP BY i_create_month
     </select>
     <select id="Handling" resultType="java.util.Map">
-        SELECT count(*)  as num1  from ${table}
+        SELECT count(*)  as Handling  from ${table}
         <where>
             i_is_display =0
             <if test="bdata.sCreateBy != null and bdata.sCreateBy != ''">
@@ -233,7 +233,26 @@
         </where>
     </select>
     <select id="getAvg" resultType="java.lang.Double">
-        select (select sum(num)	from (select i_create_month ,count(i_id) as num  from  ${table}  GROUP BY i_create_month) b)/12 as ave
+        select (select sum(num)	from (select i_create_month ,count(i_id) as num  from  ${table}
+        <where>
+            i_is_display =0
+            <if test="bdata.sCreateBy != null and bdata.sCreateBy != ''">
+                AND  s_create_by = #{bdata.sCreateBy}
+            </if>
+            <if test="bdata.sCreateDeptid != null and bdata.sCreateDeptid != ''">
+                AND s_create_deptid = #{bdata.sCreateDeptid}
+            </if>
+            <if test="bdata.sCreateUnitid != null and bdata.sCreateUnitid != ''">
+                AND s_create_unitid = #{bdata.sCreateUnitid}
+            </if>
+            <if test="bdata.iBusFunctionId != null and bdata.iBusFunctionId != ''">
+                AND i_bus_function_id=#{bdata.iBusFunctionId}
+            </if>
+            <if test="bdata.iCreateYear != null and bdata.iCreateYear != ''">
+                AND i_create_year=#{bdata.iCreateYear}
+            </if>
+        </where>
+         GROUP BY i_create_month) b)/12 as ave
     </select>
 
 </mapper>

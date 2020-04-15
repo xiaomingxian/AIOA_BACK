@@ -10,7 +10,7 @@ public interface DataAnalysisService extends IService<OaBusdata> {
     //统计我的数据的数据量  --LYJ
     List<Map<String, Object>> findByTableAndMy(String table, OaBusdata oaBusdata);
     //我的办结率   --LYJ
-    List<Map<String, Object>>  MyRate(String table, OaBusdata oaBusdata);
+   Map<String, Object>  MyRate(String table, OaBusdata oaBusdata);
 
 
     String getDepartId(String sCreateBy);
@@ -22,11 +22,11 @@ public interface DataAnalysisService extends IService<OaBusdata> {
 
     List<Map<String, Object>> selectMyCreateDepart( String table,OaBusdata oaBusdata);
 
-    List<Map<String, Object>> PeerNum(String table, OaBusdata oaBusdata);
+    Map<String, Object> PeerNum(String table, OaBusdata oaBusdata);
 
-    List<Map<String, Object>> HandlingRate(String table, OaBusdata oaBusdata);
+    Map<String, Object> HandlingRate(String table, OaBusdata oaBusdata);
 
     Map<String, Object> Handling(String table, OaBusdata oaBusdata);
 
-    double getAvg(String table);
+    double getAvg(String table,OaBusdata oaBusdata);
 }

@@ -75,49 +75,16 @@ public class DataAnalysis {
     @ResponseBody
     public List<Map<String, Object>> myAnalysis(OaBusdata oaBusdata, @RequestParam(name = "modelId", required = false) Integer modelId) {
         String table = iOaBusdataService.queryTableName(modelId);
-        List<Map<String, Object>> sortList = null;
         List<Map<String, Object>> byTableAndMy = dataAnalysisService.findByTableAndMy(table, oaBusdata);
-        List<Integer> list = new ArrayList<>();
-        for (int i = 1; i <= 12; i++) {
-            Boolean b = true;
-            for (int j = 0; j < byTableAndMy.size(); j++) {
-                if (i == (Integer) byTableAndMy.get(j).get("i_create_month")) {
-                    b = false;
-                }
-            }
-            if (b) {
-                list.add(i);
-            }
-        }
-        list.forEach(i -> {
-            Map<String, Object> map = new HashMap<>();
-            map.put("i_create_month", i);
-            map.put("num", 0);
-            byTableAndMy.add(map);
-        });
-        sortList = byTableAndMy.stream()
-                .sorted((m1, m2) -> {
-                    if ((Integer) m1.get("i_create_month") >= (Integer) m2.get("i_create_month")) {
-                        return 1;
-                    } else {
-                        return -1;
-                    }
-                })
-                .collect(Collectors.toList());
-        return sortList;
+        return byTableAndMy;
     }
 
     @AutoLog(value = "办结率---办结数量/总共公文数量(同一个所属模块的)")
     @GetMapping(value = "/Rate")
     @ResponseBody
-    public List<Map<String, Object>> MyRate(OaBusdata oaBusdata, @RequestParam(name = "modelId", required = false) Integer modelId) {
+    public Map<String, Object> MyRate(OaBusdata oaBusdata, @RequestParam(name = "modelId", required = false) Integer modelId) {
         String table = iOaBusdataService.queryTableName(modelId);
-        List<Map<String, Object>> rate = dataAnalysisService.MyRate(table, oaBusdata);
-        if(rate == null){
-            Map<String,Object> map = new HashMap<>() ;
-            map.put("rate",0);
-            rate.add(map);
-        }
+        Map<String, Object>  rate = dataAnalysisService.MyRate(table, oaBusdata);
         return rate;
     }
     @AutoLog(value = "超过平均值的月份")
@@ -125,86 +92,69 @@ public class DataAnalysis {
     @ResponseBody
     public List<Map<String, Object>> MonthAverage(OaBusdata oaBusdata, @RequestParam(name = "modelId", required = false) Integer modelId) {
         String table = iOaBusdataService.queryTableName(modelId);
-        List<Map<String,Object>> tableList=new ArrayList<>();
-        List<Map<String, Object>> sortList = null;
         List<Map<String, Object>> byTableAndMy = dataAnalysisService.findByTableAndMy(table, oaBusdata);
-        List<Integer> list = new ArrayList<>();
-        for (int i = 1; i <= 12; i++) {
-            Boolean b = true;
-            for (int j = 0; j < byTableAndMy.size(); j++) {
-                if (i == (Integer) byTableAndMy.get(j).get("i_create_month")) {
-                    b = false;
-                }
-            }
-            if (b) {
-                list.add(i);
-            }
+        Map<String, Object>  rate = dataAnalysisService.MyRate(table, oaBusdata);//办结率---办结数量/总共公文数量(同一个所属模块的)
+        Map<String, Object> peerNum = dataAnalysisService.PeerNum(table, oaBusdata);//同行办理数量的百分比---功能办理的数量/总公文的数量（不管办结没办结、所属业务）
+        Map<String, Object> handlingRate = dataAnalysisService.HandlingRate(table, oaBusdata);//办理率-----功能办结的数量/总公文的数量（同一个所属模块）
+        Map<String, Object> Handling = dataAnalysisService.Handling(table, oaBusdata);//总共公文数量
+        Map<String,Object> map2 = new HashMap<>();
+        Map<String, Object> map1 = new HashMap<>();
+        List<Map<String,Object>>  sortList  = new ArrayList<>();
+        if(rate == null){
+            rate.put("rate",0);
+            sortList.add(rate);
         }
-        list.forEach(i -> {
-            Map<String, Object> map = new HashMap<>();
-            map.put("i_create_month", i);
-            map.put("num", 0);
-            byTableAndMy.add(map);
-        });
-        sortList = byTableAndMy.stream()
-                .sorted((m1, m2) -> {
-                    if ((Integer) m1.get("i_create_month") >= (Integer) m2.get("i_create_month")) {
-                        return 1;
-                    } else {
-                        return -1;
-                    }
-                })
-                .collect(Collectors.toList());
-        double avg= dataAnalysisService.getAvg(table);
-        for(int i=1;i<sortList.size();i++){
-           Long month = Long.valueOf(sortList.get(i).get("num").toString());
+        sortList.add(rate);
+        if(peerNum == null){
+            peerNum.put("peerNum",0);
+            sortList.add(peerNum);
+        }
+        sortList.add(peerNum);
+        if(handlingRate == null){
+            handlingRate.put("handlingRate",0);
+            sortList.add(handlingRate);
+        }
+        sortList.add(handlingRate);
+        if(Handling == null){
+            Handling.put("Handling",0);
+            sortList.add(Handling);
+        }
+        sortList.add(Handling);
+        map1.put("year",oaBusdata.getICreateYear());
+        sortList.add(map1);
+        double avg= dataAnalysisService.getAvg(table,oaBusdata);
+        map2.put("average",avg);
+        sortList.add(map2);
+        /*for(int i=1;i<byTableAndMy.size();i++){
+           Map<String, Object> map = new HashMap<>();
+           Long month = Long.valueOf(byTableAndMy.get(i).get("num").toString());
             if(month>=avg){
-                Map<String, Object> map = new HashMap<>();
                 map.put("i_create_month", i+1);
                 map.put("num", month);
-                tableList.add(map);
+                sortList.add(map);
             }else{
                 continue;
             }
-        }
+        }*/
 
-        return tableList;
+        return sortList;
     }
     @AutoLog(value = "同行办理数量的百分比---功能办理的数量/总公文的数量（不管办结没办结、所属业务）")
     @GetMapping(value = "/PeerNum")
     @ResponseBody
-    public List<Map<String, Object>> PeerNum(OaBusdata oaBusdata, @RequestParam(name = "modelId", required = false) Integer modelId) {
+    public Map<String, Object> PeerNum(OaBusdata oaBusdata, @RequestParam(name = "modelId", required = false) Integer modelId) {
         String table = iOaBusdataService.queryTableName(modelId);
-        List<Map<String, Object>> rate = dataAnalysisService.PeerNum(table, oaBusdata);
-      /*  List<Object> list1= new ArrayList();
-        for(int i=0;i<rate.size();i++){
-            list1.add( rate.get(i));
-        }*/
-        if(rate == null){
-            Map<String,Object> map = new HashMap<>() ;
-            map.put("year",oaBusdata.getICreateYear());
-            map.put("rate",0);
-            rate.add(map);
-        }
+        Map<String, Object> rate = dataAnalysisService.PeerNum(table, oaBusdata);
+
+
         return rate;
     }
     @AutoLog(value = "办理率-----功能办结的数量/总公文的数量（同一个所属模块）")
     @GetMapping(value = "/HandlingRate")
     @ResponseBody
-    public List<Map<String, Object>> HandlingRate(OaBusdata oaBusdata, @RequestParam(name = "modelId", required = false) Integer modelId) {
+    public Map<String, Object> HandlingRate(OaBusdata oaBusdata, @RequestParam(name = "modelId", required = false) Integer modelId) {
         String table = iOaBusdataService.queryTableName(modelId);
-        List<Map<String, Object>> rate = dataAnalysisService.HandlingRate(table, oaBusdata);
-        if(rate == null){
-            Map<String,Object> map = new HashMap<>() ;
-            map.put("year",oaBusdata.getICreateYear());
-            map.put("rate",0);
-            rate.add(map);
-        }else{
-            Map<String,Object> map = new HashMap<>() ;
-            map.put("year",oaBusdata.getICreateYear());
-            rate.add(map);
-        }
-
+        Map<String, Object> rate = dataAnalysisService.HandlingRate(table, oaBusdata);
         return rate;
     }
 
