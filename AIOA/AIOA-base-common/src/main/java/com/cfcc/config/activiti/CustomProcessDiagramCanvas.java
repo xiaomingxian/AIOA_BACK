@@ -267,8 +267,8 @@ public class CustomProcessDiagramCanvas extends DefaultProcessDiagramCanvas {
 
             ApplicationContext applicationContext = SpringContextUtilsAIOA.applicationContextGet();
             if (applicationContext==null){
-                System.err.println("===============>>>>>spring容器为空");
-                return null;//初始化的时候为null正常
+                System.err.println("===============>>>>>spring容器为空  流程图生成Canvas 初始化的时候为空正常");
+                return null;//
             }
             FontBean bean = applicationContext.getBean(FontBean.class);
             String fontPath = bean.getFontPath();
