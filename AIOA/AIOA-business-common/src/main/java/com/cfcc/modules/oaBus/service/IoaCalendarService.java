@@ -57,4 +57,6 @@ public interface IoaCalendarService extends IService<oaCalendar> {
 
     oaCalendar findByTaskUserId(String taskUserId);
 
+    oaCalendar findBybusDataId(Integer busDataId);
+
 }

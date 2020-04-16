@@ -335,43 +335,65 @@ public class oaCalendarController implements Job {
         String token = request.getHeader(DefContants.X_ACCESS_TOKEN);
         String username = JwtUtil.getUsername(token);
         try {
-            // 给定截取条件分割字符串为字符数组
-            String[] split = oaCalendar.getSUserNames().split(",");
-            List<SysUser> listUsr = new ArrayList<>();
-            //接收排序好的字符串
-            String str = "";
-            for (int i = 0; i < split.length; i++) {
-                SysUser user = sysUserService.getUserByName(split[i]); //根据username查出user
-                if (user != null) {
-                    listUsr.add(user);
+            Integer busDataId = oaCalendar.getIFunDataId();
+            oaCalendar o = oaCalendarService.findBybusDataId(busDataId);
+            if(o == null){
+                // 给定截取条件分割字符串为字符数组
+                String[] split = oaCalendar.getSUserNames().split(",");
+                List<SysUser> listUsr = new ArrayList<>();
+                //接收排序好的字符串
+                String str = "";
+                for (int i = 0; i < split.length; i++) {
+                    SysUser user = sysUserService.getUserByName(split[i]); //根据username查出user
+                    if (user != null) {
+                        listUsr.add(user);
+                    }
                 }
-            }
-            List<SysUser> listUserOrder = listUsr.stream().sorted(Comparator.comparing(SysUser::getShowOrder)).collect(Collectors.toList());
-            //遍历show_order   根据show_order 找到对应的id
+                List<SysUser> listUserOrder = listUsr.stream().sorted(Comparator.comparing(SysUser::getShowOrder)).collect(Collectors.toList());
+                //遍历show_order   根据show_order 找到对应的id
 
-            for (SysUser sysUser : listUserOrder) {
-                str = str + sysUser.getUsername() + ",";
+                for (SysUser sysUser : listUserOrder) {
+                    str = str + sysUser.getUsername() + ",";
+                }
+                oaCalendar.setSUserNames(str);
+                if(oaCalendar.getSCreateBy().length()!=0){
+                    oaCalendar.setSCreateBy(oaCalendar.getSCreateBy());
+                }else{
+                    oaCalendar.setSCreateBy(username);
+                }
+                if(oaCalendar.getIFunDataId()==0){
+                    oaCalendar.setIFunDataId(1);
+                }
+                if(oaCalendar.getState().length()==0){
+                    oaCalendar.setState("0");
+                }
+                if (oaCalendar.getIIsTop() == null) {
+                    oaCalendar.setIIsTop(0);
+                }
+                if (oaCalendar.getIIsLeader() == null) {
+                    oaCalendar.setIIsLeader(0);
+                }
+                if (oaCalendar.getIOpenType() == null) {
+                    oaCalendar.setIOpenType(0);
+                }
+                if (oaCalendar.getIRemindType() == null) {
+                    oaCalendar.setIOpenType(0);
+                }
+
+                String s = UUID.randomUUID().toString().replace("-", "");
+                oaCalendar.setTaskUserId(s);
+
+                oaCalendarService.saveCalendar(oaCalendar);
+                result.success("添加成功！");
+            }else{
+                String sUserNames = oaCalendar.getSUserNames();
+                String sUserNames1 = o.getSUserNames();
+                String s = sUserNames + sUserNames1 + ",";
+                oaCalendar.setSUserNames(s);
+                oaCalendar.setIId(o.getIId());
+                oaCalendarService.updateByIid(oaCalendar);
             }
-            oaCalendar.setSUserNames(str);
-            oaCalendar.setSCreateBy(username);
-            if (oaCalendar.getIIsTop() == null) {
-                oaCalendar.setIIsTop(0);
-            }
-            if (oaCalendar.getIIsLeader() == null) {
-                oaCalendar.setIIsLeader(0);
-            }
-            if (oaCalendar.getIOpenType() == null) {
-                oaCalendar.setIOpenType(0);
-            }
-            if (oaCalendar.getIRemindType() == null) {
-                oaCalendar.setIOpenType(0);
-            }
-            oaCalendar.setIFunDataId(1);
-            String s = UUID.randomUUID().toString().replace("-", "");
-            oaCalendar.setTaskUserId(s);
-            oaCalendar.setState("0");
-            oaCalendarService.saveCalendar(oaCalendar);
-            result.success("添加成功！");
+
         } catch (Exception e) {
             log.error(e.getMessage(), e);
             result.error500("操作失败");

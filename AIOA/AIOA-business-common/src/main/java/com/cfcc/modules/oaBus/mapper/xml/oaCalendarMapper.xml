@@ -397,4 +397,7 @@
           ORDER BY  c.d_create_time  desc limit
         ${pageNo},${pageSize}
     </select>
+    <select id="findBybusDataId" resultType="com.cfcc.modules.oaBus.entity.oaCalendar">
+        select * from oa_calendar c where c.i_fun_data_id = #{busDataId}
+    </select>
 </mapper>
