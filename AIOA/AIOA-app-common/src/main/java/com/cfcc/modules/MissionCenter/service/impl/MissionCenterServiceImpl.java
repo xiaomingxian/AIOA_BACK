@@ -19,12 +19,12 @@ public class MissionCenterServiceImpl implements MissionCenterService {
     private oaCalendarMapper oaCalendarMapper;
 
     @Override
-    public List<Map<String, Object>> queryListMap(oaCalendar oaCalendar, Integer pageNo, Integer pageSize) {
-        int total =  oaCalendarMapper.appCount(oaCalendar);
+    public Map<String, Object> queryListMap(oaCalendar oaCalendar, Integer pageNo, Integer pageSize) {
+        Map<String, Object> res = new HashMap<>() ;
         List<Map<String, Object>> list = oaCalendarMapper.findList(oaCalendar, (pageNo-1)* pageSize, pageSize);
-        Map<String, Object> map = new HashMap<>();
-        map.put("total",total);
-        list.add(map);
-        return list;
+        int total =  oaCalendarMapper.appCount(oaCalendar);
+        res.put("total",total);
+        res.put("list",list);
+        return res;
     }
 }
