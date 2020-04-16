@@ -29,10 +29,10 @@ public class MycatInterceptor implements Interceptor {
             metaObject = SystemMetaObject.forObject(metaObject.getValue("h"));
         }
         String sql = MycatSchema.getMycatAnnot() + metaObject.getValue("delegate.boundSql.sql");
-        System.out.println("sql is " + sql);
+//        System.out.println("sql is " + sql);
         metaObject.setValue("delegate.boundSql.sql", sql);
         Object result = invocation.proceed();
-        System.out.println("invocation.proceed()");
+//        System.out.println("invocation.proceed()");
         return result;
     }
 

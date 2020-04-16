@@ -42,6 +42,8 @@ public class ShiroConfig {
         // 拦截器
         Map<String, String> filterChainDefinitionMap = new LinkedHashMap<String, String>();
 
+        filterChainDefinitionMap.put("/registerNoShiro/**", "anon");//注册机构
+
         filterChainDefinitionMap.put("/ntko/filentko/**", "anon");//起草底稿不限制token
         filterChainDefinitionMap.put("/oafile/LoginPicture/**", "anon");//起草底稿不限制token
         filterChainDefinitionMap.put("/oafile/signPicture/**", "anon");//起草底稿不限制token

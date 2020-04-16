@@ -1,8 +1,14 @@
 package com.cfcc.modules.shiro.authc;
 
-import java.util.Set;
-
+import com.cfcc.common.constant.CommonConstant;
+import com.cfcc.common.system.util.JwtUtil;
+import com.cfcc.common.system.vo.LoginUser;
+import com.cfcc.common.util.RedisUtil;
+import com.cfcc.common.util.SpringContextUtils;
+import com.cfcc.common.util.oConvertUtils;
+import com.cfcc.modules.system.entity.SysUser;
 import com.cfcc.modules.system.service.ISysUserService;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.shiro.authc.AuthenticationException;
 import org.apache.shiro.authc.AuthenticationInfo;
 import org.apache.shiro.authc.AuthenticationToken;
@@ -11,21 +17,15 @@ import org.apache.shiro.authz.AuthorizationInfo;
 import org.apache.shiro.authz.SimpleAuthorizationInfo;
 import org.apache.shiro.realm.AuthorizingRealm;
 import org.apache.shiro.subject.PrincipalCollection;
-import com.cfcc.common.constant.CommonConstant;
-import com.cfcc.common.system.util.JwtUtil;
-import com.cfcc.common.system.vo.LoginUser;
-import com.cfcc.common.util.RedisUtil;
-import com.cfcc.common.util.SpringContextUtils;
-import com.cfcc.common.util.oConvertUtils;
-import com.cfcc.modules.system.entity.SysUser;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Component;
+import org.springframework.web.context.request.RequestContextHolder;
+import org.springframework.web.context.request.ServletRequestAttributes;
 
-import lombok.extern.slf4j.Slf4j;
+import javax.servlet.http.HttpServletRequest;
+import java.util.Set;
 
 /**
  * @Description: 用户登录鉴权和获取用户授权
@@ -88,6 +88,8 @@ public class ShiroRealm extends AuthorizingRealm {
     @Override
     protected AuthenticationInfo doGetAuthenticationInfo(AuthenticationToken auth) throws AuthenticationException {
         String token = (String) auth.getCredentials();
+        HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder.getRequestAttributes()).getRequest();
+
         if (token == null) {
             log.info("————————身份认证失败——————————IP地址:  " + oConvertUtils.getIpAddrByRequest(SpringContextUtils.getHttpServletRequest()));
             throw new AuthenticationException("token为空!");
