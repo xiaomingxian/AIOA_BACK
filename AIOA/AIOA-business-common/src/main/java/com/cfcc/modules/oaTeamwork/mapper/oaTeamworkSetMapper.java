@@ -32,7 +32,7 @@ public interface oaTeamworkSetMapper extends BaseMapper<oaTeamworkSet> {
 
     List<oaTeamworkSet> findTeamworkSet(@Param("iTeamworkId")Integer iTeamworkId);
 
-    List<Integer> findorder();
+    List<Integer> findorder(Integer iTeamworkId);
 
     List<oaTeamworkSet> findListByteamworkId(@Param("TeamworkName")String TeamworkName);
 
