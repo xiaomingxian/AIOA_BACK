@@ -51,8 +51,8 @@ public class oaTeamworkSetServiceImpl extends ServiceImpl<oaTeamworkSetMapper, o
     private BusFunctionPermitMapper busFunctionPermitMapper;
 
     @Override
-    public List<Integer> findorder() {
-        return oaTeamworkSetMapper.findorder();
+    public List<Integer> findorder(Integer iTeamworkId) {
+        return oaTeamworkSetMapper.findorder(iTeamworkId);
     }
 
     @Override
