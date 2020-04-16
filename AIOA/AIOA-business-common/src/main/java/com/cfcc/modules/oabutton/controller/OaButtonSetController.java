@@ -149,7 +149,9 @@ public class OaButtonSetController {
         oaButtonSet.setIIsReader((Integer) map.get("iisReader"));
         oaButtonSet.setIIsCreater((Integer) map.get("iisCreater"));
         oaButtonSet.setIPermitType((Integer) map.get("ipermitType"));
-        oaButtonSet.setIOrder(Integer.valueOf(map.get("iorder").toString()));
+        if (map.get("iorder")!=null){
+            oaButtonSet.setIOrder(Integer.valueOf(map.get("iorder").toString()));
+        }
         try {
             String schema = MycatSchema.getSchema();
 //            if(oaButtonSet.getSRoles()!=null && oaButtonSet.getSRoles().trim().equals("")){
