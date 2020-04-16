@@ -312,7 +312,7 @@ public class oaCalendarController implements Job {
         strBuf.append(107) ;
         strBuf.append("}} ") ;
         Result<IPage<Map<String, Object>>> byModelId = oaBusdataService.getByModelId(strBuf.toString(), realname, username);
-        log.info(byModelId.toString());
+//        log.info(byModelId.toString());
         if (byModelId!=null && byModelId.getResult()!=null) {
             oaList1 = byModelId.getResult().getRecords() ;
 
@@ -330,6 +330,79 @@ public class oaCalendarController implements Job {
     @ApiOperation(value = "日程管理表-添加", notes = "日程管理表-添加")
     @PutMapping(value = "/add")
     public Result<oaCalendar> add(@RequestBody oaCalendar oaCalendar, HttpServletRequest request) {
+        Result<oaCalendar> result = new Result<oaCalendar>();
+        //查询当前用户，作为assignee
+        String token = request.getHeader(DefContants.X_ACCESS_TOKEN);
+        String username = JwtUtil.getUsername(token);
+        try {
+            Integer busDataId = oaCalendar.getIFunDataId();
+            oaCalendar o = oaCalendarService.findBybusDataId(busDataId);
+            if(o == null){
+                // 给定截取条件分割字符串为字符数组
+                String[] split = oaCalendar.getSUserNames().split(",");
+                List<SysUser> listUsr = new ArrayList<>();
+                //接收排序好的字符串
+                String str = "";
+                for (int i = 0; i < split.length; i++) {
+                    SysUser user = sysUserService.getUserByName(split[i]); //根据username查出user
+                    if (user != null) {
+                        listUsr.add(user);
+                    }
+                }
+                List<SysUser> listUserOrder = listUsr.stream().sorted(Comparator.comparing(SysUser::getShowOrder)).collect(Collectors.toList());
+                //遍历show_order   根据show_order 找到对应的id
+
+                for (SysUser sysUser : listUserOrder) {
+                    str = str + sysUser.getUsername() + ",";
+                }
+                oaCalendar.setSUserNames(str);
+                oaCalendar.setSCreateBy(username);
+                if (oaCalendar.getIIsTop() == null) {
+                    oaCalendar.setIIsTop(0);
+                }
+                if (oaCalendar.getIIsLeader() == null) {
+                    oaCalendar.setIIsLeader(0);
+                }
+                if (oaCalendar.getIOpenType() == null) {
+                    oaCalendar.setIOpenType(0);
+                }
+                if (oaCalendar.getIRemindType() == null) {
+                    oaCalendar.setIOpenType(0);
+                }
+                oaCalendar.setState("0");
+                oaCalendar.setIFunDataId(1);
+                String s = UUID.randomUUID().toString().replace("-", "");
+                oaCalendar.setTaskUserId(s);
+
+                oaCalendarService.saveCalendar(oaCalendar);
+                result.success("添加成功！");
+            }else{
+                String sUserNames = oaCalendar.getSUserNames();
+                String sUserNames1 = o.getSUserNames();
+                String s = sUserNames + sUserNames1 + ",";
+                oaCalendar.setSUserNames(s);
+                oaCalendar.setIId(o.getIId());
+                oaCalendarService.updateByIid(oaCalendar);
+            }
+
+        } catch (Exception e) {
+            log.error(e.getMessage(), e);
+            result.error500("操作失败");
+        }
+        return result;
+    }
+
+
+    /**
+     * 未办存到日程
+     *
+     * @param oaCalendar
+     * @return
+     */
+    @AutoLog(value = "日程管理表-添加")
+    @ApiOperation(value = "日程管理表-添加", notes = "日程管理表-添加")
+    @PutMapping(value = "/DataAdd")
+    public Result<oaCalendar> DataAdd(@RequestBody oaCalendar oaCalendar, HttpServletRequest request) {
         Result<oaCalendar> result = new Result<oaCalendar>();
         //查询当前用户，作为assignee
         String token = request.getHeader(DefContants.X_ACCESS_TOKEN);

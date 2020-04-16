@@ -132,75 +132,72 @@ public class OaFile implements Job {
                 }
                 oaBusdataList.addAll(oaBusdataCan);
             }
-            if (oaBusdataList.size() != 0){
-                try {
-                    //索引名 = 库名+银行id+1
+            if (oaBusdataList.size() != 0) try {
+                //索引名 = 库名+银行id+1
 
-                    String indexName = "elasticsearch"+DBvalue+departId+1;
-                    String indexType = "oaBusdate";
-                    if (!searchService.existsIndex(indexName)){
-                        logger.info(indexName+"索引开始创建！！！！");
-                        searchService.createIndex(indexName,indexType);
-                    }
-
-                    Iterator<Map<String, Object>> iterator = oaBusdataList.iterator();
-                    while (iterator.hasNext()) {
-                        Map<String, Object> map = iterator.next();
-                        SimpleDateFormat dateFormat1 = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-                        SimpleDateFormat dateFormat2 = new SimpleDateFormat("yyyy年MM月dd日 HH时mm分ss秒");
-                        if (map.get("d_create_time") != null && map.get("d_create_time") != "") {
-                            String dCreateTime = map.get("d_create_time")+"";
-                            String time = dCreateTime.substring(0,dCreateTime.lastIndexOf("."));
-                            Date parse = dateFormat1.parse(time);
-                            String format = dateFormat2.format(parse);
-                            map.put("d_create_time", format);
-                        }
-                        if (map.get("d_update_time") != null && map.get("d_update_time") != "") {
-                            String dCreateTime = map.get("d_update_time")+"";
-                            String time = dCreateTime.substring(0,dCreateTime.lastIndexOf("."));
-                            Date parse = dateFormat1.parse(time);
-                            String format = dateFormat2.format(parse);
-                            map.put("d_update_time", format);
-                        }
-                        if (map.get("d_datetime1") != null && map.get("d_datetime1") != "") {
-                            String dCreateTime = map.get("d_datetime1")+"";
-                            String time = dCreateTime.substring(0,dCreateTime.lastIndexOf("."));
-                            Date parse = dateFormat1.parse(time);
-                            String format = dateFormat2.format(parse);
-                            map.put("d_datetime1", format);
-                        }
-                        if (map.get("d_datetime2") != null && map.get("d_datetime2") != "") {
-                            String dCreateTime = map.get("d_datetime2")+"";
-                            String time = dCreateTime.substring(0,dCreateTime.lastIndexOf("."));
-                            Date parse = dateFormat1.parse(time);
-                            String format = dateFormat2.format(parse);
-                            map.put("d_datetime2", format);
-                        }
-                    }
-
-                    for (Map<String, Object> map : oaBusdataList) {
-
-                        String json = JSON.toJSONString(map);
-                        RestStatus restStatus = searchService.saveOrUpdate(json, map.get("table_name").toString() + map.get("i_id").toString(), indexName, indexType);
-                        Integer res = restStatus.getStatus();
-                        System.out.println("----是否添加成功----" + restStatus);
-                        if (res == 200) {
-                            log.info("-----------------oa_busdata添加数据成功-------------------");
-                        } else {
-                            log.info("-----------------oa_busdata添加数据失败-------------------");
-                            while (res != 200) {
-                                restStatus = searchService.saveOrUpdate(json, map.get("table_name").toString() + map.get("i_id").toString(), indexName, indexType);
-                                res = restStatus.getStatus();
-                            }
-                            log.info("-----------------oa_busdata添加数据成功-------------------");
-                        }
-                    }
-                    //将数据库中修改为已添加ES库成功
-                    iOaBusdataService.updateIsES(oaBusdataList,DBvalue);
-                } catch (Exception e) {
-                    e.printStackTrace();
+                String indexName = "elasticsearch" + DBvalue + departId + 1;
+                String indexType = "oaBusdate";
+                if (!searchService.existsIndex(indexName)) {
+                    logger.info(indexName + "索引开始创建！！！！");
+                    searchService.createIndex(indexName, indexType);
                 }
 
+                Iterator<Map<String, Object>> iterator = oaBusdataList.iterator();
+                while (iterator.hasNext()) {
+                    Map<String, Object> map = iterator.next();
+                    SimpleDateFormat dateFormat1 = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+                    SimpleDateFormat dateFormat2 = new SimpleDateFormat("yyyy年MM月dd日 HH时mm分ss秒");
+                    if (map.get("d_create_time") != null && map.get("d_create_time") != "") {
+                        String dCreateTime = map.get("d_create_time") + "";
+                        String time = dCreateTime.substring(0, dCreateTime.lastIndexOf("."));
+                        Date parse = dateFormat1.parse(time);
+                        String format = dateFormat2.format(parse);
+                        map.put("d_create_time", format);
+                    }
+                    if (map.get("d_update_time") != null && map.get("d_update_time") != "") {
+                        String dCreateTime = map.get("d_update_time") + "";
+                        String time = dCreateTime.substring(0, dCreateTime.lastIndexOf("."));
+                        Date parse = dateFormat1.parse(time);
+                        String format = dateFormat2.format(parse);
+                        map.put("d_update_time", format);
+                    }
+                    if (map.get("d_datetime1") != null && map.get("d_datetime1") != "") {
+                        String dCreateTime = map.get("d_datetime1") + "";
+                        String time = dCreateTime.substring(0, dCreateTime.lastIndexOf("."));
+                        Date parse = dateFormat1.parse(time);
+                        String format = dateFormat2.format(parse);
+                        map.put("d_datetime1", format);
+                    }
+                    if (map.get("d_datetime2") != null && map.get("d_datetime2") != "") {
+                        String dCreateTime = map.get("d_datetime2") + "";
+                        String time = dCreateTime.substring(0, dCreateTime.lastIndexOf("."));
+                        Date parse = dateFormat1.parse(time);
+                        String format = dateFormat2.format(parse);
+                        map.put("d_datetime2", format);
+                    }
+                }
+
+                for (Map<String, Object> map : oaBusdataList) {
+
+                    String json = JSON.toJSONString(map);
+                    RestStatus restStatus = searchService.saveOrUpdate(json, map.get("table_name").toString() + map.get("i_id").toString(), indexName, indexType);
+                    Integer res = restStatus.getStatus();
+                    System.out.println("----是否添加成功----" + restStatus);
+                    if (res == 200) {
+                        log.info("-----------------oa_busdata添加数据成功-------------------");
+                    } else {
+                        log.error("-----------------oa_busdata添加数据失败-------------------");
+                        while (res != 200) {
+                            restStatus = searchService.saveOrUpdate(json, map.get("table_name").toString() + map.get("i_id").toString(), indexName, indexType);
+                            res = restStatus.getStatus();
+                        }
+                        log.info("-----------------oa_busdata添加数据成功-------------------");
+                    }
+                }
+                //将数据库中修改为已添加ES库成功
+                iOaBusdataService.updateIsES(oaBusdataList, DBvalue);
+            } catch (Exception e) {
+                log.error("全文检索的oa_busdata添加数据异常"+e.getMessage());
             }
 
             //====================================
@@ -233,9 +230,9 @@ public class OaFile implements Job {
                         Integer res = restStatus.getStatus();
                         System.out.println("----是否添加成功----"+restStatus);
                         if (res == 200){
-                            log.info("-----------------oa_busdata添加数据成功-------------------");
+                            log.info("-----------------oa_file添加数据成功-------------------");
                         }else {
-                            log.info("-----------------oa_busdata添加数据失败-------------------");
+                            log.error("-----------------oa_file添加数据失败-------------------");
                             while (res != 200){
                                 restStatus = searchService.saveOrUpdate(json, map.get("i_id").toString(), indexName, indexType);
                                 res = restStatus.getStatus();
@@ -245,7 +242,7 @@ public class OaFile implements Job {
                         //将数据库中修改为已添加ES库成功
                     }
                 } catch (Exception e) {
-                    e.printStackTrace();
+                    log.error("全文检索的oa_file添加数据异常"+e.getMessage());
                 }
             }
         }
@@ -349,7 +346,7 @@ public class OaFile implements Job {
                             if (res == 200) {
                                 log.info("-----------------oa_busdata添加数据成功-------------------");
                             } else {
-                                log.info("-----------------oa_busdata添加数据失败-------------------");
+                                log.error("-----------------oa_busdata添加数据失败-------------------");
                                 while (res != 200) {
                                     restStatus = searchService.saveOrUpdate(json, map.get("table_name").toString() + map.get("i_id").toString(), indexName, indexType);
                                     res = restStatus.getStatus();
@@ -360,7 +357,7 @@ public class OaFile implements Job {
                         //将数据库中修改为已添加ES库成功
                         iOaBusdataService.updateIsES(oaBusdataList,DBvalue);
                     } catch (Exception e) {
-                        e.printStackTrace();
+                        log.error("全文检索的oa_busdata添加数据异常"+e.getMessage());
                     }
                 }
 
@@ -397,19 +394,19 @@ public class OaFile implements Job {
                             int res = restStatus.getStatus();
                             System.out.println("----是否添加成功----"+restStatus);
                             if (res == 200){
-                                log.info("-----------------oa_busdata添加数据成功-------------------");
+                                log.info("-----------------oa_file添加数据成功-------------------");
                             }else {
-                                log.info("-----------------oa_busdata添加数据失败-------------------");
+                                log.error("-----------------oa_file添加数据失败-------------------");
                                 while (res != 200){
                                     restStatus = searchService.saveOrUpdate(json, map.get("tableName").toString() + map.get("tableId").toString(), indexName, indexType);
                                     res = restStatus.getStatus();
                                 }
-                                log.info("-----------------oa_busdata添加数据成功-------------------");
+                                log.info("-----------------oa_file添加数据成功-------------------");
                             }
                             //将数据库中修改为已添加ES库成功
                         }
                     } catch (Exception e) {
-                        e.printStackTrace();
+                        log.error("全文检索的oa_file添加数据异常"+e.getMessage());
                     }
                 }
             }

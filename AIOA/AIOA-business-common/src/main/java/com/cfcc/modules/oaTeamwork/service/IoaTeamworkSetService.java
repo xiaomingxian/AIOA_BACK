@@ -32,7 +32,7 @@ public interface IoaTeamworkSetService extends IService<oaTeamworkSet> {
 
     List<oaTeamworkSet> findTeamworkSet(Integer iTeamworkId);
 
-    List<Integer> findorder();
+    List<Integer> findorder(Integer iTeamworkId);
 
     List<oaTeamworkSet> findListByteamworkId(String TeamworkName);
 

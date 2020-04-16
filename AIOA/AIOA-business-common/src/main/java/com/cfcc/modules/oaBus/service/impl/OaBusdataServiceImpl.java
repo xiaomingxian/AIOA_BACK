@@ -165,7 +165,7 @@ public class OaBusdataServiceImpl extends ServiceImpl<OaBusdataMapper, OaBusdata
                 .collect(Collectors.toList());
         IPage<TableCol> pageList = new Page<TableCol>();
         pageList.setRecords(busPageDetails);
-        log.info(busPageDetails.toString());
+//        log.info(busPageDetails.toString());
         return pageList;
     }
 
@@ -192,11 +192,11 @@ public class OaBusdataServiceImpl extends ServiceImpl<OaBusdataMapper, OaBusdata
     @Override
     public void updateIsES(List<Map<String, Object>> oaFileList, String DBvalue) {
         for (Map<String, Object> map : oaFileList) {
-            //System.out.println("****************");
+            //log.info("****************");
             String id = map.get("i_id").toString();
             Object table_name = map.get("table_name");
-            //System.out.println(table_name);
-            //System.out.println(map);
+            //log.info(table_name);
+            //log.info(map);
             String tableName = map.get("table_name").toString();
 
             Integer count = oaBusdataMapper.updateIsESByid(tableName, id, DBvalue);
@@ -217,7 +217,7 @@ public class OaBusdataServiceImpl extends ServiceImpl<OaBusdataMapper, OaBusdata
      */
     @Override
     public Result<IPage<Map<String, Object>>> getByModelId(String json, String realName, String username) {
-        log.info(json);
+//        log.info(json);
         Result<IPage<Map<String, Object>>> result = new Result<>();
         Map maps = (Map) JSONObject.parse(json);
 
@@ -258,7 +258,7 @@ public class OaBusdataServiceImpl extends ServiceImpl<OaBusdataMapper, OaBusdata
             }
             functionId = optional.get();
             condition.put("function_id", functionId + "");
-            //System.out.println("fuctionId:" + functionId);
+            //log.info("fuctionId:" + functionId);
         } else {
             result.setMessage("查询条件中必须包含 function_id！！");
             return result;
@@ -266,7 +266,7 @@ public class OaBusdataServiceImpl extends ServiceImpl<OaBusdataMapper, OaBusdata
         String orderFlag = "";     //排序标志
         if (condition.containsKey("orderFlag")) {
             orderFlag = condition.get("orderFlag") + "";
-            log.info(orderFlag);
+//            log.info(orderFlag);
             condition.remove("orderFlag");
         }
         BusFunction busFunction = busFunctionService.getById(functionId);
@@ -308,11 +308,11 @@ public class OaBusdataServiceImpl extends ServiceImpl<OaBusdataMapper, OaBusdata
             permitData.remove("userId");
             permitData.remove("userUnit");
             permitData.remove("userDepart");
-            log.info(permitData.toString());
+//            log.info(permitData.toString());
             List<Map<String, Object>> dataList = oaBusdataMapper.getBusdataByMap((pageNo - 1) * pageSize,
                     pageSize, col, tableName, condition, permitData, userId, userUnit, userDepart, orderFlag);
             int total = oaBusdataMapper.getBusdataByMapTotal(tableName, condition, permitData, userId, userUnit, userDepart);
-            //System.out.println(dataList);
+            //log.info(dataList);
             page.setRecords(dataList);
             page.setTotal(total);
             result.setResult(page);
@@ -320,7 +320,7 @@ public class OaBusdataServiceImpl extends ServiceImpl<OaBusdataMapper, OaBusdata
 
 
         String tableHead = JSON.toJSON(listColumns).toString();
-        //System.out.println("tableHead:" + tableHead);
+        //log.info("tableHead:" + tableHead);
         Map<String, Object> mapHead = new HashMap<>();
         mapHead.put("tableHead", tableHead);
         result.setMessage(tableHead);
@@ -372,7 +372,7 @@ public class OaBusdataServiceImpl extends ServiceImpl<OaBusdataMapper, OaBusdata
     @Override
     public Map<String, Object> getBusDataAndDetailById(Map<String, Object> param, LoginInfo loginInfo) {
 
-        System.out.println("===================>>>>查详情开始<<<<==========================");
+        log.info("===================>>>>查详情开始<<<<==========================");
         long l1 = System.currentTimeMillis();
         // 业务数据表名
         String tableName = param.get("tableName") == null ? null : param.get("tableName") + "";
@@ -435,9 +435,9 @@ public class OaBusdataServiceImpl extends ServiceImpl<OaBusdataMapper, OaBusdata
         long aaa = System.currentTimeMillis();
         optionMap = selOptionByDtailList(optionMap, map, busPageDetailList, loginInfo.getDepart().getId(), loginInfo.getId(), loginInfo.getDepart().getParentId());
         result.put("optionMap", optionMap);
-        log.info(map.toString());
+//        log.info(map.toString());
         long bbb = System.currentTimeMillis();
-        System.out.println("查询配置用时：" + (bbb - aaa));
+//        log.info("查询配置用时：" + (bbb - aaa));
         result.put("detailList", map);
         // 业务function信息
         BusFunction busFunction = busFunctionService.getOneByFunId(functionId);
@@ -457,7 +457,7 @@ public class OaBusdataServiceImpl extends ServiceImpl<OaBusdataMapper, OaBusdata
         long l2 = System.currentTimeMillis();
         String userId = user.getId();
 
-        System.out.println("================>>>业务详情查询时间::" + (l2 - l1));
+//        log.info("================>>>业务详情查询时间::" + (l2 - l1));
         String endTime = (String) oaBusdata.get("s_varchar9");
         //********************************************************************* 流程信息查询
         //读取该流程的第一个环节
@@ -670,7 +670,7 @@ public class OaBusdataServiceImpl extends ServiceImpl<OaBusdataMapper, OaBusdata
 
 
         long l4 = System.currentTimeMillis();
-        System.out.println("================>>>总共查询时间：" + (l4 - l1));
+        log.info("================>>>总共查询时间：" + (l4 - l1));
 
         return result;
     }
@@ -700,17 +700,17 @@ public class OaBusdataServiceImpl extends ServiceImpl<OaBusdataMapper, OaBusdata
     public boolean checkBusDataSer(String tableName, String id, String userName) {
         boolean res = false;
         if (tableName == null || "".equals(tableName)) {
-            log.info("查询失败：表名为空");
+            log.error("查询失败：表名为空");
             return false;
         }
         if (id == null || "".equals(id)) {
-            log.info("查询失败：id为空");
+            log.error("查询失败：id为空");
             return false;
         }
         Map<String, Object> oaBusdata = oaBusdataMapper.getBusdataMapByIdDao(tableName, id);
         if (null == oaBusdata) {
             // 数据不存在
-            log.info("数据不存在可能已被删除");
+            log.error("数据不存在可能已被删除");
             return false;
         }
         String functionId = oaBusdata.get("i_bus_function_id") + "";
@@ -791,7 +791,7 @@ public class OaBusdataServiceImpl extends ServiceImpl<OaBusdataMapper, OaBusdata
             }
         });
         long bbb = System.currentTimeMillis();
-        System.out.println("AAAA查询配置用时：" + (bbb - aaa));
+//        log.info("AAAA查询配置用时：" + (bbb - aaa));
         aaa = System.currentTimeMillis();
        /* //查询秘密等级
         List<DictModel> secretDegreeList = sysDictService.getDictByCode("secretDegree");
@@ -810,7 +810,7 @@ public class OaBusdataServiceImpl extends ServiceImpl<OaBusdataMapper, OaBusdata
         optionMap.put("regulars", regulars);*/
         optionMap.put("checkList", checkList);
         bbb = System.currentTimeMillis();
-        System.out.println("AAAA查询其他配置用时：" + (bbb - aaa));
+//        log.info("AAAA查询其他配置用时：" + (bbb - aaa));
         return optionMap;
     }
 
@@ -920,7 +920,7 @@ public class OaBusdataServiceImpl extends ServiceImpl<OaBusdataMapper, OaBusdata
                 result.put("i_id",dataIdList) ;
             }*/
         }
-        //System.out.println(result);
+        //log.info(result);
         return result;
     }
 
@@ -933,7 +933,7 @@ public class OaBusdataServiceImpl extends ServiceImpl<OaBusdataMapper, OaBusdata
             }
         }*/
         Optional<SysUserRole> userRole = list.stream().filter(sysUserRole -> sysUserRole.getRoleId().equals(roleId)).findFirst();
-        log.info("查询出的userRole：{}", userRole.toString());
+//        log.info("查询出的userRole：{}", userRole.toString());
         return userRole.isPresent();
     }
 
@@ -1224,7 +1224,7 @@ public class OaBusdataServiceImpl extends ServiceImpl<OaBusdataMapper, OaBusdata
         String orderFlag = "";     //排序标志
         if (condition.containsKey("orderFlag")) {
             orderFlag = condition.get("orderFlag") + "";
-            log.info(orderFlag);
+//            log.info(orderFlag);
             condition.remove("orderFlag");
         }
 

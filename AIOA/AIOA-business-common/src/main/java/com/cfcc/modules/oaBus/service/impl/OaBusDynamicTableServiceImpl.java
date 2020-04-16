@@ -118,15 +118,15 @@ public class OaBusDynamicTableServiceImpl implements OaBusDynamicTableService {
     @Override
     public Map<String, Object> queryDataById(Map<String, Object> map) {
         String tableName = (String) map.get("table");
-        if(tableName == null || "".equals(tableName)){
+        if (tableName == null || "".equals(tableName)) {
             log.error("表名为空！！！");
-            return null ;
+            return null;
         }
-        if(map.containsKey("i_id")){
-            String i_id =  map.get("i_id") +"";
-            if (i_id == null ||"".equals(i_id)) {
+        if (map.containsKey("i_id")) {
+            String i_id = map.get("i_id") + "";
+            if (i_id == null || "".equals(i_id)) {
                 log.error("i_id为空！！！");
-                return null ;
+                return null;
             }
         }
         return dynamicTableMapper.queryDataById(map);
@@ -493,7 +493,7 @@ public class OaBusDynamicTableServiceImpl implements OaBusDynamicTableService {
         for (OaFile file : fileList) {
             Map<String, Object> map = new HashMap<>();
             map.put("sFilePath", uploadpath + File.separator + orgSchema + File.separator + file.getSFilePath());
-            log.info("附件路径============"+map.get("sFilePath"));
+//            log.info("附件路径============"+map.get("sFilePath"));
             map.put("sFileName", file.getSFileName());
             mapFiles.add(map);
         }
@@ -605,7 +605,7 @@ public class OaBusDynamicTableServiceImpl implements OaBusDynamicTableService {
 
     @Override
     public Result provinceToCityClient(HttpServletRequest request) {
-        log.info("========省会向地市转收文服务开始============");
+//        log.info("========省会向地市转收文服务开始============");
         Result respData = new Result();
         try {
             Collection<Part> parts = request.getParts();
@@ -673,7 +673,7 @@ public class OaBusDynamicTableServiceImpl implements OaBusDynamicTableService {
             paramMap.put("s_inside_deptnames", jsonParam.get("s_inside_deptnames")); //内部传送单位
             paramMap.put("table", result.getResult().get("tableName"));
             paramMap.put("i_id", result.getResult().get("busdataId"));
-            paramMap.put("i_is_display","0");
+            paramMap.put("i_is_display", "0");
             paramMap.put("i_is_es", 3);
             //查询收文管理员角色用户（编码710）
             List<Map<String, Object>> userList = dynamicTableMapper.queryUsersByUnit(unitId);
@@ -712,7 +712,7 @@ public class OaBusDynamicTableServiceImpl implements OaBusDynamicTableService {
                 dynamicTableService.checkProc(busDataMap);
             } catch (Exception e) {
                 e.printStackTrace();
-                log.info("流程开启失败！");
+                log.error("流程开启失败！");
                 result.setCode(500);
                 result.setSuccess(false);
             }
@@ -742,11 +742,13 @@ public class OaBusDynamicTableServiceImpl implements OaBusDynamicTableService {
             }
 
         } catch (IOException e) {
+            log.error(e.getMessage(), e);
             e.printStackTrace();
         } catch (ServletException e) {
+            log.error(e.getMessage(), e);
             e.printStackTrace();
         }
-        log.info("========省会向地市转收文服务结束============");
+//        log.info("========省会向地市转收文服务结束============");
         respData.setCode(200);
         respData.setMessage("收文传输完毕！");
         respData.setSuccess(true);
@@ -757,7 +759,7 @@ public class OaBusDynamicTableServiceImpl implements OaBusDynamicTableService {
     @Override
     public Result provinceToCityInsideClient(HttpServletRequest request) {
         Result result = new Result();
-        log.info("========省会向地市传阅服务开始============");
+//        log.info("========省会向地市传阅服务开始============");
         try {
             Collection<Part> parts = request.getParts();
 //            List<Map<String, Object>> fileList = new ArrayList<>();
@@ -903,11 +905,13 @@ public class OaBusDynamicTableServiceImpl implements OaBusDynamicTableService {
                 }
             }
         } catch (IOException e) {
+            log.error(e.getMessage(), e);
             e.printStackTrace();
         } catch (ServletException e) {
+            log.error(e.getMessage(), e);
             e.printStackTrace();
         }
-        log.info("========省会向地市传阅服务结束============");
+//        log.info("========省会向地市传阅服务结束============");
         result.setSuccess(true);
         result.setCode(200);
         result.setMessage("传阅完毕！");
@@ -934,11 +938,11 @@ public class OaBusDynamicTableServiceImpl implements OaBusDynamicTableService {
 
     @Override
     public void deleteOaFile(String table, String id, int i) {
-        dynamicTableMapper .deleteOaFile(table,id,i);
+        dynamicTableMapper.deleteOaFile(table, id, i);
         Map<String, Object> obj = new HashMap<>();
-        obj.put("table",table);
-        obj.put("i_id",id);
-        obj.put("i_is_typeset",0);
+        obj.put("table", table);
+        obj.put("i_id", id);
+        obj.put("i_is_typeset", 0);
         dynamicTableMapper.updateData(obj);
     }
 
@@ -967,18 +971,19 @@ public class OaBusDynamicTableServiceImpl implements OaBusDynamicTableService {
             }
         } catch (Exception e) {
             e.printStackTrace();
-            log.info("文号状态修改失败！");
+            log.error("文号状态修改失败！");
         }
         return b;
     }
 
     /**
      * 添加操作日志
+     *
      * @param sTitle
      */
-    private void addSysLog(Map<String, Object> map ) {
-        String sTitle = "" ;
-        sTitle = (String) map.get("s_title") ;
+    private void addSysLog(Map<String, Object> map) {
+        String sTitle = "";
+        sTitle = (String) map.get("s_title");
         int id = (int) map.get("i_id");
         String tableName = (String) map.get("table");
         System.out.println(sTitle);
@@ -989,8 +994,8 @@ public class OaBusDynamicTableServiceImpl implements OaBusDynamicTableService {
         sysLog.setLogType(0);
         sysLog.setMethod("delete");
         //操作类型（1查询，2添加，3修改，4删除,5导入，6导出）
-        sysLog.setOperateType(4) ;
-        sysLog.setRequestParam(tableName+":"+id);
+        sysLog.setOperateType(4);
+        sysLog.setRequestParam(tableName + ":" + id);
         //获取request
         HttpServletRequest request = SpringContextUtils.getHttpServletRequest();
         //设置IP地址
@@ -998,7 +1003,7 @@ public class OaBusDynamicTableServiceImpl implements OaBusDynamicTableService {
 
         //获取登录用户信息
         LoginUser sysUser = (LoginUser) SecurityUtils.getSubject().getPrincipal();
-        if(sysUser!=null){
+        if (sysUser != null) {
             sysLog.setUserid(sysUser.getUsername());
             sysLog.setUsername(sysUser.getRealname());
 

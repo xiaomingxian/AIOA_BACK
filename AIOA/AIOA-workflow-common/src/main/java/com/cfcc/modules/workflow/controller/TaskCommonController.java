@@ -474,7 +474,7 @@ public class TaskCommonController {
         } catch (AIOAException e) {
             return Result.error(e.getMessage());
         } catch (Exception e) {
-            e.printStackTrace();
+//            e.printStackTrace();
             log.error("撤回失败：" + e.toString());
             return Result.error("撤回失败");
         }
