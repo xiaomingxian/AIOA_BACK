@@ -1,6 +1,7 @@
 package com.cfcc.modules.oadatafetailedinst.mapper;
 
 import java.util.List;
+import java.util.Map;
 
 import org.apache.ibatis.annotations.Param;
 import com.cfcc.modules.oadatafetailedinst.entity.OaDatadetailedInst;
@@ -14,4 +15,5 @@ import com.baomidou.mybatisplus.core.mapper.BaseMapper;
  */
 public interface OaDatadetailedInstMapper extends BaseMapper<OaDatadetailedInst> {
 
+    Map<String, Object> findByTableId(Integer iTableId,String sCreateName);
 }
