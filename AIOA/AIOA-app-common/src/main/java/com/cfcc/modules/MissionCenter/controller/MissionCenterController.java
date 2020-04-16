@@ -38,15 +38,15 @@ public class MissionCenterController {
     @AutoLog(value = "日程表-查询任务中心的列表")
     @ApiOperation(value="日程表-查询任务中心的列表", notes="日程表-查询任务中心的列表")
     @PostMapping(value = "/queryList")
-    public Result<List<Map<String,Object>>> queryListByUserId(oaCalendar oaCalendar,
+    public Result<Map<String, Object>> queryListByUserId(oaCalendar oaCalendar,
                                                               @RequestParam(name="pageNo", defaultValue="1") Integer pageNo,
                                                               @RequestParam(name="pageSize", defaultValue="10") Integer pageSize,
                                                               HttpServletRequest request) {
         // 查询当前用户，作为assignee
         LoginInfo loginInfo = isysUserService.getLoginInfo(request);
-        Result<List<Map<String,Object>>> result = new Result<>();
+        Result<Map<String, Object>> result = new Result<>();
         oaCalendar.setSUserNames(loginInfo.getUsername());
-        List<Map<String,Object>> CenterList = missionCenterService.queryListMap(oaCalendar,pageNo, pageSize) ;
+        Map<String, Object> CenterList = missionCenterService.queryListMap(oaCalendar,pageNo, pageSize) ;
         if (CenterList ==null){
             result.error500("未找到对应实体");
         }

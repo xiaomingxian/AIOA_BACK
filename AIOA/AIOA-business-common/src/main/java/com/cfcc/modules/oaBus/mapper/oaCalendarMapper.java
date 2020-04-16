@@ -78,4 +78,7 @@ public interface oaCalendarMapper extends BaseMapper<oaCalendar> {
     List<Map<String, Object>> findList(@Param(value = "oaCalendar") oaCalendar oaCalendar,@Param(value = "pageNo") int pageNo, @Param(value = "pageSize")Integer pageSize);
 
 
+    oaCalendar findBybusDataId(Integer busDataId);
+
+    int appCount(oaCalendar oaCalendar);
 }

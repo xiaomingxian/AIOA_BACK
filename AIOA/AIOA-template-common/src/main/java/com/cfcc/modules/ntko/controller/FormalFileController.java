@@ -156,6 +156,7 @@ public class FormalFileController {
             if (!orgSchema.equals("")){
                 request.setAttribute("orgSchema",orgSchema);
             }
+            result.setSuccess(true);
             DocNumManage docNumManage = documentMangeService.queryById(id);
             Integer tmplateId = iDocNumSetService.queryByTemplateId(docNumManage);
             OaTemplate oaTemplate = iOaTemplateService.queryById(tmplateId);
@@ -172,21 +173,22 @@ public class FormalFileController {
                         AccessoryFileName += oaFileList.get(i).getSFileName().lastIndexOf(".", 1) + "\n";
                     }
                 }
-            }else {
-                result.setSuccess(false);
-                result.setMessage("意见类型不可设置为空");
             }
-
             map.put("TAttachment", AccessoryFileName);
             //根据业务功能id查业务含义数据
             Integer funcationid = (Integer) map.get("i_bus_function_id");
             Map<String, Object> OptionMap = oaBusDynamicTableService.queryOptionsByBusDataIdAndFuncationId(stable, tableid, funcationid);
-            //判断意见类型并添加书签map中
-            for (int i = 0; i < OptionMap.size(); i++) {
-                int j = i + 1;
-                if (OptionMap.get("opinion" + j) != "") {
-                    map.put("opinion" + j, OptionMap.get("opinion" + j));
+            if (OptionMap.size()!=0){
+                //判断意见类型并添加书签map中
+                for (int i = 0; i < OptionMap.size(); i++) {
+                    int j = i + 1;
+                    if (OptionMap.get("opinion" + j) != "") {
+                        map.put("opinion" + j, OptionMap.get("opinion" + j));
+                    }
                 }
+            }else {
+                result.setSuccess(false);
+                result.setMessage("意见类型不可设置为空");
             }
             List<BusPageDetail> busPageDetails = busPageDetailService.getListByFunID(funcationid + "");
             //遍历业务含义对象
@@ -216,11 +218,9 @@ public class FormalFileController {
             map.put("CurDate", nowTime);
             map.put("fileName", fileName);
             result.setResult(map);
-            result.setSuccess(true);
         } catch (Exception e) {
             e.printStackTrace();
             result.setSuccess(false);
-            log.error("办文单业务文件名查询失败");
         }
         return result;
     }

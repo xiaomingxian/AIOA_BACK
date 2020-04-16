@@ -397,4 +397,29 @@
           ORDER BY  c.d_create_time  desc limit
         ${pageNo},${pageSize}
     </select>
+    <select id="findBybusDataId" resultType="com.cfcc.modules.oaBus.entity.oaCalendar">
+        select * from oa_calendar c where c.i_fun_data_id = #{busDataId}
+    </select>
+    <select id="appCount" resultType="java.lang.Integer">
+        select  count(*) from oa_calendar c
+        <where>
+            c.s_user_names  like CONCAT(CONCAT('%', #{oaCalendar.sUserNames}), '%')
+            <if test="oaCalendar.sCreateBy != '' and oaCalendar.sCreateBy != null">
+                and c.s_create_by = #{oaCalendar.sCreateBy}
+            </if>
+            <if test="oaCalendar.iOpenType != '' and oaCalendar.iOpenType != null">
+                and c.i_open_type = #{oaCalendar.iOpenType}
+            </if>
+            <if test="oaCalendar.state != '' and oaCalendar.state != null">
+                and c.i_is_state = #{oaCalendar.state}
+            </if>
+            <if test="oaCalendar.Strdate != '' and oaCalendar.Strdate != null">
+                and CONVERT(c.d_start_time,char(20)) like '%'#{Strdate}'%'
+            </if>
+            <if test="oaCalendar.Enddate != '' and oaCalendar.Enddate != null">
+                and CONVERT(c.d_end_time,char(20)) like '%'#{Enddate}'%'
+            </if>
+
+        </where>
+    </select>
 </mapper>

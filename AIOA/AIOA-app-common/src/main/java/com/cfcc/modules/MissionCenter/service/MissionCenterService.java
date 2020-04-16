@@ -8,6 +8,6 @@ import java.util.Map;
 
 public interface MissionCenterService {
 
-    List<Map<String, Object>> queryListMap(oaCalendar oaCalendar, Integer pageNo, Integer pageSize);
+    Map<String, Object>queryListMap(oaCalendar oaCalendar, Integer pageNo, Integer pageSize);
 
 }
