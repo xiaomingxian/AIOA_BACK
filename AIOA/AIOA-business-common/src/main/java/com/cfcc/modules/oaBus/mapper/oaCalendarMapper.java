@@ -80,4 +80,5 @@ public interface oaCalendarMapper extends BaseMapper<oaCalendar> {
 
     oaCalendar findBybusDataId(Integer busDataId);
 
+    int appCount(oaCalendar oaCalendar);
 }
