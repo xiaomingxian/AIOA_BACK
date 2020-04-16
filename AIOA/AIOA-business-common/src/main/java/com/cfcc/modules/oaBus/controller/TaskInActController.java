@@ -346,7 +346,7 @@ public class TaskInActController {
         } catch (AIOAException e) {
             return Result.error(e.getMessage());
         } catch (Exception e) {
-            e.printStackTrace();
+//            e.printStackTrace();
             log.error("追加任务失败" + e.toString());
             return Result.error("追加任务失败");
         }
@@ -368,7 +368,7 @@ public class TaskInActController {
         } catch (AIOAException e) {
             return Result.error(e.getMessage());
         } catch (Exception e) {
-            e.printStackTrace();
+//            e.printStackTrace();
             log.error(e.toString());
             return Result.error("查询失败");
         }
@@ -451,7 +451,7 @@ public class TaskInActController {
         } catch (AIOAException e) {
             return Result.error(e.getMessage());
         } catch (Exception e) {
-            e.printStackTrace();
+//            e.printStackTrace();
             log.error(e.toString());
             return Result.error("查询失败");
         }
@@ -520,7 +520,7 @@ public class TaskInActController {
         } catch (AIOAException e) {
             return Result.error(e.getMessage());
         } catch (Exception e) {
-            e.printStackTrace();
+//            e.printStackTrace();
             log.error(e.toString());
             return Result.error("查询失败");
         }
@@ -712,7 +712,7 @@ public class TaskInActController {
             if (StringUtils.isNotBlank(taskId)){
                 taskCommonService.updateTaskStatus(taskId, null);
             }
-            e.printStackTrace();
+//            e.printStackTrace();
             log.error("办理任务失败" + e.toString());
             return Result.error("办理任务失败");
         }
@@ -817,7 +817,7 @@ public class TaskInActController {
             return Result.error(e.getMessage());
         } catch (Exception e) {
             taskCommonService.updateTaskStatus(taskId, null);
-            e.printStackTrace();
+//            e.printStackTrace();
             log.error("办理任务失败" + e.toString());
             return Result.error("办理任务失败");
         }
@@ -1055,7 +1055,7 @@ public class TaskInActController {
                 return Result.ok(maps);
             }
         } catch (Exception e) {
-            e.printStackTrace();
+//            e.printStackTrace();
             log.error(e.toString());
             return Result.error("查询失败");
         }
