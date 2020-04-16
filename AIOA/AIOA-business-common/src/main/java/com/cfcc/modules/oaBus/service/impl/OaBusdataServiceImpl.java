@@ -165,7 +165,7 @@ public class OaBusdataServiceImpl extends ServiceImpl<OaBusdataMapper, OaBusdata
                 .collect(Collectors.toList());
         IPage<TableCol> pageList = new Page<TableCol>();
         pageList.setRecords(busPageDetails);
-        log.info(busPageDetails.toString());
+//        log.info(busPageDetails.toString());
         return pageList;
     }
 
@@ -217,7 +217,7 @@ public class OaBusdataServiceImpl extends ServiceImpl<OaBusdataMapper, OaBusdata
      */
     @Override
     public Result<IPage<Map<String, Object>>> getByModelId(String json, String realName, String username) {
-        log.info(json);
+//        log.info(json);
         Result<IPage<Map<String, Object>>> result = new Result<>();
         Map maps = (Map) JSONObject.parse(json);
 
@@ -266,7 +266,7 @@ public class OaBusdataServiceImpl extends ServiceImpl<OaBusdataMapper, OaBusdata
         String orderFlag = "";     //排序标志
         if (condition.containsKey("orderFlag")) {
             orderFlag = condition.get("orderFlag") + "";
-            log.info(orderFlag);
+//            log.info(orderFlag);
             condition.remove("orderFlag");
         }
         BusFunction busFunction = busFunctionService.getById(functionId);
@@ -308,7 +308,7 @@ public class OaBusdataServiceImpl extends ServiceImpl<OaBusdataMapper, OaBusdata
             permitData.remove("userId");
             permitData.remove("userUnit");
             permitData.remove("userDepart");
-            log.info(permitData.toString());
+//            log.info(permitData.toString());
             List<Map<String, Object>> dataList = oaBusdataMapper.getBusdataByMap((pageNo - 1) * pageSize,
                     pageSize, col, tableName, condition, permitData, userId, userUnit, userDepart, orderFlag);
             int total = oaBusdataMapper.getBusdataByMapTotal(tableName, condition, permitData, userId, userUnit, userDepart);
@@ -435,7 +435,7 @@ public class OaBusdataServiceImpl extends ServiceImpl<OaBusdataMapper, OaBusdata
         long aaa = System.currentTimeMillis();
         optionMap = selOptionByDtailList(optionMap, map, busPageDetailList, loginInfo.getDepart().getId(), loginInfo.getId(), loginInfo.getDepart().getParentId());
         result.put("optionMap", optionMap);
-        log.info(map.toString());
+//        log.info(map.toString());
         long bbb = System.currentTimeMillis();
         System.out.println("查询配置用时：" + (bbb - aaa));
         result.put("detailList", map);
@@ -700,17 +700,17 @@ public class OaBusdataServiceImpl extends ServiceImpl<OaBusdataMapper, OaBusdata
     public boolean checkBusDataSer(String tableName, String id, String userName) {
         boolean res = false;
         if (tableName == null || "".equals(tableName)) {
-            log.info("查询失败：表名为空");
+            log.error("查询失败：表名为空");
             return false;
         }
         if (id == null || "".equals(id)) {
-            log.info("查询失败：id为空");
+            log.error("查询失败：id为空");
             return false;
         }
         Map<String, Object> oaBusdata = oaBusdataMapper.getBusdataMapByIdDao(tableName, id);
         if (null == oaBusdata) {
             // 数据不存在
-            log.info("数据不存在可能已被删除");
+            log.error("数据不存在可能已被删除");
             return false;
         }
         String functionId = oaBusdata.get("i_bus_function_id") + "";
@@ -933,7 +933,7 @@ public class OaBusdataServiceImpl extends ServiceImpl<OaBusdataMapper, OaBusdata
             }
         }*/
         Optional<SysUserRole> userRole = list.stream().filter(sysUserRole -> sysUserRole.getRoleId().equals(roleId)).findFirst();
-        log.info("查询出的userRole：{}", userRole.toString());
+//        log.info("查询出的userRole：{}", userRole.toString());
         return userRole.isPresent();
     }
 
@@ -1224,7 +1224,7 @@ public class OaBusdataServiceImpl extends ServiceImpl<OaBusdataMapper, OaBusdata
         String orderFlag = "";     //排序标志
         if (condition.containsKey("orderFlag")) {
             orderFlag = condition.get("orderFlag") + "";
-            log.info(orderFlag);
+//            log.info(orderFlag);
             condition.remove("orderFlag");
         }
 

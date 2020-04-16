@@ -312,7 +312,7 @@ public class oaCalendarController implements Job {
         strBuf.append(107) ;
         strBuf.append("}} ") ;
         Result<IPage<Map<String, Object>>> byModelId = oaBusdataService.getByModelId(strBuf.toString(), realname, username);
-        log.info(byModelId.toString());
+//        log.info(byModelId.toString());
         if (byModelId!=null && byModelId.getResult()!=null) {
             oaList1 = byModelId.getResult().getRecords() ;
 

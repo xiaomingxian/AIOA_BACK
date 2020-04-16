@@ -712,7 +712,7 @@ public class OaBusDynamicTableServiceImpl implements OaBusDynamicTableService {
                 dynamicTableService.checkProc(busDataMap);
             } catch (Exception e) {
                 e.printStackTrace();
-                log.info("流程开启失败！");
+                log.error("流程开启失败！");
                 result.setCode(500);
                 result.setSuccess(false);
             }
