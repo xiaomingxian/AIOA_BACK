@@ -86,7 +86,7 @@ public class DocNumManageController {
 			result.setResult(button);
 		} catch (Exception e) {
 			e.printStackTrace();
-			log.info("文号设置失败！");
+			log.error("文号设置失败！");
 		}
 		return result;
 	}
@@ -100,6 +100,7 @@ public class DocNumManageController {
 			List<DocNumManage> docNumManages = docNumManageService.checkDocNum(docNumManage);
 			result.setResult(docNumManages);
 		} catch (Exception e) {
+			log.error(e.getMessage(),e);
 			e.printStackTrace();
 			result.setMessage("查询失败！");
 		}
