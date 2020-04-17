@@ -251,37 +251,33 @@ public class oaCalendarServiceImpl extends ServiceImpl<oaCalendarMapper, oaCalen
     }
 
     @Override
-        public void MostUserLink(HttpServletResponse response, HttpServletRequest request, String id, String resourceType)  {
-
+    public void MostUserLink(HttpServletResponse response, HttpServletRequest request, String id, String resourceType) {
         try {
             String filePath = oaCalendarMapper.selectPath(Integer.parseInt(id));
-          //  String fileName =  oaCalendarMapper.selectName(Integer.parseInt(id));
-          //  filePath = uploadpath+"\\"+filePath.substring(0,filePath.lastIndexOf("\\")+1)+fileName;
-
+//            String fileName =  oaCalendarMapper.selectName(Integer.parseInt(id));
+//            filePath = uploadpath+"\\"+filePath.substring(0,filePath.lastIndexOf("\\")+1)+fileName;
 //            LoginInfo loginInfo = userService.getLoginInfo(request);
-
-                String orgSchema = MycatSchema.getSchema();
-                if (StringUtils.isNotBlank(orgSchema)) {
-                    filePath = uploadpath + File.separator + orgSchema + File.separator + filePath;
-                } else {
-                    filePath = uploadpath + File.separator + filePath;
-                }
-                System.out.println(filePath+"------------------");
-                File file = new File(filePath);
+            String orgSchema = MycatSchema.getSchema();
+            if (StringUtils.isNotBlank(orgSchema)) {
+                filePath = uploadpath + File.separator + orgSchema + File.separator + filePath;
+            } else {
+                filePath = uploadpath + File.separator + filePath;
+            }
+//                System.out.println(filePath+"------------------");
+            File file = new File(filePath);
+            if (file.exists()) {
                 FileInputStream stream = new FileInputStream(file);
                 byte[] b = new byte[1024];
                 int len = -1;
                 while ((len = stream.read(b, 0, 1024)) != -1) {
                     response.getOutputStream().write(b, 0, len);
                 }
-
-
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
+            } else {
+                log.error("找不到文件：" + filePath);
+            }
+        } catch (Exception e) {
+            log.error(e.toString());
         }
-
     }
 
   /*  @Override
