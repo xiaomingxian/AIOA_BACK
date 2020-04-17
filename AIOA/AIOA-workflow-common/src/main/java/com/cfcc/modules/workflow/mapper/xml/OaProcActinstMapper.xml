@@ -44,6 +44,7 @@
         depts depts,
         is_dept_finish isDeptFinish,
         create_time createTime,
+        s_signer isSigner,
         update_time updateTime,
         user_record_val userRecordVal
         from oa_proc_actinst

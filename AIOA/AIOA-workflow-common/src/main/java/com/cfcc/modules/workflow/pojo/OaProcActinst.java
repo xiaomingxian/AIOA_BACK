@@ -75,8 +75,13 @@ public class OaProcActinst extends Model<OaProcActinst> {
      */
     @Excel(name = "是否多选", width = 15)
     @ApiModelProperty(value = "是否多选")
-
     private boolean isMultAssignee;
+
+
+    @TableField(value = "s_signer")
+    private boolean isSigner;//是否是签发人
+
+
     /**
      * 候选人选择范围
      */
@@ -114,8 +119,7 @@ public class OaProcActinst extends Model<OaProcActinst> {
     private Boolean recordCurrentuser;//是否记录当前用户
 
 
-    @TableField(value = "s_signer")
-    private boolean signer;//是否是签发人
+
 
 
     /**
