@@ -223,8 +223,10 @@ public class TaskCommonController {
 
             return taskCommonService.departFinish(taskId, processInstanceId, user);
         } catch (AIOAException e) {
+            log.error(e.toString());
             return Result.error(e.getMessage());
         } catch (Exception e) {
+            log.error(e.toString());
             return Result.error("部门完成失败");
         }
     }
@@ -305,6 +307,7 @@ public class TaskCommonController {
             }
             return Result.ok(list);
         } catch (AIOAException e) {
+            log.error(e.toString());
             return Result.error(e.getMessage());
         } catch (Exception e) {
             log.error(e.toString());
@@ -335,7 +338,7 @@ public class TaskCommonController {
 
             return Result.ok(flag);
         } catch (Exception e) {
-            e.printStackTrace();
+//            e.printStackTrace();
             log.error(e.toString());
             return Result.error("查询状态失败");
         }
@@ -351,9 +354,11 @@ public class TaskCommonController {
             taskCommonService.jump(jumpMsg, request);
             return Result.ok("跳转节点成功");
         } catch (AIOAException e) {
+            log.error(e.toString());
             return Result.error(e.getMessage());
         } catch (Exception e) {
-            e.printStackTrace();
+            log.error(e.toString());
+//            e.printStackTrace();
             return Result.error("跳转节点失败");
         }
     }
@@ -367,10 +372,12 @@ public class TaskCommonController {
             taskCommonService.back(jumpMsg, request);
             return Result.ok("回退成功");
         } catch (AIOAException e) {
+            log.error(e.toString());
             return Result.error(e.getMessage());
 
         } catch (Exception e) {
-            e.printStackTrace();
+            log.error(e.toString());
+//            e.printStackTrace();
             return Result.error("回退失败");
         }
     }
@@ -402,9 +409,11 @@ public class TaskCommonController {
 
 
         } catch (AIOAException e) {
+            log.error(e.toString());
             return Result.error(e.getMessage());
         } catch (Exception e) {
-            e.printStackTrace();
+            log.error(e.toString());
+//            e.printStackTrace();
             return Result.error("回退/撤回记录查看失败");
         }
     }
@@ -419,7 +428,8 @@ public class TaskCommonController {
             taskCommonService.taskShift(taskId, sourceUserId, sourceUsername, destUserId);
             return Result.ok("任务移交成功");
         } catch (Exception e) {
-            e.printStackTrace();
+            log.error(e.toString());
+//            e.printStackTrace();
             return Result.error("任务移交失败");
         }
     }
@@ -441,7 +451,8 @@ public class TaskCommonController {
             }
             return Result.ok("批量移交成功");
         } catch (Exception e) {
-            e.printStackTrace();
+            log.error(e.toString());
+//            e.printStackTrace();
             return Result.error("批量移交失败");
         }
     }
@@ -455,7 +466,7 @@ public class TaskCommonController {
             List<Map<String, String>> maps = taskCommonService.queryAllHaveDone(assignee, procInstId);
             return Result.ok(maps);
         } catch (Exception e) {
-            e.printStackTrace();
+//            e.printStackTrace();
             log.error("查询失败：" + e.toString());
             return Result.error("查询失败");
         }
@@ -474,6 +485,7 @@ public class TaskCommonController {
             Result reCallAble = taskCommonService.reCallAble(taskId, currentUser);
             return reCallAble;
         } catch (AIOAException e) {
+            log.error(e.toString());
             return Result.error(e.getMessage());
         } catch (Exception e) {
 //            e.printStackTrace();

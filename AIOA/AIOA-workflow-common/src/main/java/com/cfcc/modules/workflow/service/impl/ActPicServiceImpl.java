@@ -4,6 +4,7 @@ import com.cfcc.config.activiti.AioaProcessDiagramGenerator;
 import com.cfcc.config.activiti.WorkflowConstants;
 import com.cfcc.modules.utils.ProcssUtil;
 import com.cfcc.modules.workflow.service.ActPicService;
+import lombok.extern.slf4j.Slf4j;
 import org.activiti.bpmn.model.BpmnModel;
 import org.activiti.engine.HistoryService;
 import org.activiti.engine.ProcessEngineConfiguration;
@@ -29,6 +30,7 @@ import java.util.stream.Collectors;
 
 @Service
 @Transactional
+@Slf4j
 public class ActPicServiceImpl implements ActPicService {
 
     @Autowired
@@ -79,12 +81,14 @@ public class ActPicServiceImpl implements ActPicService {
             //写出到请求的地方
             out.flush();
         } catch (Exception e) {
-            e.printStackTrace();
+            log.error(e.toString());
+//            e.printStackTrace();
         } finally {
             try {
                 if (buf != null) buf.close();
                 if (out != null) out.close();
             }catch (Exception e){
+                log.error(e.toString());
 
             }
 

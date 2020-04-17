@@ -46,8 +46,10 @@ public class ProcessManagerController {
             processManagerService.deploy(files, schema);
 
         } catch (AIOAException e) {
+            log.error(e.toString());
             return Result.error(e.getMessage());
         } catch (Exception e) {
+            log.error(e.toString());
             return Result.error("流程发布失败");
         }
 
@@ -76,6 +78,7 @@ public class ProcessManagerController {
         try {
             return processManagerService.lastVersionProc(key);
         } catch (Exception e) {
+            log.error(e.toString());
             return Result.error("流程查询失败");
         }
     }
@@ -123,6 +126,7 @@ public class ProcessManagerController {
         try {
             xml = processManagerService.loadByDeploymentXml(processDefinitionId);
         } catch (Exception e) {
+            log.error(e.toString());
             return Result.error("查询xml出错");
         }
         return Result.ok(xml);
@@ -137,6 +141,7 @@ public class ProcessManagerController {
             String xml = map.get("xml");
             processManagerService.saveXml(name, xml);
         } catch (Exception e) {
+            log.error(e.toString());
             return Result.error("更新xml出错");
         }
         return Result.ok("更新xml成功");

@@ -7,16 +7,13 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.cfcc.common.api.vo.Result;
 import com.cfcc.common.aspect.annotation.AutoLog;
 import com.cfcc.common.system.query.QueryGenerator;
-import com.cfcc.common.system.service.CommonDynamicTableService;
 import com.cfcc.common.util.oConvertUtils;
-import com.cfcc.modules.workflow.pojo.OaProcActinst;
 import com.cfcc.modules.workflow.pojo.OaProcActinst;
 import com.cfcc.modules.workflow.service.IoaProcActinstService;
 import com.cfcc.modules.workflow.service.TaskCommonFoldService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
-import org.activiti.engine.ProcessEngine;
 import org.apache.commons.lang3.StringUtils;
 import org.jeecgframework.poi.excel.ExcelImportUtil;
 import org.jeecgframework.poi.excel.def.NormalExcelConstants;
@@ -29,7 +26,6 @@ import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.multipart.MultipartHttpServletRequest;
 import org.springframework.web.servlet.ModelAndView;
 
-import javax.annotation.PreDestroy;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
@@ -266,7 +262,8 @@ public class OaProcActinstController {
                 queryWrapper = QueryGenerator.initQueryWrapper(OaProcActinst, request.getParameterMap());
             }
         } catch (UnsupportedEncodingException e) {
-            e.printStackTrace();
+//            e.printStackTrace();
+            log.error(e.toString());
         }
 
         //Step.2 AutoPoi 导出Excel
@@ -308,7 +305,8 @@ public class OaProcActinstController {
                 try {
                     file.getInputStream().close();
                 } catch (IOException e) {
-                    e.printStackTrace();
+//                    e.printStackTrace();
+                    log.error(e.toString());
                 }
             }
         }

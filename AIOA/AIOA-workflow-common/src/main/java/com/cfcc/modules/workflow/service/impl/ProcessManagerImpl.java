@@ -113,9 +113,11 @@ public class ProcessManagerImpl implements ProcessManagerService {
             result.setMessage("发布成功");
 
         }catch (AIOAException e){
+            log.error(e.toString());
             throw  new AIOAException(e.getMessage());
         }
         catch (Exception e) {
+            log.error(e.toString());
             throw new AIOAException("发布失败,请检查流程图是否正确(建议按照手册操作)");
         }
     }
