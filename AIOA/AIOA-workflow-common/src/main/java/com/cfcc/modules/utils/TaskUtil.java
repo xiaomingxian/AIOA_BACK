@@ -9,6 +9,7 @@ import org.activiti.engine.impl.pvm.PvmActivity;
 import org.activiti.engine.impl.pvm.PvmTransition;
 import org.activiti.engine.impl.pvm.delegate.ActivityBehavior;
 import org.activiti.engine.impl.pvm.process.ActivityImpl;
+import org.apache.commons.lang.StringUtils;
 import org.springframework.stereotype.Component;
 
 import java.util.HashMap;
@@ -204,6 +205,18 @@ public class TaskUtil /*extends WorkFlowService implements ApplicationContextAwa
             activity.setAllowMulti(false);
             Expression assigneeExpression = userTaskActivityBehavior.getTaskDefinition().getAssigneeExpression();
             String assignee = assigneeExpression == null ? null : ElParse.parseNormal(assigneeExpression.getExpressionText());
+            if (StringUtils.isBlank(assignee)) {
+                int size = userTaskActivityBehavior.getTaskDefinition().getCandidateUserIdExpressions().size();
+
+                if (size > 0) {
+                    for (Expression candidateGroupIdExpression : userTaskActivityBehavior.getTaskDefinition().getCandidateUserIdExpressions()) {
+                        String expressionText = candidateGroupIdExpression.getExpressionText();
+                        assignee = expressionText == null ? null : ElParse.parseNormal(expressionText);
+                    }
+                    activity.setQiangQian(true);
+                }
+
+            }
             activity.setAssignee(assignee);
         }
 

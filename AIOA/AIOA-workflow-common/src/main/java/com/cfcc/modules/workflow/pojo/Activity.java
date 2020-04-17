@@ -22,6 +22,7 @@ public class Activity implements Serializable {
     private String userOrRole;
     private String depts;
     private boolean  canAdd;
+    private boolean isQiangQian;//抢签
 
     /**
      * 网关类型：包容网关与 并行网关 特殊处理
