@@ -27,8 +27,6 @@ public class OaDatadetailedInstServiceImpl extends ServiceImpl<OaDatadetailedIns
     @Autowired
     private OaBusDynamicTableMapper dynamicTableMapper;
 
-    @Autowired
-    private OaDatadetailedInstMapper  oaDatadetailedInstMapper;
     @Override
     public Map<String, Object> findByTableId(Integer iTableId,String sCreateName) {
         return oaDatadetailedInstMapper.findByTableId(iTableId,sCreateName);
