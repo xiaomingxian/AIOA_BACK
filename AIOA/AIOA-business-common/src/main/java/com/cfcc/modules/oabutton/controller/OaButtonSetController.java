@@ -85,9 +85,13 @@ public class OaButtonSetController {
 		/*QueryWrapper<OaButtonSet> queryWrapper = QueryGenerator.initQueryWrapper(oaButtonSet, req.getParameterMap());
 		Page<OaButtonSet> page = new Page<OaButtonSet>(pageNo, pageSize);
 		IPage<OaButtonSet> pageList = oaButtonSetService.page(page, queryWrapper);*/
-        IPage<OaButtonSet> pageList = oaButtonSetService.getPage(pageNo, pageSize, id,null,null);
-        result.setSuccess(true);
-        result.setResult(pageList);
+        try {
+            IPage<OaButtonSet> pageList = oaButtonSetService.getPage(pageNo, pageSize, id,null,null);
+            result.setSuccess(true);
+            result.setResult(pageList);
+        } catch (Exception e) {
+            log.error("findById列表查询失败",e.getMessage());
+        }
         return result;
     }
 
@@ -103,16 +107,20 @@ public class OaButtonSetController {
     public Result<IPage<OaButtonSet>> findByIf(@RequestBody Map<String,Object> map) {
         Result<IPage<OaButtonSet>> result = new Result<>();
         List<OaButton>  buttonList=null;
-        if (map.get("buttonId")!=null){
-            buttonList=(List<OaButton>)map.get("buttonId");
+        try {
+            if (map.get("buttonId")!=null){
+                buttonList=(List<OaButton>)map.get("buttonId");
+            }
+            List<OaProcActinst>  taskDefKeyList=null;
+            if (map.get("taskDefKey")!=null){
+                taskDefKeyList=(List<OaProcActinst>)map.get("taskDefKey");
+            }
+            IPage<OaButtonSet> pageList = oaButtonSetService.getPage((Integer) map.get("pageNo"),(Integer)map.get("pageSize"),(Integer)map.get("id"),buttonList,taskDefKeyList);
+            result.setSuccess(true);
+            result.setResult(pageList);
+        } catch (Exception e) {
+            log.error("findByIf列表查询失败",e.getMessage());
         }
-        List<OaProcActinst>  taskDefKeyList=null;
-        if (map.get("taskDefKey")!=null){
-            taskDefKeyList=(List<OaProcActinst>)map.get("taskDefKey");
-        }
-        IPage<OaButtonSet> pageList = oaButtonSetService.getPage((Integer) map.get("pageNo"),(Integer)map.get("pageSize"),(Integer)map.get("id"),buttonList,taskDefKeyList);
-        result.setSuccess(true);
-        result.setResult(pageList);
         return result;
     }
 
@@ -128,6 +136,7 @@ public class OaButtonSetController {
     public Result<OaButtonSet> add(@RequestBody Map<String,Object> map) {
         Result<OaButtonSet> result = new Result<OaButtonSet>();
         OaButtonSet oaButtonSet=new OaButtonSet();
+        try {
         oaButtonSet.setIProcButtonId((Integer) map.get("iprocButtonId"));
         oaButtonSet.setIButtonId((Integer) map.get("ibuttonId"));
         if (map.get("taskDefKey")!=null){
@@ -152,7 +161,7 @@ public class OaButtonSetController {
         if (map.get("iorder")!=null){
             oaButtonSet.setIOrder(Integer.valueOf(map.get("iorder").toString()));
         }
-        try {
+
             String schema = MycatSchema.getSchema();
 //            if(oaButtonSet.getSRoles()!=null && oaButtonSet.getSRoles().trim().equals("")){
 //                oaButtonSet.setSRoles(null);
@@ -177,19 +186,23 @@ public class OaButtonSetController {
     @PutMapping(value = "/edit")
     public Result<OaButtonSet> edit(@RequestBody OaButtonSet oaButtonSet) {
         Result<OaButtonSet> result = new Result<OaButtonSet>();
-        OaButtonSet oaButtonSetEntity = oaButtonSetService.queryById(oaButtonSet.getIId());
-        if (oaButtonSetEntity == null) {
-            result.error500("未找到对应实体");
-        } else {
-//            if(oaButtonSet.getSRoles()!=null && oaButtonSet.getSRoles().trim().equals("")){
-//                oaButtonSet.setSRoles(null);
-//            }
-            String schema = MycatSchema.getSchema();
-            boolean ok = oaButtonSetService.updateOaButtonSetById(oaButtonSet,schema);
-            //TODO 返回false说明什么？
-            if (ok) {
-                result.success("修改成功!");
+        try {
+            OaButtonSet oaButtonSetEntity = oaButtonSetService.queryById(oaButtonSet.getIId());
+            if (oaButtonSetEntity == null) {
+                result.error500("未找到对应实体");
+            } else {
+    //            if(oaButtonSet.getSRoles()!=null && oaButtonSet.getSRoles().trim().equals("")){
+    //                oaButtonSet.setSRoles(null);
+    //            }
+                String schema = MycatSchema.getSchema();
+                boolean ok = oaButtonSetService.updateOaButtonSetById(oaButtonSet,schema);
+                //TODO 返回false说明什么？
+                if (ok) {
+                    result.success("修改成功!");
+                }
             }
+        } catch (Exception e) {
+            log.error("edit修改失败",e.getMessage());
         }
 
         return result;
@@ -275,14 +288,18 @@ public class OaButtonSetController {
     @DeleteMapping(value = "/deleteBatch")
     public Result<OaButtonSet> deleteBatch(@RequestParam(name = "ids", required = true) String ids) {
         Result<OaButtonSet> result = new Result<OaButtonSet>();
-        if (ids == null || "".equals(ids.trim())) {
-            result.error500("参数不识别！");
-        } else {
-//            List<String> idList = Arrays.asList(ids.split(","));
-//            for (int i = 0; i < idList.size(); i++) {
-                this.oaButtonSetService.removeByIds(Arrays.asList(ids.split(",")));
-//            }
-//            result.success("删除成功!");
+        try {
+            if (ids == null || "".equals(ids.trim())) {
+                result.error500("参数不识别！");
+            } else {
+    //            List<String> idList = Arrays.asList(ids.split(","));
+    //            for (int i = 0; i < idList.size(); i++) {
+                    this.oaButtonSetService.removeByIds(Arrays.asList(ids.split(",")));
+    //            }
+    //            result.success("删除成功!");
+            }
+        } catch (Exception e) {
+            log.error("deleteBatch删除失败", e.getMessage());
         }
         return result;
     }
@@ -298,12 +315,16 @@ public class OaButtonSetController {
     @GetMapping(value = "/queryById")
     public Result<OaButtonSet> queryById(@RequestParam(name = "id", required = true) Integer id) {
         Result<OaButtonSet> result = new Result<OaButtonSet>();
-        OaButtonSet oaButtonSet = oaButtonSetService.queryById(id);
-        if (oaButtonSet == null) {
-            result.error500("未找到对应实体");
-        } else {
-            result.setResult(oaButtonSet);
-            result.setSuccess(true);
+        try {
+            OaButtonSet oaButtonSet = oaButtonSetService.queryById(id);
+            if (oaButtonSet == null) {
+                result.error500("未找到对应实体");
+            } else {
+                result.setResult(oaButtonSet);
+                result.setSuccess(true);
+            }
+        } catch (Exception e) {
+            log.error("queryById通过id查询失败", e.getMessage());
         }
         return result;
     }
@@ -319,17 +340,21 @@ public class OaButtonSetController {
     @PostMapping(value = "/queryByTaskDefKeyAndBtnId")
     public Result<OaButtonSet> queryByTaskDefKeyAndBtnId(@RequestBody Map<String,Object> map) {
         Result<OaButtonSet> result = new Result<OaButtonSet>();
-        if (map.get("taskDefKey")==null || map.get("iButtonId")==null
-                || map.get("iProcButtonId")==null || map.get("procDefKey")==null){
-            result.error500("未找到对应实体");
-            return result;
-        }
-        OaButtonSet oaButtonSet = oaButtonSetService.queryByTaskDefKeyAndBtnId(map);
-        if (oaButtonSet == null) {
-            result.error500("未找到对应数据");
-        } else {
-            result.setResult(oaButtonSet);
-            result.setSuccess(true);
+        try {
+            if (map.get("taskDefKey")==null || map.get("iButtonId")==null
+                    || map.get("iProcButtonId")==null || map.get("procDefKey")==null){
+                result.error500("未找到对应实体");
+                return result;
+            }
+            OaButtonSet oaButtonSet = oaButtonSetService.queryByTaskDefKeyAndBtnId(map);
+            if (oaButtonSet == null) {
+                result.error500("未找到对应数据");
+            } else {
+                result.setResult(oaButtonSet);
+                result.setSuccess(true);
+            }
+        } catch (Exception e) {
+            log.error("queryByTaskDefKeyAndBtnId通过任务KEY和按钮ID查询失败", e.getMessage());
         }
         return result;
     }
@@ -352,7 +377,7 @@ public class OaButtonSetController {
                 queryWrapper = QueryGenerator.initQueryWrapper(oaButtonSet, request.getParameterMap());
             }
         } catch (UnsupportedEncodingException e) {
-            e.printStackTrace();
+            log.error("导出失败", e.getMessage());
         }
 
         //Step.2 AutoPoi 导出Excel

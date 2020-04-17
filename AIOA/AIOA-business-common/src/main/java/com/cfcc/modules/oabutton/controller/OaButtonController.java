@@ -77,9 +77,13 @@ public class OaButtonController {
 		/*QueryWrapper<OaButton> queryWrapper = QueryGenerator.initQueryWrapper(oaButton, req.getParameterMap());
 		Page<OaButton> page = new Page<OaButton>(pageNo, pageSize);
 		IPage<OaButton> pageList = oaButtonService.page(page, queryWrapper);*/
-		IPage<OaButton> pageList = oaButtonService.getPage(pageNo,pageSize,oaButton);
-		result.setSuccess(true);
-		result.setResult(pageList);
+		try {
+			IPage<OaButton> pageList = oaButtonService.getPage(pageNo,pageSize,oaButton);
+			result.setSuccess(true);
+			result.setResult(pageList);
+		} catch (Exception e) {
+			log.error("按钮列表查询失败",e.getMessage());
+		}
 		return result;
 	}
 
@@ -117,20 +121,24 @@ public class OaButtonController {
 	@PutMapping(value = "/edit")
 	public Result<OaButton> edit(@RequestBody OaButton oaButton) {
 		Result<OaButton> result = new Result<OaButton>();
-		if (oaButton!=null && oaButton.getSBtnValue()!=null ){
-			oaButton.setSMethod(oaButton.getSBtnValue());
+		try {
+			if (oaButton!=null && oaButton.getSBtnValue()!=null ){
+                oaButton.setSMethod(oaButton.getSBtnValue());
+            }
+			List<OaButton> oaButtonEntity = oaButtonService.queryById(oaButton.getIId(),null);
+			if(oaButtonEntity==null ||oaButtonEntity.size()!=1) {
+                result.error500("未找到对应实体");
+            }else {
+                boolean ok = oaButtonService.updateOaButtonById(oaButton);
+                //TODO 返回false说明什么？
+                if(ok) {
+                    result.success("修改成功!");
+                }
+            }
+		} catch (Exception e) {
+			log.error("edit失败",e.getMessage());
 		}
-		List<OaButton> oaButtonEntity = oaButtonService.queryById(oaButton.getIId(),null);
-		if(oaButtonEntity==null ||oaButtonEntity.size()!=1) {
-			result.error500("未找到对应实体");
-		}else {
-			boolean ok = oaButtonService.updateOaButtonById(oaButton);
-			//TODO 返回false说明什么？
-			if(ok) {
-				result.success("修改成功!");
-			}
-		}
-		
+
 		return result;
 	}
 
@@ -167,14 +175,19 @@ public class OaButtonController {
 	@DeleteMapping(value = "/deleteBatch")
 	public Result<OaButton> deleteBatch(@RequestParam(name="ids",required=true) String ids) {
 		Result<OaButton> result = new Result<OaButton>();
-		if(ids==null || "".equals(ids.trim())) {
-			result.error500("参数不识别！");
-		}else {
-			List<String> idList = Arrays.asList(ids.split(","));
-			for (int i = 0; i < idList.size(); i++) {
-				this.oaButtonService.deleteOaButtonByID(idList.get(i));
-			}
-			result.success("删除成功!");
+		try {
+			if(ids==null || "".equals(ids.trim())) {
+                result.error500("参数不识别！");
+            }else {
+                List<String> idList = Arrays.asList(ids.split(","));
+                for (int i = 0; i < idList.size(); i++) {
+                    this.oaButtonService.deleteOaButtonByID(idList.get(i));
+                }
+                result.success("删除成功!");
+            }
+		} catch (Exception e) {
+//			e.printStackTrace();
+			log.error("删除失败",e.getMessage());
 		}
 		return result;
 	}
@@ -205,7 +218,7 @@ public class OaButtonController {
             }
 			return result;
 		} catch (Exception e) {
-			e.printStackTrace();
+			log.error("按钮管理通过id查询失败",e.getMessage());
 		}
 		return null;
 	}
@@ -235,7 +248,7 @@ public class OaButtonController {
 			 }
 			 return result;
 		 } catch (Exception e) {
-			 e.printStackTrace();
+			 log.error("按钮管理通过按钮名称查询失败",e.getMessage());
 		 }
 		 return null;
 	 }
@@ -260,7 +273,7 @@ public class OaButtonController {
               queryWrapper = QueryGenerator.initQueryWrapper(oaButton, request.getParameterMap());
           }
       } catch (UnsupportedEncodingException e) {
-          e.printStackTrace();
+		  log.error("按钮管理导出失败",e.getMessage());
       }
 
       //Step.2 AutoPoi 导出Excel
@@ -321,7 +334,7 @@ public class OaButtonController {
 		 try {
 			 buttonList = oaButtonService.buttonList();
 		 } catch (Exception e) {
-			 e.printStackTrace();
+			 log.error("按钮管理buttonList查询失败",e.getMessage());
 		 }
 		 result.setSuccess(true);
 		 result.setResult(buttonList);
