@@ -131,8 +131,8 @@ public class ProcssUtil implements ApplicationContextAware {
                         int size = userTaskActivityBehavior.getTaskDefinition().getCandidateUserIdExpressions().size();
 
                         //activity.setQiangQian(true);
-                        activity.setAllowMulti(true);
                         if (size > 0) {
+                            activity.setAllowMulti(true);
                             for (Expression candidateGroupIdExpression : userTaskActivityBehavior.getTaskDefinition().getCandidateUserIdExpressions()) {
                                 String expressionText = candidateGroupIdExpression.getExpressionText();
                                 String mulAssignee = expressionText == null ? null : ElParse.parseNormal(expressionText);
