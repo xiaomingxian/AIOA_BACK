@@ -120,16 +120,13 @@ public class OaElasticsearchController {
             DBvalue = DBvalue.substring(DBvalue.indexOf("=")+1,DBvalue.lastIndexOf("*"));
         }
         indexName = "elasticsearch"+DBvalue+departId+1;
-//        String indexName = "elasticsearch1";
         String indexType = "oaBusdata";
         try {
-            if (!keyWord.equals("")){   //输入查询的数据为空时，则为全查
-//                sourceList = searchService.queryAll(INDEX_NAME1,pageNo,pageSize);
-//            }else {
+            if (!keyWord.equals("")){
                 sourceList = searchService.query(keyWord1,pageNo,pageSize,indexName,indexType);
             }
         } catch (Exception e) {
-            e.printStackTrace();
+            log.error("公文检索查询异常"+e.getMessage());
         }
         //存入频繁搜索数据
         if (sourceList != null){
@@ -137,7 +134,7 @@ public class OaElasticsearchController {
         }
         result.setResult(sourceList);
         result.setSuccess(true);
-        System.out.println("------------附件检索完毕-------------");
+        log.info("------------附件检索完毕-------------");
         return result;
     }
 
@@ -169,16 +166,13 @@ public class OaElasticsearchController {
         String indexType = "oaFile";
         try {
             if (!keyWord.equals("")){  //输入查询的数据为空时，则为不查
-//                sourceList = searchService.queryAll(INDEX_NAME2,(pageNo-1)*pageSize,pageSize);
-//            }else {
                 sourceList = searchService.query(keyWord1,pageNo,pageSize,indexName,indexType);
             }
         } catch (Exception e) {
-            e.printStackTrace();
+            log.error("附件检索"+e.getMessage());
         }
         result.setResult(sourceList);
         result.setSuccess(true);
-//        System.out.println("------------全文检索完毕-------------");
         return result;
     }
 }

@@ -37,7 +37,7 @@ public class MissionCenterController {
 
     @AutoLog(value = "日程表-查询任务中心的列表")
     @ApiOperation(value="日程表-查询任务中心的列表", notes="日程表-查询任务中心的列表")
-    @PostMapping(value = "/queryList")
+    @GetMapping(value = "/queryList")
     public Result<Map<String, Object>> queryListByUserId(oaCalendar oaCalendar,
                                                               @RequestParam(name="pageNo", defaultValue="1") Integer pageNo,
                                                               @RequestParam(name="pageSize", defaultValue="10") Integer pageSize,

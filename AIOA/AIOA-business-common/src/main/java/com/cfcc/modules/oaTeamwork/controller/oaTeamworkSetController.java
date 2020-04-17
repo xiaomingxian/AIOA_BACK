@@ -128,7 +128,7 @@ public class oaTeamworkSetController {
 			oaTeamworkSet.setSCreateBy(UserId);
 			oaTeamworkSet.setSCreateDeptid(DepartId);
 			oaTeamworkSet.setSCreateUnitid(parentId);
-			List<Integer> orderlist = oaTeamworkSetService.findorder();
+			List<Integer> orderlist = oaTeamworkSetService.findorder(oaTeamworkSet.getITeamworkId());
 			if(orderlist != null){
 				if(orderlist.contains(oaTeamworkSet.getIOrder())){
 					result.error500("序号不能重复");
@@ -159,7 +159,7 @@ public class oaTeamworkSetController {
 		if(oaTeamworkSetEntity==null) {
 			result.error500("未找到对应实体");
 		}else {
-			List<Integer> orderlist = oaTeamworkSetService.findorder();
+			List<Integer> orderlist = oaTeamworkSetService.findorder(oaTeamworkSet.getITeamworkId());
 			if(orderlist != null){
 				if(orderlist.contains(oaTeamworkSet.getIOrder()) && !oaTeamworkSetEntity.getIOrder().equals(oaTeamworkSet.getIOrder())){
 					result.error500("序号不能重复");

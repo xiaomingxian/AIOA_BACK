@@ -151,6 +151,7 @@ public class OaOpinionSetController {
 //			result.error500("请选择业务");
 //			return result;
 //		}
+ try {
 		if (oaOpinionSet==null|| oaOpinionSet.getIProcOpinionId()==null){
 			result.error500("当前意见不存在");
 			return result;
@@ -174,7 +175,7 @@ public class OaOpinionSetController {
 			result.error500("当前意见类型已存在");
 			return result;
 		}
-		try {
+
 			oaOpinionSetService.insertOaButtonSet(oaOpinionSet);
 			result.success("添加成功！");
 		} catch (Exception e) {
@@ -198,27 +199,32 @@ public class OaOpinionSetController {
 //			result.error500("请选择业务");
 //			return result;
 //		}
-		if (oaOpinionSet==null|| oaOpinionSet.getIProcOpinionId()==null){
-			result.error500("当前意见不存在");
-			return result;
-		}
-		if (oaOpinionSet!=null && oaOpinionSet.getType()!=null && oaOpinionSet.getType().equals("9999")){
-			oaOpinionSet.setType(null);
-		}
+		try {
+			if (oaOpinionSet==null|| oaOpinionSet.getIProcOpinionId()==null){
+                result.error500("当前意见不存在");
+                return result;
+            }
+			if (oaOpinionSet!=null && oaOpinionSet.getType()!=null && oaOpinionSet.getType().equals("9999")){
+                oaOpinionSet.setType(null);
+            }
 //		List<OaOpinionSet> oaOpinionSets = oaOpinionSetService.queryByType(oaOpinionSet.getType(), oaOpinionSet.getIProcOpinionId());
 //		if (oaOpinionSet.getType()!=null&&oaOpinionSet.getType().trim().length()>0&&oaOpinionSets.size()>0&&oaOpinionSets.get(0).getIId()!=oaOpinionSet.getIId()){
 //			result.error500("当前意见类型已存在");
 //			return result;
 //		}
-		OaOpinionSet oaOpinionSetEntity = oaOpinionSetService.queryById(oaOpinionSet.getIId());
-		if(oaOpinionSetEntity==null) {
-			result.error500("未找到对应实体");
-		}else {
-			boolean ok = oaOpinionSetService.updateOaButtonById(oaOpinionSet);
-			//TODO 返回false说明什么？
-			if(ok) {
-				result.success("修改成功!");
-			}
+			OaOpinionSet oaOpinionSetEntity = oaOpinionSetService.queryById(oaOpinionSet.getIId());
+			if(oaOpinionSetEntity==null) {
+                result.error500("未找到对应实体");
+            }else {
+                boolean ok = oaOpinionSetService.updateOaButtonById(oaOpinionSet);
+                //TODO 返回false说明什么？
+                if(ok) {
+                    result.success("修改成功!");
+                }
+            }
+		} catch (Exception e) {
+			log.error("修改失败",e.getMessage());
+
 		}
 		return result;
 	}
@@ -251,14 +257,18 @@ public class OaOpinionSetController {
 	@DeleteMapping(value = "/deleteBatch")
 	public Result<OaOpinionSet> deleteBatch(@RequestParam(name="ids",required=true) String ids) {
 		Result<OaOpinionSet> result = new Result<OaOpinionSet>();
-		if(ids==null || "".equals(ids.trim())) {
-			result.error500("参数不识别！");
-		}else {
-			List<String> idList = Arrays.asList(ids.split(","));
-			for (int i = 0; i < idList.size(); i++) {
-				this.oaOpinionSetService.deleteOaOpinionSetByID(idList.get(i));
-			}
-			result.success("删除成功!");
+		try {
+			if(ids==null || "".equals(ids.trim())) {
+                result.error500("参数不识别！");
+            }else {
+                List<String> idList = Arrays.asList(ids.split(","));
+                for (int i = 0; i < idList.size(); i++) {
+                    this.oaOpinionSetService.deleteOaOpinionSetByID(idList.get(i));
+                }
+                result.success("删除成功!");
+            }
+		} catch (Exception e) {
+			log.error("删除失败",e.getMessage());
 		}
 		return result;
 	}
@@ -273,12 +283,16 @@ public class OaOpinionSetController {
 	@GetMapping(value = "/queryById")
 	public Result<OaOpinionSet> queryById(@RequestParam(name="id",required=true) Integer id) {
 		Result<OaOpinionSet> result = new Result<OaOpinionSet>();
-		OaOpinionSet oaOpinionSet = oaOpinionSetService.queryById(id);
-		if(oaOpinionSet==null) {
-			result.error500("未找到对应实体");
-		}else {
-			result.setResult(oaOpinionSet);
-			result.setSuccess(true);
+		try {
+			OaOpinionSet oaOpinionSet = oaOpinionSetService.queryById(id);
+			if(oaOpinionSet==null) {
+                result.error500("未找到对应实体");
+            }else {
+                result.setResult(oaOpinionSet);
+                result.setSuccess(true);
+            }
+		} catch (Exception e) {
+			log.error("queryById失败",e.getMessage());
 		}
 		return result;
 	}
@@ -295,19 +309,23 @@ public class OaOpinionSetController {
 	 @PostMapping(value = "/queryByTaskDefKey")
 	 public Result<OaOpinionSet> queryByTaskKey(@RequestBody Map<String,Object> map) {
 		 Result<OaOpinionSet> result = new Result<OaOpinionSet>();
-		 if (map.get("taskDefKey")==null || map.get("iProcOpinionId")==null ||map.get("procDefKey")==null){
-			 result.error500("未找到对应实体");
-			 return result;
-		 }
-		 if(map.get("type")!=null && map.get("type")==" "|| map.get("type")!=null && map.get("type").equals("9999")){
-			 map.put("type",null);
-		 }
-		 OaOpinionSet oaOpinionSet = oaOpinionSetService.queryByTaskKey(map);
-		 if (oaOpinionSet == null) {
-			 result.error500("未找到对应数据4");
-		 } else {
-			 result.setResult(oaOpinionSet);
-			 result.setSuccess(true);
+		 try {
+			 if (map.get("taskDefKey")==null || map.get("iProcOpinionId")==null ||map.get("procDefKey")==null){
+                 result.error500("未找到对应实体");
+                 return result;
+             }
+			 if(map.get("type")!=null && map.get("type")==" "|| map.get("type")!=null && map.get("type").equals("9999")){
+                 map.put("type",null);
+             }
+			 OaOpinionSet oaOpinionSet = oaOpinionSetService.queryByTaskKey(map);
+			 if (oaOpinionSet == null) {
+                 result.error500("未找到对应数据4");
+             } else {
+                 result.setResult(oaOpinionSet);
+                 result.setSuccess(true);
+             }
+		 } catch (Exception e) {
+			 log.error("queryByTaskDefKey失败",e.getMessage());
 		 }
 		 return result;
 	 }
@@ -323,21 +341,25 @@ public class OaOpinionSetController {
 	 @PostMapping(value = "/queryByOrderAndKey")
 	 public Result<List<OaOpinionSet>> queryByOrderAndKey(@RequestBody Map<String,Object> map) {
 		 Result<List<OaOpinionSet>> result = new Result<>();
-		 if (map.get("itaskOpinionOrder")==null
-				 ||map.get("procDefKey")==null ||map.get("iProcOpinionId")==null){
-//			 result.error500("未找到对应实体");
-			 return result;
-		 }
-		 List<OaOpinionSet> oaOpinionSet = oaOpinionSetService.queryByOrderAndKey(map);
-		 if (oaOpinionSet == null || oaOpinionSet.size()<1) {
-			 result.setResult(null);
-			 result.setSuccess(true);
-		 }else if(oaOpinionSet.size()==1 && map.get("iid")!=null && map.get("iid").toString()!="" && oaOpinionSet.get(0).getIId().equals(map.get("iid"))){
-			 result.setResult(null);
-			 result.setSuccess(true);
-		 }else {
-			 result.setResult(oaOpinionSet);
-			 result.setSuccess(true);
+		 try {
+			 if (map.get("itaskOpinionOrder")==null
+                     ||map.get("procDefKey")==null ||map.get("iProcOpinionId")==null){
+    //			 result.error500("未找到对应实体");
+                 return result;
+             }
+			 List<OaOpinionSet> oaOpinionSet = oaOpinionSetService.queryByOrderAndKey(map);
+			 if (oaOpinionSet == null || oaOpinionSet.size()<1) {
+                 result.setResult(null);
+                 result.setSuccess(true);
+             }else if(oaOpinionSet.size()==1 && map.get("iid")!=null && map.get("iid").toString()!="" && oaOpinionSet.get(0).getIId().equals(map.get("iid"))){
+                 result.setResult(null);
+                 result.setSuccess(true);
+             }else {
+                 result.setResult(oaOpinionSet);
+                 result.setSuccess(true);
+             }
+		 } catch (Exception e) {
+			 log.error("queryByOrderAndKey失败",e.getMessage());
 		 }
 		 return result;
 	 }
@@ -360,7 +382,7 @@ public class OaOpinionSetController {
               queryWrapper = QueryGenerator.initQueryWrapper(oaOpinionSet, request.getParameterMap());
           }
       } catch (UnsupportedEncodingException e) {
-          e.printStackTrace();
+		  log.error("exportXls失败",e.getMessage());
       }
 
       //Step.2 AutoPoi 导出Excel

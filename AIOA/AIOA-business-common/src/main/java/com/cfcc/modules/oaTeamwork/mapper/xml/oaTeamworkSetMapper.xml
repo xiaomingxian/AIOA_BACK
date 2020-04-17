@@ -90,7 +90,7 @@
         SELECT * FROM oa_teamwork_set where i_teamwork_id = #{iTeamworkId}
     </select>
     <select id="findorder" resultType="java.lang.Integer">
-        select i_order from oa_teamwork_set
+        select i_order from oa_teamwork_set where i_teamwork_id = #{iTeamworkId}
     </select>
     <select id="findListByteamworkId" resultType="com.cfcc.modules.oaTeamwork.entity.oaTeamworkSet">
         select * from oa_teamwork_set where i_teamwork_id =(select i_id from oa_teamwork where s_teamwork_name =#{TeamworkName})

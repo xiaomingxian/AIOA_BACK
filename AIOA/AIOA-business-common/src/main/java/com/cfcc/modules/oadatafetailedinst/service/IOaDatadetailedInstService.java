@@ -15,4 +15,11 @@ import java.util.Map;
 public interface IOaDatadetailedInstService extends IService<OaDatadetailedInst> {
 
     Map<String, Object> findByTableId(Integer iTableId,String sCreateName);
+    int addorupdataDetailed( Map<String,Object> map);
+
+    List<OaDatadetailedInst> seletdetailedInstList(String sCreateBy, String sCreateDeptid);
+
+    List<OaDatadetailedInst> seletSharedetailedInstList(String sTable, Integer iTableId);
+
+    List<OaDatadetailedInst> seletAlldetailedInstList(String sTable, Integer iTableId, String sCreateBy, String sCreateDeptid);
 }
