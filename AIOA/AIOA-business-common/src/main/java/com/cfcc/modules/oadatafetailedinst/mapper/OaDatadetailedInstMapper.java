@@ -1,11 +1,11 @@
 package com.cfcc.modules.oadatafetailedinst.mapper;
 
 import java.util.List;
-import java.util.Map;
 
 import org.apache.ibatis.annotations.Param;
 import com.cfcc.modules.oadatafetailedinst.entity.OaDatadetailedInst;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+import org.apache.ibatis.annotations.Select;
 
 /**
  * @Description: 明细存储
@@ -15,5 +15,18 @@ import com.baomidou.mybatisplus.core.mapper.BaseMapper;
  */
 public interface OaDatadetailedInstMapper extends BaseMapper<OaDatadetailedInst> {
 
-    Map<String, Object> findByTableId(Integer iTableId,String sCreateName);
+    @Select("SELECT i_id,s_create_dept,s_create_name,s_opinion,d_datetime1,i_is_1,i_is_2,s_create_by,s_create_deptid " +
+            "FROM oa_datadetailed_inst " +
+            "WHERE s_create_by=#{sCreateBy} and s_create_deptid=#{sCreateDeptid}")
+    List<OaDatadetailedInst> seletdetailedInstList(String sCreateBy, String sCreateDeptid);
+
+    @Select("SELECT i_id,s_create_dept,s_create_name,s_opinion,d_datetime1,i_is_1,i_is_2,s_create_by,s_create_deptid " +
+            "FROM oa_datadetailed_inst " +
+            "WHERE s_table=#{sTable} and i_table_id=#{iTableId} and i_is_open=1")
+    List<OaDatadetailedInst> seletSharedetailedInstList(String sTable, Integer iTableId);
+
+    @Select("SELECT i_id,s_create_dept,s_create_name,s_opinion,d_datetime1,i_is_1,i_is_2,s_create_by,s_create_deptid " +
+            "FROM oa_datadetailed_inst " +
+            "WHERE s_table=#{sTable} and i_table_id=#{iTableId} and i_is_open=1 and  s_create_by != #{sCreateBy} and s_create_deptid != #{sCreateDeptid} ")
+    List<OaDatadetailedInst> seletAlldetailedInstList(String sTable, Integer iTableId, String sCreateBy, String sCreateDeptid);
 }

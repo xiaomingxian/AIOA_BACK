@@ -81,7 +81,7 @@ public class SysUserManagedeptsServiceImpl extends ServiceImpl<SysUserManagedept
             for (Map<String, Object> user : userList) {
                 String sDeptId = user.get("deptId") + "";
                 Map<String,Object> deptList = sysUserManagedeptsMapper.findDepartNameByDeptId(sDeptId);
-                if (!deptList.get("parentId").equals("1")){
+                if (!deptList.get("org_type").equals("1")){
                     String parentName = sysUserManagedeptsMapper.finParentName(deptList.get("parentId")+"");
                     user.put("parentName", parentName);
                 }else{
