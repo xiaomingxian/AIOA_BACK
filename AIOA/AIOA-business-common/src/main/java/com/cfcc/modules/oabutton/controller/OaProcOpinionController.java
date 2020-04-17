@@ -131,7 +131,12 @@ public class OaProcOpinionController {
 	/*	QueryWrapper<OaProcOpinion> queryWrapper = QueryGenerator.initQueryWrapper(oaProcOpinion, req.getParameterMap());
 		Page<OaProcOpinion> page = new Page<OaProcOpinion>(pageNo, pageSize);
 		IPage<OaProcOpinion> pageList = oaProcOpinionService.page(page, queryWrapper);*/
-		IPage<OaProcOpinion> pageList = oaProcOpinionService.getPage(pageNo,pageSize,oaProcOpinion);
+		IPage<OaProcOpinion> pageList = null;
+		try {
+			pageList = oaProcOpinionService.getPage(pageNo,pageSize,oaProcOpinion);
+		} catch (Exception e) {
+			log.error(e.getMessage(),e);
+		}
 		result.setSuccess(true);
 		result.setResult(pageList);
 		return result;
@@ -175,27 +180,32 @@ public class OaProcOpinionController {
 	@PutMapping(value = "/edit")
 	public Result<OaProcOpinion> edit(@RequestBody Map<String,Object> map) {
 		OaProcOpinion oaProcOpinion=new OaProcOpinion();
-		if (map.get("iid")!=null){
-			oaProcOpinion.setIId((Integer)map.get("iid"));		}
-		if (map.get("sprocOpinionName")!=null){
-			oaProcOpinion.setSProcOpinionName(map.get("sprocOpinionName").toString());
+		Result<OaProcOpinion> result = null;
+		try {
+			if (map.get("iid")!=null){
+                oaProcOpinion.setIId((Integer)map.get("iid"));		}
+			if (map.get("sprocOpinionName")!=null){
+                oaProcOpinion.setSProcOpinionName(map.get("sprocOpinionName").toString());
+            }
+			if (map.get("procDefKey")!=null){
+                oaProcOpinion.setProcDefKey(map.get("procDefKey").toString());
+            }
+			result = new Result<OaProcOpinion>();
+			OaProcOpinion oaProcOpinionEntity = oaProcOpinionService.queryById(oaProcOpinion.getIId());
+			if(oaProcOpinionEntity==null) {
+                result.error500("未找到对应实体");
+            }else {
+                boolean ok = oaProcOpinionService.updateOaProcOpinionById(oaProcOpinion);
+                //TODO 返回false说明什么？
+                if(ok) {
+                    result.success("修改成功!");
+                    result.setSuccess(true);
+                }
+            }
+		} catch (Exception e) {
+			log.error(e.getMessage(),e);
 		}
-		if (map.get("procDefKey")!=null){
-			oaProcOpinion.setProcDefKey(map.get("procDefKey").toString());
-		}
-		Result<OaProcOpinion> result = new Result<OaProcOpinion>();
-		OaProcOpinion oaProcOpinionEntity = oaProcOpinionService.queryById(oaProcOpinion.getIId());
-		if(oaProcOpinionEntity==null) {
-			result.error500("未找到对应实体");
-		}else {
-			boolean ok = oaProcOpinionService.updateOaProcOpinionById(oaProcOpinion);
-			//TODO 返回false说明什么？
-			if(ok) {
-				result.success("修改成功!");
-				result.setSuccess(true);
-			}
-		}
-		
+
 		return result;
 	}
 	
@@ -227,14 +237,18 @@ public class OaProcOpinionController {
 	@DeleteMapping(value = "/deleteBatch")
 	public Result<OaProcOpinion> deleteBatch(@RequestParam(name="ids",required=true) String ids) {
 		Result<OaProcOpinion> result = new Result<OaProcOpinion>();
-		if(ids==null || "".equals(ids.trim())) {
-			result.error500("参数不识别！");
-		}else {
-			List<String> idList = Arrays.asList(ids.split(","));
-			for (int i = 0; i < idList.size(); i++) {
-				this.oaProcOpinionService.deleteOaProcOpinionByID(idList.get(i));
-			}
-			result.success("删除成功!");
+		try {
+			if(ids==null || "".equals(ids.trim())) {
+                result.error500("参数不识别！");
+            }else {
+                List<String> idList = Arrays.asList(ids.split(","));
+                for (int i = 0; i < idList.size(); i++) {
+                    this.oaProcOpinionService.deleteOaProcOpinionByID(idList.get(i));
+                }
+                result.success("删除成功!");
+            }
+		} catch (Exception e) {
+			log.error(e.getMessage(),e);
 		}
 		return result;
 	}
@@ -249,7 +263,12 @@ public class OaProcOpinionController {
 	@GetMapping(value = "/queryById")
 	public Result<OaProcOpinion> queryById(@RequestParam(name="id",required=true) Integer id) {
 		Result<OaProcOpinion> result = new Result<OaProcOpinion>();
-		OaProcOpinion oaProcOpinion = oaProcOpinionService.queryById(id);
+		OaProcOpinion oaProcOpinion = null;
+		try {
+			oaProcOpinion = oaProcOpinionService.queryById(id);
+		} catch (Exception e) {
+			log.error(e.getMessage(),e);
+		}
 		if(oaProcOpinion==null) {
 			result.error500("未找到对应实体");
 		}else {
@@ -269,39 +288,43 @@ public class OaProcOpinionController {
 	 @PostMapping(value = "/copeConfig")
 	 public Result<OaProcOpinion> copeConfig(@RequestBody OaProcOpinion oaProcOpinion1) {
 		 Result<OaProcOpinion> result = new Result<OaProcOpinion>();
-		 OaProcOpinion oaProcOpinion = oaProcOpinionService.queryById(oaProcOpinion1.getIId());
-		 if(oaProcOpinion==null) {
-			 result.error500("未找到对应实体");
-		 }else {
-			 int countName = oaProcOpinionService.queryBysProcOpinionName(oaProcOpinion1.getSProcOpinionName());
-			 if (countName>0){
-				 result.error500("意见配置名称重复");
-				 return result;
-			 }
+		 try {
+			 OaProcOpinion oaProcOpinion = oaProcOpinionService.queryById(oaProcOpinion1.getIId());
+			 if(oaProcOpinion==null) {
+                 result.error500("未找到对应实体");
+             }else {
+                 int countName = oaProcOpinionService.queryBysProcOpinionName(oaProcOpinion1.getSProcOpinionName());
+                 if (countName>0){
+                     result.error500("意见配置名称重复");
+                     return result;
+                 }
 
-			 if (oaProcOpinion1.getSProcOpinionName()==null || oaProcOpinion1.getSProcOpinionName().trim().length()<1){
-				 result.error500("流程配置名称不能为空");
-				 return result;
-			 }
-			 //重新配置命名
-			 oaProcOpinion.setSProcOpinionName(oaProcOpinion1.getSProcOpinionName());
-			 int ids = oaProcOpinionService.insertOaProcOpinion(oaProcOpinion);
-			 if (ids<=0){
-				 result.error500("复制失败");
-				 return result;
-			 }
+                 if (oaProcOpinion1.getSProcOpinionName()==null || oaProcOpinion1.getSProcOpinionName().trim().length()<1){
+                     result.error500("流程配置名称不能为空");
+                     return result;
+                 }
+                 //重新配置命名
+                 oaProcOpinion.setSProcOpinionName(oaProcOpinion1.getSProcOpinionName());
+                 int ids = oaProcOpinionService.insertOaProcOpinion(oaProcOpinion);
+                 if (ids<=0){
+                     result.error500("复制失败");
+                     return result;
+                 }
 
-			 List<OaOpinionSet> OaOpinionSetList = oaOpinionSetService.queryListByOpinionId(oaProcOpinion1.getIId());
-			 //判断按钮是否有关联流程，若有复制相关流程
-			 if (OaOpinionSetList.size()>0){
-				 for (int i = 0; i < OaOpinionSetList.size(); i++) {
-					 OaOpinionSetList.get(i).setIProcOpinionId(oaProcOpinion.getIId());
-					 OaOpinionSetList.get(i).setProcDefKey(oaProcOpinion.getProcDefKey());
-					 oaOpinionSetService.insertOaButtonSet(OaOpinionSetList.get(i));
-				 }
-			 }
-			 result.setResult(oaProcOpinion);
-			 result.setSuccess(true);
+                 List<OaOpinionSet> OaOpinionSetList = oaOpinionSetService.queryListByOpinionId(oaProcOpinion1.getIId());
+                 //判断按钮是否有关联流程，若有复制相关流程
+                 if (OaOpinionSetList.size()>0){
+                     for (int i = 0; i < OaOpinionSetList.size(); i++) {
+                         OaOpinionSetList.get(i).setIProcOpinionId(oaProcOpinion.getIId());
+                         OaOpinionSetList.get(i).setProcDefKey(oaProcOpinion.getProcDefKey());
+                         oaOpinionSetService.insertOaButtonSet(OaOpinionSetList.get(i));
+                     }
+                 }
+                 result.setResult(oaProcOpinion);
+                 result.setSuccess(true);
+             }
+		 } catch (Exception e) {
+			 log.error(e.getMessage(),e);
 		 }
 		 return result;
 	 }
@@ -325,7 +348,7 @@ public class OaProcOpinionController {
               queryWrapper = QueryGenerator.initQueryWrapper(oaProcOpinion, request.getParameterMap());
           }
       } catch (UnsupportedEncodingException e) {
-          e.printStackTrace();
+		  log.error(e.getMessage(),e);
       }
 
       //Step.2 AutoPoi 导出Excel

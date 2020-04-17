@@ -84,9 +84,13 @@ public class OaProcButtonController {
 		/*QueryWrapper<OaProcButton> queryWrapper = QueryGenerator.initQueryWrapper(oaProcButton, req.getParameterMap());
 		Page<OaProcButton> page = new Page<OaProcButton>(pageNo, pageSize);
 		IPage<OaProcButton> pageList = oaProcButtonService.page(page, queryWrapper);*/
-		IPage<OaProcButton> pageList = oaProcButtonService.getPage(pageNo,pageSize,oaProcButton);
-		result.setSuccess(true);
-		result.setResult(pageList);
+		try {
+			IPage<OaProcButton> pageList = oaProcButtonService.getPage(pageNo,pageSize,oaProcButton);
+			result.setSuccess(true);
+			result.setResult(pageList);
+		} catch (Exception e) {
+			log.error("list失败",e.getMessage());
+		}
 		return result;
 	}
 
@@ -99,7 +103,12 @@ public class OaProcButtonController {
 	 @GetMapping(value = "/queryProcButton")
 	 public Result<List<OaProcButton>> queryProcButton(String key) {
 		 Result<List<OaProcButton>> result = new Result<List<OaProcButton>>();
-		 List<OaProcButton> list = oaProcButtonService.queryProcButtonByProc(key) ;
+		 List<OaProcButton> list = null;
+		 try {
+			 list = oaProcButtonService.queryProcButtonByProc(key);
+		 } catch (Exception e) {
+			 log.error("queryProcButton失败",e.getMessage());
+		 }
 		 result.setSuccess(true);
 		 result.setResult(list);
 		 return result;
@@ -109,7 +118,12 @@ public class OaProcButtonController {
 	 @GetMapping(value = "/queryNoProcButton")
 	 public Result<List<OaProcButton>> queryNoProcButton() {
 		 Result<List<OaProcButton>> result = new Result<List<OaProcButton>>();
-		 List<OaProcButton> list = oaProcButtonService.queryNoProcButtonByProc() ;
+		 List<OaProcButton> list = null;
+		 try {
+			 list = oaProcButtonService.queryNoProcButtonByProc();
+		 } catch (Exception e) {
+			 log.error("queryNoProcButton失败",e.getMessage());
+		 }
 		 result.setSuccess(true);
 		 result.setResult(list);
 		 return result;
@@ -150,26 +164,31 @@ public class OaProcButtonController {
 	@PutMapping(value = "/edit")
 	public Result<OaProcButton> edit(@RequestBody Map<String,Object> map) {
 		OaProcButton oaProcButton=new OaProcButton();
-		if (map.get("iid")!=null){
-			oaProcButton.setIId((Integer)map.get("iid"));		}
-		if (map.get("sbuttonSetName")!=null){
-			oaProcButton.setSButtonSetName(map.get("sbuttonSetName").toString());
+		Result<OaProcButton> result = null;
+		try {
+			if (map.get("iid")!=null){
+                oaProcButton.setIId((Integer)map.get("iid"));		}
+			if (map.get("sbuttonSetName")!=null){
+                oaProcButton.setSButtonSetName(map.get("sbuttonSetName").toString());
+            }
+			if (map.get("procDefKey")!=null){
+                oaProcButton.setProcDefKey(map.get("procDefKey").toString());
+            }
+			result = new Result<OaProcButton>();
+			OaProcButton oaProcButtonEntity = oaProcButtonService.queryById(oaProcButton.getIId());
+			if(oaProcButtonEntity==null) {
+                result.error500("未找到对应实体");
+            }else {
+                boolean ok = oaProcButtonService.updateProcOaButtonById(oaProcButton);
+                //TODO 返回false说明什么？
+                if(ok) {
+                    result.success("修改成功!");
+                }
+            }
+		} catch (Exception e) {
+			log.error(e.getMessage(),e);
 		}
-		if (map.get("procDefKey")!=null){
-			oaProcButton.setProcDefKey(map.get("procDefKey").toString());
-		}
-		Result<OaProcButton> result = new Result<OaProcButton>();
-		OaProcButton oaProcButtonEntity = oaProcButtonService.queryById(oaProcButton.getIId());
-		if(oaProcButtonEntity==null) {
-			result.error500("未找到对应实体");
-		}else {
-			boolean ok = oaProcButtonService.updateProcOaButtonById(oaProcButton);
-			//TODO 返回false说明什么？
-			if(ok) {
-				result.success("修改成功!");
-			}
-		}
-		
+
 		return result;
 	}
 
@@ -250,14 +269,18 @@ public class OaProcButtonController {
 	@DeleteMapping(value = "/deleteBatch")
 	public Result<OaProcButton> deleteBatch(@RequestParam(name="ids",required=true) String ids) {
 		Result<OaProcButton> result = new Result<OaProcButton>();
-		if(ids==null || "".equals(ids.trim())) {
-			result.error500("参数不识别！");
-		}else {
-//			List<String> idList = Arrays.asList(ids.split(","));
-//			for (int i = 0; i < idList.size(); i++) {
-				this.oaProcButtonService.removeByIds(Arrays.asList(ids.split(",")));
-//			}
-			result.success("删除成功!");
+		try {
+			if(ids==null || "".equals(ids.trim())) {
+                result.error500("参数不识别！");
+            }else {
+    //			List<String> idList = Arrays.asList(ids.split(","));
+    //			for (int i = 0; i < idList.size(); i++) {
+                    this.oaProcButtonService.removeByIds(Arrays.asList(ids.split(",")));
+    //			}
+                result.success("删除成功!");
+            }
+		} catch (Exception e) {
+			log.error(e.getMessage(),e);
 		}
 		return result;
 	}
@@ -272,12 +295,16 @@ public class OaProcButtonController {
 	@GetMapping(value = "/queryById")
 	public Result<OaProcButton> queryById(@RequestParam(name="id",required=false) Integer id) {
 		Result<OaProcButton> result = new Result<OaProcButton>();
-		OaProcButton oaProcButton = oaProcButtonService.queryById(id);
-		if(oaProcButton==null) {
-			result.error500("未找到对应实体");
-		}else {
-			result.setResult(oaProcButton);
-			result.setSuccess(true);
+		try {
+			OaProcButton oaProcButton = oaProcButtonService.queryById(id);
+			if(oaProcButton==null) {
+                result.error500("未找到对应实体");
+            }else {
+                result.setResult(oaProcButton);
+                result.setSuccess(true);
+            }
+		} catch (Exception e) {
+			log.error(e.getMessage(),e);
 		}
 		return result;
 	}
@@ -292,46 +319,50 @@ public class OaProcButtonController {
 	 @PostMapping(value = "/copeConfig")
 	 public Result<OaProcButton> copeConfig(@RequestBody OaProcButton oaProcButton1) {
 		 Result<OaProcButton> result = new Result<OaProcButton>();
-		 OaProcButton oaProcButton = oaProcButtonService.queryById(oaProcButton1.getIId());
+		 try {
+			 OaProcButton oaProcButton = oaProcButtonService.queryById(oaProcButton1.getIId());
 
-		 if(oaProcButton==null) {
-			 result.error500("未找到对应实体");
-		 }else {
-			 int countName = oaProcButtonService.queryProcButtonBySButtonSetName(oaProcButton1.getSButtonSetName());
-			 if (countName>0){
-				 result.error500("流程配置名称重复");
-				 return result;
-			 }
+			 if(oaProcButton==null) {
+                 result.error500("未找到对应实体");
+             }else {
+                 int countName = oaProcButtonService.queryProcButtonBySButtonSetName(oaProcButton1.getSButtonSetName());
+                 if (countName>0){
+                     result.error500("流程配置名称重复");
+                     return result;
+                 }
 
-			 if (oaProcButton1.getSButtonSetName()==null || oaProcButton1.getSButtonSetName().trim().length()<1){
-				 result.error500("流程配置名称不能为空");
-				 return result;
-			 }
-			 //重新配置命名
-			 oaProcButton.setSButtonSetName(oaProcButton1.getSButtonSetName());
-			 int ids = oaProcButtonService.insertProcOaButton(oaProcButton);
-//			 测试添加主键返回
-			 oaProcButton.getIId();
-			 if (ids<=0){
-				 result.error500("复制失败");
-				 return result;
-			 }
-			 String schema = MycatSchema.getSchema();
-			 List<OaButtonSet> oaButtonSetList = oaButtonSetService.queryByProcButtonId(oaProcButton1.getIId());
-			 //判断按钮是否有关联流程，若有复制相关流程
-			 if (oaButtonSetList.size()>0){
-				 for (int i = 0; i < oaButtonSetList.size(); i++) {
-				 	if (oaButtonSetList.get(i).getSRoles()==null || oaButtonSetList.get(i).getSRoles().equalsIgnoreCase("")){
-						oaButtonSetList.get(i).setSRoles("0");
-//						oaButtonSetList.get(i).setIPermitType(1);
-					}
-					 oaButtonSetList.get(i).setIProcButtonId(oaProcButton.getIId());
-					 oaButtonSetList.get(i).setProcDefKey(oaProcButton.getProcDefKey());
-					 oaButtonSetService.insertoaButtonSet(oaButtonSetList.get(i),schema);
-				 }
-			 }
-			 result.setResult(oaProcButton);
-			 result.setSuccess(true);
+                 if (oaProcButton1.getSButtonSetName()==null || oaProcButton1.getSButtonSetName().trim().length()<1){
+                     result.error500("流程配置名称不能为空");
+                     return result;
+                 }
+                 //重新配置命名
+                 oaProcButton.setSButtonSetName(oaProcButton1.getSButtonSetName());
+                 int ids = oaProcButtonService.insertProcOaButton(oaProcButton);
+    //			 测试添加主键返回
+                 oaProcButton.getIId();
+                 if (ids<=0){
+                     result.error500("复制失败");
+                     return result;
+                 }
+                 String schema = MycatSchema.getSchema();
+                 List<OaButtonSet> oaButtonSetList = oaButtonSetService.queryByProcButtonId(oaProcButton1.getIId());
+                 //判断按钮是否有关联流程，若有复制相关流程
+                 if (oaButtonSetList.size()>0){
+                     for (int i = 0; i < oaButtonSetList.size(); i++) {
+                         if (oaButtonSetList.get(i).getSRoles()==null || oaButtonSetList.get(i).getSRoles().equalsIgnoreCase("")){
+                            oaButtonSetList.get(i).setSRoles("0");
+    //						oaButtonSetList.get(i).setIPermitType(1);
+                        }
+                         oaButtonSetList.get(i).setIProcButtonId(oaProcButton.getIId());
+                         oaButtonSetList.get(i).setProcDefKey(oaProcButton.getProcDefKey());
+                         oaButtonSetService.insertoaButtonSet(oaButtonSetList.get(i),schema);
+                     }
+                 }
+                 result.setResult(oaProcButton);
+                 result.setSuccess(true);
+             }
+		 } catch (Exception e) {
+			 log.error(e.getMessage(),e);
 		 }
 		 return result;
 	 }
@@ -354,7 +385,7 @@ public class OaProcButtonController {
               queryWrapper = QueryGenerator.initQueryWrapper(oaProcButton, request.getParameterMap());
           }
       } catch (UnsupportedEncodingException e) {
-          e.printStackTrace();
+		  log.error(e.getMessage(),e);
       }
 
       //Step.2 AutoPoi 导出Excel

@@ -527,11 +527,11 @@ ORDER BY d.sort_order
         </if>
         ) task where 1=1
         <if test="pojo.startQueryTime!=null ">
-            and task.startTime &gt;= #{pojo.startQueryTime}
+            and task.createTime &gt;= #{pojo.startQueryTime}
         </if>
 
         <if test="pojo.endQueryTime!=null ">
-            and task.startTime &lt;= #{pojo.endQueryTime}
+            and task.createTime &lt;= #{pojo.endQueryTime}
         </if>
 
         <if test="pojo.dataTitle!=null and pojo.dataTitle!=''">

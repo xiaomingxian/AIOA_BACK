@@ -1,5 +1,6 @@
 package com.cfcc.modules.oadatafetailedinst.controller;
 import com.cfcc.common.api.vo.Result;
+import com.cfcc.modules.oadatafetailedinst.entity.OaDatadetailedInst;
 import com.cfcc.modules.oadatafetailedinst.service.IOaDatadetailedInstService;
 import com.cfcc.modules.workflow.service.TaskCommonService;
 import io.swagger.annotations.ApiOperation;
@@ -9,6 +10,10 @@ import org.springframework.web.bind.annotation.*;
 import io.swagger.annotations.Api;
 
 import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+/**
 import java.util.List;
 import java.util.Map;
 
@@ -57,9 +62,64 @@ public class OaDatadetailedInstController {
 			return Result.error("查询失败");
 		}
 	}
-	
-
-	
 
 
-}
+     @PostMapping(value = "/adddatadetailedInst")
+     public Result<Object> adddatadetailedInst(@RequestBody Map<String,Object> map) {
+         Result<Object> result = new Result<Object>();
+         int num=oaDatadetailedInstService.addorupdataDetailed(map);
+         if (num!=0){
+             result.setSuccess(true);
+         }else {
+             result.setSuccess(false);
+         }
+         return result;
+     }
+
+     @GetMapping(value = "/selectdetailedInst")
+     public Result<Object> selectdetailedInst(@RequestParam(value = "sCreateBy", required = true) String sCreateBy,
+                                              @RequestParam(value = "sCreateDeptid", required = true) String sCreateDeptid){
+         Result<Object> result = new Result<Object>();
+         List<OaDatadetailedInst> list=oaDatadetailedInstService.seletdetailedInstList(sCreateBy,sCreateDeptid);
+         if (list.size()!=0){
+             result.setResult(list);
+             result.setSuccess(true);
+         }else {
+             result.setSuccess(false);
+         }
+         return result;
+     }
+
+    @GetMapping(value = "/selectSharedetailedInst")
+    public Result<Object> selectsharedetailedInst(@RequestParam(value = "sTable", required = true) String sTable,
+                                                  @RequestParam(value = "iTableId", required = true) Integer iTableId,
+                                                  @RequestParam(value = "sCreateBy", required = true) String sCreateBy,
+                                                  @RequestParam(value = "sCreateDeptid", required = true) String sCreateDeptid){
+        Result<Object> result = new Result<Object>();
+        List<OaDatadetailedInst> list=oaDatadetailedInstService.seletAlldetailedInstList(sTable,iTableId,sCreateBy,sCreateDeptid);
+        if (list.size()!=0){
+            result.setResult(list);
+            result.setSuccess(true);
+        }else {
+            result.setSuccess(false);
+        }
+        return result;
+    }
+
+    @GetMapping(value = "/selectAlldetailedInst")
+    public Result<Object> selectAlldetailedInst(@RequestParam(value = "sTable", required = true) String sTable,
+                                                  @RequestParam(value = "iTableId", required = true) Integer iTableId){
+        Result<Object> result = new Result<Object>();
+        List<OaDatadetailedInst> list=oaDatadetailedInstService.seletSharedetailedInstList(sTable,iTableId);
+        if (list.size()!=0){
+            result.setResult(list);
+            result.setSuccess(true);
+        }else {
+            result.setSuccess(false);
+        }
+        return result;
+    }
+
+
+ }
+

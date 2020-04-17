@@ -118,8 +118,10 @@ public class TaskInActController {
 
 //            }
         } catch (AIOAException e) {
+            log.error(e.toString());
             return Result.error(e.getMessage());
         } catch (Exception e) {
+            log.error(e.toString());
             return Result.error("查询用户失败");
         }
     }
@@ -134,8 +136,12 @@ public class TaskInActController {
         try {
             return canAddUsers(taskId, false, i_id, table, request);
         } catch (AIOAException e) {
+            log.error(e.toString());
+
             return Result.error(e.getMessage());
         } catch (Exception e) {
+            log.error(e.toString());
+
             return Result.error("查询可追加用户失败");
         }
     }
@@ -344,6 +350,8 @@ public class TaskInActController {
             }
             return Result.ok("任务追加成功");
         } catch (AIOAException e) {
+            log.error(e.toString());
+
             return Result.error(e.getMessage());
         } catch (Exception e) {
 //            e.printStackTrace();
@@ -366,6 +374,8 @@ public class TaskInActController {
 
             return Result.ok(list);
         } catch (AIOAException e) {
+            log.error(e.toString());
+
             return Result.error(e.getMessage());
         } catch (Exception e) {
 //            e.printStackTrace();
@@ -635,8 +645,12 @@ public class TaskInActController {
 
             return Result.ok(nextUsers);
         } catch (AIOAException e) {
+            log.error(e.toString());
+
             return Result.error(e.getMessage());
         } catch (Exception e) {
+            log.error(e.toString());
+
             return Result.error("查询失败");
         }
     }
@@ -704,12 +718,14 @@ public class TaskInActController {
             taskInActService.doTask(taskInfoVO, request);
             return Result.ok("任务办理成功");
         } catch (AIOAException e) {
-            if (StringUtils.isNotBlank(taskId)){
+            log.error(e.toString());
+
+            if (StringUtils.isNotBlank(taskId)) {
                 taskCommonService.updateTaskStatus(taskId, null);
             }
             return Result.error(e.getMessage());
         } catch (Exception e) {
-            if (StringUtils.isNotBlank(taskId)){
+            if (StringUtils.isNotBlank(taskId)) {
                 taskCommonService.updateTaskStatus(taskId, null);
             }
 //            e.printStackTrace();
@@ -813,10 +829,17 @@ public class TaskInActController {
             }
             return Result.ok("任务办理成功");
         } catch (AIOAException e) {
-            taskCommonService.updateTaskStatus(taskId, null);
+            if (StringUtils.isNotBlank(taskId)) {
+                taskCommonService.updateTaskStatus(taskId, null);
+            }
+
+            log.error(e.toString());
             return Result.error(e.getMessage());
         } catch (Exception e) {
-            taskCommonService.updateTaskStatus(taskId, null);
+            if (StringUtils.isNotBlank(taskId)) {
+                taskCommonService.updateTaskStatus(taskId, null);
+            }
+
 //            e.printStackTrace();
             log.error("办理任务失败" + e.toString());
             return Result.error("办理任务失败");
@@ -1045,7 +1068,7 @@ public class TaskInActController {
                 SimpleDateFormat sf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
                 maps.stream().forEach(m -> {
                     Long endTimeStemp = (Long) m.get("endTime");
-                    if (endTimeStemp!=null){
+                    if (endTimeStemp != null) {
                         String format = sf.format(new Date(endTimeStemp));
                         m.put("endTime", format);
                     }
