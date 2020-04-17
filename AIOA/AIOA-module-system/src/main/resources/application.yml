@@ -5,8 +5,10 @@ spring:
       enabled: true
       force: true
   profiles:
-#    active: prod
-    active: dev
+    active: dev #开发环境配置
+#    active: prod #业务网环境配置
+#    active: cfcc #公司内网环境配置
+#    active: heb #哈尔滨测试环境配置
 swagger:
   production: false
   basic:
