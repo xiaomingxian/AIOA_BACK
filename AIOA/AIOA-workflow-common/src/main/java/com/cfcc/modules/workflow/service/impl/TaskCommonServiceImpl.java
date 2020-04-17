@@ -1091,7 +1091,7 @@ public class TaskCommonServiceImpl implements TaskCommonService {
         boolean haveJuTi = false;
         for (ActivityImpl activity : activities) {
             String name = (String) activity.getProperty("name");
-            if (name.equals(juTiAct)) {
+            if (null!=name&&name.equals(juTiAct)) {
                 haveJuTi = true;
                 break;
             }

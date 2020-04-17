@@ -335,6 +335,8 @@ public class TaskCommonController {
 
             return Result.ok(flag);
         } catch (Exception e) {
+            e.printStackTrace();
+            log.error(e.toString());
             return Result.error("查询状态失败");
         }
 

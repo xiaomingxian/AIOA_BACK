@@ -1,23 +1,14 @@
 package com.cfcc.modules.utils;
 
 import com.cfcc.modules.workflow.pojo.Activity;
-import com.cfcc.modules.workflow.vo.TaskInfoVO;
-import org.activiti.engine.RepositoryService;
-import org.activiti.engine.RuntimeService;
 import org.activiti.engine.delegate.Expression;
-import org.activiti.engine.impl.bpmn.behavior.ExclusiveGatewayActivityBehavior;
 import org.activiti.engine.impl.bpmn.behavior.InclusiveGatewayActivityBehavior;
 import org.activiti.engine.impl.bpmn.behavior.ParallelMultiInstanceBehavior;
 import org.activiti.engine.impl.bpmn.behavior.UserTaskActivityBehavior;
-import org.activiti.engine.impl.persistence.entity.ProcessDefinitionEntity;
 import org.activiti.engine.impl.pvm.PvmActivity;
 import org.activiti.engine.impl.pvm.PvmTransition;
 import org.activiti.engine.impl.pvm.delegate.ActivityBehavior;
 import org.activiti.engine.impl.pvm.process.ActivityImpl;
-import org.activiti.engine.runtime.ProcessInstance;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.ApplicationContext;
-import org.springframework.context.ApplicationContextAware;
 import org.springframework.stereotype.Component;
 
 import java.util.HashMap;
@@ -52,7 +43,6 @@ public class TaskUtil /*extends WorkFlowService implements ApplicationContextAwa
                 ActivityBehavior activityBehavior = ((ActivityImpl) destination).getActivityBehavior();
                 //节点属性存储实体 网关连着而且可能存储完成条件(条件要接起来)
                 Activity activity = new Activity();
-
 
 
                 /**
@@ -134,7 +124,7 @@ public class TaskUtil /*extends WorkFlowService implements ApplicationContextAwa
             PvmActivity source = outLineInGateWay.getSource();
             PvmActivity destination = outLineInGateWay.getDestination();
             if (source != null && ((String) source.getProperty("type")).endsWith("Gateway")
-                    && destination!=null&& ((String) destination.getProperty("type")).endsWith("Gateway")) {
+                    && destination != null && ((String) destination.getProperty("type")).endsWith("Gateway")) {
 
                 Object conditionText = outLineInGateWay.getProperty("conditionText");
                 Map<String, String> parse = null;
@@ -144,16 +134,17 @@ public class TaskUtil /*extends WorkFlowService implements ApplicationContextAwa
                 if (null != parse) activity.getConditionContext().putAll(parse);
 
 
-
                 String sourceType = (String) source.getProperty("type");
 
                 if (sourceType.equalsIgnoreCase("exclusiveGateway"))
                     activity.setExclusiveGatewayParent(true);
+
                 if (sourceType.equalsIgnoreCase("InclusiveGateway"))
                     activity.setInclusiveGatewayParent(true);
                 if (sourceType.equalsIgnoreCase("ParallelGateway"))
                     activity.setParallelGatewayParent(true);
 
+                activity.setParentActId(source.getId());
             }
 
         }
