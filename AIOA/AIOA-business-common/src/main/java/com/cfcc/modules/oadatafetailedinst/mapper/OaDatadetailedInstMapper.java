@@ -1,6 +1,7 @@
 package com.cfcc.modules.oadatafetailedinst.mapper;
 
 import java.util.List;
+import java.util.Map;
 
 import org.apache.ibatis.annotations.Param;
 import com.cfcc.modules.oadatafetailedinst.entity.OaDatadetailedInst;
@@ -29,4 +30,6 @@ public interface OaDatadetailedInstMapper extends BaseMapper<OaDatadetailedInst>
             "FROM oa_datadetailed_inst " +
             "WHERE s_table=#{sTable} and i_table_id=#{iTableId} and i_is_open=1 and  s_create_by != #{sCreateBy} and s_create_deptid != #{sCreateDeptid} ")
     List<OaDatadetailedInst> seletAlldetailedInstList(String sTable, Integer iTableId, String sCreateBy, String sCreateDeptid);
+
+    Map<String, Object> findByTableId(Integer iTableId, String sCreateName);
 }
