@@ -157,7 +157,7 @@ public class SysUserController {
     }
 
     @RequestMapping(value = "/edit", method = RequestMethod.PUT)
-    //@RequiresPermissions("user:edit")
+    @RequiresPermissions("user:edit")
     public Result<SysUser> edit(@RequestBody JSONObject jsonObject) {
         Result<SysUser> result = new Result<SysUser>();
         try {
@@ -479,6 +479,7 @@ public class SysUserController {
      * @param sysUser
      * @param request
      */
+    @RequiresPermissions("user:export")
     @RequestMapping(value = "/exportXls")
     public ModelAndView exportXls(SysUser sysUser, HttpServletRequest request) {
         // Step.1 组装查询条件
@@ -502,7 +503,7 @@ public class SysUserController {
      * @param response
      * @return
      */
-    //@RequiresPermissions("user:import")
+    @RequiresPermissions("user:import")
     @RequestMapping(value = "/importExcel", method = RequestMethod.POST)
     public Result<?> importExcel(HttpServletRequest request, HttpServletResponse response) {
         MultipartHttpServletRequest multipartRequest = (MultipartHttpServletRequest) request;
