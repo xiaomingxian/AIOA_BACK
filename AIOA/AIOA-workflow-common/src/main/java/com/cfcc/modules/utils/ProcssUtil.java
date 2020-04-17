@@ -10,10 +10,10 @@ import org.activiti.engine.impl.pvm.PvmTransition;
 import org.activiti.engine.impl.pvm.delegate.ActivityBehavior;
 import org.activiti.engine.impl.pvm.process.ActivityImpl;
 import org.activiti.engine.impl.task.TaskDefinition;
+import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.BeansException;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
-import org.springframework.context.annotation.Bean;
 import org.springframework.stereotype.Component;
 
 import java.util.*;
@@ -126,6 +126,22 @@ public class ProcssUtil implements ApplicationContextAware {
                     UserTaskActivityBehavior userTaskActivityBehavior = (UserTaskActivityBehavior) activityBehavior;
                     Expression assigneeExpression = userTaskActivityBehavior.getTaskDefinition().getAssigneeExpression();
                     String assignee = assigneeExpression == null ? null : ElParse.parseNormal(assigneeExpression.getExpressionText());
+
+                    if (StringUtils.isBlank(assignee)) {
+                        int size = userTaskActivityBehavior.getTaskDefinition().getCandidateUserIdExpressions().size();
+
+                        //activity.setQiangQian(true);
+                        activity.setAllowMulti(true);
+                        if (size > 0) {
+                            for (Expression candidateGroupIdExpression : userTaskActivityBehavior.getTaskDefinition().getCandidateUserIdExpressions()) {
+                                String expressionText = candidateGroupIdExpression.getExpressionText();
+                                String mulAssignee = expressionText == null ? null : ElParse.parseNormal(expressionText);
+                                activity.setMultiAssignee(mulAssignee);
+                            }
+
+                        }
+
+                    }
                     activity.setAssignee(assignee);
                 }
                 if (activityBehavior instanceof ParallelMultiInstanceBehavior) {

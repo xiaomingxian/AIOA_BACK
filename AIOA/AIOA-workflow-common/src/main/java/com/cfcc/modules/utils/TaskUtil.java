@@ -211,9 +211,11 @@ public class TaskUtil /*extends WorkFlowService implements ApplicationContextAwa
                 if (size > 0) {
                     for (Expression candidateGroupIdExpression : userTaskActivityBehavior.getTaskDefinition().getCandidateUserIdExpressions()) {
                         String expressionText = candidateGroupIdExpression.getExpressionText();
-                        assignee = expressionText == null ? null : ElParse.parseNormal(expressionText);
+                        String mulAssignees = expressionText == null ? null : ElParse.parseNormal(expressionText);
+                        activity.setMultiAssignee(mulAssignees);
                     }
-                    activity.setQiangQian(true);
+//                    activity.setQiangQian(true);
+                    activity.setAllowMulti(true);
                 }
 
             }
