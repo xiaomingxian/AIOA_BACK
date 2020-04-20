@@ -60,4 +60,42 @@ public class OaDatadetailedInstServiceImpl extends ServiceImpl<OaDatadetailedIns
         List<OaDatadetailedInst> list= oaDatadetailedInstMapper.seletAlldetailedInstList(sTable,iTableId,sCreateBy,sCreateDeptid);
         return list;
     }
+
+    @Override
+    public Integer findOpions(Integer tableid, String userName) {
+        Integer opions = oaDatadetailedInstMapper.findOpions(tableid, userName);
+        if(opions == null){
+            return 0 ;
+        }
+        return opions;
+    }
+
+
+    @Override
+    public Integer findIsFile(Integer tableid) {
+        Integer isFile = oaDatadetailedInstMapper.findIsFile(tableid);
+        if(isFile == null){
+            return  0;
+        }
+        return isFile;
+    }
+
+    @Override
+    public Map<String, Object> findDate(Integer tableid) {
+        return oaDatadetailedInstMapper.findDate(tableid);
+    }
+
+    @Override
+    public Integer getBanjieBydept(String itableId) {
+        Integer banjieBydept = oaDatadetailedInstMapper.getBanjieBydept(itableId);
+        if(banjieBydept == null ){
+            return  0;
+        }
+        return banjieBydept;
+    }
+
+    @Override
+    public Integer getDateCount(String createTime, String dateTime,String sCreateName) {
+        return oaDatadetailedInstMapper.getDateCount(createTime,dateTime,sCreateName);
+    }
 }

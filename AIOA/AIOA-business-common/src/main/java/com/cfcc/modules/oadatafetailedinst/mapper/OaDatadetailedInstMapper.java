@@ -32,4 +32,15 @@ public interface OaDatadetailedInstMapper extends BaseMapper<OaDatadetailedInst>
     List<OaDatadetailedInst> seletAlldetailedInstList(String sTable, Integer iTableId, String sCreateBy, String sCreateDeptid);
 
     Map<String, Object> findByTableId(Integer iTableId, String sCreateName);
+
+    Integer findOpions(Integer tableid, String userName);
+
+    Integer findIsFile(Integer tableid);
+
+    Map<String, Object> findDate(Integer tableid);
+
+    Integer getBanjieBydept(String itableId);
+
+    Integer getDateCount(String createTime, String dateTime,String sCreateName);
+
 }

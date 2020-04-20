@@ -22,4 +22,16 @@ public interface IOaDatadetailedInstService extends IService<OaDatadetailedInst>
     List<OaDatadetailedInst> seletSharedetailedInstList(String sTable, Integer iTableId);
 
     List<OaDatadetailedInst> seletAlldetailedInstList(String sTable, Integer iTableId, String sCreateBy, String sCreateDeptid);
+
+    Integer findOpions(Integer tableid, String userName);
+
+    //Integer findIsFile(Integer tableid,String userName);
+
+    Integer findIsFile(Integer tableid);
+
+    Map<String, Object> findDate(Integer tableid);
+
+    Integer getBanjieBydept(String itableId);
+
+    Integer getDateCount(String createTime, String dateTime,String sCreateName);
 }
