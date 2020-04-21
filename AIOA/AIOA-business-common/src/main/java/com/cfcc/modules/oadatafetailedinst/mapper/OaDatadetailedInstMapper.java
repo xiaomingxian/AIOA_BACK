@@ -43,4 +43,10 @@ public interface OaDatadetailedInstMapper extends BaseMapper<OaDatadetailedInst>
 
     Integer getDateCount(String createTime, String dateTime,String sCreateName);
 
+    List<Map<String, Object>> findTypeNum(String table,String userId,int year,String parentId);
+
+    Map<String, Object> getDept(String parentId);
+
+    List<Map<String, Object>> findorganizeNum(String table, String userId, int year, String parentId);
+
 }

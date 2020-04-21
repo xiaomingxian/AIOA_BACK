@@ -34,4 +34,10 @@ public interface IOaDatadetailedInstService extends IService<OaDatadetailedInst>
     Integer getBanjieBydept(String itableId);
 
     Integer getDateCount(String createTime, String dateTime,String sCreateName);
+
+    List<Map<String, Object>> findTypeNum(String table,String userId,int year,String parentId);
+
+    Map<String, Object> findPret(String parentId);
+
+    List<Map<String, Object>> findorganizeNum(String table, String userId, int year, String parentId);
 }

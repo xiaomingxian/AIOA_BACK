@@ -99,4 +99,22 @@ public class OaDatadetailedInstServiceImpl extends ServiceImpl<OaDatadetailedIns
     public Integer getDateCount(String createTime, String dateTime,String sCreateName) {
         return oaDatadetailedInstMapper.getDateCount(createTime,dateTime,sCreateName);
     }
+
+    @Override
+    public Map<String, Object> findPret(String parentId) {
+        Map<String,Object>  depart = oaDatadetailedInstMapper.getDept(parentId);
+        return depart;
+    }
+
+    @Override
+    public List<Map<String, Object>> findorganizeNum(String table, String userId, int year, String parentId) {
+        List<Map<String, Object>> organizeNum = oaDatadetailedInstMapper.findorganizeNum(table,userId,year,parentId);
+        return organizeNum;
+    }
+
+    @Override
+    public List<Map<String, Object>> findTypeNum(String table,String userId,int year,String parentId) {
+        List<Map<String, Object>> hostNum = oaDatadetailedInstMapper.findTypeNum(table,userId,year,parentId);
+       return hostNum;
+    }
 }
