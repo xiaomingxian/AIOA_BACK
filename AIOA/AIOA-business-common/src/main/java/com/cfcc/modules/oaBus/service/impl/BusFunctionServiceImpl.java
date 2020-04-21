@@ -64,6 +64,8 @@ public class BusFunctionServiceImpl extends ServiceImpl<BusFunctionMapper, BusFu
     ISysDepartService iSysDepartService;
     @Autowired
     ISysDictService isysDictService;
+    @Autowired
+    private IBusPageDetailService busPageDetailService;
 
 
     @Override
@@ -183,16 +185,32 @@ public class BusFunctionServiceImpl extends ServiceImpl<BusFunctionMapper, BusFu
         });
         iBusFunctionUnitService.saveBatch(busFunctionUnit);
 
-        //设置对应的字段含义，查询该业务所属的业务分类下的已配置业务，
+        //设置对应的字段含义，查询该业务所属模板下的已配置业务，
         // 找到业务优先级最高的业务，复制含义配置，给新的业务功能。
         // 如果此项业务功能是第一个，则提示用户配置业务含义。
-        //1、查询这个业务对应的model下的优先级最高的一条数据
-        BusFunction bus2 = busFunctionMapper.queryFunByModel(busFunction.getIId()) ;
+        //1、查询这个业务对应的模板下的优先级最高的一条数据
+        Integer bus2 = busFunctionMapper.queryFunByModel(busFunction.getIPageId()) ;
         if(bus2 == null ){
+            //2、沒有的话就将数据模板定义的含义输入到对应的数据中
+            String tableName = iBusModelService.getBusModelById(busFunction.getIBusModelId()).getSBusdataTable();
+            QueryWrapper<BusPageDetail> queryWrapper = new QueryWrapper<>() ;
+            queryWrapper.isNull("i_bus_function_id")
+                    .eq("i_bus_page_id",busFunction.getIPageId());
+            //查询出页面模板定义后的数据
+            List<BusPageDetail> list = busPageDetailService.list(queryWrapper);
+            for(int i = 0 ; i < list.size() ; i ++){
+                list.get(i).setIBusFunctionId(busFunction.getIId()) ;
+                list.get(i).setSBusdataTable(tableName) ;
+                list.get(i).setIId(null);
+            }
+            //批量将数据插入到表中
+            boolean res = busPageDetailService.saveBatch(list);
+
             result = "请配置对应的含义";
-        }else{
-            //2、插入数据到busdatail中
-            int oldId =  bus2.getIId();
+        } else{
+
+            //3、插入数据到busdatail中
+            int oldId =  bus2;
             int newId = busFunction.getIId() ;
             busPageDetailMapper.insertBusPageDetailByFunId(oldId,newId);
         }
