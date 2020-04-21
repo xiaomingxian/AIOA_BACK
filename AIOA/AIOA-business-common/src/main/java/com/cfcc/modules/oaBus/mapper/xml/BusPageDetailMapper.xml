@@ -2,6 +2,9 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.cfcc.modules.oaBus.mapper.BusPageDetailMapper">
 
+    <sql id="sql_column">
+        `i_id`, `i_bus_page_id`, `i_bus_function_id`, `s_busdata_table`, `s_table_column`, `i_order`, `s_dict_id`, `s_dict_sql_key`, `s_column_name`, `i_column_type`, `i_is_listtitle`, `i_is_listquery`, `i_is_esquery`, `i_check_is_null`, `s_check_expjava`, `s_check_expsql`, `i_check_expjs`, `s_check_showmsg`, `s_send_key`, `s_archives_key`, `s_mark_key`, `i_is_default`, `s_column_remarks`
+    </sql>
 
     <insert id="insertBusPageDetail">
 
@@ -178,7 +181,7 @@
     </select>
     <select id="queryBusPageDetail" resultType="com.cfcc.modules.oaBus.entity.BusPageDetail">
 
-        select * from oa_bus_page_detail c
+        select <include refid="sql_column"/> from oa_bus_page_detail c
         <where>
             <if test="busPageDetail.iId != null and busPageDetailiId != '' ">
                 i_id = #{busPageDetail.iID}
@@ -193,20 +196,20 @@
         order by c.i_id desc limit #{pageNo},#{pageSize}
     </select>
     <select id="queryByIdDao" resultType="com.cfcc.modules.oaBus.entity.BusPageDetail">
-        select * from oa_bus_page_detail
+        select <include refid="sql_column"/> from oa_bus_page_detail
         <where>
             i_bus_function_id=#{iBusFunctionId}
         </where>
     </select>
     <select id="findList" resultType="com.cfcc.modules.oaBus.entity.BusPageDetail">
-		select * from oa_bus_page_detail
+		select <include refid="sql_column"/> from oa_bus_page_detail
 	</select>
 
     <select id="queryConditionByIdDao" resultType="com.cfcc.modules.oaBus.entity.BusPageDetail">
-		select * from oa_bus_page_detail where i_bus_function_id=#{iBusFunctionId} and i_is_listquery = 1
+		select <include refid="sql_column"/> from oa_bus_page_detail where i_bus_function_id=#{iBusFunctionId} and i_is_listquery = 1
 	</select>
     <select id="getColumsNameByTableAndColumn" resultType="com.cfcc.modules.oaBus.entity.BusPageDetail">
-        select *
+        select <include refid="sql_column"/>
         from oa_bus_page_detail
         <where>
             <if test="sBusdataTable != null and sBusdataTable != ''">
@@ -242,22 +245,26 @@
 	</select>
 
     <select id="getAllColumsList" resultType="java.util.Map">
-		select * from oa_bus_page_detail c
+		select <include refid="sql_column"/> from oa_bus_page_detail c
 		where c.i_bus_function_id = #{functionId} and c.i_bus_page_id = #{iPageId}  order by if(ISNULL(i_order),1,0),i_order ,i_id asc
 	</select>
 
     <select id="getAllColumsListPageDtail" resultType="com.cfcc.modules.oaBus.entity.BusPageDetail">
-		select * from oa_bus_page_detail c
+		select <include refid="sql_column"/> from oa_bus_page_detail c
 		where c.i_bus_function_id = #{functionId} and c.i_bus_page_id = #{iPageId}  order by if(ISNULL(i_order),1,0),i_order ,i_id asc
 	</select>
 
     <select id="getColumsByTableName" resultType="java.util.Map">
-		select * from oa_bus_page_detail c
+		select <include refid="sql_column"/> from oa_bus_page_detail c
 		where c.s_busdata_table = #{tableName} and c.i_bus_function_id = #{functionId} and c.i_is_listtitle = 1
 	</select>
     <select id="getListByFunIDAndIPageIdDao" resultType="com.cfcc.modules.oaBus.entity.BusPageDetail">
-		select * from oa_bus_page_detail c where c.i_bus_function_id = #{functionId} and c.i_bus_page_id = #{iPageId} ;
+		select <include refid="sql_column"/> from oa_bus_page_detail c where c.i_bus_function_id = #{functionId} and c.i_bus_page_id = #{iPageId} ;
 	</select>
+    <!--根据functionId查询对应的数据-->
+    <select id="getListByFunIDDao" resultType="com.cfcc.modules.oaBus.entity.BusPageDetail">
+        select <include refid="sql_column"/> from oa_bus_page_detail c where c.i_bus_function_id = #{functionId}
+    </select>
     <update id="updatePageDetail">
         UPDATE oa_bus_page_detail SET
         <if test="sSendKey != null and sSendKey != '' and sSendKey != '00000'">

@@ -14,7 +14,8 @@
             c.i_bus_function_id,
             c.i_bus_model_id,
             f.s_name AS funName,
-            m.s_name AS modelName
+            m.s_name AS modelName,
+            m.s_busdata_table
         FROM
             sys_user_fun c,
             oa_bus_model m,

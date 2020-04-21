@@ -50,6 +50,7 @@ public class BusPageDetail /* extends Model<BusPageDetail>*/ {
 	/**排序order*/
 	@Excel(name = "排序order", width = 15)
 	@ApiModelProperty(value = "排序order")
+	@TableField(updateStrategy = FieldStrategy.IGNORED)
 	private java.lang.Integer iOrder;
 	/**业务数据表列名*/
 	@Excel(name = "数据字典类别ID", width = 15)

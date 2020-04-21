@@ -49,6 +49,7 @@ public class AppTestController {
     @PostMapping(value = "/queryListByUserId")
     public Result<Map<String,Object>> queryListByUserId(@RequestBody String json,
                                                         HttpServletRequest request) {
+        log.info(json.toString());
         Map<String,Object> jsonObj = (Map<String,Object> ) JSONObject.parse(json);
         Integer pageNo = (Integer) jsonObj.get("pageNo");
         Integer pageSize = (Integer) jsonObj.get("pageSize");
@@ -72,7 +73,6 @@ public class AppTestController {
         result.setResult(map);
         return result;
     }
-    @AutoLog(value = "用户收藏功能表-查询用户收藏对应的列表")
     @ApiOperation(value="用户收藏功能表-查询用户收藏对应的列表", notes="用户收藏功能表-查询用户收藏对应的列表")
     @GetMapping(value = "/queryFunByModelId")
     public Result<Map<String,Object>> queryFunByModelId(String modelId,
@@ -141,5 +141,22 @@ public class AppTestController {
         result.setResult(map);
         return result;
     }
+
+    /**
+     * 根据条件进行查询
+     * @param request
+     * @return
+     */
+    @PostMapping(value = "/getDetail")
+    public Result<Map<String,Object>> getDetail(@RequestBody String json,
+                                                       HttpServletRequest request) {
+        Result<Map<String,Object>> result = new Result<Map<String,Object>>();
+        LoginInfo loginInfo = isysUserService.getLoginInfo(request);
+        Map<String,Object> res = appDataListService.getDetailSer(loginInfo,json) ;
+        result.setResult(res);
+        return result ;
+
+    }
+
 
 }
