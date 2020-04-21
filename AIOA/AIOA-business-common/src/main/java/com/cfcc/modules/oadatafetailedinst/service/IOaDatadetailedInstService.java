@@ -25,9 +25,9 @@ public interface IOaDatadetailedInstService extends IService<OaDatadetailedInst>
 
     Integer findOpions(Integer tableid, String userName);
 
-    //Integer findIsFile(Integer tableid,String userName);
+    Integer findIsFile(Integer tableid,String userName,String deptName);
 
-    Integer findIsFile(Integer tableid);
+    //Integer findIsFile(Integer tableid);
 
     Map<String, Object> findDate(Integer tableid);
 

@@ -9,7 +9,7 @@
        select count(length(s_opinion))* length(s_opinion)  as count ,count(s_create_dept)  as deptcount, (count(length(s_opinion))* length(s_opinion))/ count(s_create_dept)  as avg from oa_datadetailed_inst  where  i_table_id = #{tableid} and s_create_name = #{userName}   GROUP BY s_create_dept
     </select>
     <select id="findIsFile" resultType="java.lang.Integer">
-       select i_is_file from oa_busdata11  where i_id =  #{tableid}
+       select count(*) from oa_datadetailed_inst where  i_is_2 = 1 and s_table =#{tableName} and s_create_by =#{userName} and i_table_id = #{tableid} and  s_create_dept = #{deptName}
     </select>
     <select id="findDate" resultType="java.util.Map">
         select  DATE_FORMAT(d_create_time,'%Y-%m-%d') as createTime, DATE_FORMAT( d_datetime2,'%Y-%m-%d')  as dateTime,s_varchar2 from oa_busdata11 where i_id =  #{tableid}

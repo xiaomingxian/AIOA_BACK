@@ -72,8 +72,9 @@ public class OaDatadetailedInstServiceImpl extends ServiceImpl<OaDatadetailedIns
 
 
     @Override
-    public Integer findIsFile(Integer tableid) {
-        Integer isFile = oaDatadetailedInstMapper.findIsFile(tableid);
+    public Integer findIsFile(Integer tableid,String userName,String deptName) {
+        String tableName = "oa_busdata11";
+        Integer isFile = oaDatadetailedInstMapper.findIsFile(tableName,tableid,userName,deptName);
         if(isFile == null){
             return  0;
         }

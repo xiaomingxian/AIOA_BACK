@@ -1,5 +1,6 @@
 package com.cfcc.modules.oadatafetailedinst.controller;
 import com.cfcc.common.api.vo.Result;
+import com.cfcc.common.util.DateUtils;
 import com.cfcc.common.util.FileUtils;
 import com.cfcc.modules.oadatafetailedinst.entity.OaDatadetailedInst;
 import com.cfcc.modules.oadatafetailedinst.service.IOaDatadetailedInstService;
@@ -94,23 +95,29 @@ public class OaDatadetailedInstController {
                             SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd");
                             String taskDefName =(String) m.get("taskDefName");
                             String userName = (String) m.get("userName");
+                            String deptName = (String) m.get("deptName");
                             Date endTime1 = (Date)m.get("endTime");
-                            String formatdate = "0";
+                            String formatdate = null;
                             if(endTime1 != null){
                                  formatdate=sdf.format(endTime1);
                                 if(formatdate.equals("")){
-                                    formatdate = "0";
+                                    formatdate = null;
                                 }
                             }
 
                             Map<String,Object> maps = new HashMap<>();
                             Integer sum = 1;
+                            Date date = DateUtils.getDate();
+                            String Now = null;
+                            Now=sdf.format(date);
                             long time1 = 0 ; //创建时间
                             long time2 = 0; //约定办理时间
                             long time = 0; //最后办理时间
+                            long nowTime = 0;//当前时间
+
                             Integer count = oaDatadetailedInstService.findOpions(tableid,userName);  //字数
-                            //Integer file  = oaDatadetailedInstService.findIsFile(tableid,userName);  //附件
-                            Integer file = oaDatadetailedInstService.findIsFile(tableid);
+                            Integer file  = oaDatadetailedInstService.findIsFile(tableid,userName,deptName);  //附件
+                            //Integer file = oaDatadetailedInstService.findIsFile(tableid);
                             Map<String,Object>  dateMap =  oaDatadetailedInstService.findDate(tableid); //时间
                             String createTime= null;
                             String dateTime = null;
@@ -127,7 +134,13 @@ public class OaDatadetailedInstController {
                                 try {
                                     time1 = sdf.parse(createTime).getTime(); //创建时间
                                     time2 = sdf.parse(dateTime).getTime(); //约定办理时间
-                                    time = sdf.parse(formatdate).getTime(); //最后办理时间
+                                    nowTime = sdf.parse(Now).getTime(); //当前时间
+                                    if(formatdate != null){
+                                        time = sdf.parse(formatdate).getTime(); //最后办理时间
+                                    }
+
+
+
                                     long between_days=(time2-time1)/(1000*3600*24);
                                 } catch (ParseException e) {
                                     e.printStackTrace();
@@ -161,13 +174,16 @@ public class OaDatadetailedInstController {
                                     }
 
                                 }else if(text.equals("after")&&  status==1){  //是否超时并且启动
-                                    if(time - time1 > 0){//最后办理的时间- 办理时间>0
+                                    if(nowTime-time2>0&& time == 0){//当前时间大于约定的办理时间并且还没办理
+                                        sum = sum-1;
+                                    }
+                                    else if(time - time2 > 0){//最后办理的时间-约定办理时间
                                         sum = sum-1;
                                     }
 
                                 }else if(text.equals("before")&&  status==1){ //是否提前并且启动
-                                    if(time - time1 < 0){//最后办理的时间- 办理时间<0
-                                        long between_days=(time2-time1)/(1000*3600*24);
+                                    if(time - time2 < 0){//最后办理的时间- 约定办理时间<0
+                                        long between_days=(time-time2)/(1000*3600*24);
                                         if(between_days>5){
                                             sum = sum+1;
                                         }
@@ -175,7 +191,7 @@ public class OaDatadetailedInstController {
                                     }
 
                                 }else if(text.equals("isfile")&& status==1){ //是否有附件并且启动
-                                    if(file == 1){//表示有附件
+                                    if(file>0){//表示有附件
                                         sum = sum +1;
                                     }
                                 }

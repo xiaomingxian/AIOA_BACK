@@ -35,7 +35,7 @@ public interface OaDatadetailedInstMapper extends BaseMapper<OaDatadetailedInst>
 
     Integer findOpions(Integer tableid, String userName);
 
-    Integer findIsFile(Integer tableid);
+    Integer findIsFile(String tableName,Integer tableid, String userName,String deptName);
 
     Map<String, Object> findDate(Integer tableid);
 
