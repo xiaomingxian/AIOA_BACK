@@ -2,6 +2,7 @@ package com.cfcc.modules.oadatafetailedinst.controller;
 import com.cfcc.common.api.vo.Result;
 import com.cfcc.common.util.DateUtils;
 import com.cfcc.common.util.FileUtils;
+import com.cfcc.modules.docnum.entity.DocNumSet;
 import com.cfcc.modules.oadatafetailedinst.entity.OaDatadetailedInst;
 import com.cfcc.modules.oadatafetailedinst.service.IOaDatadetailedInstService;
 import com.cfcc.modules.system.entity.SysUser;
@@ -258,8 +259,10 @@ public class OaDatadetailedInstController {
      @PostMapping(value = "/adddatadetailedInst")
      public Result<Object> adddatadetailedInst(@RequestBody Map<String,Object> map) {
          Result<Object> result = new Result<Object>();
-         int num=oaDatadetailedInstService.addorupdataDetailed(map);
-         if (num!=0){
+         int id=oaDatadetailedInstService.addDetailed(map);
+//         int id=oaDatadetailedInstService.addorupdataDetailed(OaDatadetailedInst);
+         if (id!=0){
+             result.setResult(id);
              result.setSuccess(true);
          }else {
              result.setSuccess(false);
@@ -268,10 +271,12 @@ public class OaDatadetailedInstController {
      }
 
      @GetMapping(value = "/selectdetailedInst")
-     public Result<Object> selectdetailedInst(@RequestParam(value = "sCreateBy", required = true) String sCreateBy,
+     public Result<Object> selectdetailedInst(@RequestParam(value = "sTable", required = true) String sTable,
+                                              @RequestParam(value = "iTableId", required = true) Integer iTableId,
+                                              @RequestParam(value = "sCreateBy", required = true) String sCreateBy,
                                               @RequestParam(value = "sCreateDeptid", required = true) String sCreateDeptid){
          Result<Object> result = new Result<Object>();
-         List<OaDatadetailedInst> list=oaDatadetailedInstService.seletdetailedInstList(sCreateBy,sCreateDeptid);
+         List<OaDatadetailedInst> list=oaDatadetailedInstService.seletdetailedInstList(sTable,iTableId,sCreateBy,sCreateDeptid);
          if (list.size()!=0){
              result.setResult(list);
              result.setSuccess(true);
@@ -311,6 +316,42 @@ public class OaDatadetailedInstController {
         return result;
     }
 
+    @PostMapping(value = "/updatadetailedInst")
+    public Result<Object> updatadetailedInst(@RequestBody Map<String,Object> map){
+        Result<Object> result = new Result<>();
+        boolean flag=oaDatadetailedInstService.updatadetailedInst(map);
+        if (flag){
+            result.setSuccess(true);
+        }else {
+            result.setSuccess(false);
+        }
+        return result;
+    }
+
+    @GetMapping(value = "/deteledetailedInst")
+    public Result<Object> deteledetailedInst(@RequestParam(value = "iId", required = true) Integer iId){
+        Result<Object> result = new Result<Object>();
+        int num=oaDatadetailedInstService.deteledetailedInst(iId);
+        if (num!=0){
+            result.setSuccess(true);
+        }else {
+            result.setSuccess(false);
+        }
+        return result;
+    }
+
+    @GetMapping(value = "/updataDetailedIsStats")
+    public Result<Object> updataDetailedIsStats(@RequestParam(value = "iId", required = true) Integer iId
+                                                ){
+        Result<Object> result = new Result<Object>();
+        boolean flag=oaDatadetailedInstService.updataDetailedIsStats(iId);
+        if (flag){
+            result.setSuccess(true);
+        }else {
+            result.setSuccess(false);
+        }
+        return result;
+    }
 
  }
 

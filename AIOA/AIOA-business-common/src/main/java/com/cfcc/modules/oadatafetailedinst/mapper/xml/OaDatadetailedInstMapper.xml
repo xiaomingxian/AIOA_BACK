@@ -33,4 +33,16 @@
        where s_cc_unit_names  in  (SELECT depart_name from  sys_depart  where  id != 1 and  id != 2  and  parent_id =  #{parentId})  and  i_is_display = 0 AND  s_create_by = #{userId}  AND i_create_year= #{year}
        group by  s_cc_unit_names
     </select>
+
+    <insert id="insertDataInst" parameterType="com.cfcc.modules.oadatafetailedinst.entity.OaDatadetailedInst">
+        INSERT INTO oa_datadetailed_inst
+        (i_id,s_table,i_table_id,s_create_name,s_create_by,s_create_dept,s_create_deptid,i_is_display,d_create_time)
+        VALUES
+        (0,#{sTable},#{iTableId},#{sCreateName},#{sCreateBy},#{sCreateDept},#{sCreateDeptid},0,NOW())
+        <selectKey resultType="integer" keyProperty="iId" order="AFTER">
+            SELECT LAST_INSERT_ID()
+        </selectKey>
+    </insert>
+
+
 </mapper>
