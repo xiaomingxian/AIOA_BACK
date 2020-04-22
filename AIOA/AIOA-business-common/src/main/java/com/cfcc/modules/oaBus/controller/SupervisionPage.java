@@ -11,12 +11,12 @@ import com.cfcc.modules.oaBus.service.IBusModelService;
 import com.cfcc.modules.oaBus.service.IOaBusdataService;
 import com.cfcc.modules.oadatafetailedinst.entity.OaDatadetailedInst;
 import com.cfcc.modules.oadatafetailedinst.service.IOaDatadetailedInstService;
-import com.cfcc.modules.system.entity.LoginInfo;
-import com.cfcc.modules.system.entity.SysDepart;
-import com.cfcc.modules.system.entity.SysUser;
-import com.cfcc.modules.system.entity.SysUserSet;
+import com.cfcc.modules.system.entity.*;
 import com.cfcc.modules.system.service.ISysUserService;
 import com.cfcc.modules.system.service.ISysUserSetService;
+import com.cfcc.modules.utils.IWfConstant;
+import com.cfcc.modules.workflow.service.TaskCommonService;
+import com.cfcc.modules.workflow.vo.TaskInfoVO;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
@@ -45,6 +45,9 @@ public class SupervisionPage {
 
     @Autowired
     private IOaBusdataService oaBusdataService;
+
+    @Autowired
+    private TaskCommonService taskCommonService;
 
     @Autowired
     private IOaDatadetailedInstService oaDatadetailedInstService;
@@ -135,6 +138,78 @@ public class SupervisionPage {
         map.put("depart",depart);
         map.put("typeNum",typeNum);
         return map;
+    }
+    @GetMapping("queryTask")
+    @ApiOperation("任务查询")
+    public Result queryTask(TaskInfoVO taskInfoVO, @RequestParam(required = false, defaultValue = "1") Integer pageNo,
+                            @RequestParam(required = false, defaultValue = "10") Integer pageSize,
+                            HttpServletRequest request) {
+        try {
+
+            LoginInfo loginInfo = iSysUserService.getLoginInfo(request);
+            String operstatus = taskInfoVO.getOperstatus();
+
+            //判断查询条件是否有用户(作为查询条件)
+            if (taskInfoVO.getUserId() != null) {
+                //有任何一个就去填充完整
+                if (taskInfoVO.getUserName() == null)
+                    taskInfoVO.setUserName(iSysUserService.selectUserNameById(taskInfoVO.getUserId()));
+            } else {
+                //查询当前用户，作为assignee
+                if (operstatus != null && !operstatus.equals(IWfConstant.JUMP)) {//重置是管理员权限(不用必须加用户)
+
+                    taskInfoVO.setUserId(loginInfo.getId());
+                    taskInfoVO.setUserName(loginInfo.getUsername());
+                }
+            }
+
+
+            Result result = null;
+            Integer modelId = 51;
+            List<String> functionIds = oaDatadetailedInstService.findFunctionIds(modelId);
+            taskInfoVO.setFunctionIds(functionIds);
+            switch (operstatus) {
+                //待办(部门类型已加)
+                case IWfConstant.TASK_TODO:
+                    result = taskCommonService.queryTaskToDo(taskInfoVO, pageNo, pageSize);
+                    break;
+                //已办
+                case IWfConstant.TASK_DONE:
+                    result = taskCommonService.queryTaskDone(taskInfoVO, pageNo, pageSize);
+                    break;
+                //流程监控数据
+                case IWfConstant.TASK_MONITOR:
+                    //判断是不是超级管理员 是的话展示所有人
+                    List<SysRole> roles = loginInfo.getRoles();
+                    boolean isAdmin = false;
+                    for (SysRole role : roles) {
+                        String roleName = role.getRoleName();
+                        if ("系统管理员".equalsIgnoreCase(roleName)) {
+                            isAdmin = true;
+                            break;
+                        }
+                    }
+                    result = taskCommonService.queryTaskMonitor(taskInfoVO, pageNo, pageSize, isAdmin);
+                    break;
+                //我的委托
+                case IWfConstant.MY_AGENT:
+                    result = taskCommonService.queryTaskMyAgent(taskInfoVO, pageNo, pageSize);
+                    break;
+                //重置(所有未完成-不区分用户[查询条件可以用区分])
+                case IWfConstant.JUMP:
+                    result = taskCommonService.queryTaskToDo(taskInfoVO, pageNo, pageSize);
+                    break;
+                case IWfConstant.SHHIFT://任务移交-以人为准
+                    result = taskCommonService.queryTaskShift(taskInfoVO, pageNo, pageSize);
+                    break;
+            }
+            return result;
+        } catch (
+                Exception e) {
+            log.error("任务查询失败" + e.toString());
+            return Result.error("任务查询失败");
+        }
+
     }
 
 }

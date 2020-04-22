@@ -33,5 +33,5 @@ public interface DataAnalysisMapper extends BaseMapper<OaBusdata> {
 
     Map<String, Object> Handling(@Param("table")String table, @Param("bdata") OaBusdata oaBusdata);
 
-    double getAvg(@Param("table")String table, @Param("bdata") OaBusdata oaBusdata);
+    Map<String,Object> getAvg(@Param("table")String table, @Param("bdata") OaBusdata oaBusdata);
 }

@@ -84,8 +84,10 @@ public class DataAnalysisServiveImpl extends ServiceImpl<DataAnalysisMapper, OaB
     }
 
     @Override
-    public double getAvg(String table,OaBusdata oaBusdata) {
-        return dataAnalisisMapper.getAvg(table,oaBusdata);
+    public Map<String,Object> getAvg(String table,OaBusdata oaBusdata) {
+        Map<String,Object> avg = dataAnalisisMapper.getAvg(table, oaBusdata);
+
+        return avg;
     }
 
     //查询所有的字段名  ——LYJ

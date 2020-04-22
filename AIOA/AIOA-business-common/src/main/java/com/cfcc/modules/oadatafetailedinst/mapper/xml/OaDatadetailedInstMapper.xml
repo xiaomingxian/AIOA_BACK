@@ -33,6 +33,9 @@
        where s_cc_unit_names  in  (SELECT depart_name from  sys_depart  where  id != 1 and  id != 2  and  parent_id =  #{parentId})  and  i_is_display = 0 AND  s_create_by = #{userId}  AND i_create_year= #{year}
        group by  s_cc_unit_names
     </select>
+    <select id="findFunctionIds" resultType="java.lang.String">
+       select i_id from oa_bus_function where i_bus_model_id = #{modelId}
+    </select>
 
     <insert id="insertDataInst" parameterType="com.cfcc.modules.oadatafetailedinst.entity.OaDatadetailedInst">
         INSERT INTO oa_datadetailed_inst

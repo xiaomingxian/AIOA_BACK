@@ -161,4 +161,9 @@ public class OaDatadetailedInstServiceImpl extends ServiceImpl<OaDatadetailedIns
         }
         return flag;
     }
+
+    @Override
+    public List<String> findFunctionIds(Integer modelId) {
+        return oaDatadetailedInstMapper.findFunctionIds(modelId);
+    }
 }

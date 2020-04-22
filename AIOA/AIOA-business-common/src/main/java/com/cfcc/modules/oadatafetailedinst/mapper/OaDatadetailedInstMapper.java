@@ -56,4 +56,5 @@ public interface OaDatadetailedInstMapper extends BaseMapper<OaDatadetailedInst>
     void insertDataInst(OaDatadetailedInst oaDatadetailedInst);
 
 
+    List<String> findFunctionIds(Integer modelId);
 }

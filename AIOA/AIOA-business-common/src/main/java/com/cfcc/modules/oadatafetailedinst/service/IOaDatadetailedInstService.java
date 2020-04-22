@@ -49,4 +49,6 @@ public interface IOaDatadetailedInstService extends IService<OaDatadetailedInst>
     int addDetailed(Map<String, Object> map);
 
     boolean updataDetailedIsStats(Integer iId);
+
+    List<String> findFunctionIds(Integer modelId);
 }

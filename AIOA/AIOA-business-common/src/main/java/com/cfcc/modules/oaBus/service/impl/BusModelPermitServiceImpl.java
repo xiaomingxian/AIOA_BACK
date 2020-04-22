@@ -97,7 +97,13 @@ public class BusModelPermitServiceImpl extends ServiceImpl<BusModelPermitMapper,
 
                 if(! (sysDepart == null)){
                     modelPermitList.get(i).setItypeName(sysDepart.getDepartName());
-                    modelPermitList.get(i).setParentName(sysDepartMapper.selectById( sysDepart.getParentId()).getDepartName());
+                    SysDepart sysDepart1 = sysDepartMapper.selectById(sysDepart.getParentId());
+                    if(sysDepart1 == null){
+                        modelPermitList.get(i).setItypeName(sysDepart.getDepartName());
+                    }else{
+                        modelPermitList.get(i).setItypeName(sysDepart.getDepartName()+"--"+sysDepart1.getDepartName());
+                    }
+
                 }
             }
             else if("3".equals(modelPermitList.get(i).getSPermitType()) ){      // 人员
@@ -144,8 +150,13 @@ public class BusModelPermitServiceImpl extends ServiceImpl<BusModelPermitMapper,
             else if( "2".equals(busModelPermitList.get(i).getSPermitType())){      // 部门
                 SysDepart sysDepart = sysDepartMapper.selectById(busModelPermitList.get(i).getITypeId());
                 if(! (sysDepart == null)){
-                    busModelPermitList.get(i).setParentName(sysDepartMapper.selectById( sysDepart.getParentId()).getDepartName());
                     busModelPermitList.get(i).setItypeName(sysDepart.getDepartName());
+                    SysDepart sysDepart1 = sysDepartMapper.selectById(sysDepart.getParentId());
+                    if(sysDepart1 == null){
+                        busModelPermitList.get(i).setItypeName(sysDepart.getDepartName());
+                    }else {
+                        busModelPermitList.get(i).setItypeName(sysDepart.getDepartName() + "--" + sysDepart1.getDepartName());
+                    }
                 }
             }
             else if("3".equals(busModelPermitList.get(i).getSPermitType()) ){      // 人员

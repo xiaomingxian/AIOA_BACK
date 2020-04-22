@@ -232,7 +232,7 @@
             </if>
         </where>
     </select>
-    <select id="getAvg" resultType="java.lang.Double">
+    <select id="getAvg" resultType="java.util.Map">
         select (select sum(num)	from (select i_create_month ,count(i_id) as num  from  ${table}
         <where>
             i_is_display =0
