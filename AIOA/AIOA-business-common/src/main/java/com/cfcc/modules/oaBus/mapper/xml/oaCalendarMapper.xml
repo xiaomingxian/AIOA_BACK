@@ -191,7 +191,7 @@
             </if>
              and SUBSTRING_INDEX(c.s_user_names,',',1) = s.username
         </where>
-        order by c.i_is_top desc ,s.show_order desc  limit
+        order by c.i_is_top desc ,s.show_order desc  ,d_create_time desc limit
         ${pageNo},${pageSize}
     </select>
     <select id="countIsWait" resultType="java.lang.Integer">
@@ -258,7 +258,7 @@
             </if>
             and SUBSTRING_INDEX(s_user_names,',',1) = s.username
         </where>
-        order by i_is_top desc ,s.show_order desc  limit
+        order by i_is_top desc ,s.show_order desc  ,d_create_time desc limit
         ${pageNo},${pageSize}
     </select>
     <!-- 共享日程-->
@@ -294,7 +294,7 @@
             </if>
             and SUBSTRING_INDEX(s_user_names,',',1) = s.username
         </where>
-        order by i_is_top desc ,s.show_order desc limit ${pageNo},${pageSize}
+        order by i_is_top desc ,s.show_order desc ,d_create_time desc limit ${pageNo},${pageSize}
     </select>
     <!--待办-->
     <select id="findWait" resultType="com.cfcc.modules.oaBus.entity.oaCalendar">

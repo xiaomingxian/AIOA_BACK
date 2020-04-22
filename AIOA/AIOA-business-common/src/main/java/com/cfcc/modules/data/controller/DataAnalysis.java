@@ -92,7 +92,7 @@ public class DataAnalysis {
     @ResponseBody
     public List<Map<String, Object>> MonthAverage(OaBusdata oaBusdata, @RequestParam(name = "modelId", required = false) Integer modelId) {
         String table = iOaBusdataService.queryTableName(modelId);
-        List<Map<String, Object>> byTableAndMy = dataAnalysisService.findByTableAndMy(table, oaBusdata);
+        List<Map<String, Object>> byTableAndMy = dataAnalysisService.findByTableAndMy(table, oaBusdata);//月份
         Map<String, Object>  rate = dataAnalysisService.MyRate(table, oaBusdata);//办结率---办结数量/总共公文数量(同一个所属模块的)
         Map<String, Object> peerNum = dataAnalysisService.PeerNum(table, oaBusdata);//同行办理数量的百分比---功能办理的数量/总公文的数量（不管办结没办结、所属业务）
         Map<String, Object> handlingRate = dataAnalysisService.HandlingRate(table, oaBusdata);//办理率-----功能办结的数量/总公文的数量（同一个所属模块）

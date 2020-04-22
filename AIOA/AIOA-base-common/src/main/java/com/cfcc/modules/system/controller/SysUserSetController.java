@@ -216,34 +216,39 @@ public class SysUserSetController {
      */
     @GetMapping(value = "/chuiban")
     public Result chuiban(String title,String userName,String tableName ,String busdataId){
+
         Result<List<String>> result = new Result<List<String>>();
         try {
-            userName = URLEncoder.encode(userName,"gbk") ;
-            String sendImg = "/SendNotify.cgi?";  //  RTX发送消息接口
-            //String host = "192.168.199.108";  //  RTX服务器地址
-            String getSessionkey = "/getsessionkey.cgi?";  //  RTX获取会话接口
-            //int port = 8012;  //  RTX服务器监听端口
-            //String[] receiverss  =  {  " woailuo "  };  //  接收人，RTX帐号
-            //String sender = "";  //  发送人
+            String[] userNameList = userName.split(",") ;
+            for(String userNameStr : userNameList){
+                userNameStr = URLEncoder.encode(userNameStr,"gbk") ;
+                String sendImg = "/SendNotify.cgi?";  //  RTX发送消息接口
+                //String host = "192.168.199.108";  //  RTX服务器地址
+                String getSessionkey = "/getsessionkey.cgi?";  //  RTX获取会话接口
+                //int port = 8012;  //  RTX服务器监听端口
+                //String[] receiverss  =  {  " woailuo "  };  //  接收人，RTX帐号
+                //String sender = "";  //  发送人
            /* String content = "您有待办，请及时处理，" + title + "，[点我跳转|http://192.168.199.108:8080/RtxTest2_war_exploded/openDetail.jsp?tableName="
                     +tableName+"&busdataId="+busdataId+"]";  //  内容*/
-            String content = "您有代办，"+title+"，请及时处理" ;
-            StringBuffer sendMsgParams = new StringBuffer(sendImg);
-            StringBuffer receiveUrlStr = new StringBuffer(userName);
+                String content = "您有代办，"+title+"，请及时处理" ;
+                StringBuffer sendMsgParams = new StringBuffer(sendImg);
+                StringBuffer receiveUrlStr = new StringBuffer(userNameStr);
 
-            sendMsgParams.append("&receiver=" + receiveUrlStr);
-            if (content != null) {
+                sendMsgParams.append("&receiver=" + receiveUrlStr);
+                if (content != null) {
 //                sendMsgParams.append("&msg=" + new String(content.getBytes("UTF-8"), "GBK"));
-                sendMsgParams.append("&msg=" + URLEncoder.encode(content,"gbk"));
+                    sendMsgParams.append("&msg=" + URLEncoder.encode(content,"gbk"));
 //                sendMsgParams.append("&msg=" + content);
-            }
-            URL url = null;
+                }
+                URL url = null;
 
-            url = new URL("HTTP", hostIp, port, sendMsgParams.toString());
-            System.out.println(url);
-            HttpURLConnection httpconn = (HttpURLConnection) url.openConnection();
-            String ret = httpconn.getHeaderField(3);
-            System.out.println(ret);
+                url = new URL("HTTP", hostIp, port, sendMsgParams.toString());
+                System.out.println(url);
+                HttpURLConnection httpconn = (HttpURLConnection) url.openConnection();
+                String ret = httpconn.getHeaderField(3);
+                System.out.println(ret);
+            }
+
         } catch (Exception e) {
             System.out.println(e);
             e.printStackTrace();
@@ -251,6 +256,7 @@ public class SysUserSetController {
 
         return result ;
     }
+
     public void sendMegToRtx(String userName,String tableName, String busdataId ) {
         try {
             userName = URLEncoder.encode(userName,"gbk") ;

@@ -50,7 +50,7 @@ public interface BusPageDetailMapper extends BaseMapper<BusPageDetail> {
 
     boolean updatePageDetail(BusPageDetail busPageDetail);
 
-    @Select("select * from oa_bus_page_detail c where c.i_bus_function_id = #{functionId}")
+    //@Select("select * from oa_bus_page_detail c where c.i_bus_function_id = #{functionId}")
     List<BusPageDetail> getListByFunIDDao(String functionId);
 
     @Select("select count(*) from oa_bus_page_detail  c where c.i_bus_function_id  = #{functionId} " +
@@ -62,7 +62,6 @@ public interface BusPageDetailMapper extends BaseMapper<BusPageDetail> {
      * 通过IFunctionId和iFunVersion查询出对应的iPageId，再查出对应的PageDetail
      *  中的数据
      * @param functionId
-     * @param iFunVersion
      * @return
      */
     List<BusPageDetail> getListByFunIDAndIPageIdDao(@Param("functionId")String functionId, @Param("iPageId")String iPageId);

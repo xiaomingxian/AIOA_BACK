@@ -98,4 +98,8 @@ public class OaDatadetailedInst {
     @DateTimeFormat(pattern="yyyy-MM-dd HH:mm:ss")
     @ApiModelProperty(value = "创建时间")
 	private java.util.Date dCreateTime;
+	/**是否为临时文件*/
+	@Excel(name = "是否为临时文件", width = 15)
+	@ApiModelProperty(value = "是否为临时文件")
+	private java.lang.Integer i_is_display;
 }

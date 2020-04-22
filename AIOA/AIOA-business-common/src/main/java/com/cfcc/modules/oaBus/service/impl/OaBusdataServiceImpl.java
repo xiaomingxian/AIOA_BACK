@@ -178,7 +178,7 @@ public class OaBusdataServiceImpl extends ServiceImpl<OaBusdataMapper, OaBusdata
     public Map<String, Object> getSqlCodeDictAllSelect(List<BusPageDetail> busPageDetailList, LoginInfo loginInfo) {
         Map<String, Object> optionMap = new TreeMap<>();
         Map<String, String> map = new TreeMap<>();
-        return selOptionByDtailList(optionMap, map, busPageDetailList, loginInfo.getDepart().getId(), loginInfo.getDepart().getId(), loginInfo.getId());
+        return selOptionByDtailList(optionMap, map, busPageDetailList, loginInfo.getDepart().getId(), loginInfo.getDepart().getParentId(), loginInfo.getId());
     }
 
     /**
@@ -433,7 +433,8 @@ public class OaBusdataServiceImpl extends ServiceImpl<OaBusdataMapper, OaBusdata
         Map<String, Object> optionMap = new HashMap<>();
         //存放校验规则,字典数据，detail数据
         long aaa = System.currentTimeMillis();
-        optionMap = selOptionByDtailList(optionMap, map, busPageDetailList, loginInfo.getDepart().getId(), loginInfo.getId(), loginInfo.getDepart().getParentId());
+        optionMap = selOptionByDtailList(optionMap, map, busPageDetailList,
+                loginInfo.getDepart().getId(), loginInfo.getDepart().getParentId(), loginInfo.getId());
         result.put("optionMap", optionMap);
 //        log.info(map.toString());
         long bbb = System.currentTimeMillis();
@@ -785,7 +786,7 @@ public class OaBusdataServiceImpl extends ServiceImpl<OaBusdataMapper, OaBusdata
             else if (entry.getSDictSqlKey() != null && !"".equals(entry.getSDictSqlKey())) {
                 SysDictItem itemByCode = sysDictService.getDictItemByCode("sql", entry.getSDictSqlKey());
                 if (itemByCode != null || !"".equals(itemByCode)) {
-                    List<DictModel> dictMOdelList = sysDictService.getSqlValue(itemByCode.getDescription(), unitId, departId, unitId);
+                    List<DictModel> dictMOdelList = sysDictService.getSqlValue(itemByCode.getDescription(), userId, departId, unitId);
                     optionMap.put(entry.getSTableColumn() + "_option", dictMOdelList);
                 }
             }
@@ -862,9 +863,16 @@ public class OaBusdataServiceImpl extends ServiceImpl<OaBusdataMapper, OaBusdata
             units[i] = "'" + unitSet.get(i) + "'";
         }
         String unit = String.join(",", units);     //机构对应的字符串，使用in查询
+        if("".equals(unit)){
+            unit = "'-'" ;
+        }
+        String deptStr = String.join(",", depts) ;
+        if("".equals(deptStr)){
+            deptStr = "'-'" ;
+        }
         result.put("userId", sysUser.getId());
         result.put("userUnit", unit);
-        result.put("userDepart", String.join(",", depts));
+        result.put("userDepart", deptStr);
 
         //用户的角色
         List<SysUserRole> userRole = sysUserRoleService.list(new QueryWrapper<SysUserRole>().lambda().eq(SysUserRole::getUserId, sysUser.getId()));

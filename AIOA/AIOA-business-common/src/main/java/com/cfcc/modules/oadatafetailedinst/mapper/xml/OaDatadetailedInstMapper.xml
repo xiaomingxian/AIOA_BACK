@@ -3,6 +3,46 @@
 <mapper namespace="com.cfcc.modules.oadatafetailedinst.mapper.OaDatadetailedInstMapper">
 
     <select id="findByTableId" resultType="java.util.Map">
-        select d_create_time,i_is_1 from oa_datadetailed_inst where i_table_id =#{iTableId} and s_create_name = #{sCreateName}
+        select d_create_time,i_is_1 from oa_datadetailed_inst where i_table_id =#{iTableId}  and i_is_display = 1  and s_create_name = #{sCreateName}
     </select>
+    <select id="findOpions" resultType="java.lang.Integer">
+       select count(length(s_opinion))* length(s_opinion)  as count ,count(s_create_dept)  as deptcount, (count(length(s_opinion))* length(s_opinion))/ count(s_create_dept)  as avg from oa_datadetailed_inst  where  i_table_id = #{tableid} and s_create_name = #{userName}   GROUP BY s_create_dept
+    </select>
+    <select id="findIsFile" resultType="java.lang.Integer">
+       select count(*) from oa_datadetailed_inst where  i_is_2 = 1 and s_table =#{tableName} and s_create_by =#{userName} and i_table_id = #{tableid} and  s_create_dept = #{deptName}
+    </select>
+    <select id="findDate" resultType="java.util.Map">
+        select  DATE_FORMAT(d_create_time,'%Y-%m-%d') as createTime, DATE_FORMAT( d_datetime2,'%Y-%m-%d')  as dateTime,s_varchar2 from oa_busdata11 where i_id =  #{tableid}
+    </select>
+    <select id="getBanjieBydept" resultType="java.lang.Integer">
+         select count(*) from  oa_datadetailed_inst  where i_table_id = #{itableId}  and i_is_1 = 1 and i_is_display = 1 group by  s_create_dept
+    </select>
+    <select id="getDateCount" resultType="java.lang.Integer">
+        select count(*) from  oa_datadetailed_inst  where  #{createTime}&lt;= DATE_FORMAT(d_create_time,'%Y-%m-%d')&lt;=#{dateTime} and s_create_name = #{sCreateName}  and i_is_display = 1
+    </select>
+    <select id="findTypeNum" resultType="java.util.Map">
+    select count(*) as num,  s_main_unit_names as host from #{table}
+       where s_main_unit_names  in  (SELECT depart_name from  sys_depart  where  id != 1 and  id != 2  and  parent_id =  #{parentId})  and  i_is_display = 0 AND  s_create_by = #{userId}  AND i_create_year= #{year}
+       group by  s_main_unit_names
+    </select>
+    <select id="getDept" resultType="java.util.Map">
+       SELECT depart_name from  sys_depart  where  id != 1 and  id != 2  and  parent_id = #{parentId}
+    </select>
+    <select id="findorganizeNum" resultType="java.util.Map">
+         select count(*) as num,  s_main_unit_names as organize from #{table}
+       where s_cc_unit_names  in  (SELECT depart_name from  sys_depart  where  id != 1 and  id != 2  and  parent_id =  #{parentId})  and  i_is_display = 0 AND  s_create_by = #{userId}  AND i_create_year= #{year}
+       group by  s_cc_unit_names
+    </select>
+
+    <insert id="insertDataInst" parameterType="com.cfcc.modules.oadatafetailedinst.entity.OaDatadetailedInst">
+        INSERT INTO oa_datadetailed_inst
+        (i_id,s_table,i_table_id,s_create_name,s_create_by,s_create_dept,s_create_deptid,i_is_display,d_create_time)
+        VALUES
+        (0,#{sTable},#{iTableId},#{sCreateName},#{sCreateBy},#{sCreateDept},#{sCreateDeptid},0,NOW())
+        <selectKey resultType="integer" keyProperty="iId" order="AFTER">
+            SELECT LAST_INSERT_ID()
+        </selectKey>
+    </insert>
+
+
 </mapper>

@@ -159,8 +159,8 @@ public class SysUserOpinionController {
     @AutoLog(value = "快捷意见-批量删除")
     @ApiOperation(value = "快捷意见-批量删除", notes = "快捷意见-批量删除")
     @DeleteMapping(value = "/deleteBatch")
-    public Result<SysUserOpinion> deleteBatch(@RequestParam(name = "ids", required = true) String ids) {
-        Result<SysUserOpinion> result = new Result<SysUserOpinion>();
+    public Result<?> deleteBatch(@RequestParam(name = "ids", required = true) String ids) {
+        Result<?> result = new Result<>();
         if (ids == null || "".equals(ids.trim())) {
             result.error500("参数不识别！");
         } else {
@@ -171,7 +171,7 @@ public class SysUserOpinionController {
            }
 
             //this.sysUserOpinionService.removeByIds(Arrays.asList(ids.split(",")));
-            result.success("删除成功!");
+            return Result.ok("删除成功!");
         }
         return result;
     }
