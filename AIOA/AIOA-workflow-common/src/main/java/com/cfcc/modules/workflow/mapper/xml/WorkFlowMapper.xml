@@ -52,8 +52,11 @@
         <if test="pojo.iImport!=null and pojo.iImport!=''">
             and v.text_ like CONCAT('%^important%',#{pojo.iImport},'%^%')
         </if>
-        <if test="pojo.procDefKey != null and pojo.procDefKey != '' ">
-            and t.PROC_DEF_ID_ like  CONCAT(#{pojo.procDefKey},'%')
+        <if test="pojo.functionIds != null and pojo.functionIds != '' and pojo.functionIds.size>0">
+            and
+            <foreach collection="pojo.functionIds" item="fid" separator="or" open="(" close=")">
+                v.text_ like CONCAT('%',#{fid},',!functionName:%')
+            </foreach>
         </if>
 
 
