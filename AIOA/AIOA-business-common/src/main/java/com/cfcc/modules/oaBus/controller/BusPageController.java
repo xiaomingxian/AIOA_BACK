@@ -316,7 +316,20 @@ public class BusPageController {
                     if (!newFile.exists()) {
                         newFile.mkdirs();
                     }
-                    File upFile = new File(path, file.getOriginalFilename());
+                    String fileName = file.getOriginalFilename();
+                    //判断是否为IE浏览器的文件名，IE浏览器下文件名会带有盘符信息
+                    // Check for Unix-style path
+                    int unixSep = fileName.lastIndexOf('/');
+                    // Check for Windows-style path
+                    int winSep = fileName.lastIndexOf('\\');
+                    // Cut off at latest possible point
+                    int pos = (winSep > unixSep ? winSep : unixSep);
+                    if (pos != -1)  {
+                        // Any sort of path separator found...
+                        fileName = fileName.substring(pos + 1);
+                    }
+
+                    File upFile = new File(path, fileName);
 
                     file.transferTo(upFile);
                     OaFile oaFile = new OaFile();

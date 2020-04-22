@@ -98,9 +98,9 @@ public interface IOaBusdataService  extends  IService<OaBusdata>{
     boolean commitPer(String json, SysUser currentUser);
 
     //查询某一条具体业务数据
-    List<Map<String, Object>> getModifyFieldDataOne(@Param("column") String column,
-                                                    @Param("tableName") String tableName,
-                                                    @Param("iid") Integer iid);
+    List<Map<String, Object>> getModifyFieldDataOne( String column,
+                                                     String tableName,
+                                                     Integer iid);
 
 
     //无权限 全部查询业务数据表

@@ -20,7 +20,10 @@
                 s_title_name like concat('%', #{entity.sTitleName},'%')
             </if>
             <if test=" entity.iIsDept !=null and entity.iIsDept!='' or entity.iIsDept==0">
-                and i_is_dept=#{entity.iIsDept}
+                AND i_is_dept=#{entity.iIsDept}
+            </if>
+            <if test=" entity.sLeftParameter !=null and entity.sLeftParameter!=''">
+                AND s_left_parameter like concat('%', #{entity.sLeftParameter},'%')
             </if>
         </where>
         ORDER BY d_create_time DESC
@@ -36,6 +39,9 @@
             </if>
             <if test=" iIsDept !=null and iIsDept!='' or iIsDept==0 ">
                 and i_is_dept=#{iIsDept}
+            </if>
+            <if test=" sLeftParameter !=null and sLeftParameter!=''">
+                and s_left_parameter like concat('%', #{sLeftParameter},'%')
             </if>
         </where>
     </select>
