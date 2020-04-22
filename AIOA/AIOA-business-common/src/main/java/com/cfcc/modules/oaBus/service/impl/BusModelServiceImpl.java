@@ -5,9 +5,7 @@ import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.cfcc.common.constant.CacheConstant;
-import com.cfcc.common.mycat.MycatSchema;
 import com.cfcc.modules.oaBus.entity.BusModel;
-import com.cfcc.modules.oaBus.entity.BusPageDetail;
 import com.cfcc.modules.oaBus.mapper.BusModelMapper;
 import com.cfcc.modules.oaBus.service.IBusModelService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -132,17 +130,20 @@ public class BusModelServiceImpl extends ServiceImpl<BusModelMapper, BusModel> i
     }
 
     @Override
-    public String getModelIdByUrlSer(String str) {
+    public BusModel getModelIdByUrlSer(String str) {
+
+
         BusModel busModel = new BusModel();
         busModel.setSEnName(str);
         QueryWrapper<BusModel> queryWrapper = new QueryWrapper<>();
         queryWrapper.setEntity(busModel);
         busModel = busModelMapper.selectOne(queryWrapper);
-        String res =  "";
+
+        /*String res =  "";
         if(busModel.getIId() != null){
             res = busModel.getIId() + "";
-        }
-        return res;
+        }*/
+        return busModel;
     }
 
 

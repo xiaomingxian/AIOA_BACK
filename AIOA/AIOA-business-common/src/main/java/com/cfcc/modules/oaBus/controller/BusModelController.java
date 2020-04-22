@@ -95,8 +95,16 @@ public class BusModelController {
     @AutoLog(value = "业务模块表（业务分类表）-分页列表查询")
     @ApiOperation(value = "业务模块表（业务分类表）-分页列表查询", notes = "业务模块表（业务分类表）-分页列表查询")
     @GetMapping(value = "/getModelIdByUrl")
-    public String getModelIdByUrl(String str) {
-        return busModelService.getModelIdByUrlSer(str);
+    public Result<BusModel> getModelIdByUrl(String str) {
+        Result<BusModel> result = new Result<>() ;
+        BusModel busModel = busModelService.getModelIdByUrlSer(str) ;
+        if(busModel == null){
+            result.error500("路径错误，未查到相关结果！！！") ;
+            return result ;
+        }
+        result.setResult(busModel);
+        result.success("查询成功!!!") ;
+        return result;
     }
 
     /**
