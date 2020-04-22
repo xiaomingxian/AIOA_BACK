@@ -6,6 +6,7 @@ import org.springframework.format.annotation.DateTimeFormat;
 
 import java.io.Serializable;
 import java.util.Date;
+import java.util.List;
 import java.util.Map;
 
 @Data
@@ -27,6 +28,7 @@ public class TaskInfoVO implements Serializable {
 
     private String executionId;
 
+    private List<String> functionIds;
     private String taskDefKey;//任务环节id
 
     private String taskName;//任务名称
