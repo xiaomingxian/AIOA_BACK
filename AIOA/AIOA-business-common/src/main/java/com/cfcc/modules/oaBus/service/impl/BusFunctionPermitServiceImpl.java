@@ -78,8 +78,13 @@ public class BusFunctionPermitServiceImpl extends ServiceImpl<BusFunctionPermitM
                 SysDepart sysDepart = sysDepartMapper.selectById( functionPermitList.get(i).getITypeId());
                 if(! (sysDepart == null)){
                     functionPermitList.get(i).setItypeName(sysDepart.getDepartName());
-                    functionPermitList.get(i).setParentName(sysDepartMapper.selectById( sysDepart.getParentId()).getDepartName());
-                }
+                    SysDepart sysDepart1 = sysDepartMapper.selectById(sysDepart.getParentId());
+                    if(sysDepart1 == null){
+                        functionPermitList.get(i).setItypeName(sysDepart.getDepartName());
+                    }else {
+                        functionPermitList.get(i).setItypeName(sysDepart.getDepartName() + "--" + sysDepart1.getDepartName());
+                    }
+                    }
             }
             else if("3".equals(functionPermitList.get(i).getSPermitType()) ){      // 人员
                 SysUser sysUser = sysUserMapper.selectById(functionPermitList.get(i).getITypeId());
@@ -163,8 +168,13 @@ public class BusFunctionPermitServiceImpl extends ServiceImpl<BusFunctionPermitM
 
                 SysDepart sysDepart = sysDepartMapper.selectById(functionPermitList.get(i).getITypeId());
                 if(! (sysDepart == null)){
-                    functionPermitList.get(i).setParentName(sysDepartMapper.selectById( sysDepart.getParentId()).getDepartName());
                     functionPermitList.get(i).setItypeName(sysDepart.getDepartName());
+                    SysDepart sysDepart1 = sysDepartMapper.selectById(sysDepart.getParentId());
+                    if(sysDepart1 == null){
+                        functionPermitList.get(i).setItypeName(sysDepart.getDepartName());
+                    }else {
+                        functionPermitList.get(i).setItypeName(sysDepart.getDepartName() + "--" + sysDepart1.getDepartName());
+                    }
                 }
             }
             else if("3".equals(functionPermitList.get(i).getSPermitType()) ){      // 人员

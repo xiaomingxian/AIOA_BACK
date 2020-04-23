@@ -28,5 +28,5 @@ public interface DataAnalysisService extends IService<OaBusdata> {
 
     Map<String, Object> Handling(String table, OaBusdata oaBusdata);
 
-    double getAvg(String table,OaBusdata oaBusdata);
+    Map<String,Object> getAvg(String table,OaBusdata oaBusdata);
 }

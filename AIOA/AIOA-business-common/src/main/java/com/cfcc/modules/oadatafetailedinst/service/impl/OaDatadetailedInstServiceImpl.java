@@ -149,16 +149,35 @@ public class OaDatadetailedInstServiceImpl extends ServiceImpl<OaDatadetailedIns
     }
 
     @Override
-    public boolean updataDetailedIsStats(Integer iId) {
+    public boolean updataDetailedIsStats(Integer iId,Integer num) {
         Map<String, Object> map = new HashMap<>();
         map.put("table","oa_datadetailed_inst");
         map.put("i_id",iId);
-        map.put("i_is_2",1);
-        int num=dynamicTableMapper.updateData(map);
-        boolean flag=true;
         if (num==0){
+            map.put("i_is_2",0);
+        }else {
+            map.put("i_is_2",1);
+        }
+        int nums=dynamicTableMapper.updateData(map);
+        boolean flag=true;
+        if (nums==0){
             flag=false;
         }
         return flag;
+    }
+
+    @Override
+    public List<String> findFunctionIds(Integer modelId) {
+        return oaDatadetailedInstMapper.findFunctionIds(modelId);
+    }
+
+    @Override
+    public Map<String, Object> lineLeaderRate(String table, Integer busModelId ,Integer busFunctionId) {
+        return oaDatadetailedInstMapper.lineLeaderRate(table,busModelId,busFunctionId);
+    }
+
+    @Override
+    public Map<String, Object> Rate(String table, Integer busModelId) {
+        return oaDatadetailedInstMapper.rate(table,busModelId);
     }
 }

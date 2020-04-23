@@ -52,7 +52,7 @@
         <if test="pojo.iImport!=null and pojo.iImport!=''">
             and v.text_ like CONCAT('%^important%',#{pojo.iImport},'%^%')
         </if>
-        <if test="pojo.functionIds != null and pojo.functionIds != '' and pojo.functionIds.size>0">
+        <if test="pojo.functionIds != null   and pojo.functionIds.size>0">
             and
             <foreach collection="pojo.functionIds" item="fid" separator="or" open="(" close=")">
                 v.text_ like CONCAT('%',#{fid},',!functionName:%')
@@ -107,7 +107,7 @@
         <if test="pojo.iImport!=null and pojo.iImport!=''">
             and v.text_ like CONCAT('%^important%',#{pojo.iImport},'%^%')
         </if>
-        <if test="pojo.functionIds != null and pojo.functionIds != '' and pojo.functionIds.size>0">
+        <if test="pojo.functionIds != null   and pojo.functionIds.size>0">
             and
             <foreach collection="pojo.functionIds" item="fid" separator="or" open="(" close=")">
                 v.text_ like CONCAT('%',#{fid},',!functionName:%')
@@ -190,7 +190,7 @@
         <if test="pojo.iImport!=null and pojo.iImport!=''">
             and v.text_ like CONCAT('%^important%',#{pojo.iImport},'%^%')
         </if>
-        <if test="pojo.functionIds != null and pojo.functionIds != '' and pojo.functionIds.size>0">
+        <if test="pojo.functionIds != null   and pojo.functionIds.size>0">
             and
             <foreach collection="pojo.functionIds" item="fid" separator="or" open="(" close=")">
                 v.text_ like CONCAT('%',#{fid},',!functionName:%')
@@ -246,7 +246,7 @@
         <if test="pojo.iImport!=null and pojo.iImport!=''">
             and v.text_ like CONCAT('%^important%',#{pojo.iImport},'%^%')
         </if>
-        <if test="pojo.functionIds != null and pojo.functionIds != '' and pojo.functionIds.size>0">
+        <if test="pojo.functionIds != null   and pojo.functionIds.size>0">
             and
             <foreach collection="pojo.functionIds" item="fid" separator="or" open="(" close=")">
                 v.text_ like CONCAT('%',#{fid},',!functionName:%')

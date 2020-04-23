@@ -12,6 +12,8 @@ import com.cfcc.common.util.oConvertUtils;
 import com.cfcc.modules.data.service.DataAnalysisService;
 import com.cfcc.modules.oaBus.entity.*;
 import com.cfcc.modules.oaBus.service.IOaBusdataService;
+import com.cfcc.modules.system.entity.LoginInfo;
+import com.cfcc.modules.system.service.ISysUserService;
 import io.swagger.annotations.Api;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
@@ -46,6 +48,8 @@ public class DataAnalysis {
     @Value("${system.runDate}")
     private String runDate;
 
+    @Autowired
+    private ISysUserService sysUserService;
     /**
      * 查询年份
      *
@@ -97,53 +101,55 @@ public class DataAnalysis {
         Map<String, Object> peerNum = dataAnalysisService.PeerNum(table, oaBusdata);//同行办理数量的百分比---功能办理的数量/总公文的数量（不管办结没办结、所属业务）
         Map<String, Object> handlingRate = dataAnalysisService.HandlingRate(table, oaBusdata);//办理率-----功能办结的数量/总公文的数量（同一个所属模块）
         Map<String, Object> Handling = dataAnalysisService.Handling(table, oaBusdata);//总共公文数量
-        Map<String,Object> map2 = new HashMap<>();
         Map<String, Object> map1 = new HashMap<>();
+        Map<String, Object> map2 = new HashMap<>();
+        Map<String,Object> map3  = new HashMap<>();
         List<Map<String,Object>>  sortList  = new ArrayList<>();
-        if(rate == null){
-            rate.put("rate",0);
+
+        if(rate ==  null){
+            map2.put("rate",0);
+            sortList.add(map2);
+        }else{
             sortList.add(rate);
         }
-        sortList.add(rate);
         if(peerNum == null){
             peerNum.put("peerNum",0);
             sortList.add(peerNum);
+        }else{
+            sortList.add(peerNum);
         }
-        sortList.add(peerNum);
         if(handlingRate == null){
             handlingRate.put("handlingRate",0);
             sortList.add(handlingRate);
+        }else{
+            sortList.add(handlingRate);
         }
-        sortList.add(handlingRate);
         if(Handling == null){
             Handling.put("Handling",0);
             sortList.add(Handling);
+        }else{
+            sortList.add(Handling);
         }
-        sortList.add(Handling);
         map1.put("year",oaBusdata.getICreateYear());
         sortList.add(map1);
-        double avg= dataAnalysisService.getAvg(table,oaBusdata);
-        map2.put("average",avg);
-        sortList.add(map2);
-        /*for(int i=1;i<byTableAndMy.size();i++){
-           Map<String, Object> map = new HashMap<>();
-           Long month = Long.valueOf(byTableAndMy.get(i).get("num").toString());
-            if(month>=avg){
-                map.put("i_create_month", i+1);
-                map.put("num", month);
-                sortList.add(map);
-            }else{
-                continue;
-            }
-        }*/
-
+        Map<String,Object> avg= dataAnalysisService.getAvg(table,oaBusdata);
+        if(avg == null){
+            map3.put("avg",0);
+            sortList.add(map3);
+        }else{
+            sortList.add(avg);
+        }
         return sortList;
     }
     @AutoLog(value = "同行办理数量的百分比---功能办理的数量/总公文的数量（不管办结没办结、所属业务）")
     @GetMapping(value = "/PeerNum")
     @ResponseBody
-    public Map<String, Object> PeerNum(OaBusdata oaBusdata, @RequestParam(name = "modelId", required = false) Integer modelId) {
+    public Map<String, Object> PeerNum(HttpServletRequest request,OaBusdata oaBusdata, @RequestParam(name = "modelId", required = false) Integer modelId) {
         String table = iOaBusdataService.queryTableName(modelId);
+        //查询当前用户，作为assignee
+        LoginInfo loginInfo = sysUserService.getLoginInfo(request);
+        String parentId = loginInfo.getDepart().getParentId();
+        oaBusdata.setSCreateUnitid(parentId);
         Map<String, Object> rate = dataAnalysisService.PeerNum(table, oaBusdata);
 
 

@@ -7,7 +7,6 @@ import com.cfcc.common.api.vo.Result;
 import com.cfcc.common.aspect.annotation.AutoLog;
 import com.cfcc.common.system.query.QueryGenerator;
 import com.cfcc.common.system.util.JwtUtil;
-import com.cfcc.common.system.vo.LoginUser;
 import com.cfcc.common.util.oConvertUtils;
 import com.cfcc.modules.docnum.entity.DocNumExport;
 import com.cfcc.modules.docnum.entity.DocNumSet;
@@ -25,8 +24,6 @@ import com.cfcc.modules.system.service.ISysUserService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.ibatis.annotations.Param;
-import org.apache.shiro.SecurityUtils;
 import org.jeecgframework.poi.excel.ExcelImportUtil;
 import org.jeecgframework.poi.excel.def.NormalExcelConstants;
 import org.jeecgframework.poi.excel.entity.ExportParams;
@@ -37,18 +34,13 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.multipart.MultipartHttpServletRequest;
 import org.springframework.web.servlet.ModelAndView;
-
-import javax.annotation.PostConstruct;
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * @Description: 文号配置
@@ -237,7 +229,34 @@ public class DocNumSetController {
 		}
 		return result;
 	}
-
+	@AutoLog(value = "文号记录校验")
+	@ApiOperation(value="文号记录校验", notes="")
+	@GetMapping(value = "/queryBusdataListByDocNum")
+	public Result queryById(DocNumSet docNumSet) {
+		Result<List<Map<String, Object>>> result = new Result<List<Map<String, Object>>>();
+		if ( docNumSet.getIId() == null){
+			result.setCode(500);
+			result.setMessage("参数为空！");
+			return result;
+		}
+		Integer iId = docNumSet.getIId();
+		List<Map<String, Object>> functionData = null;
+		try {
+			functionData = docNumSetMapper.selectBusdataLIstsByDocId(Integer.valueOf(iId));
+			functionData.removeAll(Collections.singleton(null));
+			if (functionData.size() == 0){
+				result.setCode(500);
+				result.setMessage("暂无数据！");
+				return result;
+			}
+		} catch (NumberFormatException e) {
+			Result.error("暂无业务数据！");
+			e.printStackTrace();
+		}
+		result.setCode(200);
+		result.setResult(functionData);
+		return result;
+	}
 	/**
 	 * 导出excel
 	 *

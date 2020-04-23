@@ -103,11 +103,26 @@
             <if test="s_signer !=null and s_signer !=''">
                 s_signer=#{s_signer},
             </if>
+            <if test="s_signer ==null or s_signer ==''">
+                s_signer = NULL,
+            </if>
             <if test="i_phone !=null and i_phone !=''">
                 i_phone=#{i_phone},
             </if>
+            <if test="i_phone ==null or i_phone ==''">
+                i_phone =NULL,
+            </if>
             <if test="d_sealdate !=null and d_sealdate !=''">
                 d_sealdate=#{d_sealdate},
+            </if>
+            <if test="d_sealdate ==null or d_sealdate ==''">
+                d_sealdate = NULL,
+            </if>
+            <if test="s_receive_num !=null and s_receive_num !=''">
+                s_receive_num=#{s_receive_num},
+            </if>
+            <if test="s_receive_num ==null or s_receive_num ==''">
+                s_receive_num = NULL,
             </if>
             <if test="i_bus_model_id !=null and i_bus_model_id !=''">
                 i_bus_model_id=#{i_bus_model_id},
@@ -121,20 +136,38 @@
             <if test="s_main_unit_names !=null and s_main_unit_names !=''">
                 s_main_unit_names=#{s_main_unit_names},
             </if>
+            <if test="s_main_unit_names ==null or s_main_unit_names ==''">
+                s_main_unit_names = NULL,
+            </if>
             <if test="s_cc_unit_names !=null and s_cc_unit_names !=''">
                 s_cc_unit_names=#{s_cc_unit_names},
+            </if>
+            <if test="s_cc_unit_names ==null or s_cc_unit_names ==''">
+                s_cc_unit_names = NULL,
             </if>
             <if test="s_inside_deptnames !=null and s_inside_deptnames !=''">
                 s_inside_deptnames=#{s_inside_deptnames},
             </if>
+            <if test="s_inside_deptnames ==null or s_inside_deptnames ==''">
+                s_inside_deptnames = NULL,
+            </if>
             <if test="s_report_nuit_names !=null and s_report_nuit_names !=''">
                 s_report_nuit_names=#{s_report_nuit_names},
+            </if>
+            <if test="s_report_nuit_names ==null or s_report_nuit_names ==''">
+                s_report_nuit_names = NULL,
             </if>
             <if test="s_crc_deptnames !=null and s_crc_deptnames !=''">
                 s_crc_deptnames=#{s_crc_deptnames},
             </if>
+            <if test="s_crc_deptnames ==null or s_crc_deptnames ==''">
+                s_crc_deptnames = NULL,
+            </if>
             <if test="s_title !=null and s_title !=''">
                 s_title=#{s_title},
+            </if>
+            <if test="s_title ==null or s_title ==''">
+                s_title = NULL,
             </if>
             <if test="s_left_parameter !=null and s_left_parameter !=''">
                 s_left_parameter=#{s_left_parameter},
@@ -142,8 +175,14 @@
             <if test="s_unit_name !=null and s_unit_name !=''">
                 s_unit_name=#{s_unit_name},
             </if>
+            <if test="s_unit_name ==null or s_unit_name ==''">
+                s_unit_name = NULL,
+            </if>
             <if test="s_dept_name !=null and s_dept_name !=''">
                 s_dept_name=#{s_dept_name},
+            </if>
+            <if test="s_dept_name ==null or s_dept_name ==''">
+                s_dept_name = NULL,
             </if>
             <if test="s_middle_parameter !=null and s_middle_parameter !=''">
                 s_middle_parameter=#{s_middle_parameter},
@@ -156,6 +195,9 @@
             <!--</if>-->
             <if test="s_file_num !=null and s_file_num !=''">
                 s_file_num=#{s_file_num},
+            </if>
+            <if test="s_file_num ==null or s_file_num ==''">
+                s_file_num = NULL,
             </if>
             <!--<if test="iIsRelease !=null and iIsRelease !=''">-->
                 <!--sReportNuitNames=#{iIsRelease}-->
@@ -190,17 +232,32 @@
             <if test="s_remarks !=null and s_remarks !=''">
                 s_remarks=#{s_remarks},
             </if>
+            <if test="s_remarks ==null or s_remarks ==''">
+                s_remarks = NULL,
+            </if>
             <if test="i_create_year !=null and i_create_year !=''">
                 i_create_year=#{i_create_year},
+            </if>
+            <if test="i_create_year ==null or i_create_year ==''">
+                i_create_year = NULL,
             </if>
             <if test="i_create_month !=null and i_create_month !=''">
                 i_create_month=#{i_create_month},
             </if>
+            <if test="i_create_month ==null or i_create_month ==''">
+                i_create_month = NULL,
+            </if>
             <if test="i_create_day !=null and i_create_day !=''">
                 i_create_day=#{i_create_day},
             </if>
+            <if test="i_create_day ==null or i_create_day ==''">
+                i_create_day = NULL,
+            </if>
             <if test="s_create_name !=null and s_create_name !=''">
                 s_create_name=#{s_create_name},
+            </if>
+            <if test="s_create_name ==null or s_create_name ==''">
+                s_create_name = NULL,
             </if>
             <if test="s_create_by !=null and s_create_by !=''">
                 s_create_by=#{s_create_by},
@@ -208,122 +265,156 @@
             <if test="s_create_dept !=null and s_create_dept !=''">
                 s_create_dept=#{s_create_dept},
             </if>
+            <if test="s_create_dept ==null or s_create_dept ==''">
+                s_create_dept = NULL,
+            </if>
             <if test="d_create_time !=null and d_create_time !=''">
                 d_create_time=#{d_create_time},
+            </if>
+            <if test="d_create_time ==null or d_create_time ==''">
+                d_create_time = NULL,
             </if>
             <if test="i_bigint1 !=null and i_bigint1 !=''">
                 i_bigint1=#{i_bigint1},
             </if>
+            <if test="i_bigint1 ==null or i_bigint1 ==''">
+                i_bigint1 = NULL,
+            </if>
             <if test="i_bigint2 !=null and i_bigint2 !=''">
                 i_bigint2=#{i_bigint2},
+            </if>
+            <if test="i_bigint2 ==null or i_bigint2 ==''">
+                i_bigint2 = NULL,
             </if>
             <if test="i_bigint3 !=null and i_bigint3 !=''">
                 i_bigint3=#{i_bigint3},
             </if>
-            <if test="i_bigint4 !=null and i_bigint4 !=''">
-                i_bigint4=#{i_bigint4},
+            <if test="i_bigint3 ==null or i_bigint3 ==''">
+                i_bigint3 = NULL,
             </if>
             <if test="d_datetime1 !=null and d_datetime1 !=''">
                 d_datetime1=#{d_datetime1},
             </if>
+            <if test="d_datetime1 ==null or d_datetime1 ==''">
+                d_datetime1 = NULL,
+            </if>
             <if test="d_datetime2 !=null and d_datetime2 !=''">
                 d_datetime2=#{d_datetime2},
+            </if>
+            <if test="d_datetime2 ==null or d_datetime2 ==''">
+                d_datetime2 = NULL,
             </if>
             <if test="d_datetime3 !=null and d_datetime3 !=''">
                 d_datetime3=#{d_datetime3},
             </if>
+            <if test="d_datetime3 ==null or d_datetime3 ==''">
+                d_datetime3 = NULL,
+            </if>
             <if test="d_datetime4 !=null and d_datetime4 !=''">
                 d_datetime4=#{d_datetime4},
+            </if>
+            <if test="d_datetime4 ==null or d_datetime4 ==''">
+                d_datetime4 = NULL,
             </if>
             <if test="d_datetime5 !=null and d_datetime5 !=''">
                 d_datetime5=#{d_datetime5},
             </if>
-            <if test="d_datetime6 !=null and d_datetime6 !=''">
-                d_datetime6=#{d_datetime6},
+            <if test="d_datetime5 ==null or d_datetime5 ==''">
+                d_datetime5 = NULL,
             </if>
             <if test="s_varchar1 !=null and s_varchar1 !=''">
                 s_varchar1=#{s_varchar1},
             </if>
+            <if test="s_varchar1 ==null or s_varchar1 ==''">
+                s_varchar1 = NULL,
+            </if>
             <if test="s_varchar2 !=null and s_varchar2 !=''">
                 s_varchar2=#{s_varchar2},
+            </if>
+            <if test="s_varchar2 ==null or s_varchar2 ==''">
+                s_varchar2 = NULL,
             </if>
             <if test="s_varchar3 !=null and s_varchar3 !=''">
                 s_varchar3=#{s_varchar3},
             </if>
+            <if test="s_varchar3 ==null or s_varchar3 ==''">
+                s_varchar3 = NULL,
+            </if>
             <if test="s_varchar4 !=null and s_varchar4 !=''">
                 s_varchar4=#{s_varchar4},
+            </if>
+            <if test="s_varchar4 ==null or s_varchar4 ==''">
+                s_varchar4 = NULL,
             </if>
             <if test="s_varchar5 !=null and s_varchar5 !=''">
                 s_varchar5=#{s_varchar5},
             </if>
+            <if test="s_varchar5 ==null or s_varchar5 ==''">
+                s_varchar5 = NULL,
+            </if>
             <if test="s_varchar6 !=null and s_varchar6 !=''">
                 s_varchar6=#{s_varchar6},
+            </if>
+            <if test="s_varchar6 ==null or s_varchar6 ==''">
+                s_varchar6 = NULL,
             </if>
             <if test="s_varchar7 !=null and s_varchar7 !=''">
                 s_varchar7=#{s_varchar7},
             </if>
+            <if test="s_varchar7 ==null or s_varchar7 ==''">
+                s_varchar7 = NULL,
+            </if>
             <if test="s_varchar8 !=null and s_varchar8 !=''">
                 s_varchar8=#{s_varchar8},
+            </if>
+            <if test="s_varchar8 ==null or s_varchar8 ==''">
+                s_varchar8 = NULL,
             </if>
             <if test="s_varchar9 !=null and s_varchar9 !=''">
                 s_varchar9=#{s_varchar9},
             </if>
+            <if test="s_varchar9 ==null or s_varchar9 ==''">
+                s_varchar9 = NULL,
+            </if>
             <if test="s_varchar10 !=null and s_varchar10 !=''">
                 s_varchar10=#{s_varchar10},
             </if>
-            <if test="s_varchar11 !=null and s_varchar11 !=''">
-                s_varchar11=#{s_varchar11},
+            <if test="s_varchar10 ==null or s_varchar10 ==''">
+                s_varchar10 = NULL,
             </if>
-            <if test="s_varchar12 !=null and s_varchar12 !=''">
-                s_varchar12=#{s_varchar12},
+            <if test="d_date1 !=null and d_date1 !=''">
+                d_date1=#{d_date1},
             </if>
-            <if test="s_varchar13 !=null and s_varchar13 !=''">
-                s_varchar13=#{s_varchar13},
+            <if test="d_date1 ==null or d_date1 ==''">
+                d_date1 = NULL,
             </if>
-            <if test="s_varchar14 !=null and s_varchar14 !=''">
-                s_varchar14=#{s_varchar14},
+            <if test="d_date2 !=null and d_date2 !=''">
+                d_date2=#{d_date2},
             </if>
-            <if test="s_varchar15 !=null and s_varchar15 !=''">
-                s_varchar15=#{s_varchar15},
-            </if>
-            <if test="s_varchar16 !=null and s_varchar16 !=''">
-                s_varchar16=#{s_varchar16},
-            </if>
-            <if test="s_varchar17 !=null and s_varchar17 !=''">
-                s_varchar17=#{s_varchar17},
-            </if>
-            <if test="s_varchar18 !=null and s_varchar18 !=''">
-                s_varchar18=#{s_varchar18},
-            </if>
-            <if test="s_varchar19 !=null and s_varchar19 !=''">
-                s_varchar19=#{s_varchar19},
-            </if>
-            <if test="s_varchar20 !=null and s_varchar20 !=''">
-                s_varchar20=#{s_varchar20},
+            <if test="d_date2 ==null or d_date2 ==''">
+                d_date2 = NULL,
             </if>
             <if test="i_is_1 !=null and i_is_1 !=''">
                 i_is_1=#{i_is_1},
             </if>
+            <if test="i_is_1 ==null or i_is_1 ==''">
+                i_is_1 = NULL,
+            </if>
             <if test="i_is_2 !=null and i_is_2 !=''">
                 i_is_2=#{i_is_2},
             </if>
-            <if test="i_is_3 !=null and i_is_3 !=''">
-                i_is_3=#{i_is_3},
+            <if test="i_is_2 ==null or i_is_2 ==''">
+                i_is_2 = NULL,
             </if>
-            <if test="i_is_4 !=null and i_is_4 !=''">
-                i_is_4=#{i_is_4},
-            </if>
-            <if test="i_is_5 !=null and i_is_5 !=''">
-                i_is_5=#{i_is_5},
-            </if>
+
             <if test="s_create_deptid !=null and s_create_deptid !=''">
                 s_create_deptid=#{s_create_deptid},
             </if>
             <if test="s_create_unitid !=null and s_create_unitid !=''">
                 s_create_unitid=#{s_create_unitid},
             </if>
-            <if test="s_cc_dept_names !=null and s_cc_dept_names !=''">
-                s_cc_dept_names=#{s_cc_dept_names},
+            <if test="d_update_time ==null or d_update_time ==''">
+                d_update_time=now(),
             </if>
         </set>
         WHERE i_id = #{i_id}

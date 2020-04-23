@@ -2,7 +2,6 @@ package com.cfcc.modules.oaBus.service;
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.service.IService;
-import com.cfcc.common.mycat.MycatSchema;
 import com.cfcc.modules.oaBus.entity.BusModel;
 
 import java.util.List;
@@ -51,5 +50,5 @@ public interface IBusModelService extends IService<BusModel> {
      * @param str
      * @return
      */
-    String getModelIdByUrlSer(String str);
+    BusModel getModelIdByUrlSer(String str);
 }
