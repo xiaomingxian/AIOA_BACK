@@ -275,12 +275,6 @@
             <if test="i_bigint3 ==null or i_bigint3 ==''">
                 i_bigint3 = NULL,
             </if>
-            <if test="i_bigint4 !=null and i_bigint4 !=''">
-                i_bigint4=#{i_bigint4},
-            </if>
-            <if test="i_bigint4 ==null or i_bigint4 ==''">
-                i_bigint4 = NULL,
-            </if>
             <if test="d_datetime1 !=null and d_datetime1 !=''">
                 d_datetime1=#{d_datetime1},
             </if>
@@ -310,9 +304,6 @@
             </if>
             <if test="d_datetime5 ==null or d_datetime5 ==''">
                 d_datetime5 = NULL,
-            </if>
-            <if test="d_datetime6 !=null and d_datetime6 !=''">
-                d_datetime6=#{d_datetime6},
             </if>
             <if test="s_varchar1 !=null and s_varchar1 !=''">
                 s_varchar1=#{s_varchar1},
@@ -374,35 +365,17 @@
             <if test="s_varchar10 ==null or s_varchar10 ==''">
                 s_varchar10 = NULL,
             </if>
-            <if test="s_varchar11 !=null and s_varchar11 !=''">
-                s_varchar11=#{s_varchar11},
+            <if test="d_date1 !=null and d_date1 !=''">
+                d_date1=#{d_date1},
             </if>
-            <if test="s_varchar12 !=null and s_varchar12 !=''">
-                s_varchar12=#{s_varchar12},
+            <if test="d_date1 ==null or d_date1 ==''">
+                d_date1 = NULL,
             </if>
-            <if test="s_varchar13 !=null and s_varchar13 !=''">
-                s_varchar13=#{s_varchar13},
+            <if test="d_date2 !=null and d_date2 !=''">
+                d_date2=#{d_date2},
             </if>
-            <if test="s_varchar14 !=null and s_varchar14 !=''">
-                s_varchar14=#{s_varchar14},
-            </if>
-            <if test="s_varchar15 !=null and s_varchar15 !=''">
-                s_varchar15=#{s_varchar15},
-            </if>
-            <if test="s_varchar16 !=null and s_varchar16 !=''">
-                s_varchar16=#{s_varchar16},
-            </if>
-            <if test="s_varchar17 !=null and s_varchar17 !=''">
-                s_varchar17=#{s_varchar17},
-            </if>
-            <if test="s_varchar18 !=null and s_varchar18 !=''">
-                s_varchar18=#{s_varchar18},
-            </if>
-            <if test="s_varchar19 !=null and s_varchar19 !=''">
-                s_varchar19=#{s_varchar19},
-            </if>
-            <if test="s_varchar20 !=null and s_varchar20 !=''">
-                s_varchar20=#{s_varchar20},
+            <if test="d_date2 ==null or d_date2 ==''">
+                d_date2 = NULL,
             </if>
             <if test="i_is_1 !=null and i_is_1 !=''">
                 i_is_1=#{i_is_1},
@@ -416,26 +389,12 @@
             <if test="i_is_2 ==null or i_is_2 ==''">
                 i_is_2 = NULL,
             </if>
-            <if test="i_is_3 !=null and i_is_3 !=''">
-                i_is_3=#{i_is_3},
-            </if>
-            <if test="i_is_4 !=null and i_is_4 !=''">
-                i_is_4=#{i_is_4},
-            </if>
-            <if test="i_is_5 !=null and i_is_5 !=''">
-                i_is_5=#{i_is_5},
-            </if>
+
             <if test="s_create_deptid !=null and s_create_deptid !=''">
                 s_create_deptid=#{s_create_deptid},
             </if>
             <if test="s_create_unitid !=null and s_create_unitid !=''">
                 s_create_unitid=#{s_create_unitid},
-            </if>
-            <if test="s_cc_dept_names !=null and s_cc_dept_names !=''">
-                s_cc_dept_names=#{s_cc_dept_names},
-            </if>
-            <if test="s_cc_dept_names ==null or s_cc_dept_names ==''">
-                s_cc_dept_names = NULL,
             </if>
             <if test="d_update_time ==null or d_update_time ==''">
                 d_update_time=now(),
