@@ -57,4 +57,8 @@ public interface OaDatadetailedInstMapper extends BaseMapper<OaDatadetailedInst>
 
 
     List<String> findFunctionIds(Integer modelId);
+
+    Map<String, Object> lineLeaderRate(String table, Integer busModelId ,Integer busFunctionId);
+
+    Map<String, Object> rate(String table, Integer busModelId);
 }

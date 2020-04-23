@@ -139,6 +139,36 @@ public class SupervisionPage {
         map.put("typeNum",typeNum);
         return map;
     }
+    /**
+     *行领导批示办结率
+     * @return
+     */
+    @GetMapping(value = "lineLeaderRate")
+    public Map<String,Object> lineLeaderRate() {
+        String table = "oa_busdata11";
+        Integer busModelId = 51;
+        Integer busFunctionId = 163;
+        Map<String, Object> rate = new HashMap<>();
+        rate = oaDatadetailedInstService.lineLeaderRate(table,busModelId,busFunctionId);
+        if(rate == null){
+            rate.put("rate",0);
+        }
+        return rate;
+    } /**
+     *办结率
+     * @return
+     */
+    @GetMapping(value = "Rate")
+    public Map<String,Object> Rate() {
+        String table = "oa_busdata11";
+        Integer busModelId = 51;
+        Map<String, Object> rate = new HashMap<>();
+         rate = oaDatadetailedInstService.Rate(table,busModelId);
+         if(rate == null){
+             rate.put("rate",0);
+         }
+        return rate;
+    }
     @GetMapping("queryTask")
     @ApiOperation("任务查询")
     public Result queryTask(TaskInfoVO taskInfoVO, @RequestParam(required = false, defaultValue = "1") Integer pageNo,

@@ -51,4 +51,8 @@ public interface IOaDatadetailedInstService extends IService<OaDatadetailedInst>
     boolean updataDetailedIsStats(Integer iId);
 
     List<String> findFunctionIds(Integer modelId);
+
+    Map<String, Object> lineLeaderRate(String table, Integer busModelId,Integer busFunctionId);
+
+    Map<String, Object> Rate(String table, Integer busModelId);
 }

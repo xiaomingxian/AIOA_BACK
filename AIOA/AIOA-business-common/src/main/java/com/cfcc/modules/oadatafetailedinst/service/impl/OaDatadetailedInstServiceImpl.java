@@ -166,4 +166,14 @@ public class OaDatadetailedInstServiceImpl extends ServiceImpl<OaDatadetailedIns
     public List<String> findFunctionIds(Integer modelId) {
         return oaDatadetailedInstMapper.findFunctionIds(modelId);
     }
+
+    @Override
+    public Map<String, Object> lineLeaderRate(String table, Integer busModelId ,Integer busFunctionId) {
+        return oaDatadetailedInstMapper.lineLeaderRate(table,busModelId,busFunctionId);
+    }
+
+    @Override
+    public Map<String, Object> Rate(String table, Integer busModelId) {
+        return oaDatadetailedInstMapper.rate(table,busModelId);
+    }
 }
