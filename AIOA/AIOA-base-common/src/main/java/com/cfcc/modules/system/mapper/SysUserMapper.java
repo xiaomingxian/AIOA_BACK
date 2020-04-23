@@ -92,10 +92,10 @@ public interface SysUserMapper extends BaseMapper<SysUser> {
             "  FROM  sys_user u " +
             "  LEFT JOIN sys_user_depart ud ON u.id = ud.user_id " +
             "  LEFT JOIN sys_depart d ON ud.dep_id = d.id " +
-            "  WHERE  u.id = #{userId} order by u.show_order  ) udp on 1=1 " +
+            "  WHERE  u.id = #{userId}  order by u.show_order  ) udp on 1=1 " +
             " LEFT JOIN sys_user_role ur on uu.id=ur.user_id " +
             " left JOIN sys_role r on ur.role_id=r.id " +
-            " where d.id = udp.depId  " +
+            " where d.id = udp.depId  and uu.status=1 and uu.del_flag=0  " +
             " and r.role_name=#{roleName} ORDER BY uu.show_order")
         //当前用户所在部门 对应角色
     List<Map<String, Object>> getNextUsersByDept(@Param("userId") String userId, @Param("roleName") String roleName);
@@ -117,7 +117,10 @@ public interface SysUserMapper extends BaseMapper<SysUser> {
         //当前用户所在部门 对应角色
     List<Map<String, Object>> deptUserChoice(@Param("userId") String userId);
 
-    @Select("select u.id uid,u.username uname,d.depart_name dname from sys_user u LEFT JOIN sys_user_depart ud on u.id=ud.user_id LEFT JOIN sys_depart d on d.id=ud.dep_id where u.id=#{drafterId}")
+    @Select("select u.id uid,u.username uname,d.depart_name dname from sys_user u" +
+            " LEFT JOIN sys_user_depart ud on u.id=ud.user_id" +
+            " LEFT JOIN sys_depart d on d.id=ud.dep_id where u.id=#{drafterId}" +
+            " and u.status=1 and u.del_flag=0")
     List<Map<String, Object>> getDraftMsg(@Param("drafterId") String drafterId);
 
 
@@ -132,18 +135,18 @@ public interface SysUserMapper extends BaseMapper<SysUser> {
             "    LEFT JOIN sys_user_depart ud ON u.id = ud.user_id " +
             "    LEFT JOIN sys_depart d ON ud.dep_id = d.id " +
             "    WHERE " +
-            "      u.id = #{id}  order by u.show_order  " +
+            "      u.id = #{id}   order by u.show_order  " +
             "  ) udp on 1=1  " +
             " LEFT JOIN sys_user_role ur on uu.id=ur.user_id " +
             " left JOIN sys_role r on ur.role_id=r.id " +
-            " where d.parent_id = udp.org_id  " +
+            " where d.parent_id = udp.org_id  and uu.status=1 and uu.del_flag=0 " +
             " and r.role_name=#{candidates}  ORDER BY uu.show_order")
     List<Map<String, Object>> getNextUsersByOrg(@Param("id") String id, @Param("candidates") String candidates);
 
     @Select("select u.id uid,u.username uname,d.depart_name dname  from sys_user u LEFT JOIN " +
             " " +
             "sys_user_depart ud on ud.user_id=u.id LEFT JOIN sys_depart d on d.id=ud.dep_id " +
-            " where u.id in ( " +
+            " where u.status=1 and u.del_flag=0  and  u.id in ( " +
             "select user_id  from sys_user_role ur where ur.role_id = " +
             "(select id from sys_role r where r.role_name=#{candidates} ) " +
             ")  ORDER BY u.show_order")
@@ -185,7 +188,7 @@ public interface SysUserMapper extends BaseMapper<SysUser> {
             "LEFT JOIN sys_user u ON ud.user_id = u.id " +
             "LEFT JOIN sys_user_role ur ON u.id = ur.user_id " +
             "LEFT JOIN sys_role r on ur.role_id=r.id " +
-            "where  " +
+            "where  u.status=1 and u.del_flag=0 and " +
             "d.id in " +
             "<foreach collection='deptids' item='id' index='index' separator=',' open='(' close=')'>" +
             " #{id}" +
@@ -204,7 +207,7 @@ public interface SysUserMapper extends BaseMapper<SysUser> {
             "LEFT JOIN sys_user_role ur ON ur.user_id = u.id\n" +
             "LEFT JOIN sys_role r ON r.id = ur.role_id\n" +
             "\n" +
-            "where d.depart_name=#{departName} and  r.role_name=#{roleName}" +
+            "where d.depart_name=#{departName} and  r.role_name=#{roleName} and u.status=1 and u.del_flag=0" +
             "  order BY u.show_order ")
     List<Map<String, Object>> getNextUsersMainDept(@Param("roleName") String candidates,@Param("departName") String s_main_unit_names);
 
