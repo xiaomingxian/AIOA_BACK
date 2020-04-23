@@ -7,6 +7,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Map;
+
 
 @Service
 @Transactional
@@ -19,5 +21,11 @@ public class DepartWithTaskServiceImpl implements DepartWithTaskService {
     public void save(String procInstId,TaskWithDepts taskWithDepts) {
         departWithTaskMapper.save(procInstId,taskWithDepts);
 
+    }
+
+    @Override
+    public Map<String, Integer> deptDone() {
+
+        return departWithTaskMapper.deptDone();
     }
 }

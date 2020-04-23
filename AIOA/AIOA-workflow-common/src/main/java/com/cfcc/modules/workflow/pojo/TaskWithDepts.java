@@ -24,6 +24,6 @@ public class TaskWithDepts implements Serializable {
      * val:用户id
      */
     private Map<String, List<String>> deptMsg;
-    //private Map<String, String[]> deptMsg2;
+    private Map<String, String> userDeptMap;
 
 }

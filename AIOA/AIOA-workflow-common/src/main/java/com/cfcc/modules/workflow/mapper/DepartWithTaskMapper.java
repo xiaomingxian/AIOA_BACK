@@ -1,6 +1,5 @@
 package com.cfcc.modules.workflow.mapper;
 
-import com.cfcc.common.util.StringUtil;
 import com.cfcc.modules.workflow.pojo.TaskWithDepts;
 import org.apache.ibatis.annotations.Delete;
 import org.apache.ibatis.annotations.Insert;
@@ -8,15 +7,16 @@ import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Select;
 
 import java.util.List;
+import java.util.Map;
 
 public interface DepartWithTaskMapper {
 
 
     @Insert("<script>" +
-            " insert into  oa_task_dept(proc_inst_id,task_id,task_def_key,type,user_id) VALUES " +
+            " insert into  oa_task_dept(proc_inst_id,task_id,task_def_key,type,user_id,dept_id) VALUES " +
             "<foreach collection='pojo.deptMsg' item='item' index='key' separator=','>" +
             "<foreach collection='item' item='value' index='key2' separator=','>" +
-            "   (#{procInstId},#{pojo.tskId},#{pojo.taskDefKey},#{key},#{value} ) " +
+            "   (#{procInstId},#{pojo.tskId},#{pojo.taskDefKey},#{key},#{value},#{pojo.userDeptMap[${value}]} ) " +
             "</foreach>" +
             "</foreach>" +
             "</script>")
@@ -39,6 +39,11 @@ public interface DepartWithTaskMapper {
 
     @Delete("   DELETE from oa_task_dept where proc_inst_id=#{processInstanceId} and task_def_key=#{task_def_key};")
     void deleteSameTask(@Param("processInstanceId") String processInstanceId, @Param("task_def_key") String taskDefinitionKey);
+
+    @Select("SELECT td.dept_id did,COUNT(ht.ID_) countDone FROM oa_task_dept  td LEFT JOIN act_hi_taskinst ht on td.task_id=ht.ID_ and td.user_id=ht.ASSIGNEE_ and ht.DELETE_REASON_ is not null \n" +
+            "where ht.ID_ is not null \n" +
+            "GROUP BY td.dept_id ")
+    Map<String, Integer> deptDone();
 }
 
 
