@@ -259,12 +259,17 @@ public class OaDatadetailedInstController {
      @PostMapping(value = "/adddatadetailedInst")
      public Result<Object> adddatadetailedInst(@RequestBody Map<String,Object> map) {
          Result<Object> result = new Result<Object>();
-         int id=oaDatadetailedInstService.addDetailed(map);
+         try {
+             int id=oaDatadetailedInstService.addDetailed(map);
 //         int id=oaDatadetailedInstService.addorupdataDetailed(OaDatadetailedInst);
-         if (id!=0){
-             result.setResult(id);
-             result.setSuccess(true);
-         }else {
+             if (id!=0){
+                 result.setResult(id);
+                 result.setSuccess(true);
+             }else {
+                 result.setSuccess(false);
+             }
+         } catch (Exception e) {
+             e.printStackTrace();
              result.setSuccess(false);
          }
          return result;
@@ -276,11 +281,16 @@ public class OaDatadetailedInstController {
                                               @RequestParam(value = "sCreateBy", required = true) String sCreateBy,
                                               @RequestParam(value = "sCreateDeptid", required = true) String sCreateDeptid){
          Result<Object> result = new Result<Object>();
-         List<OaDatadetailedInst> list=oaDatadetailedInstService.seletdetailedInstList(sTable,iTableId,sCreateBy,sCreateDeptid);
-         if (list.size()!=0){
-             result.setResult(list);
-             result.setSuccess(true);
-         }else {
+         try {
+             List<OaDatadetailedInst> list=oaDatadetailedInstService.seletdetailedInstList(sTable,iTableId,sCreateBy,sCreateDeptid);
+             if (list.size()!=0){
+                 result.setResult(list);
+                 result.setSuccess(true);
+             }else {
+                 result.setSuccess(false);
+             }
+         } catch (Exception e) {
+             e.printStackTrace();
              result.setSuccess(false);
          }
          return result;
@@ -292,12 +302,16 @@ public class OaDatadetailedInstController {
                                                   @RequestParam(value = "sCreateBy", required = true) String sCreateBy,
                                                   @RequestParam(value = "sCreateDeptid", required = true) String sCreateDeptid){
         Result<Object> result = new Result<Object>();
-        List<OaDatadetailedInst> list=oaDatadetailedInstService.seletAlldetailedInstList(sTable,iTableId,sCreateBy,sCreateDeptid);
-        if (list.size()!=0){
-            result.setResult(list);
-            result.setSuccess(true);
-        }else {
-            result.setSuccess(false);
+        try {
+            List<OaDatadetailedInst> list=oaDatadetailedInstService.seletAlldetailedInstList(sTable,iTableId,sCreateBy,sCreateDeptid);
+            if (list.size()!=0){
+                result.setResult(list);
+                result.setSuccess(true);
+            }else {
+                result.setSuccess(false);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
         }
         return result;
     }
@@ -306,12 +320,16 @@ public class OaDatadetailedInstController {
     public Result<Object> selectAlldetailedInst(@RequestParam(value = "sTable", required = true) String sTable,
                                                   @RequestParam(value = "iTableId", required = true) Integer iTableId){
         Result<Object> result = new Result<Object>();
-        List<OaDatadetailedInst> list=oaDatadetailedInstService.seletSharedetailedInstList(sTable,iTableId);
-        if (list.size()!=0){
-            result.setResult(list);
-            result.setSuccess(true);
-        }else {
-            result.setSuccess(false);
+        try {
+            List<OaDatadetailedInst> list=oaDatadetailedInstService.seletSharedetailedInstList(sTable,iTableId);
+            if (list.size()!=0){
+                result.setResult(list);
+                result.setSuccess(true);
+            }else {
+                result.setSuccess(false);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
         }
         return result;
     }
@@ -319,11 +337,15 @@ public class OaDatadetailedInstController {
     @PostMapping(value = "/updatadetailedInst")
     public Result<Object> updatadetailedInst(@RequestBody Map<String,Object> map){
         Result<Object> result = new Result<>();
-        boolean flag=oaDatadetailedInstService.updatadetailedInst(map);
-        if (flag){
-            result.setSuccess(true);
-        }else {
-            result.setSuccess(false);
+        try {
+            boolean flag=oaDatadetailedInstService.updatadetailedInst(map);
+            if (flag){
+                result.setSuccess(true);
+            }else {
+                result.setSuccess(false);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
         }
         return result;
     }
@@ -331,27 +353,36 @@ public class OaDatadetailedInstController {
     @GetMapping(value = "/deteledetailedInst")
     public Result<Object> deteledetailedInst(@RequestParam(value = "iId", required = true) Integer iId){
         Result<Object> result = new Result<Object>();
-        int num=oaDatadetailedInstService.deteledetailedInst(iId);
-        if (num!=0){
-            result.setSuccess(true);
-        }else {
-            result.setSuccess(false);
+        try {
+            int num=oaDatadetailedInstService.deteledetailedInst(iId);
+            if (num!=0){
+                result.setSuccess(true);
+            }else {
+                result.setSuccess(false);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
         }
         return result;
     }
 
     @GetMapping(value = "/updataDetailedIsStats")
-    public Result<Object> updataDetailedIsStats(@RequestParam(value = "iId", required = true) Integer iId
-                                                ){
+    public Result<Object> updataDetailedIsStats(@RequestParam(value = "iId", required = true) Integer iId,
+                                                @RequestParam(value = "num", required = true) Integer num){
         Result<Object> result = new Result<Object>();
-        boolean flag=oaDatadetailedInstService.updataDetailedIsStats(iId);
-        if (flag){
-            result.setSuccess(true);
-        }else {
-            result.setSuccess(false);
+        try {
+            boolean flag=oaDatadetailedInstService.updataDetailedIsStats(iId,num);
+            if (flag){
+                result.setSuccess(true);
+            }else {
+                result.setSuccess(false);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
         }
         return result;
     }
+
 
  }
 
