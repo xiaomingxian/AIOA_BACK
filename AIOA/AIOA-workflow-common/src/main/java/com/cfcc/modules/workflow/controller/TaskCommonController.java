@@ -31,10 +31,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @Api(tags = "工作流：通用任务接口")
 @RestController
@@ -120,7 +117,6 @@ public class TaskCommonController {
 
 
             Result result = null;
-
             switch (operstatus) {
                 //待办(部门类型已加)
                 case IWfConstant.TASK_TODO:

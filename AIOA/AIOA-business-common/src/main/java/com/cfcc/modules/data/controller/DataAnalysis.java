@@ -12,6 +12,8 @@ import com.cfcc.common.util.oConvertUtils;
 import com.cfcc.modules.data.service.DataAnalysisService;
 import com.cfcc.modules.oaBus.entity.*;
 import com.cfcc.modules.oaBus.service.IOaBusdataService;
+import com.cfcc.modules.system.entity.LoginInfo;
+import com.cfcc.modules.system.service.ISysUserService;
 import io.swagger.annotations.Api;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
@@ -46,6 +48,8 @@ public class DataAnalysis {
     @Value("${system.runDate}")
     private String runDate;
 
+    @Autowired
+    private ISysUserService sysUserService;
     /**
      * 查询年份
      *
@@ -140,8 +144,12 @@ public class DataAnalysis {
     @AutoLog(value = "同行办理数量的百分比---功能办理的数量/总公文的数量（不管办结没办结、所属业务）")
     @GetMapping(value = "/PeerNum")
     @ResponseBody
-    public Map<String, Object> PeerNum(OaBusdata oaBusdata, @RequestParam(name = "modelId", required = false) Integer modelId) {
+    public Map<String, Object> PeerNum(HttpServletRequest request,OaBusdata oaBusdata, @RequestParam(name = "modelId", required = false) Integer modelId) {
         String table = iOaBusdataService.queryTableName(modelId);
+        //查询当前用户，作为assignee
+        LoginInfo loginInfo = sysUserService.getLoginInfo(request);
+        String parentId = loginInfo.getDepart().getParentId();
+        oaBusdata.setSCreateUnitid(parentId);
         Map<String, Object> rate = dataAnalysisService.PeerNum(table, oaBusdata);
 
 

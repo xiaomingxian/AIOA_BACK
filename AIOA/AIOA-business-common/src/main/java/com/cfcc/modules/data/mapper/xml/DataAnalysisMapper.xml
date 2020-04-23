@@ -78,13 +78,16 @@
             <if test="bdata.sCreateUnitid != null and bdata.sCreateUnitid != ''">
                 AND s_create_unitid = #{bdata.sCreateUnitid}
             </if>
-
+            <if test="bdata.iBusFunctionId != null and bdata.iBusFunctionId != ''">
+                AND  i_bus_function_id = #{bdata.iBusFunctionId}
+            </if>
             <if test="bdata.sCreateDeptid != null and bdata.sCreateDeptid != ''">
                 AND  s_create_deptid = #{bdata.sCreateDeptid}
             </if>
 
     </where> ) as preeNum   from dual
     </select>
+
     <!--办理率-->
     <select id="HandlingRate" resultType="java.util.Map">
         	select
