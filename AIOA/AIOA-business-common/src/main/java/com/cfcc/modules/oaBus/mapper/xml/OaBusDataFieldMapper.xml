@@ -118,7 +118,12 @@
             <if test="d_sealdate ==null or d_sealdate ==''">
                 d_sealdate = NULL,
             </if>
-
+            <if test="s_receive_num !=null and s_receive_num !=''">
+                s_receive_num=#{s_receive_num},
+            </if>
+            <if test="s_receive_num ==null or s_receive_num ==''">
+                s_receive_num = NULL,
+            </if>
             <if test="i_bus_model_id !=null and i_bus_model_id !=''">
                 i_bus_model_id=#{i_bus_model_id},
             </if>
@@ -233,11 +238,20 @@
             <if test="i_create_year !=null and i_create_year !=''">
                 i_create_year=#{i_create_year},
             </if>
+            <if test="i_create_year ==null or i_create_year ==''">
+                i_create_year = NULL,
+            </if>
             <if test="i_create_month !=null and i_create_month !=''">
                 i_create_month=#{i_create_month},
             </if>
+            <if test="i_create_month ==null or i_create_month ==''">
+                i_create_month = NULL,
+            </if>
             <if test="i_create_day !=null and i_create_day !=''">
                 i_create_day=#{i_create_day},
+            </if>
+            <if test="i_create_day ==null or i_create_day ==''">
+                i_create_day = NULL,
             </if>
             <if test="s_create_name !=null and s_create_name !=''">
                 s_create_name=#{s_create_name},
@@ -250,6 +264,9 @@
             </if>
             <if test="s_create_dept !=null and s_create_dept !=''">
                 s_create_dept=#{s_create_dept},
+            </if>
+            <if test="s_create_dept ==null or s_create_dept ==''">
+                s_create_dept = NULL,
             </if>
             <if test="d_create_time !=null and d_create_time !=''">
                 d_create_time=#{d_create_time},
