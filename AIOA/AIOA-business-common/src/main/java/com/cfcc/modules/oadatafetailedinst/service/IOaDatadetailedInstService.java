@@ -2,6 +2,7 @@ package com.cfcc.modules.oadatafetailedinst.service;
 
 import com.cfcc.modules.oadatafetailedinst.entity.OaDatadetailedInst;
 import com.baomidou.mybatisplus.extension.service.IService;
+import com.cfcc.modules.system.entity.SysDepart;
 
 import java.util.List;
 import java.util.Map;
@@ -40,7 +41,7 @@ public interface IOaDatadetailedInstService extends IService<OaDatadetailedInst>
 
     Map<String, Object> findPret(String parentId);
 
-    List<Map<String, Object>> findorganizeNum(String table, String userId, int year, String parentId);
+    Map<String, Object> findorganizeNum(String table, String userId, int year, String parentId);
 
     boolean updatadetailedInst(Map<String, Object> map);
 
@@ -55,4 +56,8 @@ public interface IOaDatadetailedInstService extends IService<OaDatadetailedInst>
     Map<String, Object> lineLeaderRate(String table, Integer busModelId,Integer busFunctionId);
 
     Map<String, Object> Rate(String table, Integer busModelId);
+
+    String  findById(Integer departId);
+
+    Map<String, Integer> deptDone(List<String> fids);
 }

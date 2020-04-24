@@ -12,9 +12,12 @@ import com.cfcc.modules.oaBus.service.IOaBusdataService;
 import com.cfcc.modules.oadatafetailedinst.entity.OaDatadetailedInst;
 import com.cfcc.modules.oadatafetailedinst.service.IOaDatadetailedInstService;
 import com.cfcc.modules.system.entity.*;
+import com.cfcc.modules.system.service.ISysDepartService;
 import com.cfcc.modules.system.service.ISysUserService;
 import com.cfcc.modules.system.service.ISysUserSetService;
 import com.cfcc.modules.utils.IWfConstant;
+import com.cfcc.modules.workflow.pojo.TaskProcess;
+import com.cfcc.modules.workflow.service.DepartWithTaskService;
 import com.cfcc.modules.workflow.service.TaskCommonService;
 import com.cfcc.modules.workflow.vo.TaskInfoVO;
 import io.swagger.annotations.Api;
@@ -51,6 +54,12 @@ public class SupervisionPage {
 
     @Autowired
     private IOaDatadetailedInstService oaDatadetailedInstService;
+
+    @Autowired
+    private DepartWithTaskService departWithTaskService;
+
+    @Autowired
+    private ISysDepartService iSysDepartService;
     /**
      * 督办件
      * @param
@@ -80,6 +89,19 @@ public class SupervisionPage {
         strBuf.append("}} ") ;
         Result<IPage<Map<String, Object>>> byModelId = oaBusdataService.getByModelId(strBuf.toString(), realname, username);
         long total = byModelId.getResult().getTotal();
+        String table = "oa_busdata11";
+        Map<String, Object> hangrate = oaDatadetailedInstService.lineLeaderRate(table,modelId,functionId);
+        Map<String, Object> rate = oaDatadetailedInstService.Rate(table, modelId);
+        if(rate == null){
+            map.put("rate",0);
+        }else{
+            map.put("rate",rate.get("rate"));
+        }
+        if(hangrate == null){
+            map.put("hangrate",0);
+        }else{
+            map.put("hangrate",hangrate.get("rate"));
+        }
         map.put("total",total);
         return map;
     }
@@ -115,49 +137,40 @@ public class SupervisionPage {
         String parentId = loginInfo.getDepart().getParentId();
         String table = "oa_busdata11";
         int year = DateUtils.getYear();
-        Map<String, Object> depart = oaDatadetailedInstService.findPret(parentId);
-        List<Map<String, Object>> typeNum = oaDatadetailedInstService.findorganizeNum(table, UserId, year, parentId);
-        List<Integer> list = new ArrayList<>();
-        for (int i = 1; i <= depart.size(); i++) {
-            Boolean b = true;
-            for (int j = 0; j < typeNum.size(); j++) {
-                if (depart.get("depart_name").equals(typeNum.get(j).get("organize"))) {
-                    b = false;
-                }
-            }
-            if (b) {
-                list.add(i);
-            }
+        Map<String, Object> depart = oaDatadetailedInstService.findPret(parentId); //部门
+        String depart_name = (String)depart.get("depart_name");
+        Map<String, Object> typeNum = oaDatadetailedInstService.findorganizeNum(table, UserId, year, parentId);
+        String organize = (String)typeNum.get("organize");
+        Integer num = (Integer)typeNum.get("num");
+        if(depart_name.equals(organize)){
+            map.put("departName",organize);
+            map.put("count",num);
+        }else{
+            map.put("departName",depart_name);
+            map.put("count",0);
         }
-        list.forEach(i -> {
-            Map<String, Object> map1 = new HashMap<>();
-            map1.put("organize",depart.get("depart_name") );
-            map1.put("num", 0);
-            typeNum.add(map1);
-        });
-        map.put("depart",depart);
-        map.put("typeNum",typeNum);
         return map;
     }
-    /**
+  /*  *//**
      *行领导批示办结率
      * @return
-     */
+     *//*
     @GetMapping(value = "lineLeaderRate")
     public Map<String,Object> lineLeaderRate() {
         String table = "oa_busdata11";
         Integer busModelId = 51;
         Integer busFunctionId = 163;
-        Map<String, Object> rate = new HashMap<>();
+        Map<String, Object> hangrate = new HashMap<>();
         rate = oaDatadetailedInstService.lineLeaderRate(table,busModelId,busFunctionId);
         if(rate == null){
-            rate.put("rate",0);
+            rate.put("hangrate",0);
         }
         return rate;
-    } /**
+    }*/
+   /* *//**
      *办结率
      * @return
-     */
+     *//*
     @GetMapping(value = "Rate")
     public Map<String,Object> Rate() {
         String table = "oa_busdata11";
@@ -168,6 +181,54 @@ public class SupervisionPage {
              rate.put("rate",0);
          }
         return rate;
+    }*/
+    /**
+     *办结数量
+     * @return
+     */
+    @GetMapping(value = "RateNum")
+    public Map<String,Object> RateNum(HttpServletRequest request) {
+        LoginInfo loginInfo = iSysUserService.getLoginInfo(request);
+        Map<String,Object>  map = new HashMap<>();
+        String parentId = loginInfo.getDepart().getParentId();
+        String table = "oa_busdata11";
+        int year = DateUtils.getYear();
+        Map<String, Object> depart = oaDatadetailedInstService.findPret(parentId);
+        String depart_name = (String)depart.get("depart_name");
+        Integer busModelId = 51;
+        List<String> functionIds = oaDatadetailedInstService.findFunctionIds(busModelId);
+        Map<String, Integer> stringIntegerMap = departWithTaskService.deptDone(functionIds);
+        Integer departId = stringIntegerMap.get("did");
+        Integer count = stringIntegerMap.get("countDone");
+        String departName = oaDatadetailedInstService.findById(departId);
+        if(depart_name.equals(departName)){
+            map.put("departName",departName);
+            map.put("count",count);
+        }else{
+            map.put("departName",depart_name);
+            map.put("count",0);
+        }
+
+        return map;
+    }
+    /**
+     *延期数量
+     * @return
+     */
+    @GetMapping(value = "ExtensionsNum")
+    public Map<String,Object> ExtensionsNum(HttpServletRequest request) {
+        LoginInfo loginInfo = iSysUserService.getLoginInfo(request);
+        Map<String,Object>  map = new HashMap<>();
+        String parentId = loginInfo.getDepart().getParentId();
+        String table = "oa_busdata11";
+        int year = DateUtils.getYear();
+        Map<String, Object> depart = oaDatadetailedInstService.findPret(parentId);
+        String depart_name = (String)depart.get("depart_name");
+        Integer busModelId = 51;
+        List<String> functionIds = oaDatadetailedInstService.findFunctionIds(busModelId);
+        List<TaskProcess> taskProcesses = departWithTaskService.taskProcess(functionIds);
+
+        return map;
     }
     @GetMapping("queryTask")
     @ApiOperation("任务查询")

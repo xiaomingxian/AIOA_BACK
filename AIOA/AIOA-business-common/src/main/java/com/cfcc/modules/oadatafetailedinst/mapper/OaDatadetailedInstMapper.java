@@ -5,7 +5,9 @@ import java.util.Map;
 
 import com.cfcc.modules.oadatafetailedinst.entity.OaDatadetailedInst;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+import com.cfcc.modules.system.entity.SysDepart;
 import org.apache.ibatis.annotations.Delete;
+import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Select;
 
 /**
@@ -45,9 +47,9 @@ public interface OaDatadetailedInstMapper extends BaseMapper<OaDatadetailedInst>
 
     List<Map<String, Object>> findTypeNum(String table,String userId,int year,String parentId);
 
-    Map<String, Object> getDept(String parentId);
+    List<String> getDept(String parentId);
 
-    List<Map<String, Object>> findorganizeNum(String table, String userId, int year, String parentId);
+   Map<String, Object> findorganizeNum(String table, String userId, int year, String parentId);
 
 
     @Delete("DELETE FROM oa_datadetailed_inst WHERE i_id=#{iId}")
@@ -61,4 +63,8 @@ public interface OaDatadetailedInstMapper extends BaseMapper<OaDatadetailedInst>
     Map<String, Object> lineLeaderRate(String table, Integer busModelId ,Integer busFunctionId);
 
     Map<String, Object> rate(String table, Integer busModelId);
+
+    String findByid(Integer departId);
+
+    Map<String, Integer> deptDone(@Param("fids") List<String> fids);
 }
