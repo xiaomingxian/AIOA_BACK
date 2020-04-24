@@ -3,6 +3,8 @@ package com.cfcc.modules.oadeferlog.service;
 import com.cfcc.modules.oadeferlog.entity.oaDeferLog;
 import com.baomidou.mybatisplus.extension.service.IService;
 
+import java.util.Map;
+
 /**
  * @Description: 任务类事务延期记录
  * @Author: jeecg-boot
@@ -11,4 +13,5 @@ import com.baomidou.mybatisplus.extension.service.IService;
  */
 public interface IoaDeferLogService extends IService<oaDeferLog> {
 
+    boolean updataOadataAndaddOaDeferLog(Map<String, Object> map);
 }

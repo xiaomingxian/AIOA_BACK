@@ -177,4 +177,36 @@ public interface OaBusdataMapper extends BaseMapper<OaBusdata> {
                               @Param("userDepart")String userDepart);
 
     Integer getOaBusFunctionIsEsByOaBusdata(@Param("tableId") String tableId,@Param("table") String table);
+
+    Boolean updateBusDataByIdAndTable(@Param("id") Integer bBusdataId,@Param("tableName") String bTableName,@Param("s_title") String s_title,@Param("s_file_num") String s_file_num,@Param("s_create_dept") String s_create_dept,@Param("i_is_file") Integer i_is_file);
+
+    Boolean saveOaDataData(@Param("s_file_type") String s_file_type,@Param("i_a_bus_model_id") Integer i_a_bus_model_id,@Param("i_a_bus_function_id") Integer i_a_bus_function_id,
+                           @Param("s_a_busdata_table") String s_a_busdata_table,@Param("i_a_fun_version") Integer i_a_fun_version,@Param("i_a_busdata_id") Integer i_a_busdata_id,@Param("i_b_bus_model_id")Integer i_b_bus_model_id,@Param("i_b_bus_function_id") Integer i_b_bus_function_id,
+                           @Param("s_b_busdata_table") String s_b_busdata_table,@Param("i_b_fun_version") Integer i_b_fun_version,@Param("i_b_busdata_id") Integer i_b_busdata_id,@Param("s_create_name") String s_create_name,@Param("s_create_by") String s_create_by);
+
+    List<Map<String, Object>> getOaDataAllByBusdataId(@Param("busdataId") Integer busdataId,@Param("tableName") String tableName);
+
+//    Boolean saveOaDataData(Integer sFileType, String iABusModelId, String iABusFunctionId, String sABusdataTable, String iAFunVersion, String iBBusFunctionId, Object sBBusdataTable, String iBFunVersion, String iBBusdataId, String sCreateName, String sCreateBy);
+
+//    Boolean saveOaDataData(Map<String, Object> oaDataMap);
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 }

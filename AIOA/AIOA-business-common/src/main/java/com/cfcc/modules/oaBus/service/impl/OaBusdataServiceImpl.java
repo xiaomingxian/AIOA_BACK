@@ -15,6 +15,7 @@ import com.cfcc.modules.oaBus.entity.*;
 import com.cfcc.modules.oaBus.mapper.BusFunctionMapper;
 import com.cfcc.modules.oaBus.mapper.OaBusDynamicTableMapper;
 import com.cfcc.modules.oaBus.mapper.OaBusdataMapper;
+import com.cfcc.modules.oaBus.mapper.OaFileMapper;
 import com.cfcc.modules.oaBus.service.*;
 import com.cfcc.modules.system.entity.*;
 import com.cfcc.modules.system.mapper.SysDictItemMapper;
@@ -45,6 +46,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.*;
@@ -61,7 +65,17 @@ import java.util.stream.Collectors;
 public class OaBusdataServiceImpl extends ServiceImpl<OaBusdataMapper, OaBusdata> implements IOaBusdataService {
 
     @Autowired
+    private IOaFileService oaFileService;
+
+    @Autowired
     OaBusdataMapper oaBusdataMapper;
+
+    @Autowired
+    private OaFileMapper oaFileMapper;
+
+    @Autowired
+    private IBusModelService busModelService;
+
     @Autowired
     private IBusFunctionService busFunctionService;
     @Autowired
@@ -746,6 +760,183 @@ public class OaBusdataServiceImpl extends ServiceImpl<OaBusdataMapper, OaBusdata
             }
         }
         return false;
+    }
+
+    @Override
+    public Boolean createSuperiseDataByDispatch(Map<String, Object> map, LoginInfo loginInfo,String uploadpath) {
+        Integer aBusdataId = Integer.parseInt(map.get("a_busdataId").toString());
+        String aTableName = map.get("a_tableName")+"";
+        Integer bBusdataId = Integer.parseInt(map.get("b_busdataId").toString());
+        String bTableName = map.get("b_tableName") + "";
+        Integer sFileType = Integer.parseInt(map.get("s_file_type") + "");
+
+        Boolean ok = null;
+        try {
+            Map<String, Object> aBusdata = oaBusdataMapper.getBusdataById(aTableName, aBusdataId);
+            String s_title = aBusdata.get("s_title").toString();
+            String s_file_num = aBusdata.get("s_file_num").toString();
+            String s_create_dept = aBusdata.get("s_create_dept").toString();
+            Integer i_is_file = Integer.parseInt(aBusdata.get("i_is_file").toString());
+
+            ok = oaBusdataMapper.updateBusDataByIdAndTable(bBusdataId,bTableName,s_title,s_file_num,s_create_dept,i_is_file);
+            if (!ok){
+                return false;
+            }
+            String iIsFile = aBusdata.get("i_is_file").toString();
+            if (iIsFile.equals("1")){
+                List<OaFile> oaFileList = oaFileMapper.getOaFileList(aTableName,aBusdataId+"");
+                String ctxPath = uploadpath;   //盘符
+                Calendar calendar = Calendar.getInstance();
+                String calendarPath = calendar.get(Calendar.YEAR) +
+                        File.separator + (calendar.get(Calendar.MONTH) + 1) +
+                        File.separator + calendar.get(Calendar.DATE);
+                String upPath = ""; //生成文件地址
+                String suffexPath = "";  //查询文件前缀
+                if (loginInfo.getOrgSchema() != null && !loginInfo.getOrgSchema().equals("")) {
+                    upPath = ctxPath.replace("//", "/" +
+                            "") + File.separator + loginInfo.getOrgSchema() + File.separator + calendarPath;
+                    suffexPath = ctxPath.replace("//", "/" +
+                            "") + File.separator + loginInfo.getOrgSchema();
+                } else {
+                    upPath = ctxPath.replace("//", "/" +
+                            "") + File.separator + calendarPath;
+                    suffexPath = ctxPath.replace("//", "/" + "");
+                }
+                File file = new File(upPath);
+                if (!file.exists()) {
+                    file.mkdirs();// 创建文件根目录
+                }
+                for (OaFile oaFile : oaFileList) {
+                    //获取源文件的名称
+                    String srcPathStr = suffexPath + File.separator + oaFile.getSFilePath();
+                    String filename = System.currentTimeMillis() + com.cfcc.common.util.FileUtils.generatePassword(5);
+                    String newFileName = oaFile.getSFileName().replace(oaFile.getSFileName().substring(0, oaFile.getSFileName().lastIndexOf(".")), filename);
+                    String desPathStr = upPath + File.separator + newFileName; //源文件地址
+                    try
+                    {
+                        FileInputStream fis = new FileInputStream(srcPathStr);//创建输入流对象
+                        FileOutputStream fos = new FileOutputStream(desPathStr); //创建输出流对象
+                        byte datas[] = new byte[1024*8];//创建搬运工具
+                        int len = 0;//创建长度
+                        while((len = fis.read(datas))!=-1)//循环读取数据
+                        {
+                            fos.write(datas,0,len);
+                        }
+                        fis.close();//释放资源
+                        fis.close();//释放资源
+                    }
+                    catch (Exception e)
+                    {
+                        e.printStackTrace();
+                    }
+                    OaFile saveFile = new OaFile();
+                    saveFile.setSTable(bTableName);
+                    saveFile.setITableId(bBusdataId);
+                    saveFile.setSFileType(oaFile.getSFileType());
+                    saveFile.setSFilePath(calendarPath + File.separator + newFileName);
+                    saveFile.setSFileName(oaFile.getSFileName());
+                    saveFile.setSCreateBy(loginInfo.getUsername());
+                    saveFile.setDCreateTime(new Date());
+                    oaFileService.save(saveFile);
+                    oaFileService.updateIorderById(saveFile.getIId());
+                }
+            }
+            Map<String, Object> bBusdata = oaBusdataMapper.getBusdataById(bTableName, bBusdataId);
+            Map<String,Object> oaDataMap = new HashMap<>();
+            oaDataMap.put("sFileType", sFileType);
+            oaDataMap.put("iABusModelId", aBusdata.get("i_bus_model_id"));
+            oaDataMap.put("iABusFunctionId", aBusdata.get("i_bus_function_id"));
+            oaDataMap.put("sABusdataTable", aTableName);
+            oaDataMap.put("iAFunVersion", aBusdata.get("i_fun_version"));
+            oaDataMap.put("iABusdataId", aBusdataId);
+
+            oaDataMap.put("iBBusModelId", bBusdata.get("i_bus_model_id"));
+            oaDataMap.put("iBBusFunctionId", bBusdata.get("i_bus_function_id"));
+            oaDataMap.put("sBBusdataTable", bTableName);
+            oaDataMap.put("iBFunVersion", bBusdata.get("i_fun_version"));
+            oaDataMap.put("iBBusdataId", bBusdata.get("i_id"));
+
+            oaDataMap.put("sCreateName", bBusdata.get("s_create_name"));
+            oaDataMap.put("sCreateBy", aBusdata.get("s_create_by"));
+//            Boolean flag = oaBusdataMapper.saveOaDataData(oaDataMap);
+            Boolean flag = oaBusdataMapper.saveOaDataData(sFileType+"",Integer.parseInt(aBusdata.get("i_bus_model_id")+""),Integer.parseInt(aBusdata.get("i_bus_function_id")+""),
+                    aTableName,Integer.parseInt(aBusdata.get("i_fun_version")+""),aBusdataId,Integer.parseInt(bBusdata.get("i_bus_model_id")+""),Integer.parseInt(bBusdata.get("i_bus_function_id")+""),bTableName,
+                    Integer.parseInt(bBusdata.get("i_fun_version")+""),bBusdataId,bBusdata.get("s_create_name")+"",aBusdata.get("s_create_by")+"");
+            if (!flag){
+                return false;
+            }
+        } catch (NumberFormatException e) {
+            e.printStackTrace();
+            return false;
+        }
+
+        return true;
+    }
+
+
+    @Override
+    public List<Map<String, Object>> getOaDataAllByBusdataId(Map<String, Object> map) {
+        Integer busdataId = Integer.parseInt(map.get("busdataId").toString());
+        String tableName = map.get("tableName")+"";
+        List<Map<String, Object>> oaDataList = oaBusdataMapper.getOaDataAllByBusdataId(busdataId,tableName);
+
+        Iterator<Map<String, Object>> iterator = oaDataList.iterator();
+        while (iterator.hasNext()){
+            Map<String, Object> oaDataMap = iterator.next();
+            Integer iBBusModelId = Integer.parseInt(oaDataMap.get("i_b_bus_model_id")+"");
+            String sFileType = oaDataMap.get("s_file_type")+"";
+            String sCreateName = oaDataMap.get("s_create_name")+"";
+            Integer bTableId = Integer.parseInt(oaDataMap.get("i_b_busdata_id")+"");
+            String bTableName = oaDataMap.get("s_b_busdata_table")+"";
+            BusModel busModel = busModelService.getBusModelById(iBBusModelId);
+            oaDataMap.put("busModel",busModel.getSName() );
+            switch (sFileType) {
+                case "1":
+                    oaDataMap.put("fileType","公文链接" );
+                    break;
+                case "2":
+                    oaDataMap.put("fileType","起草发文" );
+                    break;
+                case "3":
+                    oaDataMap.put("fileType","列入督办" );
+                    break;
+                case "4":
+                    oaDataMap.put("fileType","其他文件" );
+                    break;
+            }
+            /*序号、业务功能、标题、关联类型、创建人、创建时间*/
+            Map<String, Object> busdata = oaBusdataMapper.getBusdataById(bTableName, bTableId);
+            String sTitle = busdata.get("s_title")+"";
+            oaDataMap.put("sTitle",sTitle );
+            oaDataMap.put("createTime", busdata.get("d_create_time"));
+        }
+
+        return oaDataList;
+    }
+
+
+    static void copy(String srcPathStr, String desPathStr)
+    {
+        //获取源文件的名称
+        String newFileName = srcPathStr.substring(srcPathStr.lastIndexOf("\\")+1); //目标文件地址
+        desPathStr = desPathStr + File.separator + newFileName; //源文件地址
+        try
+        {
+            FileInputStream fis = new FileInputStream(srcPathStr);//创建输入流对象
+            FileOutputStream fos = new FileOutputStream(desPathStr); //创建输出流对象
+            byte datas[] = new byte[1024*8];//创建搬运工具
+            int len = 0;//创建长度
+            while((len = fis.read(datas))!=-1)//循环读取数据
+            {
+                fos.write(datas,0,len);
+            }
+            fis.close();//释放资源
+            fis.close();//释放资源
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+        }
     }
 
 
