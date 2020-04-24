@@ -5,6 +5,7 @@ import com.cfcc.modules.drawing.entity.ProcessMsg;
 import com.cfcc.modules.drawing.service.ModelerService;
 import com.cfcc.modules.workflow.pojo.TaskProcess;
 import com.cfcc.modules.workflow.service.DepartWithTaskService;
+import com.cfcc.modules.workflow.service.ProcessManagerService;
 import io.micrometer.core.instrument.util.StringUtils;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -46,6 +47,19 @@ public class ModelerController {
         data.put("taskProcesses",taskProcesses);
         return  Result.ok(data);
     }
+
+    @Autowired
+    private ProcessManagerService processManagerService;
+
+
+    @GetMapping("queryTaskDefkeys")
+    @ResponseBody
+    public Result queryTaskDefkeys(String key) {
+        List<String> defKeys = processManagerService.queryTaskDefkeys(key);
+
+        return Result.ok(defKeys);
+    }
+
 
     /**
      * 创建流程模型

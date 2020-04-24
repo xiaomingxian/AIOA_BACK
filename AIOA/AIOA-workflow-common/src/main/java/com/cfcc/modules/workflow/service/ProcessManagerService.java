@@ -47,4 +47,6 @@ public interface ProcessManagerService {
 
 
     Result lastVersionProc(String key);
+
+    List<String> queryTaskDefkeys(String key);
 }

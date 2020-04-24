@@ -17,6 +17,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.activiti.engine.RepositoryService;
 import org.activiti.engine.RuntimeService;
 import org.activiti.engine.impl.persistence.entity.ProcessDefinitionEntity;
+import org.activiti.engine.impl.pvm.PvmActivity;
+import org.activiti.engine.impl.pvm.PvmTransition;
 import org.activiti.engine.impl.pvm.process.ActivityImpl;
 import org.activiti.engine.repository.DeploymentBuilder;
 import org.activiti.engine.repository.ProcessDefinition;
@@ -112,11 +114,10 @@ public class ProcessManagerImpl implements ProcessManagerService {
             result.setSuccess(true);
             result.setMessage("发布成功");
 
-        }catch (AIOAException e){
+        } catch (AIOAException e) {
             log.error(e.toString());
-            throw  new AIOAException(e.getMessage());
-        }
-        catch (Exception e) {
+            throw new AIOAException(e.getMessage());
+        } catch (Exception e) {
             log.error(e.toString());
             throw new AIOAException("发布失败,请检查流程图是否正确(建议按照手册操作)");
         }
@@ -407,6 +408,72 @@ public class ProcessManagerImpl implements ProcessManagerService {
         map.put("name", processDefinition.getName());
         map.put("id", id);
         return Result.ok(map);
+    }
+
+    @Override
+    public List<String> queryTaskDefkeys(String key) {
+        ArrayList<String> defKeys = new ArrayList<>();
+
+        ProcessDefinition processDefinition = repositoryService.createProcessDefinitionQuery()
+                .processDefinitionKey(key).latestVersion().singleResult();
+        if (processDefinition == null) throw new AIOAException("未找到流程信息请检查流程是否部署");
+
+        ProcessDefinitionEntity proc = (ProcessDefinitionEntity) repositoryService.getProcessDefinition(processDefinition.getId());
+        List<ActivityImpl> activities = proc.getActivities();
+        if (activities.size() == 0) throw new AIOAException("未找到流程环节,请检查流程图是否合法");
+        //获取开始事件的后一个节点
+        ActivityImpl start = null;
+        for (ActivityImpl activity : activities) {
+            String type = (String) activity.getProperty("type");
+            if ("startevent".equalsIgnoreCase(type)) {
+                start = activity;
+                break;
+            }
+        }
+        findAllTaskDefKeys(start, defKeys);
+
+
+        return defKeys;
+    }
+
+    private void findAllTaskDefKeys(PvmActivity activity, ArrayList<String> defKeys) {
+        List<PvmTransition> outgoingTransitions = activity.getOutgoingTransitions();
+        for (PvmTransition outgoingTransition : outgoingTransitions) {
+            PvmActivity destination = outgoingTransition.getDestination();
+            String id = destination.getId();
+            String type = (String) destination.getProperty("type");
+            if ("subProcess".equalsIgnoreCase(type)) {
+                //1.记录id
+                if (!defKeys.contains(id)) {
+                    defKeys.add(id);
+                    //查询内部内容
+                    List<? extends PvmActivity> activities = destination.getActivities();
+                    for (PvmActivity pvmActivity : activities) {
+                        String type1 = (String) pvmActivity.getProperty("type");
+                        if ("startEvent".equalsIgnoreCase(type1)) {
+                            findAllTaskDefKeys(pvmActivity, defKeys);
+                            break;
+                        }
+                    }
+                    findAllTaskDefKeys(destination, defKeys);
+                } else {
+                    continue;
+                }
+            }
+            if ("usertask".equalsIgnoreCase(type)) {
+                if (!defKeys.contains(id)) {
+                    defKeys.add(id);
+                    findAllTaskDefKeys(destination, defKeys);
+                } else {
+                    continue;
+                }
+            }
+            if (type.endsWith("Gateway")) {
+                findAllTaskDefKeys(destination, defKeys);
+            }
+        }
+
+
     }
 
     @Override
