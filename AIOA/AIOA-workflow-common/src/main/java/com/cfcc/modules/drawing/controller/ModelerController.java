@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
 
 import javax.annotation.Resource;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -34,9 +35,12 @@ public class ModelerController {
 
     @GetMapping("test1")
     @ResponseBody
-    public Result test1(){
-        Map<String, Integer> count = departWithTaskService.deptDone();
-        List<TaskProcess> taskProcesses = departWithTaskService.taskProcess();
+    public Result test1(String id){
+        List<String> fids = new ArrayList<>();
+        fids.add(id);
+
+        Map<String, Integer> count = departWithTaskService.deptDone(fids);
+        List<TaskProcess> taskProcesses = departWithTaskService.taskProcess(fids);
         HashMap<String, Object> data = new HashMap<>();
         data.put("count",count);
         data.put("taskProcesses",taskProcesses);

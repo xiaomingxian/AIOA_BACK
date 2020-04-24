@@ -20,19 +20,28 @@ public class DepartWithTaskServiceImpl implements DepartWithTaskService {
     private DepartWithTaskMapper departWithTaskMapper;
 
     @Override
-    public void save(String procInstId,TaskWithDepts taskWithDepts) {
-        departWithTaskMapper.save(procInstId,taskWithDepts);
+    public void save(String procInstId, TaskWithDepts taskWithDepts) {
+        departWithTaskMapper.save(procInstId, taskWithDepts);
 
     }
 
     @Override
-    public Map<String, Integer> deptDone() {
+    public Map<String, Integer> deptDone(List<String> fids) {
+        List<String> procInsntIds=null;
+        if (fids.size() > 0) {
+             procInsntIds = departWithTaskMapper.queryProcInstIdsByFunction(fids);
+        }
 
-        return departWithTaskMapper.deptDone();
+        return departWithTaskMapper.deptDone(procInsntIds);
     }
 
     @Override
-    public List<TaskProcess> taskProcess() {
-        return departWithTaskMapper.taskProcess();
+    public List<TaskProcess> taskProcess(List<String> fids) {
+        List<String> procInsntIds=null;
+        if (fids.size() > 0) {
+            procInsntIds = departWithTaskMapper.queryProcInstIdsByFunction(fids);
+        }
+
+        return departWithTaskMapper.taskProcess(procInsntIds);
     }
 }

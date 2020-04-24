@@ -2,4 +2,62 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.cfcc.modules.workflow.mapper.DepartWithTaskMapper">
 
+    <select id="queryProcInstIdsByFunction" resultType="string">
+
+        SELECT PROC_INST_ID_ FROM act_hi_varinst where name_ ='busMsg' and
+
+        <foreach collection="fids" item="fid" separator="or" open="(" close=")">
+            text_ like CONCAT('%',#{fid},',!functionName:%')
+        </foreach>
+
+
+    </select>
+
+    <select id="deptDone" resultType="map">
+        SELECT
+        td.dept_id did,
+        COUNT(ht.ID_) countDone
+        FROM
+        oa_task_dept td
+        LEFT JOIN act_hi_taskinst ht ON td.task_id = ht.ID_
+        AND td.user_id = ht.ASSIGNEE_
+        AND ht.DELETE_REASON_ IS NOT NULL
+        WHERE
+        ht.ID_ IS NOT NULL
+        AND td.dept_id IS NOT NULL
+        <if test="pids!=null and pids.size>0">
+            and td.proc_inst_id in
+            <foreach collection="pids" open="(" close=")" separator="," item="id">
+                #{id}
+            </foreach>
+        </if>
+
+
+        GROUP BY
+        td.dept_id
+    </select>
+
+    <select id="taskProcess" resultType="com.cfcc.modules.workflow.pojo.TaskProcess">
+
+        SELECT
+        td.dept_id deptId,
+        td.user_id userId,
+        ht.END_TIME_ endTime
+        FROM
+        oa_task_dept td
+        LEFT JOIN act_hi_taskinst ht ON td.task_id = ht.ID_
+        AND td.user_id = ht.ASSIGNEE_
+        AND ht.DELETE_REASON_ IS NOT NULL
+        WHERE
+        ht.ID_ IS NOT NULL and td.dept_id is not null
+
+        <if test="pids!=null and pids.size>0">
+            and td.proc_inst_id in
+            <foreach collection="pids" open="(" close=")" separator="," item="id">
+                #{id}
+            </foreach>
+        </if>
+
+    </select>
+
 </mapper>

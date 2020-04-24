@@ -42,24 +42,12 @@ public interface DepartWithTaskMapper {
     @Delete("   DELETE from oa_task_dept where proc_inst_id=#{processInstanceId} and task_def_key=#{task_def_key};")
     void deleteSameTask(@Param("processInstanceId") String processInstanceId, @Param("task_def_key") String taskDefinitionKey);
 
-    @Select("SELECT td.dept_id did,COUNT(ht.ID_) countDone FROM oa_task_dept  td LEFT JOIN act_hi_taskinst ht on td.task_id=ht.ID_ and td.user_id=ht.ASSIGNEE_ and ht.DELETE_REASON_ is not null \n" +
-            "where ht.ID_ is not null and td.dept_id is not null   \n" +
-            "GROUP BY td.dept_id ")
-    Map<String, Integer> deptDone();
+    Map<String, Integer> deptDone(@Param("pids") List<String> procInsntIds);
 
-    @Select(
-            "SELECT\n" +
-                    "\ttd.dept_id deptId,\n" +
-                    "td.user_id userId,\n" +
-                    "ht.END_TIME_ endTime\n" +
-                    "FROM\n" +
-                    "\toa_task_dept td\n" +
-                    "LEFT JOIN act_hi_taskinst ht ON td.task_id = ht.ID_\n" +
-                    "AND td.user_id = ht.ASSIGNEE_\n" +
-                    "AND ht.DELETE_REASON_ IS NOT NULL\n" +
-                    "WHERE\n" +
-                    "\tht.ID_ IS NOT NULL and td.dept_id is not null ")
-    List<TaskProcess> taskProcess();
+    List<TaskProcess> taskProcess(@Param("pids") List<String> fids);
+
+
+    List<String> queryProcInstIdsByFunction(@Param("fids") List<String> fids);
 }
 
 
