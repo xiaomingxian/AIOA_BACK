@@ -182,7 +182,7 @@
                 </if>
             </foreach>
         </if>
-        order by a.i_order,a.TASK_DEF_KEY_
+        order by a.TASK_DEF_KEY_ asc,a.i_order
         limit #{pageNo},#{pageSize}
     </select>
     <!--根据id查询-->
