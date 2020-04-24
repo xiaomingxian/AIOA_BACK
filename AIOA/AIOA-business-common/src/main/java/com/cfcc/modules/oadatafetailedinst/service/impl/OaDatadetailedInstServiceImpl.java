@@ -102,16 +102,14 @@ public class OaDatadetailedInstServiceImpl extends ServiceImpl<OaDatadetailedIns
     }
 
     @Override
-    public Map<String, Object> findPret(String parentId) {
-        List<String>  depart = oaDatadetailedInstMapper.getDept(parentId);
-        Map<String,Object> map =new HashMap<>();
-        map.put("depart",depart);
-        return map;
+    public  List<Map<String, Object>> findPret(String parentId) {
+        List<Map<String, Object>> depart = oaDatadetailedInstMapper.getDept(parentId);
+        return depart;
     }
 
     @Override
-    public Map<String, Object> findorganizeNum(String table, String userId, int year, String parentId) {
-        Map<String, Object> organizeNum = oaDatadetailedInstMapper.findorganizeNum(table,userId,year,parentId);
+    public List<Map<String, Object>> findorganizeNum(String table, String userId, int year, String parentId) {
+        List<Map<String, Object>> organizeNum = oaDatadetailedInstMapper.findorganizeNum(table,userId,year,parentId);
         return organizeNum;
     }
 
@@ -200,5 +198,10 @@ public class OaDatadetailedInstServiceImpl extends ServiceImpl<OaDatadetailedIns
             procInsntIds = departWithTaskMapper.queryProcInstIdsByFunction(fids);
         }
         return oaDatadetailedInstMapper.deptDone(procInsntIds);
+    }
+
+    @Override
+    public List<Map<String, Object>> findExtensionsNum(Integer busModelId, String table) {
+        return oaDatadetailedInstMapper.findExtensionsNum(busModelId,table);
     }
 }

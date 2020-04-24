@@ -47,9 +47,9 @@ public interface OaDatadetailedInstMapper extends BaseMapper<OaDatadetailedInst>
 
     List<Map<String, Object>> findTypeNum(String table,String userId,int year,String parentId);
 
-    List<String> getDept(String parentId);
+    List<Map<String, Object>> getDept(String parentId);
 
-   Map<String, Object> findorganizeNum(String table, String userId, int year, String parentId);
+    List<Map<String, Object>> findorganizeNum(String table, String userId, int year, String parentId);
 
 
     @Delete("DELETE FROM oa_datadetailed_inst WHERE i_id=#{iId}")
@@ -67,4 +67,6 @@ public interface OaDatadetailedInstMapper extends BaseMapper<OaDatadetailedInst>
     String findByid(Integer departId);
 
     Map<String, Integer> deptDone(@Param("fids") List<String> fids);
+
+    List<Map<String, Object>> findExtensionsNum(Integer busModelId, String table);
 }

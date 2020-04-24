@@ -21,16 +21,16 @@
         select count(*) from  oa_datadetailed_inst  where  #{createTime}&lt;= DATE_FORMAT(d_create_time,'%Y-%m-%d')&lt;=#{dateTime} and s_create_name = #{sCreateName}  and i_is_display = 1
     </select>
     <select id="findTypeNum" resultType="java.util.Map">
-    select count(*) as num,  s_main_unit_names as host from ${table}
-       where s_main_unit_names  in  (SELECT depart_name from  sys_depart  where  id != 1 and  id != 2  and  parent_id =  #{parentId})  and  i_is_display = 0 AND  s_create_by = #{userId}  AND i_create_year= #{year}
+       select count(*) as num,  s_main_unit_names as host from ${table}
+       where s_main_unit_names !=''    and  i_is_display = 0 AND  s_create_by = #{userId}  AND i_create_year= #{year}
        group by  s_main_unit_names
     </select>
-    <select id="getDept" resultType="java.lang.String">
+    <select id="getDept" resultType="java.util.Map">
        SELECT depart_name from  sys_depart  where  id != 1 and  id != 2  and  parent_id = #{parentId}
     </select>
     <select id="findorganizeNum" resultType="java.util.Map">
-         select count(*) as num,  s_main_unit_names as organize from ${table}
-       where s_cc_unit_names  in  (SELECT depart_name from  sys_depart  where  id != 1 and  id != 2  and  parent_id =  #{parentId})  and  i_is_display = 0 AND  s_create_by = #{userId}  AND i_create_year= #{year}
+         select count(*) as num,  s_cc_unit_names as organize from ${table}
+       where s_cc_unit_names!=''  and  i_is_display = 0 AND  s_create_by = #{userId}  AND i_create_year= #{year}
        group by  s_cc_unit_names
     </select>
     <select id="findFunctionIds" resultType="java.lang.String">
@@ -69,6 +69,19 @@
 
         GROUP BY
         td.dept_id
+    </select>
+    <select id="findExtensionsNum" resultType="java.util.Map">
+        SELECT
+        count(*) as num,
+        s_create_dept
+        FROM
+        ${table}
+        WHERE
+        i_bus_model_id = #{busModelId}
+        AND i_is_display = 0
+        AND (
+        DATE_FORMAT(d_datetime2, '%Y-%m-%d') &lt;DATE_FORMAT(IFNULL(s_varchar9, now()), '%Y-%m-%d')
+        )  group by s_create_dept
     </select>
 
     <insert id="insertDataInst" parameterType="com.cfcc.modules.oadatafetailedinst.entity.OaDatadetailedInst">
