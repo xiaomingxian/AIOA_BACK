@@ -3,10 +3,8 @@ package com.cfcc.modules.oaBus.controller;
 import com.alibaba.fastjson.JSON;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
-import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.cfcc.common.api.vo.Result;
 import com.cfcc.common.aspect.annotation.AutoLog;
-import com.cfcc.common.constant.CacheConstant;
 import com.cfcc.common.mycat.MycatSchema;
 import com.cfcc.common.system.query.QueryGenerator;
 import com.cfcc.common.system.util.JwtUtil;
@@ -26,8 +24,6 @@ import org.jeecgframework.poi.excel.entity.ImportParams;
 import org.jeecgframework.poi.excel.view.JeecgEntityExcelView;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.cache.annotation.CacheEvict;
-import org.springframework.cache.annotation.CachePut;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.multipart.MultipartHttpServletRequest;
@@ -137,6 +133,23 @@ public class BusFunctionController {
 		 result.setResult(pageList);
 		 return result;
 	 }
+
+	/**
+	 * function查询
+	 * @param id
+	 * @return
+	 */
+	@AutoLog(value = "督查模块--引入公文链接通过ModelId查询function")
+	@ApiOperation(value="督查模块--引入公文链接查询function", notes="督查模块--引入公文链接查询function")
+	@GetMapping(value = "/funtionType")
+	public Result<List<BusFunction>> getFuntionType(@RequestParam(name="modelId") String modelId)
+	{
+		Result<List<BusFunction>> result = new Result<List<BusFunction>>();
+		List<BusFunction> functionList = busFunctionService.getFunctionTypeByModelId(Integer.parseInt(modelId));
+		result.setSuccess(true);
+		result.setResult(functionList);
+		return result;
+	}
 
 	 /**
 	  * 查询业务的搜索条件

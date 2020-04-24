@@ -484,6 +484,10 @@ public class OaBusdataController {
         Result<List<Map<String,Object>>> result = new Result<>();
         try {
             List<Map<String,Object>> oaDataList = oaBusdataService.getOaDataAllByBusdataId(map);
+            if (oaDataList.size() <= 1){
+                result.setMessage("暂无发现关联文件");
+            }
+            result.setSuccess(true);
             result.setResult(oaDataList);
         } catch (Exception e) {
             e.printStackTrace();
@@ -666,6 +670,38 @@ public class OaBusdataController {
         IPage<OaBusdata> numList = oaBusdataService.selectDocList(oaBusdata, sBusdataTable, pageNo, pageSize);
         result.setSuccess(true);
         result.setResult(numList);
+        return result;
+    }
+
+    @AutoLog(value = "文号配置-分页条件查询公文链接")
+    @ApiOperation(value = "文号配置-分页条件查询公文链接", notes = "文号配置-分页条件查询公文链接")
+    @GetMapping(value = "/getDocumentLinkList")
+    public Result<List<Map<String,Object>>> getDocumentLinkList(@RequestParam("iBusModelId") String iBusModelId,@RequestParam("sTitle")String sTitle,@RequestParam("iId") String iId) {
+        Result<List<Map<String,Object>>> result = new Result<>();
+        List<Map<String,Object>> oaBusdataList = oaBusdataService.getBusDataByModelAndFunction(iBusModelId,sTitle,iId );
+//        IPage<OaBusdata> numList = oaBusdataService.selectDocList(oaBusdata, sBusdataTable, pageNo, pageSize);
+        result.setSuccess(true);
+        result.setResult(oaBusdataList);
+        return result;
+    }
+    //@RequestParam("s_varchar5") String s_varchar5, @RequestParam("s_varchar3")String s_varchar3,@RequestParam("s_varchar7")String s_varchar7,@RequestParam("id")String id,@RequestParam("table") String table
+    @AutoLog(value = "文号配置-分页条件查询公文链接")
+    @ApiOperation(value = "文号配置-分页条件查询公文链接", notes = "文号配置-分页条件查询公文链接")
+    @PostMapping(value = "/saveOaBusdata")
+    public Result<String> saveOaBusdata(@RequestBody Map<String,Object> map) {
+        Result<String> result = new Result<>();
+        Boolean ok = oaBusdataService.saveOaBusdata(map);
+        result.setSuccess(ok);
+        return result;
+    }
+
+    @AutoLog(value = "文号配置-分页条件查询公文链接")
+    @ApiOperation(value = "文号配置-分页条件查询公文链接", notes = "文号配置-分页条件查询公文链接")
+    @PostMapping(value = "/clearOaBusdata")
+    public Result<String> clearOaBusdata(@RequestBody Map<String,Object> map) {
+        Result<String> result = new Result<>();
+        Boolean ok = oaBusdataService.clearOaBusdata(map);
+        result.setSuccess(ok);
         return result;
     }
 

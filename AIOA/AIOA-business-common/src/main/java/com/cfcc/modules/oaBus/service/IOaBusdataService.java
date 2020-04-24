@@ -133,4 +133,10 @@ public interface IOaBusdataService  extends  IService<OaBusdata>{
     Boolean createSuperiseDataByDispatch(Map<String, Object> map, LoginInfo loginInfo,String uploadpath);
 
     List<Map<String, Object>> getOaDataAllByBusdataId(Map<String, Object> map);
+
+    List<Map<String, Object>> getBusDataByModelAndFunction(String iBusModelId, String sTitle, String iId);
+
+    Boolean saveOaBusdata(Map<String, Object> map);
+
+    Boolean clearOaBusdata(Map<String, Object> map);
 }

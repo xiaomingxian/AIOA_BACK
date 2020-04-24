@@ -30,6 +30,33 @@
           set i_is_es = 2 where i_id = #{id}
     </update>
 
+    <update id="saveOaBusdata">
+        update ${table}
+        <set>
+            <if test="s_varchar3 !=null and s_varchar3 !=''">
+                s_varchar3=#{s_varchar3},
+            </if>
+            <if test="s_varchar5 !=null and s_varchar5 !=''">
+                s_varchar5=#{s_varchar5},
+            </if>
+            <if test="s_varchar7 !=null and s_varchar7 !=''">
+                s_varchar7=#{s_varchar7},
+            </if>
+        </set>
+        where i_id = #{id}
+    </update>
+
+    <update id="clearOaBusdata">
+        update ${table}
+        <set>
+            s_varchar3="",
+            s_varchar5="",
+            s_varchar7="",
+        </set>
+        where i_id = #{id}
+    </update>
+
+
     <update id="updateBusDataByIdAndTable">
         update ${tableName}
         <set>
@@ -505,6 +532,20 @@
             i_a_busdata_id = #{busdataId} and s_a_busdata_table =#{tableName}
     </select>
 
+    <select id="getBusdataByFunAndITitle" resultType="java.util.Map">
+        SELECT
+          s_title,s_create_dept,d_create_time,i_id
+        FROM
+            ${sBusdataTable}
+        <where>
+            <if test="sTitle!=null and sTitle!=''">
+                and s_title=#{sTitle}
+            </if>
+            <if test="functionId!=null and functionId!=''">
+                and i_bus_function_id=#{functionId}
+            </if>
+        </where>
+    </select>
 
     <select id="getCheckData" resultType="java.util.Map">
         select i_id from ${tableName} b where

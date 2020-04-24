@@ -1,9 +1,8 @@
 package com.cfcc.modules.oaBus.service;
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
-import com.cfcc.common.api.vo.Result;
-import com.cfcc.modules.oaBus.entity.*;
 import com.baomidou.mybatisplus.extension.service.IService;
+import com.cfcc.modules.oaBus.entity.*;
 import com.cfcc.modules.oabutton.entity.OaProcOpinion;
 
 import java.util.List;
@@ -55,4 +54,6 @@ public interface IBusFunctionService extends IService<BusFunction> {
     List<BusFunction> queryByModelId(String modelId);
 
     List<BusFunction> getBusFunctionListByDepartId(String departId,String DBvalue);
+
+    List<BusFunction> getFunctionTypeByModelId(Integer modelId);
 }

@@ -74,7 +74,7 @@
     </select>
 
     <select id="selectDocType" resultType="com.cfcc.modules.oaBus.entity.BusModel">
-        SELECT i_id,s_name FROM oa_bus_model
+        SELECT i_id,s_name,s_busdata_table FROM oa_bus_model
     </select>
     <select id="findListNotInPermit" resultType="com.cfcc.modules.oaBus.entity.BusModel">
        SELECT

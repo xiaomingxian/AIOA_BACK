@@ -348,6 +348,13 @@ public class BusFunctionServiceImpl extends ServiceImpl<BusFunctionMapper, BusFu
         return busFunctionList;
     }
 
+    @Override
+    public List<BusFunction> getFunctionTypeByModelId(Integer modelId) {
+        List<BusFunction> functionList = busFunctionMapper.getFunctionTypeByModelId(modelId);
+
+        return functionList;
+    }
+
     /**
      * 获得编辑数据时的其它绑定数据
      *

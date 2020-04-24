@@ -52,6 +52,9 @@ public interface BusFunctionMapper extends BaseMapper<BusFunction> {
     List<BusFunction> getBusFunctionListByDepartId(@Param("departId") String departId,@Param("DBvalue") String DBvalue );
 
     Integer queryFunByModel(@Param("pageId")Integer pageId);
+
+    List<BusFunction> getFunctionTypeByModelId(@Param("modelId") Integer modelId);
+
 }
 
 

@@ -914,6 +914,36 @@ public class OaBusdataServiceImpl extends ServiceImpl<OaBusdataMapper, OaBusdata
         return oaDataList;
     }
 
+    @Override
+    public List<Map<String, Object>> getBusDataByModelAndFunction(String iBusModelId, String sTitle, String functionId) {
+        BusModel busModel = busModelService.getBusModelById(Integer.parseInt(iBusModelId));
+        List<Map<String, Object>> oaBusdataList = oaBusdataMapper.getBusdataByFunAndITitle(busModel.getSBusdataTable(),sTitle,functionId);
+        Iterator<Map<String, Object>> iterator = oaBusdataList.iterator();
+        while (iterator.hasNext()){
+            Map<String, Object> next = iterator.next();
+            next.put("tableName", busModel.getSBusdataTable());
+        }
+        return oaBusdataList;
+    }
+
+    @Override
+    public Boolean saveOaBusdata(Map<String, Object> map) {
+        String s_varchar5 = map.get("s_varchar5") + "";
+        String s_varchar3 = map.get("s_varchar3")+"";
+        String s_varchar7 = map.get("s_varchar7")+"";
+        String id = map.get("id")+"";
+        String table = map.get("table")+"";
+        Boolean ok = oaBusdataMapper.saveOaBusdata(s_varchar3,s_varchar5,s_varchar7,id,table);
+        return ok;
+    }
+
+    @Override
+    public Boolean clearOaBusdata(Map<String, Object> map) {
+        String id = map.get("id")+"";
+        String table = map.get("table")+"";
+        return oaBusdataMapper.clearOaBusdata(id,table);
+    }
+
 
     static void copy(String srcPathStr, String desPathStr)
     {

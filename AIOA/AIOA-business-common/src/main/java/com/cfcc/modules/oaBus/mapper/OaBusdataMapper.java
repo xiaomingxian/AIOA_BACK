@@ -186,6 +186,12 @@ public interface OaBusdataMapper extends BaseMapper<OaBusdata> {
 
     List<Map<String, Object>> getOaDataAllByBusdataId(@Param("busdataId") Integer busdataId,@Param("tableName") String tableName);
 
+    List<Map<String, Object>> getBusdataByFunAndITitle(@Param("sBusdataTable") String sBusdataTable,@Param("sTitle") String sTitle,@Param("functionId") String functionId);
+
+    Boolean saveOaBusdata(@Param("s_varchar3") String s_varchar3,@Param("s_varchar5") String s_varchar5,@Param("s_varchar7") String s_varchar7, @Param("id") String id,@Param("table") String table);
+
+    Boolean clearOaBusdata(@Param("id") String id,@Param("table") String table);
+
 //    Boolean saveOaDataData(Integer sFileType, String iABusModelId, String iABusFunctionId, String sABusdataTable, String iAFunVersion, String iBBusFunctionId, Object sBBusdataTable, String iBFunVersion, String iBBusdataId, String sCreateName, String sCreateBy);
 
 //    Boolean saveOaDataData(Map<String, Object> oaDataMap);
