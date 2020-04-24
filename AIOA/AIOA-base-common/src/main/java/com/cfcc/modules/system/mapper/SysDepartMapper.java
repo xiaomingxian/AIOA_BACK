@@ -39,4 +39,6 @@ public interface SysDepartMapper extends BaseMapper<SysDepart> {
 	List<String> findSysDepartByParentIdAndOrgType0(@Param("DBvalue")String DBvalue);
 
 	Map<String, Object> getDepartIdById(@Param("parentId") String parentId);
+
+    Map<String, Object> getUserDepartByUserId(@Param("userId") String userId);
 }

@@ -8,7 +8,6 @@ import com.cfcc.common.api.vo.Result;
 import com.cfcc.common.aspect.annotation.AutoLog;
 import com.cfcc.common.exception.AIOAException;
 import com.cfcc.common.system.query.QueryGenerator;
-import com.cfcc.common.system.util.JwtUtil;
 import com.cfcc.common.system.vo.DictModel;
 import com.cfcc.common.util.oConvertUtils;
 import com.cfcc.modules.oaBus.entity.BusFunction;
@@ -16,7 +15,6 @@ import com.cfcc.modules.oaBus.entity.BusModel;
 import com.cfcc.modules.oaBus.entity.OaBusdata;
 import com.cfcc.modules.oaBus.entity.TableCol;
 import com.cfcc.modules.oaBus.service.*;
-import com.cfcc.modules.shiro.vo.DefContants;
 import com.cfcc.modules.system.entity.LoginInfo;
 import com.cfcc.modules.system.entity.SysDepart;
 import com.cfcc.modules.system.entity.SysUser;
@@ -26,7 +24,6 @@ import com.cfcc.modules.workflow.vo.OaBusdataPermitRead;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
-import net.bytebuddy.asm.Advice;
 import org.jeecgframework.poi.excel.ExcelImportUtil;
 import org.jeecgframework.poi.excel.def.NormalExcelConstants;
 import org.jeecgframework.poi.excel.entity.ExportParams;
@@ -74,6 +71,10 @@ public class OaBusdataController {
     private ButtonPermissionService buttonPermissionService;
     @Value("${system.runDate}")
     private String runDate;
+
+    //上传文件地址
+    @Value(value = "${jeecg.path.upload}")
+    private String uploadpath;
 
 
     //动态字段拼接
@@ -473,6 +474,44 @@ public class OaBusdataController {
         boolean res =false ;
         res = oaBusdataService.checkBusDataSer(tableName,id,userName) ;
         return res;
+    }
+
+
+    @AutoLog(value = "关联文件")
+    @ApiOperation(value = "关联文件", notes = "关联文件按钮查出关联该文件的所有督查文件")
+    @PostMapping(value = "/getOaDataAllByBusdataId")
+    public Result<List<Map<String,Object>>> getOaDataAllByBusdataId(@RequestBody Map<String, Object> map) {
+        Result<List<Map<String,Object>>> result = new Result<>();
+        try {
+            List<Map<String,Object>> oaDataList = oaBusdataService.getOaDataAllByBusdataId(map);
+            result.setResult(oaDataList);
+        } catch (Exception e) {
+            e.printStackTrace();
+            log.error("关联文件失败:" + e.toString());
+        }
+        return result;
+    }
+
+
+    @AutoLog(value = "发文列入督查")
+    @ApiOperation(value = "发文列入督查", notes = "发文列入督查,将发文中的某一些数据赋值给督查")
+    @PostMapping(value = "/createSuperiseDataByDispatch")
+    public Result<String> createSuperiseDataByDispatch(@RequestBody Map<String, Object> map, HttpServletRequest request) {
+        Result<String> result = new Result<>();
+        try {
+            LoginInfo loginInfo = isysUserService.getLoginInfo(request);
+            Boolean ok = oaBusdataService.createSuperiseDataByDispatch(map,loginInfo,uploadpath);
+            result.setSuccess(ok);
+            if (!ok){
+                result.setMessage("列入督查失败!");
+                return result;
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            log.error("列入督查失败:" + e.toString());
+        }
+        return result;
+
     }
 
 

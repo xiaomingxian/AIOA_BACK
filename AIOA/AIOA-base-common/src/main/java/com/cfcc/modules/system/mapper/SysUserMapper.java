@@ -312,4 +312,14 @@ public interface SysUserMapper extends BaseMapper<SysUser> {
 
 
     SysUser getUserById(@Param("id") String id);
+
+    Map<String, Object> getPersonage(@Param("userId") String userId);
+
+    Boolean updateSysUser(@Param("sysUser") SysUser sysUser);
+
+    Boolean updatePasswordById(@Param("id") String id,@Param("password") String password);
+
+    Boolean saveavatar(@Param("userId") String userId,@Param("savePath") String savePath);
+
+    SysUser getAvatarByUsername(@Param("userId") String userId);
 }
