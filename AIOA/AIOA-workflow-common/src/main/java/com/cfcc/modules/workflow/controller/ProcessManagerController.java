@@ -31,9 +31,14 @@ public class ProcessManagerController {
 
     @GetMapping("queryTaskDefkeys")
     public Result queryTaskDefkeys(String key) {
-        List<String> defKeys = processManagerService.queryTaskDefkeys(key);
+        try {
+            List<String> defKeys = processManagerService.queryTaskDefkeys(key);
 
-        return Result.ok(defKeys);
+            return Result.ok(defKeys);
+        } catch (Exception e) {
+           log.error(e.toString());
+           return  Result.error("查询失败");
+        }
     }
 
 
