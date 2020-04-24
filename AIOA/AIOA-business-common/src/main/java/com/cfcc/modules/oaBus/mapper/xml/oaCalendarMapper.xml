@@ -85,10 +85,11 @@
                 and  (DATE_FORMAT(d_start_time,'%Y-%m-%d') &lt;= #{date} and  DATE_FORMAT(d_end_time,'%Y-%m-%d') &gt;= #{date})
             </if>
             <if test="Strdate != '' and Strdate != null">
-                and DATE_FORMAT(d_end_time,'%Y-%m-%d') &gt;= #{Strdate}
+                and !(DATE_FORMAT(d_end_time,'%Y-%m-%d') &lt; #{Strdate}
             </if>
             <if test="Enddate != '' and Enddate != null">
-                and DATE_FORMAT(d_end_time,'%Y-%m-%d') &lt;= #{Enddate}
+                or DATE_FORMAT(d_start_time,'%Y-%m-%d') &gt; #{Enddate}
+                )
             </if>
         </where>
     </select>
@@ -114,10 +115,11 @@
                 and  (DATE_FORMAT(d_start_time,'%Y-%m-%d') &lt;= #{date} and  DATE_FORMAT(d_end_time,'%Y-%m-%d') &gt;= #{date})
             </if>
             <if test="Strdate != '' and Strdate != null">
-                and DATE_FORMAT(d_end_time,'%Y-%m-%d') &gt;= #{Strdate}
+                and !(DATE_FORMAT(d_end_time,'%Y-%m-%d') &lt; #{Strdate}
             </if>
             <if test="Enddate != '' and Enddate != null">
-                and DATE_FORMAT(d_end_time,'%Y-%m-%d') &lt;= #{Enddate}
+                or DATE_FORMAT(d_start_time,'%Y-%m-%d') &gt; #{Enddate}
+                )
             </if>
         </where>
     </select>
@@ -145,10 +147,11 @@
                 and  (DATE_FORMAT(d_start_time,'%Y-%m-%d') &lt;= #{date} and  DATE_FORMAT(d_end_time,'%Y-%m-%d') &gt;= #{date})
             </if>
             <if test="Strdate != '' and Strdate != null">
-                and DATE_FORMAT(d_end_time,'%Y-%m-%d') &gt;= #{Strdate}
+                and !(DATE_FORMAT(d_end_time,'%Y-%m-%d') &lt; #{Strdate}
             </if>
             <if test="Enddate != '' and Enddate != null">
-                and DATE_FORMAT(d_end_time,'%Y-%m-%d') &lt;= #{Enddate}
+                or DATE_FORMAT(d_start_time,'%Y-%m-%d') &gt; #{Enddate}
+                )
             </if>
         </where>
     </select>
@@ -176,18 +179,11 @@
                 and  (DATE_FORMAT(c.d_start_time,'%Y-%m-%d')  &lt;=  #{oaCalendar.date} and DATE_FORMAT(c.d_end_time,'%Y-%m-%d') &gt;= #{oaCalendar.date})
             </if>
             <if test="oaCalendar.Strdate != '' and oaCalendar.Strdate != null">
-                and ((DATE_FORMAT(c.d_start_time,'%Y-%m-%d') &lt;= #{oaCalendar.Strdate}
+                and !(DATE_FORMAT(c.d_end_time,'%Y-%m-%d') &lt; #{oaCalendar.Strdate}
             </if>
             <if test="oaCalendar.Enddate != '' and oaCalendar.Enddate != null">
-                and DATE_FORMAT(c.d_end_time,'%Y-%m-%d') &gt;= #{oaCalendar.Enddate}
+                or DATE_FORMAT(c.d_start_time,'%Y-%m-%d') &gt; #{oaCalendar.Enddate}
                 )
-            </if>
-
-            <if test="oaCalendar.Strdate != '' and oaCalendar.Strdate != null">
-                or ( DATE_FORMAT(c.d_start_time,'%Y-%m-%d') &lt;=  #{oaCalendar.Strdate}
-            </if>
-            <if test="oaCalendar.Enddate != '' and oaCalendar.Enddate != null">
-                and DATE_FORMAT(c.d_end_time,'%Y-%m-%d') &gt;= #{oaCalendar.Enddate}))
             </if>
              and SUBSTRING_INDEX(c.s_user_names,',',1) = s.username
         </where>
@@ -243,18 +239,11 @@
                 and  (DATE_FORMAT(d_start_time,'%Y-%m-%d')  &lt;=  #{oaCalendar.date} and DATE_FORMAT(d_end_time,'%Y-%m-%d') &gt;= #{oaCalendar.date})
             </if>
             <if test="oaCalendar.Strdate != '' and oaCalendar.Strdate != null">
-                and ((DATE_FORMAT(d_start_time,'%Y-%m-%d') &lt;= #{oaCalendar.Strdate}
+                and !(DATE_FORMAT(d_end_time,'%Y-%m-%d') &lt; #{oaCalendar.Strdate}
             </if>
             <if test="oaCalendar.Enddate != '' and oaCalendar.Enddate != null">
-                and DATE_FORMAT(d_end_time,'%Y-%m-%d') &gt;= #{oaCalendar.Enddate}
+                or DATE_FORMAT(d_start_time,'%Y-%m-%d') &gt; #{oaCalendar.Enddate}
                 )
-            </if>
-
-            <if test="oaCalendar.Strdate != '' and oaCalendar.Strdate != null">
-                or ( DATE_FORMAT(d_start_time,'%Y-%m-%d') &lt;=  #{oaCalendar.Strdate}
-            </if>
-            <if test="oaCalendar.Enddate != '' and oaCalendar.Enddate != null">
-                and DATE_FORMAT(d_end_time,'%Y-%m-%d') &gt;= #{oaCalendar.Enddate}))
             </if>
             and SUBSTRING_INDEX(s_user_names,',',1) = s.username
         </where>
@@ -279,18 +268,11 @@
                 and  (DATE_FORMAT(d_start_time,'%Y-%m-%d')  &lt;=  #{oaCalendar.date} and DATE_FORMAT(d_end_time,'%Y-%m-%d') &gt;= #{oaCalendar.date})
             </if>
             <if test="oaCalendar.Strdate != '' and oaCalendar.Strdate != null">
-                and ((DATE_FORMAT(d_start_time,'%Y-%m-%d') &lt;= #{oaCalendar.Strdate}
+                and !(DATE_FORMAT(d_end_time,'%Y-%m-%d') &lt; #{oaCalendar.Strdate}
             </if>
             <if test="oaCalendar.Enddate != '' and oaCalendar.Enddate != null">
-                and DATE_FORMAT(d_end_time,'%Y-%m-%d') &gt;= #{oaCalendar.Enddate}
+                or DATE_FORMAT(d_start_time,'%Y-%m-%d') &gt; #{oaCalendar.Enddate}
                 )
-            </if>
-
-            <if test="oaCalendar.Strdate != '' and oaCalendar.Strdate != null">
-                or ( DATE_FORMAT(d_start_time,'%Y-%m-%d') &lt;=  #{oaCalendar.Strdate}
-            </if>
-            <if test="oaCalendar.Enddate != '' and oaCalendar.Enddate != null">
-                and DATE_FORMAT(d_end_time,'%Y-%m-%d') &gt;= #{oaCalendar.Enddate}))
             </if>
             and SUBSTRING_INDEX(s_user_names,',',1) = s.username
         </where>
@@ -311,18 +293,11 @@
                 and  (DATE_FORMAT(d_start_time,'%Y-%m-%d')  &lt;=  #{oaCalendar.date} and DATE_FORMAT(d_end_time,'%Y-%m-%d') &gt;= #{oaCalendar.date})
             </if>
             <if test="oaCalendar.Strdate != '' and oaCalendar.Strdate != null">
-                and ((DATE_FORMAT(d_start_time,'%Y-%m-%d') &lt;= #{oaCalendar.Strdate}
+                and !(DATE_FORMAT(d_end_time,'%Y-%m-%d') &lt; #{oaCalendar.Strdate}
             </if>
             <if test="oaCalendar.Enddate != '' and oaCalendar.Enddate != null">
-                and DATE_FORMAT(d_end_time,'%Y-%m-%d') &gt;= #{oaCalendar.Enddate}
+                or DATE_FORMAT(d_start_time,'%Y-%m-%d') &gt; #{oaCalendar.Enddate}
                 )
-            </if>
-
-            <if test="oaCalendar.Strdate != '' and oaCalendar.Strdate != null">
-                or ( DATE_FORMAT(d_start_time,'%Y-%m-%d') &lt;=  #{oaCalendar.Strdate}
-            </if>
-            <if test="oaCalendar.Enddate != '' and oaCalendar.Enddate != null">
-                and DATE_FORMAT(d_end_time,'%Y-%m-%d') &gt;= #{oaCalendar.Enddate}))
             </if>
             and SUBSTRING_INDEX(s_user_names,',',1) = s.username
         </where>
