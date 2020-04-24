@@ -29,6 +29,19 @@ public class ProcessManagerController {
     private ProcessManagerService processManagerService;
 
 
+    @GetMapping("queryTaskDefkeys")
+    public Result queryTaskDefkeys(String key) {
+        try {
+            List<String> defKeys = processManagerService.queryTaskDefkeys(key);
+
+            return Result.ok(defKeys);
+        } catch (Exception e) {
+           log.error(e.toString());
+           return  Result.error("查询失败");
+        }
+    }
+
+
     @PostMapping("deploy")
     @ApiOperation("发布流程")
     @NoRepeatSubmit
