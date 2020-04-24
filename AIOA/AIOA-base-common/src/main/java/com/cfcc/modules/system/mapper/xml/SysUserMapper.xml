@@ -97,6 +97,17 @@
     <update id="updateUserDepart">
 		UPDATE sys_user SET org_code = #{orgCode} where username = #{username}
 	</update>
+    <update id="updateSysUser">
+        UPDATE sys_user SET username = #{user.username} ,avatar = #{user.avatar} , phone = #{user.phone}, status = #{user.status}
+        where id = #{user.id}
+    </update>
+    <update id="updatePasswordById">
+        UPDATE sys_user SET password = #{user.password}
+        where id = #{user.id}
+    </update>
+    <update id="saveavatar">
+        UPDATE sys_user SET avatar = #{savePath} WHERE id = #{userId}
+    </update>
 
     <!-- 根据手机号查询 -->
     <select id="getUserByPhone" resultType="com.cfcc.modules.system.entity.SysUser">
@@ -202,6 +213,12 @@
     </select>
     <select id="getUserById" resultType="com.cfcc.modules.system.entity.SysUser">
         SELECT * FROM sys_user WHERE id = #{id}
+    </select>
+    <select id="getPersonage" resultType="java.util.Map">
+        SELECT username, avatar from sys_user WHERE id = #{userId}
+    </select>
+    <select id="getAvatarByUsername" resultType="com.cfcc.modules.system.entity.SysUser">
+        SELECT * sys_user WHERE id = #{userId}
     </select>
 
 </mapper>

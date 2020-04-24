@@ -22,4 +22,9 @@
     <select id="getDepartIdById" resultType="java.util.Map">
 		SELECT id AS deptId, parent_id AS parentId, org_type AS orgType FROM sys_depart WHERE id = #{parentId}
 	</select>
+    <select id="getUserDepartByUserId" resultType="java.util.Map">
+		SELECT parent_id as parentId, depart_name as departName,org_type as orgType FROM sys_depart
+		INNER JOIN sys_user_depart ON sys_user_depart.dep_id = sys_depart.id
+		WHERE sys_user_depart.user_id = #{userId}
+	</select>
 </mapper>

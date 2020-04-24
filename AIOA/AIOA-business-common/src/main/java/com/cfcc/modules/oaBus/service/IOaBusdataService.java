@@ -10,7 +10,6 @@ import com.cfcc.modules.oaBus.entity.TableCol;
 import com.cfcc.modules.system.entity.LoginInfo;
 import com.cfcc.modules.system.entity.SysDepart;
 import com.cfcc.modules.system.entity.SysUser;
-import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
 import java.util.Map;
@@ -131,4 +130,7 @@ public interface IOaBusdataService  extends  IService<OaBusdata>{
 
     Boolean getFuncitionByBusdata(String tableId, String table);
 
+    Boolean createSuperiseDataByDispatch(Map<String, Object> map, LoginInfo loginInfo,String uploadpath);
+
+    List<Map<String, Object>> getOaDataAllByBusdataId(Map<String, Object> map);
 }

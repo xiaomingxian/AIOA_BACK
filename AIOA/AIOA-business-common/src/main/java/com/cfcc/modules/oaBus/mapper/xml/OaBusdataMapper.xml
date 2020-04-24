@@ -2,6 +2,17 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.cfcc.modules.oaBus.mapper.OaBusdataMapper">
 
+
+    <insert id="saveOaDataData">
+        insert into oa_data_data (s_file_type, i_a_bus_model_id,i_a_bus_function_id,
+        s_a_busdata_table,i_a_fun_version,i_a_busdata_id,i_b_bus_model_id,i_b_bus_function_id,
+        s_b_busdata_table,i_b_fun_version,i_b_busdata_id,s_create_name,s_create_by)
+          values
+          (#{s_file_type},#{i_a_bus_model_id},#{i_a_bus_function_id},#{s_a_busdata_table},#{i_a_fun_version},
+          #{i_a_busdata_id},#{i_b_bus_model_id},#{i_b_bus_function_id},#{s_b_busdata_table}, #{i_b_fun_version},
+          #{i_b_busdata_id}, #{s_create_name}, #{s_create_by})
+    </insert>
+
     <select id="getBusdataByOaFile" resultType="java.lang.String">
         select s_title from ${sTable}
         where i_id = #{iTableId}
@@ -18,6 +29,24 @@
         update ${tableName}
           set i_is_es = 2 where i_id = #{id}
     </update>
+
+    <update id="updateBusDataByIdAndTable">
+        update ${tableName}
+        <set>
+            <if test="s_title !=null and s_title !=''">
+                s_title=#{s_title},
+            </if>
+            <if test="s_file_num !=null and s_file_num !=''">
+                s_receive_num=#{s_file_num},
+            </if>
+            <if test="i_is_file !=null and i_is_file !=''">
+                i_is_file=#{i_is_file},
+            </if>
+        </set>
+        WHERE i_id = #{id}
+    </update>
+
+
 
     <select id="queryBusdataCount" resultType="java.lang.Integer">
         select count(1) from oa_busdata1
@@ -466,6 +495,16 @@
         WHERE
             i_id = #{tableId})
     </select>
+
+    <select id="getOaDataAllByBusdataId" resultType="java.util.Map">
+        SELECT
+            *
+        FROM
+            oa_data_data
+        WHERE
+            i_a_busdata_id = #{busdataId} and s_a_busdata_table =#{tableName}
+    </select>
+
 
     <select id="getCheckData" resultType="java.util.Map">
         select i_id from ${tableName} b where

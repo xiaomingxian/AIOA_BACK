@@ -4,6 +4,8 @@ import com.cfcc.modules.oaBus.mapper.OaBusDynamicTableMapper;
 import com.cfcc.modules.oadatafetailedinst.entity.OaDatadetailedInst;
 import com.cfcc.modules.oadatafetailedinst.mapper.OaDatadetailedInstMapper;
 import com.cfcc.modules.oadatafetailedinst.service.IOaDatadetailedInstService;
+import com.cfcc.modules.system.entity.SysDepart;
+import com.cfcc.modules.workflow.mapper.DepartWithTaskMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -27,6 +29,9 @@ public class OaDatadetailedInstServiceImpl extends ServiceImpl<OaDatadetailedIns
 
     @Autowired
     private OaBusDynamicTableMapper dynamicTableMapper;
+
+    @Autowired
+    private DepartWithTaskMapper departWithTaskMapper;
 
     @Override
     public Map<String, Object> findByTableId(Integer iTableId,String sCreateName) {
@@ -98,13 +103,15 @@ public class OaDatadetailedInstServiceImpl extends ServiceImpl<OaDatadetailedIns
 
     @Override
     public Map<String, Object> findPret(String parentId) {
-        Map<String,Object>  depart = oaDatadetailedInstMapper.getDept(parentId);
-        return depart;
+        List<String>  depart = oaDatadetailedInstMapper.getDept(parentId);
+        Map<String,Object> map =new HashMap<>();
+        map.put("depart",depart);
+        return map;
     }
 
     @Override
-    public List<Map<String, Object>> findorganizeNum(String table, String userId, int year, String parentId) {
-        List<Map<String, Object>> organizeNum = oaDatadetailedInstMapper.findorganizeNum(table,userId,year,parentId);
+    public Map<String, Object> findorganizeNum(String table, String userId, int year, String parentId) {
+        Map<String, Object> organizeNum = oaDatadetailedInstMapper.findorganizeNum(table,userId,year,parentId);
         return organizeNum;
     }
 
@@ -179,5 +186,19 @@ public class OaDatadetailedInstServiceImpl extends ServiceImpl<OaDatadetailedIns
     @Override
     public Map<String, Object> Rate(String table, Integer busModelId) {
         return oaDatadetailedInstMapper.rate(table,busModelId);
+    }
+
+    @Override
+    public String  findById(Integer departId) {
+        return oaDatadetailedInstMapper.findByid(departId);
+    }
+
+    @Override
+    public Map<String, Integer> deptDone(List<String> fids) {
+        List<String> procInsntIds=null;
+        if (fids.size() > 0) {
+            procInsntIds = departWithTaskMapper.queryProcInstIdsByFunction(fids);
+        }
+        return oaDatadetailedInstMapper.deptDone(procInsntIds);
     }
 }

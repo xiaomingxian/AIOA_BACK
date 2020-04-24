@@ -9,7 +9,6 @@ import com.cfcc.modules.oaBus.service.IBusFunctionService;
 import com.cfcc.modules.oaBus.service.IOaBusdataService;
 import com.cfcc.modules.system.entity.LoginInfo;
 import com.cfcc.modules.system.entity.SysDepart;
-import com.cfcc.modules.system.entity.SysUserFun;
 import com.cfcc.modules.system.service.ISysUserFunService;
 import com.cfcc.modules.system.service.ISysUserService;
 import io.swagger.annotations.Api;
@@ -19,7 +18,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;

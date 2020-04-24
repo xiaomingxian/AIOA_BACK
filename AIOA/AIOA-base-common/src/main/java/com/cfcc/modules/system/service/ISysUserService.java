@@ -8,6 +8,7 @@ import com.cfcc.common.system.vo.SysUserCacheInfo;
 import com.cfcc.modules.system.entity.*;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import java.util.*;
 
 /**
@@ -19,6 +20,7 @@ import java.util.*;
  * @since 2018-12-20
  */
 public interface ISysUserService extends IService<SysUser> {
+
 
 	public IPage<Map<String,Object>> getAllUserByAll(SysUser user,Integer pageNo,Integer pageSize);
 
@@ -180,4 +182,19 @@ public interface ISysUserService extends IService<SysUser> {
     Map<String, SysUser> selectUsersByUids(List<String> allUserIds);
 
 	SysUser getUserById(String id);
+
+
+
+	//----------------以下为app-----------------------------
+
+
+	Map<String, Object> getPersonage(String userId);
+
+	Boolean updateSysUser(SysUser sysUser);
+
+	Boolean updatePasswordById(String id, String password);
+
+	Boolean saveavatar(String userId, String savePath);
+
+	Boolean getAvatarByUsername(String userId, String resourceType, HttpServletResponse response);
 }

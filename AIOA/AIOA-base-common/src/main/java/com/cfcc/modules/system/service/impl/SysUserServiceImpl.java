@@ -26,6 +26,10 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
 import java.util.*;
 
 /**
@@ -408,6 +412,53 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser> impl
     public SysUser getUserById(String id) {
         return sysUserMapper.getUserById(id);
     }
+
+    @Override
+    public Map<String, Object> getPersonage(String userId) {
+        Map<String,Object> map = sysUserMapper.getPersonage(userId);
+        Map<String,Object> departMap = sysDepartMapper.getUserDepartByUserId(userId);
+        String departName = departMap.get("departName")+"";
+        while (departMap.get("orgType").toString() == "2"){
+            departMap = sysDepartMapper.getUserDepartByUserId(userId);
+            departName = departName + departMap.get("departName");
+        }
+        map.put("departName",departName );
+        return map;
+    }
+
+    @Override
+    public Boolean updateSysUser(SysUser sysUser) {
+        return sysUserMapper.updateSysUser(sysUser);
+    }
+
+    @Override
+    public Boolean updatePasswordById(String id, String password) {
+        return sysUserMapper.updatePasswordById(id,password);
+    }
+
+    @Override
+    public Boolean saveavatar(String userId, String savePath) {
+        return sysUserMapper.saveavatar(userId,savePath);
+    }
+
+    @Override
+    public Boolean getAvatarByUsername(String userId, String resourceType, HttpServletResponse response) {
+        try {
+//            List<OaFile> oaFileList = oaFileMapper.getOaFileByTypeAndOrderAndChecked(fileType);
+            SysUser user = sysUserMapper.getAvatarByUsername(userId);
+            File file = new File(user.getAvatar());
+            FileInputStream stream = new FileInputStream(file);
+            byte[] b = new byte[1024];
+            int len = -1;
+            while ((len = stream.read(b, 0, 1024)) != -1) {
+                response.getOutputStream().write(b, 0, len);
+            }
+        } catch (IOException e) {
+            return false;
+        }
+        return true;
+    }
+
 
     @Override
     public Map<String, Object> getAllUserMsg(String username) {
