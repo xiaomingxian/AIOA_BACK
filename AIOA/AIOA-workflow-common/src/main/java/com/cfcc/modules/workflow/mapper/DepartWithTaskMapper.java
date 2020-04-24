@@ -42,7 +42,7 @@ public interface DepartWithTaskMapper {
     @Delete("   DELETE from oa_task_dept where proc_inst_id=#{processInstanceId} and task_def_key=#{task_def_key};")
     void deleteSameTask(@Param("processInstanceId") String processInstanceId, @Param("task_def_key") String taskDefinitionKey);
 
-    Map<String, Integer> deptDone(@Param("pids") List<String> procInsntIds);
+    List<Map<String, Integer>> deptDone(@Param("pids") List<String> procInsntIds);
 
     List<TaskProcess> taskProcess(@Param("pids") List<String> fids);
 

@@ -39,7 +39,7 @@ public class ModelerController {
         List<String> fids = new ArrayList<>();
         fids.add(id);
 
-        Map<String, Integer> count = departWithTaskService.deptDone(fids);
+        List<Map<String, Integer>> count = departWithTaskService.deptDone(fids);
         List<TaskProcess> taskProcesses = departWithTaskService.taskProcess(fids);
         HashMap<String, Object> data = new HashMap<>();
         data.put("count",count);

@@ -26,7 +26,7 @@ public class DepartWithTaskServiceImpl implements DepartWithTaskService {
     }
 
     @Override
-    public Map<String, Integer> deptDone(List<String> fids) {
+    public List<Map<String, Integer>> deptDone(List<String> fids) {
         List<String> procInsntIds=null;
         if (fids.size() > 0) {
              procInsntIds = departWithTaskMapper.queryProcInstIdsByFunction(fids);

@@ -110,46 +110,82 @@ public class SupervisionPage {
      * @return
      */
     @GetMapping(value = "/HostNum")
-    public Map<String,Object> HostNum(HttpServletRequest request) {
+    public List<Map<String,Object>> HostNum(HttpServletRequest request) {
         //查询当前用户，作为assignee
         LoginInfo loginInfo = iSysUserService.getLoginInfo(request);
-        Map<String,Object>  map = new HashMap<>();
+        List<Map<String,Object>> list = new ArrayList<>();
         String UserId = loginInfo.getId();
         String parentId = loginInfo.getDepart().getParentId();
         String table = "oa_busdata11";
         int year = DateUtils.getYear();
-        Map<String, Object> depart = oaDatadetailedInstService.findPret(parentId);
+        List<Map<String, Object>> depart = oaDatadetailedInstService.findPret(parentId);
         List<Map<String, Object>> typeNum = oaDatadetailedInstService.findTypeNum(table, UserId, year, parentId);
-        map.put("depart",depart);
-        map.put("typeNum",typeNum);
-        return map;
+        String depart_name = null ;
+        for(int i=0;i<depart.size();i++){
+            boolean flag = false ;
+            Map<String,Object> map =new HashMap<>();
+            int index = -1 ;
+            for(int j=0;j<typeNum.size();j++){
+                depart_name = (String)depart.get(i).get("depart_name");
+                String organize = (String)typeNum.get(j).get("host");
+                if(depart_name.equals(organize)){
+                    flag = true ;
+                    index = j ;
+                    break ;
+                }
+            }
+            if(flag){
+                map.put("departName",depart_name);
+                map.put("count",typeNum.get(index).get("num")) ;
+                list.add(map);
+            }else{
+                map.put("departName",depart_name);
+                map.put("count",0) ;
+                list.add(map);
+            }
+        }
+        return list;
     }
  /**
      *协办数量和部门
      * @return
      */
     @GetMapping(value = "organizeNum")
-    public Map<String,Object> organizeNum(HttpServletRequest request) {
+    public List<Map<String,Object>> organizeNum(HttpServletRequest request) {
         //查询当前用户，作为assignee
         LoginInfo loginInfo = iSysUserService.getLoginInfo(request);
-        Map<String,Object>  map = new HashMap<>();
+        List<Map<String,Object>> list = new ArrayList<>();
         String UserId = loginInfo.getId();
         String parentId = loginInfo.getDepart().getParentId();
         String table = "oa_busdata11";
         int year = DateUtils.getYear();
-        Map<String, Object> depart = oaDatadetailedInstService.findPret(parentId); //部门
-        String depart_name = (String)depart.get("depart_name");
-        Map<String, Object> typeNum = oaDatadetailedInstService.findorganizeNum(table, UserId, year, parentId);
-        String organize = (String)typeNum.get("organize");
-        Integer num = (Integer)typeNum.get("num");
-        if(depart_name.equals(organize)){
-            map.put("departName",organize);
-            map.put("count",num);
-        }else{
-            map.put("departName",depart_name);
-            map.put("count",0);
+        List<Map<String, Object>> depart = oaDatadetailedInstService.findPret(parentId); //部门
+        List<Map<String, Object>> typeNum = oaDatadetailedInstService.findorganizeNum(table, UserId, year, parentId);
+        String depart_name = null ;
+        for(int i=0;i<depart.size();i++){
+            depart_name = (String)depart.get(i).get("depart_name");
+            boolean flag = false ;
+            Map<String,Object> map =new HashMap<>();
+            int index = -1 ;
+            for(int j=0;j<typeNum.size();j++){
+                String organize = (String)typeNum.get(j).get("organize");
+                if(depart_name.equals(organize)){
+                    flag = true ;
+                    index = j ;
+                    break ;
+                }
+            }
+            if(flag){
+                map.put("departName",depart_name);
+                map.put("count",typeNum.get(index).get("num")) ;
+                list.add(map);
+            }else{
+                map.put("departName",depart_name);
+                map.put("count",0) ;
+                list.add(map);
+            }
         }
-        return map;
+        return list;
     }
   /*  *//**
      *行领导批示办结率
@@ -187,48 +223,83 @@ public class SupervisionPage {
      * @return
      */
     @GetMapping(value = "RateNum")
-    public Map<String,Object> RateNum(HttpServletRequest request) {
+    public List<Map<String,Object>> RateNum(HttpServletRequest request) {
         LoginInfo loginInfo = iSysUserService.getLoginInfo(request);
-        Map<String,Object>  map = new HashMap<>();
+        List<Map<String,Object>> list = new ArrayList<>();
         String parentId = loginInfo.getDepart().getParentId();
         String table = "oa_busdata11";
         int year = DateUtils.getYear();
-        Map<String, Object> depart = oaDatadetailedInstService.findPret(parentId);
-        String depart_name = (String)depart.get("depart_name");
+        List<Map<String, Object>> depart = oaDatadetailedInstService.findPret(parentId); //部门
+        String depart_name = null;
         Integer busModelId = 51;
         List<String> functionIds = oaDatadetailedInstService.findFunctionIds(busModelId);
-        Map<String, Integer> stringIntegerMap = departWithTaskService.deptDone(functionIds);
-        Integer departId = stringIntegerMap.get("did");
-        Integer count = stringIntegerMap.get("countDone");
-        String departName = oaDatadetailedInstService.findById(departId);
-        if(depart_name.equals(departName)){
-            map.put("departName",departName);
-            map.put("count",count);
-        }else{
-            map.put("departName",depart_name);
-            map.put("count",0);
+        List<Map<String, Integer>> stringIntegerMap = departWithTaskService.deptDone(functionIds);
+        for(int i=0;i<depart.size();i++){
+            depart_name = (String)depart.get(i).get("depart_name");
+            boolean flag = false ;
+            Map<String,Object> map =new HashMap<>();
+            int index = -1 ;
+            for(int j=0;j<stringIntegerMap.size();j++){
+                Integer departId = stringIntegerMap.get(i).get("did");
+                String departName = oaDatadetailedInstService.findById(departId);
+                if(depart_name.equals(departName)){
+                    flag = true ;
+                    index = j ;
+                    break ;
+                }
+            }
+            if(flag){
+                map.put("departName",depart_name);
+                map.put("count",stringIntegerMap.get(index).get("num")) ;
+                list.add(map);
+            }else{
+                map.put("departName",depart_name);
+                map.put("count",0) ;
+                list.add(map);
+            }
         }
 
-        return map;
+        return list;
     }
     /**
      *延期数量
      * @return
      */
     @GetMapping(value = "ExtensionsNum")
-    public Map<String,Object> ExtensionsNum(HttpServletRequest request) {
+    public List<Map<String,Object>> ExtensionsNum(HttpServletRequest request) {
         LoginInfo loginInfo = iSysUserService.getLoginInfo(request);
-        Map<String,Object>  map = new HashMap<>();
+        List<Map<String,Object>> list = new ArrayList<>();
         String parentId = loginInfo.getDepart().getParentId();
         String table = "oa_busdata11";
         int year = DateUtils.getYear();
-        Map<String, Object> depart = oaDatadetailedInstService.findPret(parentId);
-        String depart_name = (String)depart.get("depart_name");
+        List<Map<String, Object>> depart = oaDatadetailedInstService.findPret(parentId); //部门
+        String depart_name = null ;
         Integer busModelId = 51;
-        List<String> functionIds = oaDatadetailedInstService.findFunctionIds(busModelId);
-        List<TaskProcess> taskProcesses = departWithTaskService.taskProcess(functionIds);
-
-        return map;
+        List<Map<String,Object>> extensionsNum = oaDatadetailedInstService.findExtensionsNum(busModelId,table);
+        for(int i=0;i<depart.size();i++){
+            depart_name = (String)depart.get(i).get("depart_name");
+            boolean flag = false ;
+            Map<String,Object> map =new HashMap<>();
+            int index = -1 ;
+            for(int j=0;j<extensionsNum.size();j++){
+                String s_create_dept =(String) extensionsNum.get(j).get("s_create_dept");
+                if(depart_name.equals(s_create_dept)){
+                    flag = true ;
+                    index = j ;
+                    break ;
+                }
+            }
+            if(flag){
+                map.put("departName",depart_name);
+                map.put("count",extensionsNum.get(index).get("num")) ;
+                list.add(map);
+            }else{
+                map.put("departName",depart_name);
+                map.put("count",0) ;
+                list.add(map);
+            }
+        }
+        return list;
     }
     @GetMapping("queryTask")
     @ApiOperation("任务查询")

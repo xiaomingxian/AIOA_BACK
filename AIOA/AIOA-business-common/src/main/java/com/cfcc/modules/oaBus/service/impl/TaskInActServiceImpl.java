@@ -49,6 +49,9 @@ public class TaskInActServiceImpl implements TaskInActService {
     @Autowired
     private TaskService taskService;
 
+    @Autowired
+    private com.cfcc.modules.oaBus.mapper.oaCalendarMapper oaCalendarMapper;
+
 
     @Override
     public void doTask(TaskInfoVO taskInfoVO, HttpServletRequest request) {
@@ -62,7 +65,8 @@ public class TaskInActServiceImpl implements TaskInActService {
         }
         //1 流程办理
         String nextTaskMsg = taskCommonService.doTask(taskInfoVO);
-
+        //2 更新日程信息
+        oaCalendarMapper.updateByTaskUserId(taskInfoVO.getTaskId()+userId);
 
         if (nextTaskMsg.endsWith("  ")) {
             busData.put("s_signer", loginInfo.getUsername());
@@ -74,6 +78,7 @@ public class TaskInActServiceImpl implements TaskInActService {
         busAbout(taskInfoVO, nextTaskMsg);
 
     }
+
 
     private void busAbout(TaskInfoVO taskInfoVO, String nextTaskMsg) {
         //2 更新流程对应的业务数据......
@@ -101,17 +106,21 @@ public class TaskInActServiceImpl implements TaskInActService {
     @Override
     public void doTaskMore(List<TaskInfoVO> taskInfoVOs, HttpServletRequest request) {
 
-        Map<String, Object> busData = taskInfoVOs.get(0).getBusData();
+        LoginInfo loginInfo = sysUserService.getLoginInfo(request);
+        TaskInfoVO taskInfoVO = taskInfoVOs.get(0);
+        Map<String, Object> busData = taskInfoVO.getBusData();
 
         String nextTaskMsg = taskCommonService.doTasksMore(taskInfoVOs);
         if (nextTaskMsg.endsWith("  ")) {
-            LoginInfo loginInfo = sysUserService.getLoginInfo(request);
+
             busData.put("s_signer", loginInfo.getUsername());
 
             busData.put("d_date1", new Date());//new SimpleDateFormat("yyyy-MM-dd").format(new Date()));//
         }
         busData.put("s_varchar10", taskInfoVOs.get(0).getProcessId());
         busAboutMore(taskInfoVOs, nextTaskMsg);
+        //2 更新日程信息
+        oaCalendarMapper.updateByTaskUserId(taskInfoVO.getTaskId()+loginInfo.getId());
 
     }
 

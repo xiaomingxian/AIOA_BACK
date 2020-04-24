@@ -9,7 +9,7 @@ import java.util.Map;
 public interface DepartWithTaskService {
     void save(String procInstId,TaskWithDepts taskWithDepts);
 
-    Map<String,Integer> deptDone(List<String> fids);
+    List<Map<String,Integer>> deptDone(List<String> fids);
 
     List<TaskProcess> taskProcess(List<String> fids);
 
