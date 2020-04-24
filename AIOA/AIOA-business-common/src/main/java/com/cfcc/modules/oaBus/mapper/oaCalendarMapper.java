@@ -81,4 +81,7 @@ public interface oaCalendarMapper extends BaseMapper<oaCalendar> {
     oaCalendar findBybusDataId(Integer busDataId);
 
     int appCount(oaCalendar oaCalendar);
+
+    @Select("SELECT s_user_names,task_user_id,d_create_time FROM oa_calendar WHERE i_fun_data_id=#{iTableId} and s_create_by=#{username}")
+    List<oaCalendar> selecturgeInform(Integer iTableId, String username);
 }

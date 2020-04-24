@@ -1,6 +1,9 @@
 package com.cfcc.modules.oadeferlog.service.impl;
 
+import com.cfcc.modules.oaBus.entity.oaCalendar;
 import com.cfcc.modules.oaBus.mapper.OaBusDynamicTableMapper;
+import com.cfcc.modules.oaBus.mapper.oaCalendarMapper;
+import com.cfcc.modules.oadatafetailedinst.entity.OaDatadetailedInst;
 import com.cfcc.modules.oadeferlog.entity.oaDeferLog;
 import com.cfcc.modules.oadeferlog.mapper.oaDeferLogMapper;
 import com.cfcc.modules.oadeferlog.service.IoaDeferLogService;
@@ -11,6 +14,7 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 
 import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -24,6 +28,12 @@ public class oaDeferLogServiceImpl extends ServiceImpl<oaDeferLogMapper, oaDefer
 
     @Autowired
     private OaBusDynamicTableMapper dynamicTableMapper;
+
+    @Autowired
+    private oaDeferLogMapper oaDeferLogMapper;
+
+    @Autowired
+    private oaCalendarMapper oaCalendarMapper;
 
     @Override
     public boolean updataOadataAndaddOaDeferLog(Map<String, Object> map) {
@@ -47,5 +57,17 @@ public class oaDeferLogServiceImpl extends ServiceImpl<oaDeferLogMapper, oaDefer
             log=false;
         }
         return log;
+    }
+
+    @Override
+    public List<oaDeferLog> selecturgeLog(String sTable,Integer iTableId) {
+        List<oaDeferLog> list=oaDeferLogMapper.selecturgeLog(sTable,iTableId);
+        return list;
+    }
+
+    @Override
+    public List<oaCalendar> selecturgeInform(Integer iTableId, String username) {
+        List<oaCalendar> list=oaCalendarMapper.selecturgeInform(iTableId,username);
+        return list;
     }
 }
