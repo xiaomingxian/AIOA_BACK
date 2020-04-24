@@ -164,18 +164,28 @@ public class oaCalendarController implements Job {
                 if (iOpenType == 1) { //公开类型是全行
                     oaCalendarList.add(Leader);
                 } else if (iOpenType == 2) { //公开类型是分管
-                    for (int i = 0; i < manageIdList.size(); i++) {
-                        for (int j = 0; j < manageIdList2.size(); j++) {
-                            if (manageIdList.get(i).equals(manageIdList2.get(j))) {
-                                oaCalendarList.add(Leader);
+                    if(id.equals(userNameId)){
+                        oaCalendarList.add(Leader);
+                    }else{
+                        for (int i = 0; i < manageIdList.size(); i++) {
+                            for (int j = 0; j < manageIdList2.size(); j++) {
+                                if (manageIdList.get(i).equals(manageIdList2.get(j))) {
+                                    oaCalendarList.add(Leader);
+                                }
                             }
                         }
                     }
+
                 } else { //公开类型是部门
-                    for (int i = 0; i < departIdList.size(); i++)
-                        if (departId != null && departIdList.get(i).equals(departId)) {
-                            oaCalendarList.add(Leader);
-                        }
+                    if(id.equals(userNameId)){
+                        oaCalendarList.add(Leader);
+                    }else{
+                        for (int i = 0; i < departIdList.size(); i++)
+                            if (departId != null && departIdList.get(i).equals(departId)) {
+                                oaCalendarList.add(Leader);
+                            }
+
+                    }
 
                 }
             }
@@ -226,21 +236,32 @@ public class oaCalendarController implements Job {
 
                 if (iOpenType == 1) { //公开类型是全行
                     oaCalendarList.add(share);
-                } else if (iOpenType == 2) { //公开类型是分管
-                    for (int i = 0; i < manageIdList.size(); i++) {
-                        for (int j = 0; j < manageIdList2.size(); j++) {
-                            if (manageIdList.get(i).equals(manageIdList2.get(j))) {
-                                oaCalendarList.add(share);
+                }
+                   else if (iOpenType == 2) { //公开类型是分管
+                        if(id.equals(userNameId)){
+                            oaCalendarList.add(share);
+                        }else{
+                            for (int i = 0; i < manageIdList.size(); i++) {
+                                for (int j = 0; j < manageIdList2.size(); j++) {
+                                    if (manageIdList.get(i).equals(manageIdList2.get(j))) {
+                                        oaCalendarList.add(share);
+                                    }
+                                }
                             }
                         }
-                    }
-                } else if (iOpenType == 3) { //公开类型是部门
-                    for (int i = 0; i < departIdList.size(); i++)
-                        if (departId != null && departIdList.get(i).equals(departId)) {
+
+                    } else { //公开类型是部门
+                        if(id.equals(userNameId)){
                             oaCalendarList.add(share);
+                        }else{
+                            for (int i = 0; i < departIdList.size(); i++)
+                                if (departId != null && departIdList.get(i).equals(departId)) {
+                                    oaCalendarList.add(share);
+                                }
+
                         }
 
-                }
+                    }
             }
         }
         pageList.setRecords(oaCalendarList);
