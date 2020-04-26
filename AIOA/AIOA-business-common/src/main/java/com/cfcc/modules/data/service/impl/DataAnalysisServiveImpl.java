@@ -73,7 +73,8 @@ public class DataAnalysisServiveImpl extends ServiceImpl<DataAnalysisMapper, OaB
     }
 
     @Override
-    public Map<String, Object> HandlingRate(String table, OaBusdata oaBusdata) {
+    public Map<String, Object> HandlingRate(String table, OaBusdata oaBusdata,String parentId) {
+        oaBusdata.setSCreateUnitid(parentId);
         Map<String, Object> list = dataAnalisisMapper.HandlingRate(table, oaBusdata);
         return list;
     }

@@ -294,8 +294,8 @@ public class oaCalendarServiceImpl extends ServiceImpl<oaCalendarMapper, oaCalen
     }
 
     @Override
-    public oaCalendar findBybusDataId(Integer busDataId) {
-        return oaCalendarMapper.findBybusDataId(busDataId);
+    public oaCalendar findBybusDataId(Integer busDataId,String userName) {
+        return oaCalendarMapper.findBybusDataId(busDataId,userName);
     }
 
 

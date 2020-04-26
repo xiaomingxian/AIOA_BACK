@@ -24,7 +24,7 @@ public interface DataAnalysisService extends IService<OaBusdata> {
 
     Map<String, Object> PeerNum(String table, OaBusdata oaBusdata);
 
-    Map<String, Object> HandlingRate(String table, OaBusdata oaBusdata);
+    Map<String, Object> HandlingRate(String table, OaBusdata oaBusdata,String parentId);
 
     Map<String, Object> Handling(String table, OaBusdata oaBusdata);
 

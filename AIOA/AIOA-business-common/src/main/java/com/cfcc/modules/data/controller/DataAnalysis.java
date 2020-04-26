@@ -94,12 +94,15 @@ public class DataAnalysis {
     @AutoLog(value = "超过平均值的月份")
     @GetMapping(value = "/MonthAverage")
     @ResponseBody
-    public List<Map<String, Object>> MonthAverage(OaBusdata oaBusdata, @RequestParam(name = "modelId", required = false) Integer modelId) {
+    public List<Map<String, Object>> MonthAverage(HttpServletRequest request,OaBusdata oaBusdata, @RequestParam(name = "modelId", required = false) Integer modelId) {
         String table = iOaBusdataService.queryTableName(modelId);
+        //查询当前用户，作为assignee
+        LoginInfo loginInfo = sysUserService.getLoginInfo(request);
+        String parentId = loginInfo.getDepart().getParentId();
         List<Map<String, Object>> byTableAndMy = dataAnalysisService.findByTableAndMy(table, oaBusdata);//月份
         Map<String, Object>  rate = dataAnalysisService.MyRate(table, oaBusdata);//办结率---办结数量/总共公文数量(同一个所属模块的)
         Map<String, Object> peerNum = dataAnalysisService.PeerNum(table, oaBusdata);//同行办理数量的百分比---功能办理的数量/总公文的数量（不管办结没办结、所属业务）
-        Map<String, Object> handlingRate = dataAnalysisService.HandlingRate(table, oaBusdata);//办理率-----功能办结的数量/总公文的数量（同一个所属模块）
+        Map<String, Object> handlingRate = dataAnalysisService.HandlingRate(table, oaBusdata,parentId);//办理率-----功能办结的数量/总公文的数量（同一个所属模块）
         Map<String, Object> Handling = dataAnalysisService.Handling(table, oaBusdata);//总共公文数量
         Map<String, Object> map1 = new HashMap<>();
         Map<String, Object> map2 = new HashMap<>();
@@ -155,14 +158,15 @@ public class DataAnalysis {
 
         return rate;
     }
-    @AutoLog(value = "办理率-----功能办结的数量/总公文的数量（同一个所属模块）")
+  /*  @AutoLog(value = "办理率-----功能办结的数量/总公文的数量（同一个所属模块）")
     @GetMapping(value = "/HandlingRate")
     @ResponseBody
     public Map<String, Object> HandlingRate(OaBusdata oaBusdata, @RequestParam(name = "modelId", required = false) Integer modelId) {
         String table = iOaBusdataService.queryTableName(modelId);
-        Map<String, Object> rate = dataAnalysisService.HandlingRate(table, oaBusdata);
+
+        Map<String, Object> rate = dataAnalysisService.HandlingRate(table, oaBusdata,);
         return rate;
-    }
+    }*/
 
     @AutoLog(value = "总共的公文数")
     @GetMapping(value = "/Handling")
