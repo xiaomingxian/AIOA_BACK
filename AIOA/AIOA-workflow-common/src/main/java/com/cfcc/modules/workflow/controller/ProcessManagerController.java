@@ -5,6 +5,7 @@ import com.cfcc.common.exception.AIOAException;
 import com.cfcc.common.mycat.MycatSchema;
 import com.cfcc.common.util.norepeat.NoRepeatSubmit;
 import com.cfcc.modules.workflow.pojo.Activity;
+import com.cfcc.modules.workflow.pojo.ProcessDefinitionJsonAble;
 import com.cfcc.modules.workflow.service.ProcessManagerService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -47,7 +48,6 @@ public class ProcessManagerController {
     @NoRepeatSubmit
     public Result deploy(@RequestParam(value = "file", required = false) MultipartFile[] files) {
 
-
         if (files == null || (files != null && files.length <= 0)) {
             return Result.error("流程图上传未成功");
         }
@@ -72,9 +72,9 @@ public class ProcessManagerController {
 
     @GetMapping("defKv")
     @ApiOperation("查询所有流程定义k-V")
-    public Map<String, String> actKV() {
+    public Map<String, ProcessDefinitionJsonAble> actKV() {
         String schema = MycatSchema.getSchema();
-        Map<String, String> actKv = processManagerService.defKv(schema);
+        Map<String, ProcessDefinitionJsonAble> actKv = processManagerService.defKv(schema);
         return actKv;
     }
 

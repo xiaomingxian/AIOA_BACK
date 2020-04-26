@@ -2,15 +2,18 @@ package com.cfcc.modules.workflowset.controller;
 
 import com.cfcc.common.api.vo.Result;
 import com.cfcc.common.exception.AIOAException;
+import com.cfcc.common.mycat.MycatSchema;
+import com.cfcc.modules.workflowset.entity.CopyMsg;
 import com.cfcc.modules.workflowset.service.WorkFlowSetService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+
+import java.util.Date;
 
 @Slf4j
 @Api(tags = "流程设置相关")
@@ -24,12 +27,14 @@ public class WorkFlowSet {
 
     @PostMapping("copy")
     @ApiOperation("复制流程")
-    @CacheEvict(value = "defKv" , allEntries = true)
-    public Result copy(String copyKey, String copyName, String sourceDefId) {
+    public Result copy(CopyMsg copyMsg) {
         //校验名称key是否已用
 
         try {
-            workFlowSetService.copy(copyKey, copyName, sourceDefId);
+            Date date = new Date();
+            copyMsg.setCopyKey("process"+date.getTime());
+            String schema = MycatSchema.getSchema();
+            workFlowSetService.copy(copyMsg,schema);
 
         } catch (AIOAException e) {
             return Result.error(e.getMessage());

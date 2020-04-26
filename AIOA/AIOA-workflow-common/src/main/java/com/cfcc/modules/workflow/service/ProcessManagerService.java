@@ -2,6 +2,7 @@ package com.cfcc.modules.workflow.service;
 
 import com.cfcc.common.api.vo.Result;
 import com.cfcc.modules.workflow.pojo.Activity;
+import com.cfcc.modules.workflow.pojo.ProcessDefinitionJsonAble;
 import org.activiti.engine.impl.pvm.process.ActivityImpl;
 import org.activiti.engine.repository.ProcessDefinition;
 import org.activiti.engine.runtime.ProcessInstance;
@@ -29,7 +30,7 @@ public interface ProcessManagerService {
 
     void loadByDeployment(String processDefinitionId, String resourceType, HttpServletResponse response);
 
-    Map<String, String> defKv(String schema);
+    Map<String, ProcessDefinitionJsonAble> defKv(String schema);
 
     String loadByDeploymentXml(String processDefinitionId) throws IOException;
 
