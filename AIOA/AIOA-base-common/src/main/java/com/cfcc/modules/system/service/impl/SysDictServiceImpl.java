@@ -265,19 +265,7 @@ public class SysDictServiceImpl extends ServiceImpl<SysDictMapper, SysDict> impl
 
         return ls;
     }
-
-
-    /**
-     * 查询对应的sql数据字典
-     *
-     * @param description
-     * @param userId
-     * @param departId
-     * @param description
-     * @return
-     */
-    @Override
-    public List<DictModel> getSqlValue(String description, String userId, String departId, String unitId) {
+    public String cerateSqlStr(String description,String userId,String departId,String unitId){
         String str[] = description.split("#") ;
         if(str.length > 1 ){
             description = str[0] ;
@@ -309,6 +297,21 @@ public class SysDictServiceImpl extends ServiceImpl<SysDictMapper, SysDict> impl
                 description += str[i] ;
             }
         }
+        return description ;
+    }
+
+    /**
+     * 查询对应的sql数据字典
+     *
+     * @param description
+     * @param userId
+     * @param departId
+     * @param description
+     * @return
+     */
+    @Override
+    public List<DictModel> getSqlValue(String description, String userId, String departId, String unitId) {
+        description = cerateSqlStr(description,userId,departId,unitId) ;
         System.out.println("数据字典sql：" + description);
         return sysDictMapper.getSqlValueDao(description);
     }
@@ -334,6 +337,13 @@ public class SysDictServiceImpl extends ServiceImpl<SysDictMapper, SysDict> impl
     @Override
     public boolean deleteDictByDictId(String id) {
         return sysDictMapper.deleteDictByDictId(id);
+    }
+
+    @Override
+    public String getSqlValueToString(String description, String userId, String departId, String unitId) {
+        description = cerateSqlStr(description,userId,departId,unitId) ;
+        System.out.println("数据字典sql：" + description);
+        return sysDictMapper.getSqlValueToStringDao(description)+"";
     }
 
 

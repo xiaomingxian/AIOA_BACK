@@ -106,4 +106,6 @@ public interface ISysDictService extends IService<SysDict> {
     List<SysDictItem> getEsIpAndHost(String orgCode);
 
     boolean deleteDictByDictId(String id);
+
+    String getSqlValueToString(String description, String userId, String departId, String unitId);
 }
