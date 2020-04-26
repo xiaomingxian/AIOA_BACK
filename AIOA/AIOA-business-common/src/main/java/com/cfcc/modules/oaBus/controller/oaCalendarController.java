@@ -418,7 +418,7 @@ public class oaCalendarController implements Job {
         String username = JwtUtil.getUsername(token);
         try {
             Integer busDataId = oaCalendar.getIFunDataId();
-            oaCalendar o = oaCalendarService.findBybusDataId(busDataId);
+            oaCalendar o = oaCalendarService.findBybusDataId(busDataId,oaCalendar.getSCreateBy());
             if(o == null){
                 // 给定截取条件分割字符串为字符数组
                 String[] split = oaCalendar.getSUserNames().split(",");
@@ -462,43 +462,10 @@ public class oaCalendarController implements Job {
                     oaCalendar.setIOpenType(0);
                 }
 
-                String s = UUID.randomUUID().toString().replace("-", "");
-                oaCalendar.setTaskUserId(s);
-
+               // String s = UUID.randomUUID().toString().replace("-", "");
                 oaCalendarService.saveCalendar(oaCalendar);
                 result.success("添加成功！");
             }else{
-                // 给定截取条件分割字符串为字符数组
-                String[] split = oaCalendar.getSUserNames().split(",");
-                List<SysUser> listUsr = new ArrayList<>();
-                String sUserNames1 = o.getSUserNames();
-                String[] split1 = sUserNames1.split(",");
-                //接收排序好的字符串
-                String str = "";
-                for (int i = 0; i < split.length; i++) {
-                    if(!sUserNames1.contains(split[i])){
-                        SysUser user = sysUserService.getUserByName(split[i]); //根据username查出user
-                        if (user != null) {
-                            listUsr.add(user);
-                        }
-                    }
-
-                }
-                for (int i = 0; i < split1.length; i++) {
-                        SysUser user = sysUserService.getUserByName(split1[i]); //根据username查出user
-                        if (user != null) {
-                            listUsr.add(user);
-                        }
-                }
-
-                List<SysUser> listUserOrder = listUsr.stream().sorted(Comparator.comparing(SysUser::getShowOrder)).collect(Collectors.toList());
-                //遍历show_order   根据show_order 找到对应的id
-
-                for (SysUser sysUser : listUserOrder) {
-                    str = str + sysUser.getUsername() + ",";
-                }
-                oaCalendar.setSUserNames(str);
-
                 oaCalendar.setIId(o.getIId());
                 oaCalendarService.updateByIid(oaCalendar);
             }

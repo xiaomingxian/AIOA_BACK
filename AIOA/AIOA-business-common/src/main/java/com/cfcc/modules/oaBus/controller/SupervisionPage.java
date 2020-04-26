@@ -13,6 +13,7 @@ import com.cfcc.modules.oadatafetailedinst.entity.OaDatadetailedInst;
 import com.cfcc.modules.oadatafetailedinst.service.IOaDatadetailedInstService;
 import com.cfcc.modules.system.entity.*;
 import com.cfcc.modules.system.service.ISysDepartService;
+import com.cfcc.modules.system.service.ISysDictService;
 import com.cfcc.modules.system.service.ISysUserService;
 import com.cfcc.modules.system.service.ISysUserSetService;
 import com.cfcc.modules.utils.IWfConstant;
@@ -57,6 +58,9 @@ public class SupervisionPage {
 
     @Autowired
     private DepartWithTaskService departWithTaskService;
+
+    @Autowired
+    private ISysDictService sysDictService;
 
     @Autowired
     private ISysDepartService iSysDepartService;
@@ -187,37 +191,6 @@ public class SupervisionPage {
         }
         return list;
     }
-  /*  *//**
-     *行领导批示办结率
-     * @return
-     *//*
-    @GetMapping(value = "lineLeaderRate")
-    public Map<String,Object> lineLeaderRate() {
-        String table = "oa_busdata11";
-        Integer busModelId = 51;
-        Integer busFunctionId = 163;
-        Map<String, Object> hangrate = new HashMap<>();
-        rate = oaDatadetailedInstService.lineLeaderRate(table,busModelId,busFunctionId);
-        if(rate == null){
-            rate.put("hangrate",0);
-        }
-        return rate;
-    }*/
-   /* *//**
-     *办结率
-     * @return
-     *//*
-    @GetMapping(value = "Rate")
-    public Map<String,Object> Rate() {
-        String table = "oa_busdata11";
-        Integer busModelId = 51;
-        Map<String, Object> rate = new HashMap<>();
-         rate = oaDatadetailedInstService.Rate(table,busModelId);
-         if(rate == null){
-             rate.put("rate",0);
-         }
-        return rate;
-    }*/
     /**
      *办结数量
      * @return
@@ -372,6 +345,40 @@ public class SupervisionPage {
             return Result.error("任务查询失败");
         }
 
+    }
+    /**
+     *分析维度
+     * @return
+     */
+    @GetMapping(value = "/AnalysisDimension")
+    public List<Map<String,Object>> AnalysisDimension(HttpServletRequest request) {
+       // List<Map<String,Object>> list = new ArrayList<>();
+        String table = "oa_busdata11";
+        int year = DateUtils.getYear();
+        //数据字典获取functionid
+        SysUser currentUser = iSysUserService.getCurrentUser(request);
+        Map<String, Object> allUserMsg = iSysUserService.getAllUserMsg(currentUser.getUsername());
+        String parentId = (String)allUserMsg.get("parentId");//机构id
+        String deptId = allUserMsg.get("deptId") + ""; //部门id
+        List<SysRole> role = (List<SysRole>)allUserMsg.get("role");
+        for(int i=0;i<role.size();i++){
+            String roleCode = role.get(i).getRoleCode();
+
+            if(roleCode.equals(""))//督办员
+            {
+
+            }else if(roleCode.equals("")) //行领导
+            {
+
+            }else if(roleCode.equals("308")){//部门负责人
+
+            }else if(roleCode.equals("010")){//一般人员
+
+            }
+        }
+        String dictKey = "sup_parameter"; //数据字典-督办
+        List<Map<String, Object>> list = sysDictService.getDictByKeySer(dictKey, deptId);
+        return list;
     }
 
 }

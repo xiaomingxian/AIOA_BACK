@@ -18,6 +18,8 @@
             i_bus_model_id,
             i_bus_function_id,
             i_fun_data_id,
+            task_user_id ,
+            task_id,
             i_is_state
         )VALUES(
                 NULL,
@@ -35,6 +37,8 @@
                 #{iBusModelId},
                 #{iBusFunctionId},
                 #{iFunDataId},
+                #{taskUserId},
+                #{taskId},
                 #{state}
             )
     </insert>
@@ -54,7 +58,9 @@
          c.i_bus_model_id = #{iBusModelId},
          c.i_bus_function_id = #{iBusFunctionId},
          c.i_fun_data_id  = #{iFunDataId},
-         c.i_is_state  = #{state}
+         c.i_is_state  = #{state},
+         c.task_user_id  = #{taskUserId},
+         c.task_id  = #{taskId}
          where c.i_id = #{iId};
     </update>
     <delete id="deleteByIid" parameterType="String">
@@ -373,7 +379,7 @@
         ${pageNo},${pageSize}
     </select>
     <select id="findBybusDataId" resultType="com.cfcc.modules.oaBus.entity.oaCalendar">
-        select * from oa_calendar c where c.i_fun_data_id = #{busDataId}
+        select * from oa_calendar c where c.i_fun_data_id = #{busDataId}  and c.s_create_by = #{userName}
     </select>
     <select id="appCount" resultType="java.lang.Integer">
         select  count(*) from oa_calendar c
