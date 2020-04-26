@@ -176,7 +176,7 @@ public interface SysUserMapper extends BaseMapper<SysUser> {
             " u.username = #{username};")
     List<Map<String, Object>> getCurrentUserMsg(@Param("username") String username);
 
-    @Select("select id,depart_name departName from sys_depart  where org_type=2  and parent_id=#{parentId} order by depart_order ")
+    @Select("select id,depart_name departName from sys_depart  where org_type=2  and parent_id=#{parentId} and status=1 and del_flag=0 order by depart_order ")
     List<Map<String, Object>> selectAllDept(String parentId);
 
     @Select("<script> " +
