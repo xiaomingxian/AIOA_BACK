@@ -68,6 +68,12 @@ public class QuartzJobServiceImpl extends ServiceImpl<QuartzJobMapper, QuartzJob
 		return this.updateById(quartzJob);
 	}
 
+	@Override
+	public List<QuartzJob> getQuartzJob(QuartzJob quartzJob) {
+        List<QuartzJob> job = quartzJobMapper.getQuartzJob(quartzJob.getJobClassName(), quartzJob.getStatus());
+        return job;
+	}
+
 	/**
 	 * 编辑&启停定时任务
 	 * @throws SchedulerException 

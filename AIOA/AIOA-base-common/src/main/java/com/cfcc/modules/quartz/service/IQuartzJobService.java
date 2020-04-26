@@ -1,11 +1,10 @@
 package com.cfcc.modules.quartz.service;
 
-import java.util.List;
-
+import com.baomidou.mybatisplus.extension.service.IService;
 import com.cfcc.modules.quartz.entity.QuartzJob;
 import org.quartz.SchedulerException;
 
-import com.baomidou.mybatisplus.extension.service.IService;
+import java.util.List;
 
 /**
  * @Description: 定时任务在线管理
@@ -24,4 +23,6 @@ public interface IQuartzJobService extends IService<QuartzJob> {
 	boolean deleteAndStopJob(QuartzJob quartzJob);
 
 	boolean resumeJob(QuartzJob quartzJob);
+
+    List<QuartzJob> getQuartzJob(QuartzJob quartzJob);
 }
