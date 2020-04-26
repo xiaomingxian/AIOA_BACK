@@ -52,7 +52,8 @@ public class ModelerServiceImpl implements ModelerService {
             modelObjectNode.put(ModelDataJsonConstants.MODEL_DESCRIPTION, description);
             modelData.setMetaInfo(modelObjectNode.toString());
             modelData.setName(name);
-            modelData.setKey(StringUtils.defaultString(key));
+            String keys = StringUtils.defaultString(key);
+            modelData.setKey(keys);
 
             repositoryService.saveModel(modelData);
             repositoryService.addModelEditorSource(modelData.getId(), editorNode.toString().getBytes("utf-8"));

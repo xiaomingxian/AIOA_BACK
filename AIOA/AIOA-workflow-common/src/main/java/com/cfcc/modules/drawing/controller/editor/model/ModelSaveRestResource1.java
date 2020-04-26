@@ -12,29 +12,31 @@
  */
 package com.cfcc.modules.drawing.controller.editor.model;
 
+import com.cfcc.common.mycat.MycatSchema;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.activiti.bpmn.converter.BpmnXMLConverter;
-import org.activiti.bpmn.model.*;
 import org.activiti.bpmn.model.Process;
+import org.activiti.bpmn.model.*;
 import org.activiti.editor.constants.ModelDataJsonConstants;
 import org.activiti.editor.language.json.converter.BpmnJsonConverter;
 import org.activiti.engine.ActivitiException;
 import org.activiti.engine.RepositoryService;
-import org.activiti.engine.impl.bpmn.behavior.ExclusiveGatewayActivityBehavior;
 import org.activiti.engine.repository.Deployment;
 import org.activiti.engine.repository.Model;
 import org.apache.batik.transcoder.TranscoderInput;
 import org.apache.batik.transcoder.TranscoderOutput;
 import org.apache.batik.transcoder.image.PNGTranscoder;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.tomcat.jni.Proc;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.web.bind.annotation.*;
 
-import java.io.*;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.InputStream;
 import java.nio.charset.Charset;
 import java.util.Collection;
 import java.util.HashMap;
@@ -129,10 +131,19 @@ public class ModelSaveRestResource1 implements ModelDataJsonConstants {
             Model model1 = repositoryService.createModelQuery().modelId(modelId).singleResult();
             model1.setDeploymentId(deployment.getId());
             repositoryService.saveModel(model1);
+
+            String schema = MycatSchema.getSchema();
+            clear(schema);
         } catch (Exception e) {
             LOGGER.error("Error saving model", e);
             throw new ActivitiException("Error saving model", e);
         }
+
+    }
+
+    @CacheEvict(value = "defKv", allEntries = true)
+    public void clear(String schemal){
+
 
     }
 

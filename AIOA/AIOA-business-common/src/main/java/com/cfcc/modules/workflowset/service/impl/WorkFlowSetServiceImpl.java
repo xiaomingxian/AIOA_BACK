@@ -16,6 +16,7 @@ import com.cfcc.modules.oabutton.mapper.OaProcOpinionMapper;
 import com.cfcc.modules.workflow.mapper.OaProcActinstMapper;
 import com.cfcc.modules.workflow.pojo.OaProcActinst;
 import com.cfcc.modules.workflow.service.ProcessManagerService;
+import com.cfcc.modules.workflowset.entity.CopyMsg;
 import com.cfcc.modules.workflowset.service.WorkFlowSetService;
 import lombok.extern.slf4j.Slf4j;
 import org.activiti.engine.RepositoryService;
@@ -56,7 +57,12 @@ public class WorkFlowSetServiceImpl implements WorkFlowSetService {
 
 
     @Override
-    public void copy(String copyKey, String copyName, String sourceDefId) throws Exception {
+    @CacheEvict(value = "defKv" , allEntries = true)
+    public void copy(CopyMsg copyMsg,String schemal) throws Exception {
+        String copyKey = copyMsg.getCopyKey();
+        String copyName = copyMsg.getCopyName();
+        String sourceDefId = copyMsg.getSourceDefId();
+        String descriptionNew = copyMsg.getDescription();
 
         List<ProcessDefinition> listKey = repositoryService.createProcessDefinitionQuery().processDefinitionKey(copyKey).list();
         if (listKey.size() > 0) throw new AIOAException("该流程key已经存在，请修改");
@@ -68,11 +74,13 @@ public class WorkFlowSetServiceImpl implements WorkFlowSetService {
 
         String name = processDefinition.getName();
         String key = processDefinition.getKey();
+        String description = processDefinition.getDescription();
 
         String xml = processManagerService.loadByDeploymentXml(sourceDefId);
 
         String copyXml = xml.replaceAll("id=\"" + key + "\"", "id=\"" + copyKey + "\"")
-                .replaceAll("name=\"" + name + "\"", "name=\"" + copyName + "\"");
+                .replaceAll("name=\"" + name + "\"", "name=\"" + copyName + "\"")
+                .replaceAll("<documentation>"+description+"</documentation>","<documentation>"+descriptionNew+"</documentation>");
         //0 发布流程
         processManagerService.saveXml(copyKey, copyXml);
         //5张配置表(2按钮,2意见,1环节)

@@ -16,10 +16,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
 
 import javax.annotation.Resource;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @Api(tags = "工作流模型在线编辑")
 @Controller
@@ -73,7 +70,11 @@ public class ModelerController {
         Result<String> result = new Result<>();
         try {
             //创建空模型
-            String modelId = modelerService.crateModel(processMsg.getName(), processMsg.getKey(), processMsg.getDescription());
+            Date date = new Date();
+            long time = date.getTime();
+            String key ="process"+time;
+
+            String modelId = modelerService.crateModel(processMsg.getName(), key, processMsg.getDescription());
             if (StringUtils.isBlank(modelId)) {
                 throw new RuntimeException("创建modeler失败modelId:" + modelId);
             }
