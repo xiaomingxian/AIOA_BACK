@@ -81,6 +81,17 @@ public class WorkFlowSetServiceImpl implements WorkFlowSetService {
         String copyXml = xml.replaceAll("id=\"" + key + "\"", "id=\"" + copyKey + "\"")
                 .replaceAll("name=\"" + name + "\"", "name=\"" + copyName + "\"")
                 .replaceAll("<documentation>"+description+"</documentation>","<documentation>"+descriptionNew+"</documentation>");
+        if (!xml.contains("<documentation>")){
+            StringBuffer sb = new StringBuffer();
+            String[] split = copyXml.split("\n");
+            for (String oneLine : split) {
+                sb.append(oneLine+"\n");
+                if (oneLine.contains("<process")){
+                    sb.append("<documentation>"+descriptionNew+"</documentation>\n");
+                }
+            }
+            copyXml=sb.toString();
+        }
         //0 发布流程
         processManagerService.saveXml(copyKey, copyXml);
         //5张配置表(2按钮,2意见,1环节)
