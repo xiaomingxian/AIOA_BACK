@@ -5,6 +5,7 @@ import com.cfcc.modules.quartz.entity.QuartzJob;
 import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * @Description: 定时任务在线管理
@@ -17,5 +18,7 @@ public interface QuartzJobMapper extends BaseMapper<QuartzJob> {
 	public List<QuartzJob> findByJobClassName(@Param("jobClassName") String jobClassName);
 
 
-    List<QuartzJob> getQuartzJob(@Param("jobClassName") String jobClassName,@Param("status") Integer status);
+    List<Map<String,Object>> getQuartzJob(@Param("jobClassName") String jobClassName, @Param("status") Integer status);
+
+    Long getQuartzJobtotal(@Param("jobClassName") String jobClassName, @Param("status") Integer status);
 }

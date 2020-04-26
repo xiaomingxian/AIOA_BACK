@@ -69,17 +69,18 @@ public class QuartzJobController {
 	 * @return
 	 */
 	@RequestMapping(value = "/list", method = RequestMethod.GET)
-	public Result<List<QuartzJob>> queryPageList(QuartzJob quartzJob,
+	public Result<List<Map<String,Object>>> queryPageList(QuartzJob quartzJob,
 //												  @RequestParam(name = "pageNo", defaultValue = "1") Integer pageNo,
 //                                                  @RequestParam(name = "pageSize", defaultValue = "10") Integer pageSize,
 												  HttpServletRequest req) {
-		Result<List<QuartzJob>> result = new Result<List<QuartzJob>>();
+		Result<List<Map<String,Object>>> result = new Result<List<Map<String,Object>>>();
 //		QueryWrapper<QuartzJob> queryWrapper = QueryGenerator.initQueryWrapper(quartzJob, req.getParameterMap());
 //		Page<QuartzJob> page = new Page<QuartzJob>(pageNo, pageSize);
 //		IPage<QuartzJob> pageList = quartzJobService.page(page, queryWrapper);
-		List<QuartzJob> pageList = quartzJobService.getQuartzJob(quartzJob);
+		List<Map<String,Object>> pageList = quartzJobService.getQuartzJob(quartzJob);
 		result.setSuccess(true);
 		result.setResult(pageList);
+//		result.setMessage();
 		return result;
 	}
 

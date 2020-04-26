@@ -6,8 +6,20 @@
 	<select id="findByJobClassName" resultType="com.cfcc.modules.quartz.entity.QuartzJob">
 		select * from  sys_quartz_job  where job_class_name = #{jobClassName}
 	</select>
-    <select id="getQuartzJob" resultType="com.cfcc.modules.quartz.entity.QuartzJob">
+    <select id="getQuartzJob" resultType="java.util.Map">
 		SELECT * FROM sys_quartz_job
+		<where>
+			1 = 1
+			<if test="jobClassName != null and jobClassName != ''">
+				and job_class_name like concat(concat("%",#{jobClassName}),"%")
+			</if>
+			<if test="status != null and status != ''">
+				and status = #{status}
+			</if>
+		</where>
+	</select>
+	<select id="getQuartzJobtotal" resultType="java.lang.Long">
+		SELECT count(*) FROM sys_quartz_job
 		<where>
 			1 = 1
 			<if test="jobClassName != null and jobClassName != ''">

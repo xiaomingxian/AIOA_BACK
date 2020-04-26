@@ -1,28 +1,20 @@
 package com.cfcc.modules.quartz.service.impl;
 
-import java.util.List;
-
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.cfcc.common.constant.CommonConstant;
 import com.cfcc.common.exception.AIOAException;
 import com.cfcc.modules.quartz.entity.QuartzJob;
 import com.cfcc.modules.quartz.mapper.QuartzJobMapper;
 import com.cfcc.modules.quartz.service.IQuartzJobService;
-import org.quartz.CronScheduleBuilder;
-import org.quartz.CronTrigger;
-import org.quartz.Job;
-import org.quartz.JobBuilder;
-import org.quartz.JobDetail;
-import org.quartz.JobKey;
-import org.quartz.Scheduler;
-import org.quartz.SchedulerException;
-import org.quartz.TriggerBuilder;
-import org.quartz.TriggerKey;
+import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.collections.map.HashedMap;
+import org.quartz.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
-
-import lombok.extern.slf4j.Slf4j;
+import java.util.List;
+import java.util.Map;
 
 /**
  * @Description: 定时任务在线管理
@@ -69,8 +61,12 @@ public class QuartzJobServiceImpl extends ServiceImpl<QuartzJobMapper, QuartzJob
 	}
 
 	@Override
-	public List<QuartzJob> getQuartzJob(QuartzJob quartzJob) {
-        List<QuartzJob> job = quartzJobMapper.getQuartzJob(quartzJob.getJobClassName(), quartzJob.getStatus());
+	public List<Map<String,Object>> getQuartzJob(QuartzJob quartzJob) {
+        List<Map<String,Object>> job = quartzJobMapper.getQuartzJob(quartzJob.getJobClassName(), quartzJob.getStatus());
+//        Long total = quartzJobMapper.getQuartzJobtotal(quartzJob.getJobClassName(), quartzJob.getStatus());
+//        Map<String,Object> map = new HashedMap();
+//        map.put("total",total );
+//        job.add(map);
         return job;
 	}
 
