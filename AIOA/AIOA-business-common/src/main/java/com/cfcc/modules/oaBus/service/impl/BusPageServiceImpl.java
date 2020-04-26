@@ -109,9 +109,11 @@ public class BusPageServiceImpl extends ServiceImpl<BusPageMapper, BusPage> impl
         List<SysDict> dictList = iSysDictService.list(dictQueryWrapper);
         List<DictModel> dictByCodeList = iSysDictService.getDictByCode("sql");
         List<DictModel> regulars = iSysDictService.getDictByCode("regular_expressions");
+        List<DictModel> bookmarkList = iSysDictService.getDictByCode("bookmark");
         map.put("dicList",dictList);
         map.put("dictByCodeList",dictByCodeList);
         map.put("regulars",regulars);
+        map.put("bookmarkList",bookmarkList);
         return map;
     }
 

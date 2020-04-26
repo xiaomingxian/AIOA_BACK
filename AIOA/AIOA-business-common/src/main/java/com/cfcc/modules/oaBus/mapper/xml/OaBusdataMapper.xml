@@ -539,7 +539,7 @@
             ${sBusdataTable}
         <where>
             <if test="sTitle!=null and sTitle!=''">
-                and s_title=#{sTitle}
+                and s_title like concat(concat("%",#{sTitle}),"%")
             </if>
             <if test="functionId!=null and functionId!=''">
                 and i_bus_function_id=#{functionId}
