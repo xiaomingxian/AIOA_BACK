@@ -295,13 +295,15 @@ public class ProcessManagerImpl implements ProcessManagerService {
     @Override
 //    , key = "'actPro'"
     @Cacheable(value = "defKv")
-    public Map<String, String> defKv(String orgSchema) {
-        HashMap<String, String> map = new HashMap<>();
+    public Map<String, ProcessDefinitionJsonAble> defKv(String orgSchema) {
+        HashMap<String, ProcessDefinitionJsonAble> map = new HashMap<>();
         List<ProcessDefinition> list = repositoryService.createProcessDefinitionQuery().active().latestVersion().list();
         list.stream().forEach(l -> {
             String name = l.getName();
             String key = l.getKey();
-            map.put(name, key);
+            ProcessDefinitionJsonAble processDefinitionJsonAble = new ProcessDefinitionJsonAble();
+            BeanUtils.copyProperties(l,processDefinitionJsonAble);
+            map.put(name, processDefinitionJsonAble);
         });
         return map;
     }
