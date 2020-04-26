@@ -29,6 +29,7 @@ public class ProcessDefinitionJsonAble implements Serializable {
     boolean hasGraphicalNotation;
 
     boolean isSuspended;
+    private String sus ;
 
     public String getSus() {
         return isSuspended ? "挂起" : "激活";
