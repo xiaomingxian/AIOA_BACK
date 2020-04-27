@@ -74,7 +74,7 @@
         select count(*) from oa_calendar
         <where>
             i_is_leader = 1 and i_is_state = 0 and
-            s_user_names!=' ' and s_user_names is not null
+            s_user_names!=' ' and s_user_names is not null  and i_open_type!=0
             <if test="sAddress != '' and sAddress != null">
                 and s_address = #{sAddress}
             </if>
@@ -103,7 +103,7 @@
         select count(*) from oa_calendar
         <where>
             i_is_leader = 0 and i_is_state = 0  and s_user_names!=' '
-             and s_user_names is not null
+             and s_user_names is not null   and i_open_type!=0
             <if test="sAddress != '' and sAddress != null">
                 and s_address = #{sAddress}
             </if>
@@ -228,7 +228,7 @@
     <select id="findByLeader" resultType="com.cfcc.modules.oaBus.entity.oaCalendar">
         select * from oa_calendar INNER  JOIN  sys_user s
         <where>
-             i_is_leader = 1 and i_is_state = 0
+             i_is_leader = 1 and i_is_state = 0   and i_open_type!=0
 
             <if test="oaCalendar.sAddress != '' and oaCalendar.sAddress != null">
                 and s_address = #{oaCalendar.sAddress}
@@ -260,7 +260,7 @@
     <select id="queryPageList" resultType="com.cfcc.modules.oaBus.entity.oaCalendar">
         select * from oa_calendar INNER  JOIN  sys_user s
         <where>
-            i_is_leader = 0 and  i_is_state = 0
+            i_is_leader = 0 and  i_is_state = 0  and i_open_type!=0
             <if test="oaCalendar.sAddress != '' and oaCalendar.sAddress != null">
                 and s_address = #{oaCalendar.sAddress}
             </if>
