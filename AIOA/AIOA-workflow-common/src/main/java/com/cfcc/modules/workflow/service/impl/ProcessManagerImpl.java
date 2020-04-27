@@ -143,12 +143,11 @@ public class ProcessManagerImpl implements ProcessManagerService {
             query.latestVersion();
 
             //name
-            if (StringUtils.isNotEmpty(vo.getName())) query.processDefinitionNameLike(vo.getName());
+            if (StringUtils.isNotEmpty(vo.getName())) query.processDefinitionNameLike("%"+vo.getName()+"%");
             //key
             if (StringUtils.isNotEmpty(vo.getKey())) query.processDefinitionKeyLike(vo.getKey());
             //deploymentId
             if (StringUtils.isNotEmpty(vo.getDeploymentId())) query.deploymentId(vo.getDeploymentId());
-
             //总数统计
             int totalCount = (int) query.count();
             //分页后的结果查询

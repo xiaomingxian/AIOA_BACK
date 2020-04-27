@@ -420,6 +420,7 @@ public class LoginController {
             obj.put("multi_depart", 0);
         } else if (departs.size() == 1) {
             sysUserService.updateUserDepart(username, departs.get(0).getOrgCode());
+            sysUser.setOrgCode(departs.get(0).getOrgCode()) ;       //将用户的org_code信息更新到用户bena中，再跟更新到对应的缓存中
             obj.put("multi_depart", 1);
             loginInfo.setDepart(departs.get(0));
         } else {

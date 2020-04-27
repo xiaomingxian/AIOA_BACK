@@ -30,7 +30,7 @@ public interface SysUserFunMapper extends BaseMapper<SysUserFun> {
     @Select("SELECT b.s_name ,u.i_bus_model_id,u.i_bus_function_id FROM  sys_user_fun u " +
             "LEFT join oa_bus_function b " +
             "on u.i_bus_function_id=b.i_id and u.i_bus_model_id=b.i_bus_model_id " +
-            "WHERE u.s_user_id=#{userId} and u.status not in (0)")
+            "WHERE u.s_user_id=#{userId} and u.status not in (0) and b.s_name is not null")
     List<Map<String,Object>> selecUserFuntList(String userId);
 
     @Select("SELECT i_bus_model_id,i_bus_function_id,status FROM sys_user_fun WHERE s_user_id=#{usrId}")
