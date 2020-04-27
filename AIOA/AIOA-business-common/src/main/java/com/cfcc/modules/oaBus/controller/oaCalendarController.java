@@ -438,35 +438,19 @@ public class oaCalendarController implements Job {
                     str = str + sysUser.getUsername() + ",";
                 }
                 oaCalendar.setSUserNames(str);
-                if(oaCalendar.getSCreateBy().length()!=0){
-                    oaCalendar.setSCreateBy(oaCalendar.getSCreateBy());
-                }else{
-                    oaCalendar.setSCreateBy(username);
-                }
-                if(oaCalendar.getIFunDataId()==0){
-                    oaCalendar.setIFunDataId(1);
-                }
                 if(oaCalendar.getState().length()==0){
                     oaCalendar.setState("0");
                 }
-                if (oaCalendar.getIIsTop() == null) {
-                    oaCalendar.setIIsTop(0);
+                if(oaCalendar.getSUserNames().equals("")){
+                    oaCalendar.setSUserNames(username);
                 }
-                if (oaCalendar.getIIsLeader() == null) {
-                    oaCalendar.setIIsLeader(0);
-                }
-                if (oaCalendar.getIOpenType() == null) {
-                    oaCalendar.setIOpenType(0);
-                }
-                if (oaCalendar.getIRemindType() == null) {
-                    oaCalendar.setIOpenType(0);
-                }
-
+                oaCalendar.setDCreateTime(DateUtils.getDate());
                // String s = UUID.randomUUID().toString().replace("-", "");
                 oaCalendarService.saveCalendar(oaCalendar);
                 result.success("添加成功！");
             }else{
                 oaCalendar.setIId(o.getIId());
+                oaCalendar.setDCreateTime(DateUtils.getDate());
                 oaCalendarService.updateByIid(oaCalendar);
             }
 

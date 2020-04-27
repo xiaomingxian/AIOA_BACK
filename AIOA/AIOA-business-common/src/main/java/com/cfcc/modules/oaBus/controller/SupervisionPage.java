@@ -365,25 +365,27 @@ public class SupervisionPage {
         String deptId = allUserMsg.get("deptId") + ""; //部门id
         List<SysRole> role = (List<SysRole>)allUserMsg.get("role");
         String dictKey = ""; //数据字典-督办
+        String roleName = "";
         for(int i=0;i<role.size();i++){
             String roleCode = role.get(i).getRoleCode();
-            String text = "" ;
-            if(roleCode.equals("admin"))//督办员
-            {
-                dictKey ="sup_appraise1";
-                getDic(dictKey,text,deptId,list);
+            roleName = roleCode+","+roleName;
+        }
+        String text = "" ;
+        if(roleName.contains("admin"))//督办员
+        {
+            dictKey ="sup_appraise1";
+            getDic(dictKey,text,deptId,list);
 
-            }else if(roleCode.equals("101")) //行领导
-            {
-                dictKey ="sup_appraise2";
-                getDic(dictKey,text,deptId,list);
-            }else if(roleCode.equals("308")){//部门负责人
-                dictKey ="sup_appraise3";
-                getDic(dictKey,text,deptId,list);
-            }else if(roleCode.equals("010")){//一般人员
-                dictKey ="sup_appraise4";
-                getDic(dictKey,text,deptId,list);
-            }
+        }else if(roleName.contains("101")) //行领导
+        {
+            dictKey ="sup_appraise2";
+            getDic(dictKey,text,deptId,list);
+        }else if(roleName.contains("308")){//部门负责人
+            dictKey ="sup_appraise3";
+            getDic(dictKey,text,deptId,list);
+        }else if(roleName.contains("010")){//一般人员
+            dictKey ="sup_appraise4";
+            getDic(dictKey,text,deptId,list);
         }
 
 
@@ -441,17 +443,18 @@ public class SupervisionPage {
         Map<String, Object> allUserMsg = iSysUserService.getAllUserMsg(currentUser.getUsername());
         String parentId = (String)allUserMsg.get("parentId");//机构id
         String deptId = allUserMsg.get("deptId") + ""; //部门id
-        String state = "";
-        List<Map<String, Object>> diclist = sysDictService.getDictByKeySer(type, deptId);
-      /*  if(type.equals("")){ //办理中
-            state = "";
-        }else{  //办结完数据
-            state = "1";
-        }*/
+        String dick = "";
+        type = "0";
+        if(type.equals("0")){
+            dick ="sup_progress";
+        }else{
+            dick ="sup_end";
+        }
+        List<Map<String, Object>> diclist = sysDictService.getDictByKeySer(dick, deptId);
         String  day1 = "";
         String  day2 = "";
-        Map<String,Object> data =  oaDatadetailedInstService.findOverDay(modelId,parentId,state,day1,day2); //超期的
-        Map<String,Object> AdvanceData =  oaDatadetailedInstService.findAdvanceDay(modelId,parentId,state,day1,day2); //提前的
+        Map<String,Object> data =  oaDatadetailedInstService.findOverDay(modelId,parentId,type,day1,day2); //超期的
+        Map<String,Object> AdvanceData =  oaDatadetailedInstService.findAdvanceDay(modelId,parentId,type,day1,day2); //提前的
         for(int j=0;j<diclist.size();j++){
             Map<String, Object> stringObjectMap = diclist.get(j);
             String text = (String)stringObjectMap.get("text");
@@ -471,7 +474,7 @@ public class SupervisionPage {
                     String[] split = value.split(":");
                     if (split.length == 1) {
                         day1 = split[0];
-                        Map<String,Object> AdvanceData1 =  oaDatadetailedInstService.findAdvanceDay(modelId,parentId,state,day1,day2); //提前的
+                        Map<String,Object> AdvanceData1 =  oaDatadetailedInstService.findAdvanceDay(modelId,parentId,type,day1,day2); //提前的
                         map1.put("text", text);
                         map1.put("count", AdvanceData1.get("AdvanceDay"));
                         list.add(map1);
@@ -479,7 +482,7 @@ public class SupervisionPage {
                         Map<String,Object> map2 = new HashMap<>();
                         day1 = split[0];
                         day2 = split[1];
-                        Map<String,Object> AdvanceData1 =  oaDatadetailedInstService.findAdvanceDay(modelId,parentId,state,day1,day2); //提前的
+                        Map<String,Object> AdvanceData1 =  oaDatadetailedInstService.findAdvanceDay(modelId,parentId,type,day1,day2); //提前的
                         map2.put("text", text);
                         map2.put("count", AdvanceData1.get("AdvanceDay"));
                         list.add(map2);
@@ -498,7 +501,7 @@ public class SupervisionPage {
                             Map<String,Object> map5 = new HashMap<>();
                             day2 = split[1].split("-")[1];
                             day1 = split[0];
-                            Map<String,Object> data1 =  oaDatadetailedInstService.findOverDay(modelId,parentId,state,day1,day2); //超期的
+                            Map<String,Object> data1 =  oaDatadetailedInstService.findOverDay(modelId,parentId,type,day1,day2); //超期的
                             map5.put("text", text);
                             map5.put("count", data1.get("OverDay"));
                             list.add(map5);
@@ -507,7 +510,7 @@ public class SupervisionPage {
                             Map<String,Object> map6 = new HashMap<>();
                             day2 = split[1].split("-")[1];
                             day1 = split[0].split("-")[1];
-                            Map<String,Object> data1 =  oaDatadetailedInstService.findOverDay(modelId,parentId,state,day1,day2); //超期的
+                            Map<String,Object> data1 =  oaDatadetailedInstService.findOverDay(modelId,parentId,type,day1,day2); //超期的
                             map6.put("text", text);
                             map6.put("count", data1.get("OverDay"));
                             list.add(map6);
