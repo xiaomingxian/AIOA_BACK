@@ -5,6 +5,7 @@ import com.cfcc.common.api.vo.Result;
 import com.cfcc.common.mycat.MycatSchema;
 import com.cfcc.common.util.DateUtils;
 import com.cfcc.modules.oaBus.entity.BusFunction;
+import com.cfcc.modules.oaBus.entity.OaBusdata;
 import com.cfcc.modules.oaBus.service.IBusFunctionPermitService;
 import com.cfcc.modules.oaBus.service.IBusFunctionService;
 import com.cfcc.modules.oaBus.service.IBusModelService;
@@ -78,6 +79,7 @@ public class SupervisionPage {
         LoginInfo loginInfo = iSysUserService.getLoginInfo(request);
         String username = loginInfo.getUsername();
         String realname = loginInfo.getRealname();
+        String parentId = loginInfo.getDepart().getParentId();
         Integer modelId = 51;
         Integer functionId = 159;
         /*{"modelId":"1","condition":{"function_id":"","i_is_state":"","selType":1,"s_create_name":"","d_create_time":""}}*/
@@ -94,8 +96,8 @@ public class SupervisionPage {
         Result<IPage<Map<String, Object>>> byModelId = oaBusdataService.getByModelId(strBuf.toString(), realname, username);
         long total = byModelId.getResult().getTotal();
         String table = "oa_busdata11";
-        Map<String, Object> hangrate = oaDatadetailedInstService.lineLeaderRate(table,modelId,functionId);
-        Map<String, Object> rate = oaDatadetailedInstService.Rate(table, modelId);
+        Map<String, Object> hangrate = oaDatadetailedInstService.lineLeaderRate(table,modelId,functionId,parentId);
+        Map<String, Object> rate = oaDatadetailedInstService.Rate(table, modelId,parentId);
         if(rate == null){
             map.put("rate",0);
         }else{
@@ -248,7 +250,7 @@ public class SupervisionPage {
         List<Map<String, Object>> depart = oaDatadetailedInstService.findPret(parentId); //部门
         String depart_name = null ;
         Integer busModelId = 51;
-        List<Map<String,Object>> extensionsNum = oaDatadetailedInstService.findExtensionsNum(busModelId,table);
+        List<Map<String,Object>> extensionsNum = oaDatadetailedInstService.findExtensionsNum(busModelId,table,parentId);
         for(int i=0;i<depart.size();i++){
             depart_name = (String)depart.get(i).get("depart_name");
             boolean flag = false ;
@@ -358,27 +360,173 @@ public class SupervisionPage {
         //数据字典获取functionid
         SysUser currentUser = iSysUserService.getCurrentUser(request);
         Map<String, Object> allUserMsg = iSysUserService.getAllUserMsg(currentUser.getUsername());
+        List<Map<String,Object>> list = new ArrayList<>();
         String parentId = (String)allUserMsg.get("parentId");//机构id
         String deptId = allUserMsg.get("deptId") + ""; //部门id
         List<SysRole> role = (List<SysRole>)allUserMsg.get("role");
+        String dictKey = ""; //数据字典-督办
         for(int i=0;i<role.size();i++){
             String roleCode = role.get(i).getRoleCode();
-
-            if(roleCode.equals(""))//督办员
+            String text = "" ;
+            if(roleCode.equals("admin"))//督办员
             {
+                dictKey ="sup_appraise1";
+                getDic(dictKey,text,deptId,list);
 
-            }else if(roleCode.equals("")) //行领导
+            }else if(roleCode.equals("101")) //行领导
             {
-
+                dictKey ="sup_appraise2";
+                getDic(dictKey,text,deptId,list);
             }else if(roleCode.equals("308")){//部门负责人
-
+                dictKey ="sup_appraise3";
+                getDic(dictKey,text,deptId,list);
             }else if(roleCode.equals("010")){//一般人员
-
+                dictKey ="sup_appraise4";
+                getDic(dictKey,text,deptId,list);
             }
         }
-        String dictKey = "sup_parameter"; //数据字典-督办
-        List<Map<String, Object>> list = sysDictService.getDictByKeySer(dictKey, deptId);
+
+
+        return list;
+    }
+    private void getDic(String dictKey,String text,String deptId, List<Map<String,Object>> list){
+        List<Map<String, Object>> diclist = sysDictService.getDictByKeySer(dictKey, deptId);
+        for(int j=0;j<diclist.size();j++){
+            Map<String, Object> stringObjectMap = diclist.get(j);
+            Map<String,Object> map =new HashMap<>();
+            text = (String)stringObjectMap.get("text");
+            Integer status = (Integer) stringObjectMap.get("status");
+            String value = (String)stringObjectMap.get("value");
+            if(status==1){
+                map.put("text",text);
+            }
+            list.add(map);
+        }
+
+    }
+    /**
+     *领导批示 重要督办 会议督办 督查督办
+     * @return
+     */
+    @GetMapping(value = "/Leader")
+    public List<Map<String,Object>> Leader(HttpServletRequest request,Integer year,String busFunctionId,String important) {
+        Map<String,Object> map = new HashMap<>();
+        String table = "oa_busdata11";
+        String modelId = "51";
+        //数据字典获取functionid
+        List<Map<String,Object>> list = new ArrayList<>();
+        SysUser currentUser = iSysUserService.getCurrentUser(request);
+        Map<String, Object> allUserMsg = iSysUserService.getAllUserMsg(currentUser.getUsername());
+        String parentId = (String)allUserMsg.get("parentId");//机构id
+        Map<String,Object> finishNum=oaDatadetailedInstService.findFinish(year,busFunctionId,modelId,parentId,important);//办结
+        Map<String,Object> inprocessNum=oaDatadetailedInstService.findInprocess(year,busFunctionId,modelId,parentId,important);//办理中
+        Map<String,Object> overdueNum=oaDatadetailedInstService.findOverdue(year,busFunctionId,modelId,parentId,important);//超期
+        list.add(finishNum);
+        list.add(inprocessNum);
+        list.add(overdueNum);
+        return list;
+    }
+    /**
+     * 督办件分布（办理中） 督办件分布（已办结）
+     * @return
+     */
+    @GetMapping(value = "/TimeQuery")
+    public List<Map<String,Object>> TimeQuery(HttpServletRequest request,Integer year,String type) {
+
+        String table = "oa_busdata11";
+        String modelId = "51";
+        //数据字典获取functionid
+        List<Map<String,Object>> list = new ArrayList<>();
+        SysUser currentUser = iSysUserService.getCurrentUser(request);
+        Map<String, Object> allUserMsg = iSysUserService.getAllUserMsg(currentUser.getUsername());
+        String parentId = (String)allUserMsg.get("parentId");//机构id
+        String deptId = allUserMsg.get("deptId") + ""; //部门id
+        String state = "";
+        List<Map<String, Object>> diclist = sysDictService.getDictByKeySer(type, deptId);
+      /*  if(type.equals("")){ //办理中
+            state = "";
+        }else{  //办结完数据
+            state = "1";
+        }*/
+        String  day1 = "";
+        String  day2 = "";
+        Map<String,Object> data =  oaDatadetailedInstService.findOverDay(modelId,parentId,state,day1,day2); //超期的
+        Map<String,Object> AdvanceData =  oaDatadetailedInstService.findAdvanceDay(modelId,parentId,state,day1,day2); //提前的
+        for(int j=0;j<diclist.size();j++){
+            Map<String, Object> stringObjectMap = diclist.get(j);
+            String text = (String)stringObjectMap.get("text");
+            Integer status = (Integer) stringObjectMap.get("status");
+            String value = (String)stringObjectMap.get("value");
+            String description = (String)stringObjectMap.get("description");
+
+            if(status==1&&description.contains("提前")) { //启用
+                Long advanceDay = null;
+                if(AdvanceData.size()==0){
+                    Map<String,Object> map = new HashMap<>();
+                    map.put("text", text);
+                    map.put("count", 0);
+                    list.add(map);
+                }else{
+                    Map<String,Object> map1 = new HashMap<>();
+                    String[] split = value.split(":");
+                    if (split.length == 1) {
+                        day1 = split[0];
+                        Map<String,Object> AdvanceData1 =  oaDatadetailedInstService.findAdvanceDay(modelId,parentId,state,day1,day2); //提前的
+                        map1.put("text", text);
+                        map1.put("count", AdvanceData1.get("AdvanceDay"));
+                        list.add(map1);
+                    } else {
+                        Map<String,Object> map2 = new HashMap<>();
+                        day1 = split[0];
+                        day2 = split[1];
+                        Map<String,Object> AdvanceData1 =  oaDatadetailedInstService.findAdvanceDay(modelId,parentId,state,day1,day2); //提前的
+                        map2.put("text", text);
+                        map2.put("count", AdvanceData1.get("AdvanceDay"));
+                        list.add(map2);
+                    }
+            }
+        }
+            else if(status==1&&description.contains("超期")){
+                    if(data.size()==0){
+                        Map<String,Object> map4 = new HashMap<>();
+                        map4.put("text", text);
+                        map4.put("count", 0);
+                        list.add(map4);
+                    }else {
+                        String[] split = value.split(":");//先去根据：切割  例如0：-5
+                        if (!split[0].contains("-")) {
+                            Map<String,Object> map5 = new HashMap<>();
+                            day2 = split[1].split("-")[1];
+                            day1 = split[0];
+                            Map<String,Object> data1 =  oaDatadetailedInstService.findOverDay(modelId,parentId,state,day1,day2); //超期的
+                            map5.put("text", text);
+                            map5.put("count", data1.get("OverDay"));
+                            list.add(map5);
+
+                        } else {
+                            Map<String,Object> map6 = new HashMap<>();
+                            day2 = split[1].split("-")[1];
+                            day1 = split[0].split("-")[1];
+                            Map<String,Object> data1 =  oaDatadetailedInstService.findOverDay(modelId,parentId,state,day1,day2); //超期的
+                            map6.put("text", text);
+                            map6.put("count", data1.get("OverDay"));
+                            list.add(map6);
+                        }
+                    }
+            }
+        }
+
+//        Map<String,Object> finishNum=oaDatadetailedInstService.findFinish(year,busFunctionId,modelId,parentId,important);//办结
+//        Map<String,Object> inprocessNum=oaDatadetailedInstService.findInprocess(year,busFunctionId,modelId,parentId,important);//办理中
+//        Map<String,Object> overdueNum=oaDatadetailedInstService.findOverdue(year,busFunctionId,modelId,parentId,important);//超期
+//        list.add(finishNum);
+//        list.add(inprocessNum);
+//        list.add(overdueNum);
         return list;
     }
 
+
+    private void getBanJieOrNot(){
+
+    }
 }

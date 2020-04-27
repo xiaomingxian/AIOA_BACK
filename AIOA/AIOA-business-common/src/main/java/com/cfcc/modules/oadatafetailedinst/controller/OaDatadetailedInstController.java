@@ -8,6 +8,9 @@ import com.cfcc.modules.oadatafetailedinst.service.IOaDatadetailedInstService;
 import com.cfcc.modules.system.entity.SysUser;
 import com.cfcc.modules.system.service.ISysDictService;
 import com.cfcc.modules.system.service.ISysUserService;
+import com.cfcc.modules.workflow.pojo.TaskProcess;
+import com.cfcc.modules.workflow.service.DepartWithTaskService;
+import com.cfcc.modules.workflow.service.ProcessManagerService;
 import com.cfcc.modules.workflow.service.TaskCommonService;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
@@ -20,10 +23,7 @@ import io.swagger.annotations.Api;
 import javax.servlet.http.HttpServletRequest;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -49,6 +49,11 @@ public class OaDatadetailedInstController {
     private ISysUserService isysUserService;
     @Autowired
     private ISysDictService sysDictService;
+    @Autowired
+    private DepartWithTaskService departWithTaskService;
+    @Autowired
+    private ProcessManagerService processManagerService;
+
     @Value("${jeecg.path.upload}")
     private String savePath;
 	@GetMapping("queryTaskUnDoCurrent")
@@ -91,112 +96,112 @@ public class OaDatadetailedInstController {
                 if (res == null)
                 {return Result.error("流程环节配置不完善请检查");}
                 else{
+
                         for(int k=0;k<res.size();k++){
-                            Map<String, Object> m = res.get(k);
-                            SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd");
-                            String taskDefName =(String) m.get("taskDefName");
-                            String userName = (String) m.get("userName");
-                            String deptName = (String) m.get("deptName");
-                            Date endTime1 = (Date)m.get("endTime");
-                            String formatdate = null;
-                            if(endTime1 != null){
-                                 formatdate=sdf.format(endTime1);
-                                if(formatdate.equals("")){
-                                    formatdate = null;
-                                }
-                            }
-
-                            Map<String,Object> maps = new HashMap<>();
-                            Integer sum = 1;
-                            Date date = DateUtils.getDate();
-                            String Now = null;
-                            Now=sdf.format(date);
-                            long time1 = 0 ; //创建时间
-                            long time2 = 0; //约定办理时间
-                            long time = 0; //最后办理时间
-                            long nowTime = 0;//当前时间
-
-                            Integer count = oaDatadetailedInstService.findOpions(tableid,userName);  //字数
-                            Integer file  = oaDatadetailedInstService.findIsFile(tableid,userName,deptName);  //附件
-                            //Integer file = oaDatadetailedInstService.findIsFile(tableid);
-                            Map<String,Object>  dateMap =  oaDatadetailedInstService.findDate(tableid); //时间
-                            String createTime= null;
-                            String dateTime = null;
-                            Integer pinci = 0;
-                            Integer total = 0;
-                            if(dateMap!=null){
-                                createTime = (String)dateMap.get("createTime");
-                                dateTime =  (String)dateMap.get("dateTime");
-                                pinci = (Integer)dateMap.get("s_varchar2");
-                                if(pinci == null){
-                                    pinci = 0;
-                                }
-                                total = oaDatadetailedInstService.getDateCount(createTime,dateTime,userName);
-                                try {
-                                    time1 = sdf.parse(createTime).getTime(); //创建时间
-                                    time2 = sdf.parse(dateTime).getTime(); //约定办理时间
-                                    nowTime = sdf.parse(Now).getTime(); //当前时间
-                                    if(formatdate != null){
-                                        time = sdf.parse(formatdate).getTime(); //最后办理时间
+                            if(!res.get(k).get("taskDefName").equals("拟稿")){
+                                Map<String, Object> m = res.get(k);
+                                SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd");
+                                String taskDefName =(String) m.get("taskDefName");
+                                String userName = (String) m.get("userName");
+                                String deptName = (String) m.get("deptName");
+                                Date endTime1 = (Date)m.get("endTime");
+                                String formatdate = null;
+                                if(endTime1 != null){
+                                    formatdate=sdf.format(endTime1);
+                                    if(formatdate.equals("")){
+                                        formatdate = null;
                                     }
-
-
-
-                                    long between_days=(time2-time1)/(1000*3600*24);
-                                } catch (ParseException e) {
-                                    e.printStackTrace();
                                 }
-                            }
+
+                                Map<String,Object> maps = new HashMap<>();
+                                Integer sum = 1;
+                                Date date = DateUtils.getDate();
+                                String Now = null;
+                                Now=sdf.format(date);
+                                long time1 = 0 ; //创建时间
+                                long time2 = 0; //约定办理时间
+                                long time = 0; //最后办理时间
+                                long nowTime = 0;//当前时间
+
+                                Integer count = oaDatadetailedInstService.findOpions(tableid,userName);  //字数
+                                Integer file  = oaDatadetailedInstService.findIsFile(tableid,userName,deptName);  //附件
+                                //Integer file = oaDatadetailedInstService.findIsFile(tableid);
+                                Map<String,Object>  dateMap =  oaDatadetailedInstService.findDate(tableid); //时间
+                                String createTime= null;
+                                String dateTime = null;
+                                Integer pinci = 0;
+                                Integer total = 0;
+                                if(dateMap!=null){
+                                    createTime = (String)dateMap.get("createTime");
+                                    dateTime =  (String)dateMap.get("dateTime");
+                                    pinci = (Integer)dateMap.get("s_varchar2");
+                                    if(pinci == null){
+                                        pinci = 0;
+                                    }
+                                    total = oaDatadetailedInstService.getDateCount(createTime,dateTime,userName);
+                                    try {
+                                        time1 = sdf.parse(createTime).getTime(); //创建时间
+                                        time2 = sdf.parse(dateTime).getTime(); //约定办理时间
+                                        nowTime = sdf.parse(Now).getTime(); //当前时间
+                                        if(formatdate != null){
+                                            time = sdf.parse(formatdate).getTime(); //最后办理时间
+                                        }
+                                        long between_days=(time2-time1)/(1000*3600*24);
+                                    } catch (ParseException e) {
+                                        e.printStackTrace();
+                                    }
+                                }
 //                        DateFormat df=new SimpleDateFormat("yyyy-MM-dd");
 //                        String formatdate=df.format(dt);
 
-                            //数据字典获取functionid
-                            SysUser currentUser = isysUserService.getCurrentUser(request);
-                            Map<String, Object> allUserMsg = isysUserService.getAllUserMsg(currentUser.getUsername());
-                            String deptId = allUserMsg.get("deptId") + "";
-                            String dictKey = "sup_parameter"; //数据字典-督办
-                            List<Map<String, Object>> list = sysDictService.getDictByKeySer(dictKey, deptId);
-                            for(int i=0;i<list.size();i++){
-                                Map<String, Object> stringObjectMap = list.get(i);
-                                String text = (String)stringObjectMap.get("text");
-                                Integer status = (Integer) stringObjectMap.get("status");
-                                String value = (String)stringObjectMap.get("value");
-                                if (text.equals("count") &&  status==1) {
-                                    String[] split = value.split(":");
-                                    for (int j = 0; j < split.length; j++) {
-                                        int s = Integer.parseInt(split[0]);
-                                        if (s < count) {//表示字体大于配置的
-                                            sum = sum+1;
+                                //数据字典获取functionid
+                                SysUser currentUser = isysUserService.getCurrentUser(request);
+                                Map<String, Object> allUserMsg = isysUserService.getAllUserMsg(currentUser.getUsername());
+                                String deptId = allUserMsg.get("deptId") + "";
+                                String dictKey = "sup_parameter"; //数据字典-督办
+                                List<Map<String, Object>> list = sysDictService.getDictByKeySer(dictKey, deptId);
+                                for(int i=0;i<list.size();i++){
+                                    Map<String, Object> stringObjectMap = list.get(i);
+                                    String text = (String)stringObjectMap.get("text");
+                                    Integer status = (Integer) stringObjectMap.get("status");
+                                    String value = (String)stringObjectMap.get("value");
+                                    if (text.equals("count") &&  status==1) {
+                                        String[] split = value.split(":");
+                                        for (int j = 0; j < split.length; j++) {
+                                            int s = Integer.parseInt(split[0]);
+                                            if (s < count) {//表示字体大于配置的
+                                                sum = sum+1;
+                                            }
                                         }
-                                    }
-                                }else if(text.equals("frequency")&& status==1){ //是否符合频次并且启动
-                                    if(total>pinci){  //办理进展的条数>频次
-                                        sum = sum+1;
-                                    }
-
-                                }else if(text.equals("after")&&  status==1){  //是否超时并且启动
-                                    if(nowTime-time2>0&& time == 0){//当前时间大于约定的办理时间并且还没办理
-                                        sum = sum-1;
-                                    }
-                                    else if(time - time2 > 0){//最后办理的时间-约定办理时间
-                                        sum = sum-1;
-                                    }
-
-                                }else if(text.equals("before")&&  status==1){ //是否提前并且启动
-                                    if(time - time2 < 0){//最后办理的时间- 约定办理时间<0
-                                        long between_days=(time-time2)/(1000*3600*24);
-                                        if(between_days>5){
+                                    }else if(text.equals("frequency")&& status==1){ //是否符合频次并且启动
+                                        if(total>pinci){  //办理进展的条数>频次
                                             sum = sum+1;
                                         }
 
-                                    }
+                                    }else if(text.equals("after")&&  status==1){  //是否超时并且启动
+                                        if(nowTime-time2>0&& time == 0){//当前时间大于约定的办理时间并且还没办理
+                                            sum = sum-1;
+                                        }
+                                        else if(time - time2 > 0){//最后办理的时间-约定办理时间
+                                            sum = sum-1;
+                                        }
 
-                                }else if(text.equals("isfile")&& status==1){ //是否有附件并且启动
-                                    if(file>0){//表示有附件
-                                        sum = sum +1;
+                                    }else if(text.equals("before")&&  status==1){ //是否提前并且启动
+                                        if(time - time2 < 0){//最后办理的时间- 约定办理时间<0
+                                            long between_days=(time-time2)/(1000*3600*24);
+                                            if(between_days>5){
+                                                sum = sum+1;
+                                            }
+
+                                        }
+
+                                    }else if(text.equals("isfile")&& status==1){ //是否有附件并且启动
+                                        if(file>0){//表示有附件
+                                            sum = sum +1;
+                                        }
                                     }
+                                    m.put("sum",sum);
                                 }
-                                m.put("sum",sum);
                             }
                         }
                     Result<Object> result = Result.ok("查询成功");
@@ -228,21 +233,24 @@ public class OaDatadetailedInstController {
     }
     @GetMapping("findRate")
     @ApiOperation("办结率计算")
-    public Result findRate(String itableId,String proInstId, @RequestParam(defaultValue = "", required = false) String endTime) {//流程实例id
+    public Result findRate(String functionId,String itableId,String proInstId, @RequestParam(defaultValue = "", required = false) String endTime) {//流程实例id
         //环节 用户
         try {
 
-                List<Map<String, Object>> res = taskCommonService.workTrack(proInstId, true);
+            List<Map<String, Object>> res = taskCommonService.workTrack(proInstId, true);
 
-                Result<Object> result = Result.ok("查询成功");
-                if (res == null) return Result.error("流程环节配置不完善请检查");
-                Integer size = res.size();
-                Integer count = oaDatadetailedInstService.getBanjieBydept(itableId);
-                if(count == 0){
+            Result<Object> result = Result.ok("查询成功");
+            if (res == null) return Result.error("流程环节配置不完善请检查");
+            Integer size = res.size()-1;
+            List<String> list =new ArrayList<>();
+            list.add(functionId);
+            List<Map<String, Integer>> stringIntegerMap = departWithTaskService.deptDone(list); //按照部门办结的
+            int size1 = stringIntegerMap.size();
+            if(stringIntegerMap == null){
                     result.setResult(0);
                     return result;
                 }else{
-                    double i = size / count;
+                    double i = size / size1;
                     result.setResult(i);
                     return result;
                 }

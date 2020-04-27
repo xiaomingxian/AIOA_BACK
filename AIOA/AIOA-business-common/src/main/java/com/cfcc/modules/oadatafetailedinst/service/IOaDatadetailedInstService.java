@@ -53,13 +53,23 @@ public interface IOaDatadetailedInstService extends IService<OaDatadetailedInst>
 
     List<String> findFunctionIds(Integer modelId);
 
-    Map<String, Object> lineLeaderRate(String table, Integer busModelId,Integer busFunctionId);
+    Map<String, Object> lineLeaderRate(String table, Integer busModelId,Integer busFunctionId,String parentId);
 
-    Map<String, Object> Rate(String table, Integer busModelId);
+    Map<String, Object> Rate(String table, Integer busModelId,String parentId);
 
     String  findById(Integer departId);
 
     Map<String, Integer> deptDone(List<String> fids);
 
-    List<Map<String, Object>> findExtensionsNum(Integer busModelId, String table);
+    List<Map<String, Object>> findExtensionsNum(Integer busModelId, String table,String parentId);
+
+    Map<String, Object> findFinish(Integer year, String busFunctionId, String modelId, String parentId,String important);
+
+    Map<String, Object> findInprocess(Integer year, String busFunctionId, String modelId, String parentId,String important);
+
+    Map<String, Object> findOverdue(Integer year, String busFunctionId, String modelId, String parentId,String important);
+
+    Map<String,Object> findOverDay(String modelId, String parentId, String state,String day1,String day2);
+
+    Map<String,Object> findAdvanceDay(String modelId, String parentId, String state,String day1,String day2);
 }

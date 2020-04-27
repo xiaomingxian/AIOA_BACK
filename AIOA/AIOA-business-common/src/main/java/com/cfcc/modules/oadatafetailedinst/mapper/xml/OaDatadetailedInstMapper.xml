@@ -22,26 +22,26 @@
     </select>
     <select id="findTypeNum" resultType="java.util.Map">
        select count(*) as num,  s_main_unit_names as host from ${table}
-       where s_main_unit_names !=''    and  i_is_display = 0 AND  s_create_by = #{userId}  AND i_create_year= #{year}
+       where s_main_unit_names !=''    and  i_is_display = 0 AND s_create_unitid =#{parentId} AND  s_create_by = #{userId}  AND i_create_year= #{year}
        group by  s_main_unit_names
     </select>
     <select id="getDept" resultType="java.util.Map">
-       SELECT depart_name from  sys_depart  where  id != 1 and  id != 2  and  parent_id = #{parentId}
+       SELECT depart_name from  sys_depart  where  id != 1 and  id != 2  and  parent_id = #{parentId} ORDER BY depart_order
     </select>
     <select id="findorganizeNum" resultType="java.util.Map">
          select count(*) as num,  s_cc_unit_names as organize from ${table}
-       where s_cc_unit_names!=''  and  i_is_display = 0 AND  s_create_by = #{userId}  AND i_create_year= #{year}
+       where s_cc_unit_names!=''  and  i_is_display = 0 AND s_create_unitid =#{parentId} AND   s_create_by = #{userId}  AND i_create_year= #{year}
        group by  s_cc_unit_names
     </select>
     <select id="findFunctionIds" resultType="java.lang.String">
        select i_id from oa_bus_function where i_bus_model_id = #{modelId}
     </select>
     <select id="lineLeaderRate" resultType="java.util.Map">
-        select   (select count(*) from ${table} where i_bus_model_id = #{busModelId} and i_bus_function_id =#{busFunctionId} and i_is_display = 0 and i_is_state = 1)/
-        (select count(*) from ${table} where i_bus_model_id = #{busModelId} and i_bus_function_id =#{busFunctionId} and i_is_display = 0) as rate from   dual
+        select   (select count(*) from ${table} where i_bus_model_id = #{busModelId} and i_bus_function_id =#{busFunctionId} AND s_create_unitid =#{parentId} and i_is_display = 0 and i_is_state = 1)/
+        (select count(*) from ${table} where i_bus_model_id = #{busModelId} and i_bus_function_id =#{busFunctionId} AND s_create_unitid =#{parentId} and i_is_display = 0) as rate from   dual
     </select>
     <select id="rate" resultType="java.util.Map">
-        select   (select count(*) from ${table} where i_bus_model_id = #{busModelId}  and i_is_display = 0 and i_is_state = 1)/(select count(*) from ${table} where i_bus_model_id = #{busModelId}  and i_is_display = 0) as rate from   dual
+        select   (select count(*) from ${table} where i_bus_model_id = #{busModelId} AND s_create_unitid =#{parentId} and i_is_display = 0 and i_is_state = 1)/(select count(*) from ${table} where i_bus_model_id = #{busModelId} AND s_create_unitid =#{parentId}  and i_is_display = 0) as rate from   dual
     </select>
 
     <select id="findByid" resultType="java.lang.String">
@@ -79,11 +79,85 @@
         WHERE
         i_bus_model_id = #{busModelId}
         AND i_is_display = 0
+        AND s_create_unitid =#{parentId}
         AND (
         DATE_FORMAT(d_datetime2, '%Y-%m-%d') &lt;DATE_FORMAT(IFNULL(s_varchar9, now()), '%Y-%m-%d')
         )  group by s_create_dept
     </select>
+    <select id="findFinish" resultType="java.util.Map">
+        select count(*)   as  finish   from oa_busdata11
+        <where>
+            i_is_display =0 and i_create_year =#{year}   and i_is_state = 1  and  s_create_unitid =#{parentId}
+            <if test="modelId != null and modelId != '' ">
+              and  i_bus_model_id = #{modelId}
+            </if>
+            <if test="busFunctionId != null and busFunctionId != '' ">
+              and  i_bus_function_id = #{busFunctionId}
+            </if>
+            <if test="important != null and important != '' ">
+                and i_is_important = #{important}
+            </if>
+        </where>
 
+    </select>
+    <select id="findInprocess" resultType="java.util.Map">
+        select count(*) as  process   from oa_busdata11
+        <where>
+            i_is_display =0 and i_create_year =#{year}  and  s_create_unitid =#{parentId}
+            AND !(DATE_FORMAT(d_datetime2, '%Y-%m-%d') &lt; DATE_FORMAT(IFNULL(s_varchar9, now()), '%Y-%m-%d'))
+            <if test="modelId != null and modelId != '' ">
+                and  i_bus_model_id = #{modelId}
+            </if>
+            <if test="busFunctionId != null and busFunctionId != '' ">
+                and  i_bus_function_id = #{busFunctionId}
+            </if>
+            <if test="important != null and important != '' ">
+                and i_is_important = #{important}
+            </if>
+        </where>
+
+    </select>
+    <select id="findOverdue" resultType="java.util.Map">
+        select count(*)  as overdue  from oa_busdata11
+        <where>
+            i_is_display =0 and i_create_year =#{year}  and  s_create_unitid =#{parentId}
+            AND (DATE_FORMAT(d_datetime2, '%Y-%m-%d') &lt; DATE_FORMAT(IFNULL(s_varchar9, now()), '%Y-%m-%d'))
+            <if test="modelId != null and modelId != '' ">
+                and  i_bus_model_id = #{modelId}
+            </if>
+            <if test="busFunctionId != null and busFunctionId != '' ">
+                and  i_bus_function_id = #{busFunctionId}
+            </if>
+            <if test="important != null and important != '' ">
+                and i_is_important = #{important}
+            </if>
+        </where>
+
+    </select>
+    <select id="findOverDay" resultType="java.util.Map">
+        select count(*) as OverDay from  oa_busdata11
+        <where>
+            i_bus_model_id = #{modelId} and i_is_display =0  and i_is_state = #{state}  and  s_create_unitid = #{parentId}  AND (DATE_FORMAT(d_datetime2, '%Y-%m-%d') &lt;DATE_FORMAT(IFNULL(s_varchar9, now()), '%Y-%m-%d'))
+            <if test="day1 != null and day1 != '' ">
+                and timestampdiff(day,d_datetime2, now())  &gt;= #{day1}
+            </if>
+            <if test="day2 != null and day2 != '' ">
+                and timestampdiff(day,d_datetime2, now()) &lt;= #{day2}
+            </if>
+        </where>
+    </select>
+    <select id="findAdvanceDay" resultType="java.util.Map">
+        select count(*) as AdvanceDay from  oa_busdata11
+         <where>
+             i_bus_model_id = #{modelId} and i_is_display =0  and i_is_state = #{state}  and  s_create_unitid = #{parentId}  AND !(DATE_FORMAT(d_datetime2, '%Y-%m-%d') &lt;DATE_FORMAT(IFNULL(s_varchar9, now()), '%Y-%m-%d'))
+             <if test="day1 != null and day1 != '' ">
+                 and timestampdiff(day,d_datetime2, now())  &gt;= #{day1}
+             </if>
+             <if test="day2 != null and day2 != '' ">
+                 and timestampdiff(day,d_datetime2, now()) &lt;= #{day2}
+             </if>
+         </where>
+    </select>
     <insert id="insertDataInst" parameterType="com.cfcc.modules.oadatafetailedinst.entity.OaDatadetailedInst">
         INSERT INTO oa_datadetailed_inst
         (i_id,s_table,i_table_id,s_create_name,s_create_by,s_create_dept,s_create_deptid,i_is_display,d_create_time)

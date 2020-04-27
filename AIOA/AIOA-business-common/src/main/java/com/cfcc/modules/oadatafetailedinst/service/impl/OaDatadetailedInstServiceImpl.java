@@ -177,13 +177,13 @@ public class OaDatadetailedInstServiceImpl extends ServiceImpl<OaDatadetailedIns
     }
 
     @Override
-    public Map<String, Object> lineLeaderRate(String table, Integer busModelId ,Integer busFunctionId) {
-        return oaDatadetailedInstMapper.lineLeaderRate(table,busModelId,busFunctionId);
+    public Map<String, Object> lineLeaderRate(String table, Integer busModelId ,Integer busFunctionId,String parentId) {
+        return oaDatadetailedInstMapper.lineLeaderRate(table,busModelId,busFunctionId,parentId);
     }
 
     @Override
-    public Map<String, Object> Rate(String table, Integer busModelId) {
-        return oaDatadetailedInstMapper.rate(table,busModelId);
+    public Map<String, Object> Rate(String table, Integer busModelId,String parentId) {
+        return oaDatadetailedInstMapper.rate(table,busModelId,parentId);
     }
 
     @Override
@@ -201,7 +201,32 @@ public class OaDatadetailedInstServiceImpl extends ServiceImpl<OaDatadetailedIns
     }
 
     @Override
-    public List<Map<String, Object>> findExtensionsNum(Integer busModelId, String table) {
-        return oaDatadetailedInstMapper.findExtensionsNum(busModelId,table);
+    public List<Map<String, Object>> findExtensionsNum(Integer busModelId, String table,String parentId) {
+        return oaDatadetailedInstMapper.findExtensionsNum(busModelId,table,parentId);
+    }
+
+    @Override
+    public Map<String, Object> findFinish(Integer year, String busFunctionId, String modelId, String parentId,String important) {
+        return oaDatadetailedInstMapper.findFinish(year,busFunctionId,modelId,parentId,important);
+    }
+
+    @Override
+    public Map<String, Object> findInprocess(Integer year, String busFunctionId, String modelId, String parentId,String important) {
+        return oaDatadetailedInstMapper.findInprocess(year,busFunctionId,modelId,parentId,important);
+    }
+
+    @Override
+    public Map<String, Object> findOverdue(Integer year, String busFunctionId, String modelId, String parentId,String important) {
+        return oaDatadetailedInstMapper.findOverdue(year,busFunctionId,modelId,parentId,important);
+    }
+
+    @Override
+    public Map<String,Object> findOverDay(String modelId, String parentId,String state,String day1,String day2) {
+        return oaDatadetailedInstMapper.findOverDay(modelId,parentId,state,day1,day2);
+    }
+
+    @Override
+    public Map<String,Object> findAdvanceDay(String modelId, String parentId,String state,String day1,String day2) {
+        return oaDatadetailedInstMapper.findAdvanceDay(modelId,parentId,state,day1,day2);
     }
 }
