@@ -130,4 +130,6 @@ public interface SysDictMapper extends BaseMapper<SysDict> {
     List<SysDictItem> getEsIpAndHost(@Param("orgCode") String orgCode);
 
     Boolean deleteDictByDictId(@Param("id") String id);
+    @Select("${description}")
+    String getSqlValueToStringDao(@Param("description")String description);
 }

@@ -23,6 +23,7 @@ import org.quartz.JobKey;
 import org.quartz.Scheduler;
 import org.quartz.SchedulerException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.web.querydsl.QuerydslPredicateArgumentResolver;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -62,20 +63,24 @@ public class QuartzJobController {
 	 * 分页列表查询
 	 * 
 	 * @param quartzJob
-	 * @param pageNo
-	 * @param pageSize
+//	 * @param pageNo
+//	 * @param pageSize
 	 * @param req
 	 * @return
 	 */
 	@RequestMapping(value = "/list", method = RequestMethod.GET)
-	public Result<IPage<QuartzJob>> queryPageList(QuartzJob quartzJob, @RequestParam(name = "pageNo", defaultValue = "1") Integer pageNo,
-                                                  @RequestParam(name = "pageSize", defaultValue = "10") Integer pageSize, HttpServletRequest req) {
-		Result<IPage<QuartzJob>> result = new Result<IPage<QuartzJob>>();
-		QueryWrapper<QuartzJob> queryWrapper = QueryGenerator.initQueryWrapper(quartzJob, req.getParameterMap());
-		Page<QuartzJob> page = new Page<QuartzJob>(pageNo, pageSize);
-		IPage<QuartzJob> pageList = quartzJobService.page(page, queryWrapper);
+	public Result<List<Map<String,Object>>> queryPageList(QuartzJob quartzJob,
+//												  @RequestParam(name = "pageNo", defaultValue = "1") Integer pageNo,
+//                                                  @RequestParam(name = "pageSize", defaultValue = "10") Integer pageSize,
+												  HttpServletRequest req) {
+		Result<List<Map<String,Object>>> result = new Result<List<Map<String,Object>>>();
+//		QueryWrapper<QuartzJob> queryWrapper = QueryGenerator.initQueryWrapper(quartzJob, req.getParameterMap());
+//		Page<QuartzJob> page = new Page<QuartzJob>(pageNo, pageSize);
+//		IPage<QuartzJob> pageList = quartzJobService.page(page, queryWrapper);
+		List<Map<String,Object>> pageList = quartzJobService.getQuartzJob(quartzJob);
 		result.setSuccess(true);
 		result.setResult(pageList);
+//		result.setMessage();
 		return result;
 	}
 

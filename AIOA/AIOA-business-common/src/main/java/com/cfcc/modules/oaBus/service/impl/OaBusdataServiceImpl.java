@@ -1006,7 +1006,7 @@ public class OaBusdataServiceImpl extends ServiceImpl<OaBusdataMapper, OaBusdata
             //如果字典sql中有值的话，就先查出sql，再执行sql取查
             else if (entry.getSDictSqlKey() != null && !"".equals(entry.getSDictSqlKey())) {
                 SysDictItem itemByCode = sysDictService.getDictItemByCode("sql", entry.getSDictSqlKey());
-                if (itemByCode != null || !"".equals(itemByCode)) {
+                if (itemByCode != null && !("".equals(itemByCode.getDescription()))) {
                     List<DictModel> dictMOdelList = sysDictService.getSqlValue(itemByCode.getDescription(), userId, departId, unitId);
                     optionMap.put(entry.getSTableColumn() + "_option", dictMOdelList);
                 }
@@ -1217,6 +1217,8 @@ public class OaBusdataServiceImpl extends ServiceImpl<OaBusdataMapper, OaBusdata
         BusProcSet busProcSet = iBusProcSetService.getById(busFunction.getIProcSetId());
         if (busProcSet == null) return Result.error("无此类数据配置,检查数据库是否为迁移数据");
         int iVsersion = busProcSet.getIVersion() == null ? 1 : busProcSet.getIVersion();
+        // 如果pigeId为null的话就将pageId设置为-1
+        int iPageId = busProcSet.getIPageId() == null ? -1 : busProcSet.getIPageId();
 
 
         result.put("proSetId", busProcSet.getIId());
@@ -1240,7 +1242,7 @@ public class OaBusdataServiceImpl extends ServiceImpl<OaBusdataMapper, OaBusdata
         }
 
         //如果版本号为空的话，则换为0，否则就原来的处理
-        Map<String, Object> oaBusdata = insertAndSel(modelId, busFunction, proKey, loginInfo, iVsersion);
+        Map<String, Object> oaBusdata = insertAndSel(modelId, busFunction, proKey, loginInfo, iVsersion,iPageId);
         Object i_id = oaBusdata.get("i_id");
         result.put("busdataId", i_id);
         result.put("tableName", tableName);
@@ -1257,12 +1259,30 @@ public class OaBusdataServiceImpl extends ServiceImpl<OaBusdataMapper, OaBusdata
      * @return
      */
     private Map<String, Object> insertAndSel(String modelId, BusFunction function,
-                                             String proKey, LoginInfo loginInfo, int iVsersion) {
+                                             String proKey, LoginInfo loginInfo, int iVsersion,int iPageId) {
 
         Map<String, Object> map = new HashMap<>();
         String tableName = ibusModelService.getBusModelById(Integer.parseInt(modelId)).getSBusdataTable();
         map.put("table", tableName);
-
+        /*查询含义定义表，查看是否有定义的默认含义，有则添加到对应的字段中*/
+        iPageId = (iPageId == -1) ? function.getIPageId() : iPageId ;
+        List<BusPageDetail> busPageDetailList = ibusPageDetailService.getAllColumsListPageDtail(function.getIId(),iPageId) ;
+        for(int i = 0 ; i < busPageDetailList.size() ; i ++){
+            BusPageDetail entry = busPageDetailList.get(i) ;
+            //如果数据类型不等于null或不为下拉框
+            if(entry.getIColumnType() == null || entry.getIColumnType() != 2 ){
+                if(entry.getSDictSqlKey() != null){
+                    SysDictItem itemByCode = sysDictService.getDictItemByCode("sql", entry.getSDictSqlKey());
+                    if (itemByCode != null && !("".equals(itemByCode.getDescription()))) {
+                        String strValue = sysDictService.getSqlValueToString(itemByCode.getDescription(),
+                                loginInfo.getId(), loginInfo.getDepart().getId(), loginInfo.getDepart().getParentId());
+                        if(strValue != null || ("".equals(strValue))){
+                            map.put(entry.getSTableColumn(),strValue);      //将对应的字段设置上默认值
+                        }
+                    }
+                }
+            }
+        }
         map.put("i_bus_model_id", modelId);
         map.put("i_is_display", "1");
         map.put("s_title", "");
