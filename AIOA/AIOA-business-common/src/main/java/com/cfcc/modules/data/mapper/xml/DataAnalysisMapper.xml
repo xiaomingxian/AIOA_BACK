@@ -69,6 +69,9 @@
         ( SELECT count(*)  as num1  from ${table}
         <where>
         i_is_display =0
+            <if test="bdata.sCreateBy != null and bdata.sCreateBy != ''">
+            AND  s_create_by = #{bdata.sCreateBy}
+        </if>
         <if test="bdata.iCreateYear != null and bdata.iCreateYear != ''">
             AND i_create_year = #{bdata.iCreateYear}
         </if>
@@ -105,9 +108,6 @@
     </where>)/
         	(SELECT count(*)  as num1  from ${table}   <where>
         i_is_display =0
-        <if test="bdata.sCreateBy != null and bdata.sCreateBy != ''">
-            AND  s_create_by = #{bdata.sCreateBy}
-        </if>
         <if test="bdata.iCreateYear != null and bdata.iCreateYear != ''">
             AND i_create_year = #{bdata.iCreateYear}
         </if>
