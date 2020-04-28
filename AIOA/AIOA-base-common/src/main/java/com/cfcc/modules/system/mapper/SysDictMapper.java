@@ -110,7 +110,7 @@ public interface SysDictMapper extends BaseMapper<SysDict> {
 
     @Select("SELECT   " +
             " i.id id, d.id dictId,d.dict_code dictCode,d.dict_name dictName,   " +
-            "  i.item_text text,i.item_value value,i.description description,GROUP_CONCAT(dp.s_unit_id) departIds   " +
+            "  i.item_text text,i.item_value value,i.status status,i.description description,GROUP_CONCAT(dp.s_unit_id) departIds   " +
             "  FROM   " +
             "  `sys_dict` d   " +
             "  LEFT JOIN sys_dict_item i ON d.id = i.dict_id  " +
